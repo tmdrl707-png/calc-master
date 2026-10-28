@@ -1050,6 +1050,21 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .state.hslk{display:inline-flex;align-items:center;gap:4px;background:#f1edff;color:#6b4fd8}
 .state.hslk svg{width:11px;height:11px}
 .state.hslk i{font-style:normal}
+
+/* 주제 잠금 */
+.topic.tlocked{background:var(--soft);border-style:dashed;box-shadow:none;cursor:pointer}
+.topic.tlocked .ttop{opacity:.55;filter:grayscale(1)}
+.topic.tlocked .tlk{margin-left:auto;color:var(--dim);width:26px;height:26px;flex:none;align-self:center}
+.topic.tlocked .tlk svg,.tlnote svg{width:100%;height:100%;display:block}
+.tlnote{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;font-weight:500;color:var(--dim)}
+.tlnote svg{width:15px;height:15px;flex:none}
+.school.alllock .slock{color:var(--dim);width:28px;height:28px}
+.school.alllock .slock svg{width:100%;height:100%;display:block}
+.chip.chlock{opacity:.5;display:inline-flex;align-items:center;gap:5px;cursor:not-allowed}
+.chip.chlock svg{width:12px;height:12px}
+.tlgrid{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px}
+.tlitem{margin:0}
+.tlbox h3 .btn{float:right;margin-left:6px;padding:4px 10px;font-size:12px}
 </style>
 </head>
 <body>
@@ -4677,11 +4692,11 @@ function paintTeacher(){
     return Object.values(R).some(r=>r&&r.hist&&r.hist.length); });
   el('tSub').innerHTML=`${online()?'모든 기기에서 함께 보는 자료':'이 기기에 저장된 자료'} ·
     학생 <b>${all.length}명</b> · 실전 경험 <b>${played.length}명</b>`;
-  el('tTabs').innerHTML=[['rank','랭킹'],['cls','학급 대항'],['fact','계산별 정답률'],['stu','학생 정보'],['hs','고등 열쇠']]
+  el('tTabs').innerHTML=[['rank','랭킹'],['cls','학급 대항'],['fact','계산별 정답률'],['stu','학생 정보'],['hs','고등 열쇠'],['tl','주제 열기']]
     .map(([k,n])=>`<button class="tab${tTab===k?' on':''}" data-k="${k}">${n}</button>`).join('');
   el('tTabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ tTab=b.dataset.k; tOpen=null; paintTeacher(); });
-  el('tTopicBar').style.display=(tTab==='hs'||(tTab==='cls'&&tCb!=='t'))?'none':'';
-  el('tClassBar').style.display=(tTab==='hs'||tTab==='cls')?'none':'';
+  el('tTopicBar').style.display=(tTab==='hs'||tTab==='tl'||(tTab==='cls'&&tCb!=='t'))?'none':'';
+  el('tClassBar').style.display=(tTab==='hs'||tTab==='tl'||tTab==='cls')?'none':'';
   el('tTopicBar').innerHTML=TOPIC_ORDER.map(k=>
     `<button class="chip${k===tTopic?' on':''}" data-t="${k}">${topicOf(k).n}</button>`).join('');
   el('tTopicBar').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ tTopic=b.dataset.t; paintTeacher(); });
@@ -4694,6 +4709,7 @@ function paintTeacher(){
   if(tTab==='rank') paintTRank(teacherRows(tTopic));
   else if(tTab==='cls') paintTClass();
   else if(tTab==='hs') paintTHs();
+  else if(tTab==='tl') paintTTl();
   else if(tTab==='fact') paintTFact();
   else paintTStu(teacherRows(tTopic));
 }
@@ -4749,6 +4765,24 @@ function paintTClass(){
     <div class="chartlab" style="margin:0 0 12px">학생마다 ${tCb==='t'?'이 주제의':'주제별'} 실전 최고 기록을 더하고, 반 학생들의 점수를 모두 더한 값 · 학생 화면 랭킹의 '학급 대항'과 같아요</div>`+
     classBattleHTML(classBattle(tUsers,topics),'');
   el('tBody').querySelectorAll('[data-cb]').forEach(b=>b.onclick=()=>{ tCb=b.dataset.cb; paintTeacher(); });
+}
+
+/* ── 주제 열기 — 학생에게 보이는 주제를 선생님이 하나씩 엽니다 ── */
+function paintTTl(){
+  const open=new Set(CFG.tl.open||[]);
+  el('tBody').innerHTML=`<div class="tbox"><h3>주제 열기 <span>닫힌 주제는 학생 화면에 자물쇠로 보이고, 시작할 수 없어요</span></h3>
+      <div class="hint">처음에는 초등학교 <b>더하기·빼기</b>와 <b>구구단</b>만 열려 있어요. 체크하고 저장하면 모든 학생에게 바로 반영돼요.</div></div>
+    ${SCHOOLS.map(sc=>`<div class="tbox tlbox"><h3>${sc.n}
+        <button class="btn tlall" data-s="${sc.k}">모두 열기</button><button class="btn tlnone" data-s="${sc.k}">모두 잠그기</button></h3>
+      <div class="tlgrid">${sc.topics.map(t=>`<label class="tgl tlitem"><input type="checkbox" class="tlck" data-s="${sc.k}" data-t="${t}" ${open.has(t)?'checked':''}> ${topicOf(t).n}</label>`).join('')}</div></div>`).join('')}
+    <div class="hsbtns"><button class="btn primary" id="tlSave">저장</button></div>`;
+  const cks=[...el('tBody').querySelectorAll('.tlck')];
+  el('tBody').querySelectorAll('.tlall').forEach(b=>b.onclick=()=>cks.filter(c=>c.dataset.s===b.dataset.s).forEach(c=>c.checked=true));
+  el('tBody').querySelectorAll('.tlnone').forEach(b=>b.onclick=()=>cks.filter(c=>c.dataset.s===b.dataset.s).forEach(c=>c.checked=false));
+  el('tlSave').onclick=async()=>{
+    CFG.tl={open:cks.filter(c=>c.checked).map(c=>c.dataset.t)};
+    await dbSet('config/tl',CFG.tl);
+    toast('열린 주제를 저장했어요 · '+CFG.tl.open.length+'개'); };
 }
 
 /* ── 고등 열쇠 — 고등학교를 여는 기준 ── */
@@ -4959,7 +4993,7 @@ function openBattle(){
   if(!ME) return;
   stopTimer(); G=null;
   const sc=schoolOf(CUR.school);
-  if(!BT.t||!sc.topics.includes(BT.t)) BT.t=sc.topics.includes(CUR.topic)?CUR.topic:sc.topics[0];
+  if(!BT.t||!sc.topics.includes(BT.t)||!topicOpen(BT.t)){ const op=sc.topics.filter(topicOpen); BT.t=op.includes(CUR.topic)?CUR.topic:(op[0]||sc.topics[0]); }
   BT.closed=false;
   BT.view=BT.code?'room':'menu';
   show('s-battle'); btPaint();
@@ -4980,7 +5014,7 @@ function btPaintMenu(){
       <div class="btcard">
         <h3>방 만들기</h3>
         <div class="btlab">주제 · ${sc.n}</div>
-        <div class="chips" id="btTopics">${sc.topics.map(t=>`<button class="chip${t===BT.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`).join('')}</div>
+        <div class="chips" id="btTopics">${sc.topics.map(t=>topicOpen(t)?`<button class="chip${t===BT.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`:`<button class="chip chlock" data-t="${t}" disabled>${LOCKI}${topicOf(t).n}</button>`).join('')}</div>
         <div class="btlab">시간</div>
         <div class="chips" id="btSecs">${BT_SECS.map(([s,n])=>`<button class="chip${s===BT.sec?' on':''}" data-s="${s}">${n}</button>`).join('')}</div>
         <button class="btn primary btwide" id="btMake">방 만들기</button>
@@ -5104,7 +5138,7 @@ function btPaintRoom(){
       <p class="sub">${host?'친구들에게 방 번호를 알려 주세요. 다 들어오면 <b>시작하기</b>를 눌러요.':'방장이 시작하면 3초 뒤에 바로 문제가 나와요.'}</p></div></div>
     <div class="btcode"><span>방 번호</span><b>${room.code}</b></div>
     ${host?`<div class="btlab">주제</div>
-      <div class="chips" id="btTopics">${tops.map(t=>`<button class="chip${t===room.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`).join('')}</div>
+      <div class="chips" id="btTopics">${tops.map(t=>topicOpen(t)||t===room.t?`<button class="chip${t===room.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`:`<button class="chip chlock" data-t="${t}" disabled>${LOCKI}${topicOf(t).n}</button>`).join('')}</div>
       <div class="btlab">시간</div>
       <div class="chips" id="btSecs">${BT_SECS.map(([s,n])=>`<button class="chip${s===room.sec?' on':''}" data-s="${s}">${n}</button>`).join('')}</div>`
     :`<div class="btinfo"><span class="tsym sm">${symHTML(T)}</span><b>${T.n}</b><span>${secLabel(room.sec)} · 많이 맞히기</span></div>`}
@@ -5430,15 +5464,20 @@ function logout(){
    기준은 최상위권 학생이 2분 동안 틀리지 않고 풀 수 있는 정도로 잡았고,
    선생님 모드 '고등 열쇠' 탭에서 바꾸거나 학생 기록의 상위 10%로 맞출 수 있습니다. */
 const HS_GOAL_DEF={int:32, subst:22, expo:30, power:40, root:28, pyth:25, trig:25};
-let CFG={lock:{on:true,goal:{}}};
+const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
+let CFG={lock:{on:true,goal:{}},tl:{open:TL_DEF.slice()}};
 async function loadCfg(){
   try{ const c=await dbGet('config',null);
-    if(c&&c.lock) CFG.lock={on:c.lock.on!==false, goal:Object.assign({},c.lock.goal||{})}; }catch(e){}
+    if(c&&c.lock) CFG.lock={on:c.lock.on!==false, goal:Object.assign({},c.lock.goal||{})};
+    if(c&&c.tl&&c.tl.open!=null) CFG.tl={open:Object.values(c.tl.open).filter(x=>typeof x==='string')}; }catch(e){}
   return CFG;
 }
 const hsGoal=t=>{ const g=+((CFG.lock.goal||{})[t]); return g>0?g:(HS_GOAL_DEF[t]||25); };
 const hsKeys=()=>schoolOf('m').topics.map(t=>{ const best=rec(t).best||0, goal=hsGoal(t); return {t,best,goal,ok:best>=goal}; });
 const hsOpen=()=>!CFG.lock.on||!!(ME&&ME.hu)||hsKeys().every(x=>x.ok);
+const topicOpen=t=>(CFG.tl.open||[]).includes(t);
+const schoolAnyOpen=k=>schoolOf(k).topics.some(topicOpen);
+function topicShut(t){ toast('아직 잠겨 있어요 — 선생님이 열어 주면 할 수 있어요'); }
 const LOCKI='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>';
 function openHsLock(){
   const K=hsKeys(), got=K.filter(x=>x.ok).length;
@@ -5474,9 +5513,11 @@ function paintSchools(){
         <span class="skeys">${K.map(x=>`<i class="${x.ok?'on':''}"></i>`).join('')}</span>
         <span class="sgo slock" aria-label="잠김">${LOCKI}</span>
       </button>`; }
-    return `<button class="school sc-${s.k}${last?' last':''}" onclick="pickSchool('${s.k}')">
+    const nOpen=s.topics.filter(topicOpen).length;
+    return `<button class="school sc-${s.k}${last?' last':''}${nOpen?'':' alllock'}" onclick="pickSchool('${s.k}')">
       ${last?'<em class="lasttag">지난번에 여기서</em>':''}
-      <h2>${s.n}</h2><p>계산 주제 ${s.topics.length}개</p><span class="sgo" aria-hidden="true">→</span>
+      <h2>${s.n}</h2><p>${nOpen?`계산 주제 ${s.topics.length}개 · 열린 주제 <b>${nOpen}개</b>`:`계산 주제 ${s.topics.length}개 · <b>모두 잠겨 있어요</b>`}</p>
+      ${nOpen?'<span class="sgo" aria-hidden="true">→</span>':`<span class="sgo slock" aria-label="잠김">${LOCKI}</span>`}
     </button>`;
   }).join('');
 }
@@ -5489,6 +5530,7 @@ function pickSchool(k){
 }
 function goHome(){
   if(!ME) return;
+  loadCfg().then(()=>{ if(el('s-home').classList.contains('on')) paintHome(); });
   stopTimer(); G=null;
   show('s-home'); paintHome();
 }
@@ -5501,6 +5543,12 @@ function paintHome(){
   paintHomeMe();
 }
 function topicCard(t){
+  if(!topicOpen(t)){ const T=topicOf(t);
+    return `<div class="topic tlocked" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}" onclick="topicShut('${t}')">
+      <div class="ttop"><span class="tsym">${symHTML(T)}</span>
+        <div class="tinfo"><h2>${T.n}</h2><p>${T.desc}</p></div>
+        <span class="tlk" aria-label="잠김">${LOCKI}</span></div>
+      <div class="tlnote">${LOCKI}<span>잠겨 있어요 · 선생님이 열어 주면 시작할 수 있어요</span></div></div>`; }
   const T=topicOf(t), p=prog(t), r=rec(t), w=wrongOf(t).length, S=T.stages.length, cl=p.c.length;
   return `<div class="topic" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}">
     <div class="ttop"><span class="tsym">${symHTML(T)}</span>
@@ -5558,7 +5606,7 @@ function paintSide(){
 }
 
 /* ═══════════════════ 연습 스테이지 고르기 ═══════════════════ */
-function openStages(t){ if(t) CUR.topic=t; stopTimer(); G=null; show('s-stage'); renderStages(); }
+function openStages(t){ if(t&&!topicOpen(t)) return topicShut(t); if(t) CUR.topic=t; stopTimer(); G=null; show('s-stage'); renderStages(); }
 function renderStages(){
   const t=CUR.topic, T=topicOf(t), p=prog(t), today=pracDay().s;
   el('stSym').innerHTML=symHTML(T);
@@ -5620,6 +5668,7 @@ function beginStage(){ if(!G||G.phase!=='preview') return; G.t0=performance.now(
 
 /* ═══════════════════ 실전 모드 ═══════════════════ */
 function tryReal(t){
+  if(t&&!topicOpen(t)) return topicShut(t);
   if(t) CUR.topic=t;
   t=CUR.topic;
   const w=[...new Set(wrongOf(t))].map(factFromKey).filter(Boolean);
