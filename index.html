@@ -2565,13 +2565,15 @@ function stageRun(t,n){
   return out;
 }
 
-/* ═══ 실전 출제 — 맞힌 개수가 늘수록 뒤 스테이지가 섞여 나옵니다 ═══
-   REAL_STEP 문항마다 한 스테이지씩 열리고, 새로 열린 스테이지가 가장 자주 나옵니다. */
-const REAL_STEP=6;
+/* ═══ 실전 출제 — 맞힌 개수가 늘수록 어려워집니다 ═══
+   REAL_STEP 문항마다 한 스테이지씩 올라가고, 지금 단계 문제가 가장 자주 나옵니다.
+   마지막 단계까지 오른 뒤에도 더 맞히면 앞 단계는 점점 빠지고 마지막 단계만 남아요. */
+const REAL_STEP=4;
 function realLevel(t,n){ return Math.min(topicOf(t).stages.length, 1+Math.floor((n-1)/REAL_STEP)); }
 function realPick(t,n,recent){
   const S=topicOf(t).stages, lv=realLevel(t,n);
-  const w=S.slice(0,lv).map((s,i)=>i===lv-1?3:i===lv-2?2:1);
+  const over=Math.max(0,Math.floor((n-1)/REAL_STEP)+1-S.length);   /* 마지막 단계에 오른 뒤 더 맞힌 정도 */
+  const w=S.slice(0,lv).map((s,i)=>i===lv-1?4+2*over:i===lv-2?(over>1?1:2):(over>0?0:1));
   let f=null;
   for(let g=0;g<30;g++){
     let r=Math.random()*w.reduce((a,b)=>a+b,0), i=0;
@@ -5375,12 +5377,12 @@ const classLabel=c=>c.length===3?`${c[0]}학년 ${+c.slice(1)}반`:c;
 const symHTML=T=>TOPIC_SYMH[T.k]||T.sym;
 
 /* ═══════════════════ 규칙 · 코인 ═══════════════════
-   실전 : 2분 무실수. 오늘 이 주제에서 세운 기록을 '넘어선' 문항마다 2코인,
+   실전 : 1분 무실수. 오늘 이 주제에서 세운 기록을 '넘어선' 문항마다 2코인,
           내 최고 기록을 깨면 그 판 코인이 2배.
           (쉬운 앞부분만 풀고 그만두기를 되풀이해도 코인이 쌓이지 않게)
    연습 : 스테이지를 처음 클리어하면 30코인, 그 뒤로는 날마다 첫 클리어에 10코인.
    오답노트 : 다시 풀어 통과한 문항마다 5코인.                                 */
-const REAL_SEC=120, COIN_PER=2, CLEAR_FIRST=30, CLEAR_DAY=10, NOTE_COIN=5;
+const REAL_SEC=60, COIN_PER=2, CLEAR_FIRST=30, CLEAR_DAY=10, NOTE_COIN=5;
 /* 바르게 다 쓰면 '확인'을 누르지 않아도 넘어갑니다.
    단, 지우기를 한 번이라도 누른 문항은 '확인'을 눌러야 합니다 —
    숫자를 바꿔 가며 넣어 보는 것으로 답을 맞히지 못하게.                  */
@@ -5528,11 +5530,11 @@ function logout(){
 }
 
 /* ═══════════════════ 고등학교 열쇠 ═══════════════════
-   중학교 주제마다 실전 모드(2분 무실수)에서 아래 개수 이상을 맞히면 열쇠 하나.
+   중학교 주제마다 실전 모드(1분 무실수)에서 아래 개수 이상을 맞히면 열쇠 하나.
    일곱 개를 모두 모으면 고등학교가 열립니다. 한 번 열리면 계속 열려 있습니다(ME.hu).
-   기준은 최상위권 학생이 2분 동안 틀리지 않고 풀 수 있는 정도로 잡았고,
+   기준은 최상위권 학생이 1분 동안 틀리지 않고 풀 수 있는 정도로 잡았고,
    선생님 모드 '고등 열쇠' 탭에서 바꾸거나 학생 기록의 상위 10%로 맞출 수 있습니다. */
-const HS_GOAL_DEF={int:32, subst:22, expo:30, power:40, root:28, pyth:25, trig:25};
+const HS_GOAL_DEF={int:16, subst:11, expo:14, power:20, root:13, pyth:12, trig:12};   /* 1분 실전 기준 */
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
 let CFG={shop:{open:false},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
@@ -5761,7 +5763,7 @@ function tryReal(t){
   el('startTitle').textContent=`${T.n} · 실전 모드`;
   el('startSub').innerHTML=`<b>${REAL_SEC/60}분</b> 동안 <b>한 문제도 틀리지 않고</b> 몇 문제까지 갈 수 있는지 겨룹니다.
     한 문제라도 틀리면 거기서 끝나고, 그때까지 맞힌 개수가 기록이 됩니다.<br><br>
-    맞힐수록 뒤 스테이지 문제가 섞여 나와요. (${REAL_STEP}문항마다 한 단계씩)<br>
+    <b>맞힐수록 어려워져요</b> — ${REAL_STEP}문항을 맞힐 때마다 한 단계씩 어려운 문제가 나와요.<br>
     코인 : 오늘 이 주제에서 세운 기록을 <b>넘어선 문항마다 ${COIN_PER}코인</b>, 내 최고 기록을 깨면 <b>2배</b>.`+
     (T.school==='m'&&CFG.lock.on&&!ME.hu?`<br><br>고등학교 열쇠 : <b>${hsGoal(t)}개</b> 이상 맞히면 얻어요 (지금 최고 ${rec(t).best||0}개).`:'');
   el('startGo').onclick=()=>{ close_('ovStart'); startReal(t); };
@@ -5843,7 +5845,8 @@ function next(){
 }
 function qLabel(){
   if(G.mode==='real'){ const lv=realLevel(G.t,G.qi+1);
-    return `${lv}단계 · ${stageOf(G.t,lv).name}${lv>1?' 까지 섞어서':''}`; }
+    const S=topicOf(G.t).stages.length;
+    return `난이도 ${lv} / ${S} · ${stageOf(G.t,lv).name}${lv>=S&&G.qi+1>S*REAL_STEP?' · 최고 단계':''}`; }
   if(G.mode==='battle') return `${G.qi+1}번째 문제 · 모두 같은 문제를 풀고 있어요`;
   if(G.mode==='note') return G.step===2?'확인 문제 — 같은 계산을 다른 모양으로 한 번 더!':'다시 풀기 — 방금 본 풀이대로';
   return `${G.st}단계 · ${stageOf(G.t,G.st).name}`;
