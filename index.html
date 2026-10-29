@@ -1065,6 +1065,29 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .tlgrid{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px}
 .tlitem{margin:0}
 .tlbox h3 .btn{float:right;margin-left:6px;padding:4px 10px;font-size:12px}
+
+/* QR · 모드별 잠금 */
+.qrcard{display:flex;align-items:center;gap:14px;width:100%;margin-top:14px;padding:12px 14px;background:#fff;border:1px solid var(--line);border-radius:18px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.qrcard .qrimg{width:104px;height:104px;flex:none;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.qrcard .qrimg svg,.qrbig svg{width:100%;height:100%;display:block}
+.qrcard .qrtx{display:flex;flex-direction:column;gap:3px}
+.qrcard .qrtx b{font-size:15px}
+.qrcard .qrtx small{font-size:12.5px;color:var(--dim)}
+.qrmodal{text-align:center}
+.qrbig{width:min(78vw,340px);aspect-ratio:1;margin:12px auto;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.qrurl{font-size:14px;color:var(--dim);margin-bottom:6px;word-break:break-all}
+.tbtn.mlock{background:var(--soft)!important;color:var(--dim)!important;border:1px dashed var(--line)!important;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.tbtn.mlock b{display:flex;align-items:center;gap:6px}
+.tbtn.mlock svg{width:14px;height:14px}
+.tlm{width:100%;border-collapse:collapse;margin-top:8px}
+.tlrow{display:grid;grid-template-columns:1fr 64px 64px 64px;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.tlrow.hd{border-top:0;font-size:12.5px;color:var(--dim);font-weight:600}
+.tlrow.hd span:not(:first-child),.tlrow .tsw{justify-self:center}
+.tlrow .cn{font-weight:600;font-size:14.5px}
+.tsw{width:52px;height:34px;border-radius:12px;border:1px solid var(--line);background:var(--soft);color:var(--dim);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.tsw svg{width:16px;height:16px}
+.tsw.on{background:var(--o,#2f6bff);border-color:transparent;color:#fff;font-size:12.5px;font-weight:700}
+.tlrow.all .tsw{height:28px;font-size:11.5px;font-weight:600;color:var(--ink);background:#fff}
 </style>
 </head>
 <body>
@@ -1097,6 +1120,11 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
       <div class="hint">처음이라면 학번과 쓰고 싶은 비밀번호를 넣고 <b>들어가기</b>를 누르세요. 바로 캐릭터를 고를 수 있습니다.</div>
       <div class="netstat" id="netStat"></div>
     </div>
+
+    <button class="qrcard" id="gQr" type="button" onclick="openM('ovQr')" aria-label="접속 QR 크게 보기">
+      <span class="qrimg"><svg viewBox="0 0 37 37" shape-rendering="crispEdges" role="img" aria-label="계산 마스터 접속 QR"><rect width="37" height="37" fill="#fff"/><path d="M2 2h7v1h-7zM10 2h5v1h-5zM16 2h1v1h-1zM20 2h1v1h-1zM26 2h1v1h-1zM28 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM14 3h1v1h-1zM18 3h2v1h-2zM21 3h4v1h-4zM26 3h1v1h-1zM28 3h1v1h-1zM34 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM10 4h1v1h-1zM12 4h3v1h-3zM17 4h4v1h-4zM22 4h1v1h-1zM24 4h1v1h-1zM28 4h1v1h-1zM30 4h3v1h-3zM34 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM14 5h1v1h-1zM17 5h1v1h-1zM21 5h1v1h-1zM25 5h2v1h-2zM28 5h1v1h-1zM30 5h3v1h-3zM34 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h8v1h-8zM19 6h2v1h-2zM22 6h2v1h-2zM25 6h2v1h-2zM28 6h1v1h-1zM30 6h3v1h-3zM34 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM11 7h1v1h-1zM13 7h4v1h-4zM22 7h2v1h-2zM25 7h2v1h-2zM28 7h1v1h-1zM34 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h7v1h-7zM11 9h3v1h-3zM15 9h1v1h-1zM21 9h2v1h-2zM24 9h1v1h-1zM26 9h1v1h-1zM2 10h1v1h-1zM5 10h6v1h-6zM13 10h2v1h-2zM17 10h3v1h-3zM21 10h1v1h-1zM24 10h1v1h-1zM26 10h2v1h-2zM30 10h1v1h-1zM32 10h3v1h-3zM3 11h1v1h-1zM6 11h1v1h-1zM10 11h5v1h-5zM16 11h2v1h-2zM20 11h3v1h-3zM25 11h1v1h-1zM30 11h3v1h-3zM2 12h3v1h-3zM6 12h3v1h-3zM10 12h1v1h-1zM12 12h1v1h-1zM16 12h2v1h-2zM19 12h2v1h-2zM23 12h1v1h-1zM25 12h2v1h-2zM28 12h1v1h-1zM30 12h5v1h-5zM2 13h3v1h-3zM6 13h1v1h-1zM11 13h1v1h-1zM16 13h2v1h-2zM19 13h1v1h-1zM21 13h2v1h-2zM26 13h4v1h-4zM32 13h2v1h-2zM2 14h2v1h-2zM5 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM14 14h3v1h-3zM18 14h9v1h-9zM28 14h1v1h-1zM33 14h2v1h-2zM2 15h1v1h-1zM4 15h1v1h-1zM6 15h1v1h-1zM9 15h2v1h-2zM12 15h3v1h-3zM18 15h2v1h-2zM21 15h1v1h-1zM24 15h1v1h-1zM26 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM2 16h2v1h-2zM5 16h1v1h-1zM8 16h1v1h-1zM14 16h1v1h-1zM18 16h1v1h-1zM20 16h1v1h-1zM23 16h2v1h-2zM28 16h1v1h-1zM30 16h1v1h-1zM32 16h1v1h-1zM5 17h2v1h-2zM9 17h1v1h-1zM11 17h4v1h-4zM17 17h1v1h-1zM21 17h1v1h-1zM24 17h2v1h-2zM27 17h1v1h-1zM30 17h3v1h-3zM34 17h1v1h-1zM2 18h1v1h-1zM4 18h5v1h-5zM11 18h3v1h-3zM15 18h2v1h-2zM21 18h2v1h-2zM27 18h5v1h-5zM3 19h2v1h-2zM6 19h1v1h-1zM10 19h2v1h-2zM16 19h3v1h-3zM21 19h3v1h-3zM27 19h2v1h-2zM30 19h1v1h-1zM32 19h1v1h-1zM34 19h1v1h-1zM2 20h1v1h-1zM4 20h1v1h-1zM7 20h5v1h-5zM13 20h1v1h-1zM15 20h4v1h-4zM21 20h2v1h-2zM25 20h2v1h-2zM28 20h2v1h-2zM31 20h2v1h-2zM34 20h1v1h-1zM3 21h1v1h-1zM6 21h1v1h-1zM11 21h1v1h-1zM13 21h1v1h-1zM17 21h1v1h-1zM19 21h2v1h-2zM23 21h1v1h-1zM27 21h2v1h-2zM30 21h3v1h-3zM3 22h2v1h-2zM6 22h3v1h-3zM10 22h1v1h-1zM13 22h3v1h-3zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM29 22h1v1h-1zM31 22h1v1h-1zM33 22h1v1h-1zM2 23h2v1h-2zM5 23h1v1h-1zM9 23h8v1h-8zM18 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM24 23h3v1h-3zM29 23h2v1h-2zM32 23h1v1h-1zM2 24h1v1h-1zM5 24h4v1h-4zM12 24h1v1h-1zM16 24h4v1h-4zM24 24h5v1h-5zM33 24h2v1h-2zM2 25h1v1h-1zM4 25h2v1h-2zM7 25h1v1h-1zM9 25h1v1h-1zM13 25h1v1h-1zM15 25h1v1h-1zM18 25h3v1h-3zM26 25h1v1h-1zM29 25h1v1h-1zM31 25h4v1h-4zM2 26h2v1h-2zM7 26h2v1h-2zM11 26h1v1h-1zM14 26h2v1h-2zM17 26h2v1h-2zM21 26h2v1h-2zM24 26h8v1h-8zM33 26h1v1h-1zM10 27h1v1h-1zM12 27h1v1h-1zM16 27h3v1h-3zM20 27h1v1h-1zM26 27h1v1h-1zM30 27h1v1h-1zM32 27h2v1h-2zM2 28h7v1h-7zM10 28h4v1h-4zM16 28h2v1h-2zM20 28h2v1h-2zM23 28h4v1h-4zM28 28h1v1h-1zM30 28h1v1h-1zM32 28h1v1h-1zM2 29h1v1h-1zM8 29h1v1h-1zM10 29h3v1h-3zM14 29h2v1h-2zM22 29h1v1h-1zM25 29h2v1h-2zM30 29h4v1h-4zM2 30h1v1h-1zM4 30h3v1h-3zM8 30h1v1h-1zM10 30h2v1h-2zM13 30h3v1h-3zM17 30h1v1h-1zM19 30h2v1h-2zM22 30h2v1h-2zM25 30h6v1h-6zM33 30h1v1h-1zM2 31h1v1h-1zM4 31h3v1h-3zM8 31h1v1h-1zM10 31h2v1h-2zM14 31h3v1h-3zM22 31h2v1h-2zM26 31h2v1h-2zM29 31h1v1h-1zM34 31h1v1h-1zM2 32h1v1h-1zM4 32h3v1h-3zM8 32h1v1h-1zM12 32h5v1h-5zM18 32h3v1h-3zM22 32h2v1h-2zM27 32h1v1h-1zM29 32h2v1h-2zM32 32h3v1h-3zM2 33h1v1h-1zM8 33h1v1h-1zM11 33h1v1h-1zM13 33h6v1h-6zM20 33h1v1h-1zM24 33h2v1h-2zM28 33h7v1h-7zM2 34h7v1h-7zM10 34h1v1h-1zM12 34h2v1h-2zM19 34h1v1h-1zM22 34h1v1h-1zM25 34h2v1h-2zM29 34h2v1h-2z" fill="#111"/></svg></span>
+      <span class="qrtx"><b>QR로 바로 들어오기</b><small>휴대폰 카메라로 찍으세요 · 누르면 크게 보여요</small></span>
+    </button>
 
     <div class="box" id="gNew" style="display:none">
       <h2>내 연산 친구 만들기</h2>
@@ -1382,6 +1410,15 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
       <button class="btn" onclick="close_('ovHs')">닫기</button>
       <button class="btn primary" id="hsGo">중학교로 가기</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovQr" onclick="close_('ovQr')">
+  <div class="modal qrmodal">
+    <h3>계산 마스터 접속 QR</h3>
+    <div class="qrbig"><svg viewBox="0 0 37 37" shape-rendering="crispEdges" role="img" aria-label="계산 마스터 접속 QR"><rect width="37" height="37" fill="#fff"/><path d="M2 2h7v1h-7zM10 2h5v1h-5zM16 2h1v1h-1zM20 2h1v1h-1zM26 2h1v1h-1zM28 2h7v1h-7zM2 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM14 3h1v1h-1zM18 3h2v1h-2zM21 3h4v1h-4zM26 3h1v1h-1zM28 3h1v1h-1zM34 3h1v1h-1zM2 4h1v1h-1zM4 4h3v1h-3zM8 4h1v1h-1zM10 4h1v1h-1zM12 4h3v1h-3zM17 4h4v1h-4zM22 4h1v1h-1zM24 4h1v1h-1zM28 4h1v1h-1zM30 4h3v1h-3zM34 4h1v1h-1zM2 5h1v1h-1zM4 5h3v1h-3zM8 5h1v1h-1zM14 5h1v1h-1zM17 5h1v1h-1zM21 5h1v1h-1zM25 5h2v1h-2zM28 5h1v1h-1zM30 5h3v1h-3zM34 5h1v1h-1zM2 6h1v1h-1zM4 6h3v1h-3zM8 6h1v1h-1zM10 6h8v1h-8zM19 6h2v1h-2zM22 6h2v1h-2zM25 6h2v1h-2zM28 6h1v1h-1zM30 6h3v1h-3zM34 6h1v1h-1zM2 7h1v1h-1zM8 7h1v1h-1zM11 7h1v1h-1zM13 7h4v1h-4zM22 7h2v1h-2zM25 7h2v1h-2zM28 7h1v1h-1zM34 7h1v1h-1zM2 8h7v1h-7zM10 8h1v1h-1zM12 8h1v1h-1zM14 8h1v1h-1zM16 8h1v1h-1zM18 8h1v1h-1zM20 8h1v1h-1zM22 8h1v1h-1zM24 8h1v1h-1zM26 8h1v1h-1zM28 8h7v1h-7zM11 9h3v1h-3zM15 9h1v1h-1zM21 9h2v1h-2zM24 9h1v1h-1zM26 9h1v1h-1zM2 10h1v1h-1zM5 10h6v1h-6zM13 10h2v1h-2zM17 10h3v1h-3zM21 10h1v1h-1zM24 10h1v1h-1zM26 10h2v1h-2zM30 10h1v1h-1zM32 10h3v1h-3zM3 11h1v1h-1zM6 11h1v1h-1zM10 11h5v1h-5zM16 11h2v1h-2zM20 11h3v1h-3zM25 11h1v1h-1zM30 11h3v1h-3zM2 12h3v1h-3zM6 12h3v1h-3zM10 12h1v1h-1zM12 12h1v1h-1zM16 12h2v1h-2zM19 12h2v1h-2zM23 12h1v1h-1zM25 12h2v1h-2zM28 12h1v1h-1zM30 12h5v1h-5zM2 13h3v1h-3zM6 13h1v1h-1zM11 13h1v1h-1zM16 13h2v1h-2zM19 13h1v1h-1zM21 13h2v1h-2zM26 13h4v1h-4zM32 13h2v1h-2zM2 14h2v1h-2zM5 14h1v1h-1zM8 14h1v1h-1zM10 14h1v1h-1zM14 14h3v1h-3zM18 14h9v1h-9zM28 14h1v1h-1zM33 14h2v1h-2zM2 15h1v1h-1zM4 15h1v1h-1zM6 15h1v1h-1zM9 15h2v1h-2zM12 15h3v1h-3zM18 15h2v1h-2zM21 15h1v1h-1zM24 15h1v1h-1zM26 15h1v1h-1zM29 15h1v1h-1zM31 15h1v1h-1zM2 16h2v1h-2zM5 16h1v1h-1zM8 16h1v1h-1zM14 16h1v1h-1zM18 16h1v1h-1zM20 16h1v1h-1zM23 16h2v1h-2zM28 16h1v1h-1zM30 16h1v1h-1zM32 16h1v1h-1zM5 17h2v1h-2zM9 17h1v1h-1zM11 17h4v1h-4zM17 17h1v1h-1zM21 17h1v1h-1zM24 17h2v1h-2zM27 17h1v1h-1zM30 17h3v1h-3zM34 17h1v1h-1zM2 18h1v1h-1zM4 18h5v1h-5zM11 18h3v1h-3zM15 18h2v1h-2zM21 18h2v1h-2zM27 18h5v1h-5zM3 19h2v1h-2zM6 19h1v1h-1zM10 19h2v1h-2zM16 19h3v1h-3zM21 19h3v1h-3zM27 19h2v1h-2zM30 19h1v1h-1zM32 19h1v1h-1zM34 19h1v1h-1zM2 20h1v1h-1zM4 20h1v1h-1zM7 20h5v1h-5zM13 20h1v1h-1zM15 20h4v1h-4zM21 20h2v1h-2zM25 20h2v1h-2zM28 20h2v1h-2zM31 20h2v1h-2zM34 20h1v1h-1zM3 21h1v1h-1zM6 21h1v1h-1zM11 21h1v1h-1zM13 21h1v1h-1zM17 21h1v1h-1zM19 21h2v1h-2zM23 21h1v1h-1zM27 21h2v1h-2zM30 21h3v1h-3zM3 22h2v1h-2zM6 22h3v1h-3zM10 22h1v1h-1zM13 22h3v1h-3zM17 22h1v1h-1zM22 22h2v1h-2zM26 22h1v1h-1zM29 22h1v1h-1zM31 22h1v1h-1zM33 22h1v1h-1zM2 23h2v1h-2zM5 23h1v1h-1zM9 23h8v1h-8zM18 23h1v1h-1zM20 23h1v1h-1zM22 23h1v1h-1zM24 23h3v1h-3zM29 23h2v1h-2zM32 23h1v1h-1zM2 24h1v1h-1zM5 24h4v1h-4zM12 24h1v1h-1zM16 24h4v1h-4zM24 24h5v1h-5zM33 24h2v1h-2zM2 25h1v1h-1zM4 25h2v1h-2zM7 25h1v1h-1zM9 25h1v1h-1zM13 25h1v1h-1zM15 25h1v1h-1zM18 25h3v1h-3zM26 25h1v1h-1zM29 25h1v1h-1zM31 25h4v1h-4zM2 26h2v1h-2zM7 26h2v1h-2zM11 26h1v1h-1zM14 26h2v1h-2zM17 26h2v1h-2zM21 26h2v1h-2zM24 26h8v1h-8zM33 26h1v1h-1zM10 27h1v1h-1zM12 27h1v1h-1zM16 27h3v1h-3zM20 27h1v1h-1zM26 27h1v1h-1zM30 27h1v1h-1zM32 27h2v1h-2zM2 28h7v1h-7zM10 28h4v1h-4zM16 28h2v1h-2zM20 28h2v1h-2zM23 28h4v1h-4zM28 28h1v1h-1zM30 28h1v1h-1zM32 28h1v1h-1zM2 29h1v1h-1zM8 29h1v1h-1zM10 29h3v1h-3zM14 29h2v1h-2zM22 29h1v1h-1zM25 29h2v1h-2zM30 29h4v1h-4zM2 30h1v1h-1zM4 30h3v1h-3zM8 30h1v1h-1zM10 30h2v1h-2zM13 30h3v1h-3zM17 30h1v1h-1zM19 30h2v1h-2zM22 30h2v1h-2zM25 30h6v1h-6zM33 30h1v1h-1zM2 31h1v1h-1zM4 31h3v1h-3zM8 31h1v1h-1zM10 31h2v1h-2zM14 31h3v1h-3zM22 31h2v1h-2zM26 31h2v1h-2zM29 31h1v1h-1zM34 31h1v1h-1zM2 32h1v1h-1zM4 32h3v1h-3zM8 32h1v1h-1zM12 32h5v1h-5zM18 32h3v1h-3zM22 32h2v1h-2zM27 32h1v1h-1zM29 32h2v1h-2zM32 32h3v1h-3zM2 33h1v1h-1zM8 33h1v1h-1zM11 33h1v1h-1zM13 33h6v1h-6zM20 33h1v1h-1zM24 33h2v1h-2zM28 33h7v1h-7zM2 34h7v1h-7zM10 34h1v1h-1zM12 34h2v1h-2zM19 34h1v1h-1zM22 34h1v1h-1zM25 34h2v1h-2zM29 34h2v1h-2z" fill="#111"/></svg></div>
+    <div class="qrurl">tmdrl707-png.github.io/calc-master</div>
+    <div class="row"><button class="btn primary" onclick="close_('ovQr')">닫기</button></div>
   </div>
 </div>
 
@@ -4692,7 +4729,7 @@ function paintTeacher(){
     return Object.values(R).some(r=>r&&r.hist&&r.hist.length); });
   el('tSub').innerHTML=`${online()?'모든 기기에서 함께 보는 자료':'이 기기에 저장된 자료'} ·
     학생 <b>${all.length}명</b> · 실전 경험 <b>${played.length}명</b>`;
-  el('tTabs').innerHTML=[['rank','랭킹'],['cls','학급 대항'],['fact','계산별 정답률'],['stu','학생 정보'],['hs','고등 열쇠'],['tl','주제 열기']]
+  el('tTabs').innerHTML=[['rank','랭킹'],['cls','학급 대항'],['fact','계산별 정답률'],['stu','학생 정보'],['hs','고등 열쇠'],['tl','모드 잠금']]
     .map(([k,n])=>`<button class="tab${tTab===k?' on':''}" data-k="${k}">${n}</button>`).join('');
   el('tTabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ tTab=b.dataset.k; tOpen=null; paintTeacher(); });
   el('tTopicBar').style.display=(tTab==='hs'||tTab==='tl'||(tTab==='cls'&&tCb!=='t'))?'none':'';
@@ -4767,22 +4804,23 @@ function paintTClass(){
   el('tBody').querySelectorAll('[data-cb]').forEach(b=>b.onclick=()=>{ tCb=b.dataset.cb; paintTeacher(); });
 }
 
-/* ── 주제 열기 — 학생에게 보이는 주제를 선생님이 하나씩 엽니다 ── */
+/* ── 주제 열기 — 주제마다 연습·실전·친구 대전을 선생님이 바로 열고 잠급니다 (누르는 즉시 저장) ── */
 function paintTTl(){
-  const open=new Set(CFG.tl.open||[]);
-  el('tBody').innerHTML=`<div class="tbox"><h3>주제 열기 <span>닫힌 주제는 학생 화면에 자물쇠로 보이고, 시작할 수 없어요</span></h3>
-      <div class="hint">처음에는 초등학교 <b>더하기·빼기</b>와 <b>구구단</b>만 열려 있어요. 체크하고 저장하면 모든 학생에게 바로 반영돼요.</div></div>
-    ${SCHOOLS.map(sc=>`<div class="tbox tlbox"><h3>${sc.n}
-        <button class="btn tlall" data-s="${sc.k}">모두 열기</button><button class="btn tlnone" data-s="${sc.k}">모두 잠그기</button></h3>
-      <div class="tlgrid">${sc.topics.map(t=>`<label class="tgl tlitem"><input type="checkbox" class="tlck" data-s="${sc.k}" data-t="${t}" ${open.has(t)?'checked':''}> ${topicOf(t).n}</label>`).join('')}</div></div>`).join('')}
-    <div class="hsbtns"><button class="btn primary" id="tlSave">저장</button></div>`;
-  const cks=[...el('tBody').querySelectorAll('.tlck')];
-  el('tBody').querySelectorAll('.tlall').forEach(b=>b.onclick=()=>cks.filter(c=>c.dataset.s===b.dataset.s).forEach(c=>c.checked=true));
-  el('tBody').querySelectorAll('.tlnone').forEach(b=>b.onclick=()=>cks.filter(c=>c.dataset.s===b.dataset.s).forEach(c=>c.checked=false));
-  el('tlSave').onclick=async()=>{
-    CFG.tl={open:cks.filter(c=>c.checked).map(c=>c.dataset.t)};
-    await dbSet('config/tl',CFG.tl);
-    toast('열린 주제를 저장했어요 · '+CFG.tl.open.length+'개'); };
+  const T=CFG.tl, has=(t,m)=>(T[m]||[]).includes(t);
+  const sw=(on,attr)=>`<button class="tsw${on?' on':''}" ${attr} aria-pressed="${on}">${on?'열림':LOCKI}</button>`;
+  el('tBody').innerHTML=`<div class="tbox"><h3>모드 열기·잠그기 <span>누르면 바로 모든 학생 화면에 반영돼요</span></h3>
+      <div class="hint">처음에는 초등학교 <b>더하기·빼기</b>와 <b>구구단</b>만 열려 있어요. 연습·실전이 모두 잠긴 주제는 학생 화면에서 통째로 자물쇠 카드가 돼요.</div></div>
+    ${SCHOOLS.map(sc=>`<div class="tbox"><h3>${sc.n}</h3>
+      <div class="tlrow hd"><span>주제</span>${MODES.map(([m,n])=>`<span>${n}</span>`).join('')}</div>
+      <div class="tlrow all"><span class="cn">전체</span>${MODES.map(([m])=>{ const all=sc.topics.every(t=>has(t,m));
+        return `<button class="tsw" data-all="${sc.k}:${m}:${all?0:1}">${all?'모두 잠금':'모두 열기'}</button>`; }).join('')}</div>
+      ${sc.topics.map(t=>`<div class="tlrow"><span class="cn">${topicOf(t).n}</span>
+        ${MODES.map(([m])=>sw(has(t,m),`data-t="${t}" data-m="${m}"`)).join('')}</div>`).join('')}</div>`).join('')}`;
+  const save=async()=>{ await dbSet('config/tl',CFG.tl); paintTTl(); toast('저장했어요 · 학생 화면에 바로 반영돼요'); };
+  const setM=(t,m,on)=>{ const a=new Set(CFG.tl[m]||[]); on?a.add(t):a.delete(t); CFG.tl[m]=[...a]; };
+  el('tBody').querySelectorAll('.tsw[data-t]').forEach(b=>b.onclick=()=>{ setM(b.dataset.t,b.dataset.m,!has(b.dataset.t,b.dataset.m)); save(); });
+  el('tBody').querySelectorAll('.tsw[data-all]').forEach(b=>b.onclick=()=>{ const [k,m,on]=b.dataset.all.split(':');
+    schoolOf(k).topics.forEach(t=>setM(t,m,on==='1')); save(); });
 }
 
 /* ── 고등 열쇠 — 고등학교를 여는 기준 ── */
@@ -4993,7 +5031,7 @@ function openBattle(){
   if(!ME) return;
   stopTimer(); G=null;
   const sc=schoolOf(CUR.school);
-  if(!BT.t||!sc.topics.includes(BT.t)||!topicOpen(BT.t)){ const op=sc.topics.filter(topicOpen); BT.t=op.includes(CUR.topic)?CUR.topic:(op[0]||sc.topics[0]); }
+  if(!BT.t||!sc.topics.includes(BT.t)||!modeOpen(BT.t,'b')){ const op=sc.topics.filter(t=>modeOpen(t,'b')); BT.t=op.includes(CUR.topic)?CUR.topic:(op[0]||sc.topics[0]); }
   BT.closed=false;
   BT.view=BT.code?'room':'menu';
   show('s-battle'); btPaint();
@@ -5014,7 +5052,7 @@ function btPaintMenu(){
       <div class="btcard">
         <h3>방 만들기</h3>
         <div class="btlab">주제 · ${sc.n}</div>
-        <div class="chips" id="btTopics">${sc.topics.map(t=>topicOpen(t)?`<button class="chip${t===BT.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`:`<button class="chip chlock" data-t="${t}" disabled>${LOCKI}${topicOf(t).n}</button>`).join('')}</div>
+        <div class="chips" id="btTopics">${sc.topics.map(t=>modeOpen(t,'b')?`<button class="chip${t===BT.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`:`<button class="chip chlock" data-t="${t}" disabled>${LOCKI}${topicOf(t).n}</button>`).join('')}</div>
         <div class="btlab">시간</div>
         <div class="chips" id="btSecs">${BT_SECS.map(([s,n])=>`<button class="chip${s===BT.sec?' on':''}" data-s="${s}">${n}</button>`).join('')}</div>
         <button class="btn primary btwide" id="btMake">방 만들기</button>
@@ -5045,6 +5083,7 @@ async function btSweep(){
     for(const c of Object.keys(all)){ const r=all[c]; if(!r||!r.made||Date.now()-r.made>3*3600e3) await dbSet('battles/'+c,null); } }catch(e){}
 }
 async function btMake(){
+  if(!modeOpen(BT.t,'b')) return toast('친구 대전이 아직 잠겨 있어요 — 선생님이 열어 주면 할 수 있어요');
   if(BT.busy) return; BT.busy=true; el('btMake').disabled=true; el('btMake').textContent='방을 만드는 중…';
   await btSweep();
   const t=BT.t, sec=BT.sec, q=btKeys(t);
@@ -5138,7 +5177,7 @@ function btPaintRoom(){
       <p class="sub">${host?'친구들에게 방 번호를 알려 주세요. 다 들어오면 <b>시작하기</b>를 눌러요.':'방장이 시작하면 3초 뒤에 바로 문제가 나와요.'}</p></div></div>
     <div class="btcode"><span>방 번호</span><b>${room.code}</b></div>
     ${host?`<div class="btlab">주제</div>
-      <div class="chips" id="btTopics">${tops.map(t=>topicOpen(t)||t===room.t?`<button class="chip${t===room.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`:`<button class="chip chlock" data-t="${t}" disabled>${LOCKI}${topicOf(t).n}</button>`).join('')}</div>
+      <div class="chips" id="btTopics">${tops.map(t=>modeOpen(t,'b')||t===room.t?`<button class="chip${t===room.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`:`<button class="chip chlock" data-t="${t}" disabled>${LOCKI}${topicOf(t).n}</button>`).join('')}</div>
       <div class="btlab">시간</div>
       <div class="chips" id="btSecs">${BT_SECS.map(([s,n])=>`<button class="chip${s===room.sec?' on':''}" data-s="${s}">${n}</button>`).join('')}</div>`
     :`<div class="btinfo"><span class="tsym sm">${symHTML(T)}</span><b>${T.n}</b><span>${secLabel(room.sec)} · 많이 맞히기</span></div>`}
@@ -5465,17 +5504,21 @@ function logout(){
    선생님 모드 '고등 열쇠' 탭에서 바꾸거나 학생 기록의 상위 10%로 맞출 수 있습니다. */
 const HS_GOAL_DEF={int:32, subst:22, expo:30, power:40, root:28, pyth:25, trig:25};
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
-let CFG={lock:{on:true,goal:{}},tl:{open:TL_DEF.slice()}};
+const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
+let CFG={lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
 async function loadCfg(){
   try{ const c=await dbGet('config',null);
     if(c&&c.lock) CFG.lock={on:c.lock.on!==false, goal:Object.assign({},c.lock.goal||{})};
-    if(c&&c.tl&&c.tl.open!=null) CFG.tl={open:Object.values(c.tl.open).filter(x=>typeof x==='string')}; }catch(e){}
+    if(c&&c.tl){ const vs=x=>Object.values(x||{}).filter(v=>typeof v==='string');
+      CFG.tl=c.tl.open!=null&&c.tl.v==null?{v:2,p:vs(c.tl.open),r:vs(c.tl.open),b:vs(c.tl.open)}:{v:2,p:vs(c.tl.p),r:vs(c.tl.r),b:vs(c.tl.b)}; }
+    }catch(e){}
   return CFG;
 }
 const hsGoal=t=>{ const g=+((CFG.lock.goal||{})[t]); return g>0?g:(HS_GOAL_DEF[t]||25); };
 const hsKeys=()=>schoolOf('m').topics.map(t=>{ const best=rec(t).best||0, goal=hsGoal(t); return {t,best,goal,ok:best>=goal}; });
 const hsOpen=()=>!CFG.lock.on||!!(ME&&ME.hu)||hsKeys().every(x=>x.ok);
-const topicOpen=t=>(CFG.tl.open||[]).includes(t);
+const modeOpen=(t,m)=>(CFG.tl[m]||[]).includes(t);
+const topicOpen=t=>modeOpen(t,'p')||modeOpen(t,'r')||modeOpen(t,'b');
 const schoolAnyOpen=k=>schoolOf(k).topics.some(topicOpen);
 function topicShut(t){ toast('아직 잠겨 있어요 — 선생님이 열어 주면 할 수 있어요'); }
 const LOCKI='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>';
@@ -5543,7 +5586,7 @@ function paintHome(){
   paintHomeMe();
 }
 function topicCard(t){
-  if(!topicOpen(t)){ const T=topicOf(t);
+  if(!modeOpen(t,'p')&&!modeOpen(t,'r')){ const T=topicOf(t);
     return `<div class="topic tlocked" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}" onclick="topicShut('${t}')">
       <div class="ttop"><span class="tsym">${symHTML(T)}</span>
         <div class="tinfo"><h2>${T.n}</h2><p>${T.desc}</p></div>
@@ -5558,9 +5601,11 @@ function topicCard(t){
     ${T.school==='m'&&CFG.lock.on&&!(ME&&ME.hu)?`<div class="hskey${(r.best||0)>=hsGoal(t)?' ok':''}">${(r.best||0)>=hsGoal(t)?'✓':LOCKI}
       고등학교 열쇠 · 실전 <b>${hsGoal(t)}개</b>${(r.best||0)>=hsGoal(t)?' 달성':` (최고 ${r.best||0}개)`}</div>`:''}
     <div class="tbtns">
-      <button class="tbtn prac" onclick="openStages('${t}')"><b>연습 모드</b><small>스테이지 ${S}개</small></button>
-      <button class="tbtn real${w?' locked':''}" onclick="tryReal('${t}')"><b>실전 모드</b>
-        <small>${w?`오답노트 ${w}문항 남음`:`${REAL_SEC/60}분 무실수 · 최고 ${r.best||0}개`}</small></button>
+      ${modeOpen(t,'p')?`<button class="tbtn prac" onclick="openStages('${t}')"><b>연습 모드</b><small>스테이지 ${S}개</small></button>`
+        :`<button class="tbtn prac mlock" onclick="topicShut('${t}')"><b>${LOCKI}연습 모드</b><small>잠겨 있어요</small></button>`}
+      ${modeOpen(t,'r')?`<button class="tbtn real${w?' locked':''}" onclick="tryReal('${t}')"><b>실전 모드</b>
+        <small>${w?`오답노트 ${w}문항 남음`:`${REAL_SEC/60}분 무실수 · 최고 ${r.best||0}개`}</small></button>`
+        :`<button class="tbtn real mlock" onclick="topicShut('${t}')"><b>${LOCKI}실전 모드</b><small>잠겨 있어요</small></button>`}
     </div></div>`;
 }
 function paintHomeMe(){
@@ -5606,7 +5651,7 @@ function paintSide(){
 }
 
 /* ═══════════════════ 연습 스테이지 고르기 ═══════════════════ */
-function openStages(t){ if(t&&!topicOpen(t)) return topicShut(t); if(t) CUR.topic=t; stopTimer(); G=null; show('s-stage'); renderStages(); }
+function openStages(t){ if(t&&!modeOpen(t,'p')) return topicShut(t); if(t) CUR.topic=t; stopTimer(); G=null; show('s-stage'); renderStages(); }
 function renderStages(){
   const t=CUR.topic, T=topicOf(t), p=prog(t), today=pracDay().s;
   el('stSym').innerHTML=symHTML(T);
@@ -5668,7 +5713,7 @@ function beginStage(){ if(!G||G.phase!=='preview') return; G.t0=performance.now(
 
 /* ═══════════════════ 실전 모드 ═══════════════════ */
 function tryReal(t){
-  if(t&&!topicOpen(t)) return topicShut(t);
+  if(t&&!modeOpen(t,'r')) return topicShut(t);
   if(t) CUR.topic=t;
   t=CUR.topic;
   const w=[...new Set(wrongOf(t))].map(factFromKey).filter(Boolean);
