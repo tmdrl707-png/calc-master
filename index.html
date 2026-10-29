@@ -2593,6 +2593,17 @@ const TOPICS={
   gugu:{k:'gugu', n:'구구단', sym:'×', school:'e', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'2단부터 9단, 거꾸로 찾기까지',
     stages:[
+      {n:1, name:'2단', ex:'2 × 7', facts:()=>DAN([2]), take:9, pv:2},
+      {n:2, name:'3단', ex:'3 × 7', facts:()=>DAN([3]), take:9, pv:3},
+      {n:3, name:'4단', ex:'4 × 7', facts:()=>DAN([4]), take:9, pv:4},
+      {n:4, name:'5단', ex:'5 × 7', facts:()=>DAN([5]), take:9, pv:5},
+      {n:5, name:'6단', ex:'6 × 7', facts:()=>DAN([6]), take:9, pv:6},
+      {n:6, name:'7단', ex:'7 × 7', facts:()=>DAN([7]), take:9, pv:7},
+      {n:7, name:'8단', ex:'8 × 7', facts:()=>DAN([8]), take:9, pv:8},
+      {n:8, name:'9단', ex:'9 × 7', facts:()=>DAN([9]), take:9, pv:9},
+      {n:9, name:'거꾸로 찾기', ex:'7 × □ = 56', facts:DANR, take:15, old:[6]}
+    ], sv:1,
+    realStages:[
       {n:1, name:'2단 ~ 5단',  ex:'4 × 7', facts:()=>DAN([2,3,4,5]), take:18, old:[1,2],
        pick:l=>sampleN(l.filter(f=>f.b>=3),14).concat(sampleN(l.filter(f=>f.b<3),4))},
       {n:2, name:'6단 ~ 9단',  ex:'7 × 8', facts:()=>DAN([6,7,8,9]), take:18, old:[3,4],
@@ -2633,9 +2644,10 @@ function stageRun(t,n){
    REAL_STEP 문항마다 한 스테이지씩 올라가고, 지금 단계 문제가 가장 자주 나옵니다.
    마지막 단계까지 오른 뒤에도 더 맞히면 앞 단계는 점점 빠지고 마지막 단계만 남아요. */
 const REAL_STEP=4;
-function realLevel(t,n){ return Math.min(topicOf(t).stages.length, 1+Math.floor((n-1)/REAL_STEP)); }
+const realStagesOf=t=>{ const T=topicOf(t); return T.realStages||T.stages; };
+function realLevel(t,n){ return Math.min(realStagesOf(t).length, 1+Math.floor((n-1)/REAL_STEP)); }
 function realPick(t,n,recent){
-  const S=topicOf(t).stages, lv=realLevel(t,n);
+  const S=realStagesOf(t), lv=realLevel(t,n);
   const over=Math.max(0,Math.floor((n-1)/REAL_STEP)+1-S.length);   /* 마지막 단계에 오른 뒤 더 맞힌 정도 */
   const w=S.slice(0,lv).map((s,i)=>i===lv-1?4+2*over:i===lv-2?(over>1?1:2):(over>0?0:1));
   let f=null;
@@ -2967,7 +2979,11 @@ function hintOf(f){
 function chipList(arr){ return `<div class="fchips">${arr.map(s=>`<span class="fchip">${s}</span>`).join('')}</div>`; }
 /* 스테이지를 합친 뒤에도 예전 미리보기를 그대로 씁니다 — old:[1,2] 이면 두 미리보기를 이어 붙여요 */
 function stagePreview(t,n){
-  const st=stageOf(t,n), ids=(st&&st.old)||[n];
+  const st=stageOf(t,n);
+  if(st&&st.pv&&t==='gugu'){ const a=st.pv;
+    return {tip:`${a}단은 ${a}씩 커져요. 헷갈리면 아는 칸에서 ${a}를 더하거나 빼서 만들어 보세요.`,
+      table:`<div class="ftab"><h4>${a}단</h4>${range(1,9).map(b=>`<div>${a} × ${b} = <b>${a*b}</b></div>`).join('')}</div>`}; }
+  const ids=(st&&st.old)||[n];
   if(ids.length===1) return previewOf(t,ids[0]);
   const P=ids.map(o=>previewOf(t,o)).filter(Boolean), uniq=a=>a.filter((x,i)=>x&&a.indexOf(x)===i);
   const lines=(P.find(p=>p.lines&&p.lines.length)||{}).lines;
@@ -5480,8 +5496,8 @@ function meFrom(sid,u){
 function rec(t){ const R=ME.R||(ME.R={}); const r=R[t]||(R[t]={best:0,hist:[]});
   if(!Array.isArray(r.hist)) r.hist=[]; return r; }
 const STAGE_V=2;   /* 연습 스테이지를 3~5개로 줄인 판 — 예전 스테이지 번호로 남은 클리어 기록은 새로 시작해요 */
-function prog(t){ const P=ME.P||(ME.P={}); let p=P[t]||(P[t]={c:[],bt:{},v:STAGE_V});
-  if(p.v!==STAGE_V){ p=P[t]={c:[],bt:{},v:STAGE_V}; }
+function prog(t){ const V=STAGE_V+((TOPICS[t]&&TOPICS[t].sv)||0), P=ME.P||(ME.P={}); let p=P[t]||(P[t]={c:[],bt:{},v:V});
+  if(p.v!==V){ p=P[t]={c:[],bt:{},v:V}; }
   if(!Array.isArray(p.c)) p.c=[]; if(!p.bt||typeof p.bt!=='object') p.bt={}; return p; }
 function wrongOf(t){ const W=ME.W||(ME.W={}); if(!Array.isArray(W[t])) W[t]=[]; return W[t]; }
 function pracDay(){ const d=todayKey();
@@ -5927,8 +5943,8 @@ function next(){
 }
 function qLabel(){
   if(G.mode==='real'){ const lv=realLevel(G.t,G.qi+1);
-    const S=topicOf(G.t).stages.length;
-    return `난이도 ${lv} / ${S} · ${stageOf(G.t,lv).name}${lv>=S&&G.qi+1>S*REAL_STEP?' · 최고 단계':''}`; }
+    const RS=realStagesOf(G.t), S=RS.length;
+    return `난이도 ${lv} / ${S} · ${RS[lv-1].name}${lv>=S&&G.qi+1>S*REAL_STEP?' · 최고 단계':''}`; }
   if(G.mode==='battle') return `${G.qi+1}번째 문제 · 모두 같은 문제를 풀고 있어요`;
   if(G.mode==='note') return G.step===2?'확인 문제 — 같은 계산을 다른 모양으로 한 번 더!':'다시 풀기 — 방금 본 풀이대로';
   return `${G.st}단계 · ${stageOf(G.t,G.st).name}`;
