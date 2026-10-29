@@ -1088,6 +1088,10 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .tsw svg{width:16px;height:16px}
 .tsw.on{background:var(--o,#2f6bff);border-color:transparent;color:#fff;font-size:12.5px;font-weight:700}
 .tlrow.all .tsw{height:28px;font-size:11.5px;font-weight:600;color:var(--ink);background:#fff}
+
+.mebtn.shoplock .shoplab{display:inline-flex;align-items:center;gap:4px;color:var(--dim)}
+.mebtn .shoplab svg{width:12px;height:12px}
+.tlrow.shoprow{display:flex;justify-content:space-between;gap:10px;border-top:0}
 </style>
 </head>
 <body>
@@ -4810,6 +4814,9 @@ function paintTTl(){
   const sw=(on,attr)=>`<button class="tsw${on?' on':''}" ${attr} aria-pressed="${on}">${on?'열림':LOCKI}</button>`;
   el('tBody').innerHTML=`<div class="tbox"><h3>모드 열기·잠그기 <span>누르면 바로 모든 학생 화면에 반영돼요</span></h3>
       <div class="hint">처음에는 초등학교 <b>더하기·빼기</b>와 <b>구구단</b>만 열려 있어요. 연습·실전이 모두 잠긴 주제는 학생 화면에서 통째로 자물쇠 카드가 돼요.</div></div>
+    <div class="tbox"><h3>상점 <span>잠가 두어도 코인은 계속 모여요</span></h3>
+      <div class="tlrow shoprow"><span class="cn">상점 (꾸미기·랜덤 상자·학급 아이템)</span>${sw(shopOpenNow(),'data-shop="1"')}</div>
+      <div class="hint">잠겨 있으면 학생의 상점 버튼에 자물쇠가 보이고, 눌러도 들어갈 수 없어요. 문제를 풀어 얻는 코인은 그대로 쌓이고, 열리는 순간부터 쓸 수 있어요.</div></div>
     ${SCHOOLS.map(sc=>`<div class="tbox"><h3>${sc.n}</h3>
       <div class="tlrow hd"><span>주제</span>${MODES.map(([m,n])=>`<span>${n}</span>`).join('')}</div>
       <div class="tlrow all"><span class="cn">전체</span>${MODES.map(([m])=>{ const all=sc.topics.every(t=>has(t,m));
@@ -4817,6 +4824,8 @@ function paintTTl(){
       ${sc.topics.map(t=>`<div class="tlrow"><span class="cn">${topicOf(t).n}</span>
         ${MODES.map(([m])=>sw(has(t,m),`data-t="${t}" data-m="${m}"`)).join('')}</div>`).join('')}</div>`).join('')}`;
   const save=async()=>{ await dbSet('config/tl',CFG.tl); paintTTl(); toast('저장했어요 · 학생 화면에 바로 반영돼요'); };
+  el('tBody').querySelectorAll('.tsw[data-shop]').forEach(b=>b.onclick=async()=>{ CFG.shop={open:!shopOpenNow()}; await dbSet('config/shop',CFG.shop); paintTTl();
+    toast(CFG.shop.open?'상점을 열었어요':'상점을 잠갔어요 · 코인은 계속 모여요'); });
   const setM=(t,m,on)=>{ const a=new Set(CFG.tl[m]||[]); on?a.add(t):a.delete(t); CFG.tl[m]=[...a]; };
   el('tBody').querySelectorAll('.tsw[data-t]').forEach(b=>b.onclick=()=>{ setM(b.dataset.t,b.dataset.m,!has(b.dataset.t,b.dataset.m)); save(); });
   el('tBody').querySelectorAll('.tsw[data-all]').forEach(b=>b.onclick=()=>{ const [k,m,on]=b.dataset.all.split(':');
@@ -5505,9 +5514,10 @@ function logout(){
 const HS_GOAL_DEF={int:32, subst:22, expo:30, power:40, root:28, pyth:25, trig:25};
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
-let CFG={lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
+let CFG={shop:{open:false},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
 async function loadCfg(){
   try{ const c=await dbGet('config',null);
+    if(c&&c.shop) CFG.shop={open:c.shop.open===true};
     if(c&&c.lock) CFG.lock={on:c.lock.on!==false, goal:Object.assign({},c.lock.goal||{})};
     if(c&&c.tl){ const vs=x=>Object.values(x||{}).filter(v=>typeof v==='string');
       CFG.tl=c.tl.open!=null&&c.tl.v==null?{v:2,p:vs(c.tl.open),r:vs(c.tl.open),b:vs(c.tl.open)}:{v:2,p:vs(c.tl.p),r:vs(c.tl.r),b:vs(c.tl.b)}; }
@@ -5517,6 +5527,7 @@ async function loadCfg(){
 const hsGoal=t=>{ const g=+((CFG.lock.goal||{})[t]); return g>0?g:(HS_GOAL_DEF[t]||25); };
 const hsKeys=()=>schoolOf('m').topics.map(t=>{ const best=rec(t).best||0, goal=hsGoal(t); return {t,best,goal,ok:best>=goal}; });
 const hsOpen=()=>!CFG.lock.on||!!(ME&&ME.hu)||hsKeys().every(x=>x.ok);
+const shopOpenNow=()=>CFG.shop&&CFG.shop.open===true;   /* 상점은 처음에 잠겨 있고 선생님이 열어 줄 때까지 코인만 모입니다 */
 const modeOpen=(t,m)=>(CFG.tl[m]||[]).includes(t);
 const topicOpen=t=>modeOpen(t,'p')||modeOpen(t,'r')||modeOpen(t,'b');
 const schoolAnyOpen=k=>schoolOf(k).topics.some(topicOpen);
@@ -5545,7 +5556,7 @@ function openSchool(){
   show('s-school');
   el('schoolHi').innerHTML=`<b>${esc(ME.sid)}</b> 님, 오늘은 어디서 시작할까요?`;
   paintSchools();
-  loadCfg().then(()=>{ if(el('s-school').classList.contains('on')) paintSchools(); });
+  loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')) paintSchools(); });
 }
 function paintSchools(){
   el('schoolList').innerHTML=SCHOOLS.map(s=>{
@@ -5573,7 +5584,7 @@ function pickSchool(k){
 }
 function goHome(){
   if(!ME) return;
-  loadCfg().then(()=>{ if(el('s-home').classList.contains('on')) paintHome(); });
+  loadCfg().then(()=>{ paintMe(); if(el('s-home').classList.contains('on')) paintHome(); });
   stopTimer(); G=null;
   show('s-home'); paintHome();
 }
@@ -5614,17 +5625,17 @@ function paintHomeMe(){
   const sc=schoolOf(CUR.school);
   n.style.display='';
   n.innerHTML=`<div class="ttl">${esc(ME.sid)} 님의 캐릭터</div>
-    <div class="av" onclick="openShop()" title="상점에서 꾸미기">${avatarSVG(ME.ch)}</div>
+    <div class="av" onclick="openShop()" title="${shopOpenNow()?'상점에서 꾸미기':'상점은 아직 잠겨 있어요'}">${avatarSVG(ME.ch)}</div>
     <div class="figs">${sc.topics.map(t=>`<div class="fig"><b>${rec(t).best||0}</b><span>${topicOf(t).n} 최고</span></div>`).join('')}</div>`;
 }
 
 /* ═══ 상시 표시되는 내 캐릭터 · 메뉴 ═══ */
 function meBarHTML(){
   if(!ME) return '';
-  return `<button class="mebtn" onclick="openShop()" title="상점 열기">
+  return `<button class="mebtn${shopOpenNow()?'':' shoplock'}" onclick="openShop()" title="${shopOpenNow()?'상점 열기':'상점은 아직 잠겨 있어요'}">
       <span class="av">${avatarSVG(ME.ch,{tight:true})}</span>
       <span class="coin"><i></i>${ME.coin}</span>
-      <span class="shoplab">상점</span>
+      <span class="shoplab">${shopOpenNow()?'':LOCKI}상점</span>
     </button>
     <button class="mnbtn" onclick="openMine()">마이페이지</button>
     <button class="mnbtn" onclick="openRank()">랭킹</button>`;
@@ -6382,7 +6393,10 @@ function wearOn(ch,g){
   else c.items=c.items.filter(w=>CAT_OF(w)!==g.cat).concat([g.k]);
   return c;
 }
-function openShop(){ if(!ME) return; stopTimer(); G=null; shopCat='new'; TRY=null; show('s-shop'); paintShop();
+function openShop(){ if(!ME) return;
+  if(!shopOpenNow()){ toast('상점은 아직 잠겨 있어요 · 코인은 계속 모이니까 열릴 때 쓰세요');
+    loadCfg().then(()=>{ if(shopOpenNow()) openShop(); else if(typeof paintMe==='function') paintMe(); }); return; }
+  stopTimer(); G=null; shopCat='new'; TRY=null; show('s-shop'); paintShop();
   loadClass().then(()=>{ if(el('s-shop').classList.contains('on')) paintShop(); }).catch(()=>{}); }
 function endTry(){ TRY=null; const b=el('tryBar'); if(b) b.classList.remove('on'); }
 function paintShop(){
