@@ -1137,6 +1137,27 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .gbadge.g-A{background:#18b07a}
 .gbadge.g-B{background:#8a8f9c}
 .gbadge.g-none{background:var(--soft);color:var(--dim);font-weight:700}
+
+/* 학교 홈 — 간단하게 */
+.topic.tc2{padding:16px 16px 14px}
+.topic.tc2 .ttop{align-items:center}
+.topic.tc2 .tinfo h2{display:flex;align-items:center;flex-wrap:wrap;gap:2px 0}
+.topic.tc2 .tsym{width:46px;height:46px;font-size:20px}
+.tkey{margin:3px 0 0;font-size:12.5px;color:var(--dim);display:flex;align-items:center;gap:5px}
+.tkey svg{width:12px;height:12px} .tkey.ok{color:var(--o,#18a05e);font-weight:700}
+.topic.tc2 .tbtns{margin-top:12px;gap:8px}
+.topic.tc2 .tbtn{padding:10px 8px;min-height:58px}
+.topic.tc2 .tbtn b{font-size:16px}
+.topic.tc2 .tbtn small{font-size:12px}
+.shutbox{border:1px dashed var(--line);border-radius:18px;padding:12px 14px;background:transparent}
+.shuth{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--dim)}
+.shuth svg{width:13px;height:13px} .shuth b{color:var(--ink);font-weight:700} .shuth span{margin-left:auto;font-size:12px}
+.shutchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.shutchip{border:1px solid var(--line);background:var(--soft);color:var(--dim);border-radius:99px;padding:6px 11px;font-size:13px;font-weight:600}
+.btbar .btt small{white-space:nowrap}
+.st .nm .gbadge{height:20px;min-width:28px;font-size:11px;margin-left:5px;vertical-align:1px;padding:0 6px}
+.nm3 .gbadge{height:18px;min-width:26px;font-size:10.5px;margin-left:5px;padding:0 5px;vertical-align:1px}
+#clTitle .gbadge{height:30px;min-width:44px;font-size:16px;vertical-align:5px}
 </style>
 </head>
 <body>
@@ -1216,7 +1237,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
   <div class="homegrid2">
     <div class="topicscol">
       <button class="btbar" onclick="openBattle()"><span class="bti" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M2.8 19c.6-3.4 3.1-5.4 6.2-5.4s5.6 2 6.2 5.4z" fill="currentColor"/><circle cx="16.6" cy="9" r="2.6" fill="currentColor" opacity=".55"/><path d="M14.6 14.2c.6-.2 1.3-.3 2-.3 2.6 0 4.4 1.7 4.9 4.6h-4.6c-.3-1.7-1.1-3.2-2.3-4.3z" fill="currentColor" opacity=".55"/></svg></span>
-        <span class="btt"><b>친구와 대전</b><small>방을 만들어 같은 문제를 동시에 풀고, 누가 더 많이 맞히는지 겨뤄요</small></span><span class="go" aria-hidden="true">→</span></button>
+        <span class="btt"><b>친구와 대전</b><small>같은 문제로 친구와 겨루기</small></span><span class="go" aria-hidden="true">→</span></button>
       <div class="topics" id="topicList"></div>
     </div>
     <div class="homeme" id="homeMe" style="display:none"></div>
@@ -5584,6 +5605,13 @@ function gradeBadge(t){ const n=(rec(t).best)||0, g=gradeOfRec(t,n); if(!gradeCu
   if(!g) return `<span class="gbadge g-none" title="실전 모드 기록이 생기면 등급이 붙어요">-</span>`;
   const C=gradeCuts(t), i=C.findIndex(x=>x[0]===g), nx=i>0?C[i-1]:null;
   return `<span class="gbadge g-${g}" title="실전 최고 ${n}개${nx?` · ${nx[0]}까지 ${nx[1]-n}개 더`:''}">${g}</span>`; }
+/* 연습 스테이지 등급 — 스테이지 최고 시간을 문항 수로 나눈 '문항당 초'로 매깁니다.
+   실전 기준 개수 c 를 1분에 푸는 속도(60 ÷ c 초)와 같으면 그 등급. 클리어만 해도 B. */
+const stageCount=(t,n)=>{ const s=stageOf(t,n); return s.facts?Math.min(s.take,s.facts().length):s.take; };
+function stageGrade(t,n){ const c=GRADE_CUT[t], bt=prog(t).bt['s'+n]; if(!c||!bt) return null;
+  const spq=bt/stageCount(t,n), names=['SSS','SS','S','A'];
+  for(let i=0;i<4;i++) if(spq<=60/c[i]) return names[i]; return 'B'; }
+const gBadge=g=>g?`<span class="gbadge g-${g}">${g}</span>`:'';
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
 let CFG={shop:{open:false},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
@@ -5665,7 +5693,10 @@ function goHome(){
 function paintHome(){
   const sc=schoolOf(CUR.school);
   el('homeSchool').textContent=sc.n;
-  el('topicList').innerHTML=sc.topics.map(topicCard).join('');
+  const open=sc.topics.filter(t=>modeOpen(t,'p')||modeOpen(t,'r')), shut=sc.topics.filter(t=>!open.includes(t));
+  el('topicList').innerHTML=open.map(topicCard).join('')+(shut.length?`<div class="shutbox">
+      <div class="shuth">${LOCKI}<b>잠긴 주제 ${shut.length}개</b><span>선생님이 열면 위로 올라와요</span></div>
+      <div class="shutchips">${shut.map(t=>`<button class="shutchip" onclick="topicShut('${t}')">${topicOf(t).n}</button>`).join('')}</div></div>`:'');
   paintHomeMe();
 }
 function topicCard(t){
@@ -5676,19 +5707,17 @@ function topicCard(t){
         <span class="tlk" aria-label="잠김">${LOCKI}</span></div>
       <div class="tlnote">${LOCKI}<span>잠겨 있어요 · 선생님이 열어 주면 시작할 수 있어요</span></div></div>`; }
   const T=topicOf(t), p=prog(t), r=rec(t), w=wrongOf(t).length, S=T.stages.length, cl=p.c.length;
-  return `<div class="topic" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}">
+  const key=T.school==='m'&&CFG.lock.on&&!(ME&&ME.hu), kok=(r.best||0)>=hsGoal(t);
+  return `<div class="topic tc2" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}">
     <div class="ttop"><span class="tsym">${symHTML(T)}</span>
-      <div class="tinfo"><h2>${T.n}${gradeBadge(t)}</h2><p>${T.desc}</p></div></div>
-    <div class="tprog"><i style="width:${Math.round(cl/S*100)}%"></i></div>
-    <div class="tprogl">연습 스테이지 <b>${cl} / ${S}</b> 클리어</div>
-    ${T.school==='m'&&CFG.lock.on&&!(ME&&ME.hu)?`<div class="hskey${(r.best||0)>=hsGoal(t)?' ok':''}">${(r.best||0)>=hsGoal(t)?'✓':LOCKI}
-      고등학교 열쇠 · 실전 <b>${hsGoal(t)}개</b>${(r.best||0)>=hsGoal(t)?' 달성':` (최고 ${r.best||0}개)`}</div>`:''}
+      <div class="tinfo"><h2>${T.n}${gradeBadge(t)}</h2>
+        ${key?`<p class="tkey${kok?' ok':''}">${kok?'✓ 고등학교 열쇠 얻음':`${LOCKI} 고등학교 열쇠 · 실전 ${hsGoal(t)}개`}</p>`:''}</div></div>
     <div class="tbtns">
-      ${modeOpen(t,'p')?`<button class="tbtn prac" onclick="openStages('${t}')"><b>연습 모드</b><small>스테이지 ${S}개</small></button>`
-        :`<button class="tbtn prac mlock" onclick="topicShut('${t}')"><b>${LOCKI}연습 모드</b><small>잠겨 있어요</small></button>`}
-      ${modeOpen(t,'r')?`<button class="tbtn real${w?' locked':''}" onclick="tryReal('${t}')"><b>실전 모드</b>
-        <small>${w?`오답노트 ${w}문항 남음`:`${REAL_SEC/60}분 무실수 · 최고 ${r.best||0}개`}</small></button>`
-        :`<button class="tbtn real mlock" onclick="topicShut('${t}')"><b>${LOCKI}실전 모드</b><small>잠겨 있어요</small></button>`}
+      ${modeOpen(t,'p')?`<button class="tbtn prac" onclick="openStages('${t}')"><b>연습</b><small>${cl} / ${S} 클리어</small></button>`
+        :`<button class="tbtn prac mlock" onclick="topicShut('${t}')"><b>${LOCKI}연습</b><small>잠겨 있어요</small></button>`}
+      ${modeOpen(t,'r')?`<button class="tbtn real${w?' locked':''}" onclick="tryReal('${t}')"><b>실전</b>
+        <small>${w?`오답노트 ${w}개 먼저`:`최고 ${r.best||0}개`}</small></button>`
+        :`<button class="tbtn real mlock" onclick="topicShut('${t}')"><b>${LOCKI}실전</b><small>잠겨 있어요</small></button>`}
     </div></div>`;
 }
 function paintHomeMe(){
@@ -5751,7 +5780,7 @@ function renderStages(){
     return `<button class="st ${done?'done':''}" onclick="startStage('${t}',${s.n})">
       <div class="stamp">✓</div><div class="no">${s.n}</div>
       <div class="ex${s.ex.length>13?' exs':s.ex.length>9?' exm':''}">${esc(s.ex)}</div>
-      <div class="nm">${s.name}</div>
+      <div class="nm">${s.name}${gBadge(stageGrade(t,s.n))}</div>
       <div class="cn">${cnt}문항${bt?` · 최고 ${bt.toFixed(1)}초`:''}${td?' · 오늘 ✓':''}</div></button>`;
   }).join('');
   const w=wrongOf(t).length;
@@ -6035,7 +6064,7 @@ async function stageClear(){
   saveMe();
 
   el('clStamp').textContent='STAGE CLEAR';
-  el('clTitle').textContent=`${n}단계 클리어!`;
+  el('clTitle').innerHTML=`${n}단계 클리어!${gBadge(stageGrade(t,n))}`;
   el('clName').textContent=`${T.n} · ${s.name}`;
   el('clChars').innerHTML=`<div class="clav">${avatarSVG(ME.ch)}</div>`;
   el('clQ').textContent=need; el('clQl').textContent='문항 수';
@@ -6273,7 +6302,7 @@ function paintMine(){
   el('mpStage').innerHTML=T.stages.map(s=>{
     const done=p.c.includes(s.n), bt=p.bt['s'+s.n];
     return `<button class="mprow" onclick="startStage('${t}',${s.n})">
-      <span class="no3">${s.n}</span><span class="nm3">${s.name}</span>
+      <span class="no3">${s.n}</span><span class="nm3">${s.name}${gBadge(stageGrade(t,s.n))}</span>
       <span class="bar3"><i style="width:${done?100:0}%"></i></span>
       <span class="cnt3 ${done?'ok':''}">${done?(bt?bt.toFixed(1)+'초':'클리어'):'도전 전'}</span></button>`;
   }).join('');
