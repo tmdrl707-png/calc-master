@@ -1102,6 +1102,41 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .chips.rksch{margin-bottom:6px}
 .chip.sch{font-weight:700;padding-left:16px;padding-right:16px}
 .topics{grid-template-columns:minmax(0,1fr)} .topic{min-width:0} .topic .tinfo{min-width:0} .topic .tinfo p{overflow-wrap:anywhere}
+
+/* ═══ 휴대폰 문제 화면 — 숫자판이 언제나 한 화면 안에 ═══ */
+@media (max-width:520px){
+  body{padding:10px 10px 24px}
+  #s-play .hud{flex-wrap:nowrap;gap:5px;margin-bottom:6px;min-width:0}
+  #s-play .hud .pill{padding:5px 8px;font-size:12px;white-space:nowrap;box-shadow:none}
+  #s-play .hud .pill b{font-size:15px}
+  #s-play #hMe{display:none!important}
+  #s-play #hLv{min-width:0;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
+  #s-play .hud .spacer{flex:1 0 0}
+  #s-play .hud .btn{padding:6px 10px;font-size:12.5px;white-space:nowrap;flex:none;min-height:34px}
+  #s-play .timerbar{margin-bottom:8px}
+  #s-play .qcard{min-height:clamp(130px,calc(100dvh - 400px),250px);padding:12px 10px}
+  #s-play .keypad{gap:7px;margin-top:8px}
+  #s-play .kb{height:clamp(46px,8dvh,58px);font-size:26px}
+  .toast{bottom:auto;top:10px;transform:translateY(-12px)}
+  .toast.on{transform:none}
+}
+@media (max-width:520px) and (max-height:600px){
+  #s-play .qcard{min-height:120px}
+  #s-play .eq{font-size:40px}
+  #s-play .qcard .qlab,#s-play .qcard .qhd{margin-bottom:4px}
+}
+@media (max-width:520px) and (max-height:720px){ #s-play .qfig svg,#s-play .qfig .vis{max-height:92px;width:auto;max-width:100%} #s-play .qfig{margin-bottom:2px} }
+@media (max-width:520px) and (max-height:600px){ #s-play .qfig svg,#s-play .qfig .vis{max-height:68px} #s-play .kb{height:44px} }
+
+/* 실전 등급 */
+.gbadge{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:24px;padding:0 8px;margin-left:8px;border-radius:7px;
+  font-size:13px;font-weight:900;letter-spacing:.02em;vertical-align:4px;color:#fff;font-style:normal}
+.gbadge.g-SSS{background:linear-gradient(135deg,#FFD84D,#FF9F1C);color:#2a1d00}
+.gbadge.g-SS{background:#ff4f8b}
+.gbadge.g-S{background:#2f5bea}
+.gbadge.g-A{background:#18b07a}
+.gbadge.g-B{background:#8a8f9c}
+.gbadge.g-none{background:var(--soft);color:var(--dim);font-weight:700}
 </style>
 </head>
 <body>
@@ -5535,6 +5570,18 @@ function logout(){
    기준은 최상위권 학생이 1분 동안 틀리지 않고 풀 수 있는 정도로 잡았고,
    선생님 모드 '고등 열쇠' 탭에서 바꾸거나 학생 기록의 상위 10%로 맞출 수 있습니다. */
 const HS_GOAL_DEF={int:20, subst:14, expo:18, power:25, root:16, pyth:15, trig:15};   /* 1분 실전 기준 */
+/* ═══ 실전 등급 B · A · S · SS · SSS — 닮은 삼각형 게임과 같은 비율 ═══
+   그 게임은 문제당 SSS 약 6초 · SS 약 10초 · S 약 15초, 시간 안에 끝내면 A 였어요.
+   여기서는 1분 동안 맞힌 개수라, SSS 개수를 N 으로 두고 SS = 0.6N · S = 0.4N · A = 0.25N, 1개 이상이면 B.
+   N 은 주제마다 최상위권이 1분 무실수로 닿는 개수 (중학교는 고등학교 열쇠 기준과 같게) */
+const GRADE_TOP={addsub:24, gugu:28, power:25, pyth:15};
+function gradeCuts(t){ const N=GRADE_TOP[t]; if(!N) return null;
+  return [['SSS',N],['SS',Math.round(N*.6)],['S',Math.round(N*.4)],['A',Math.max(2,Math.round(N*.25))],['B',1]]; }
+function gradeOfRec(t,n){ const C=gradeCuts(t); if(!C||!(n>0)) return null; for(const [g,c] of C) if(n>=c) return g; return null; }
+function gradeBadge(t){ const n=(rec(t).best)||0, g=gradeOfRec(t,n); if(!gradeCuts(t)) return '';
+  if(!g) return `<span class="gbadge g-none" title="실전 모드 기록이 생기면 등급이 붙어요">-</span>`;
+  const C=gradeCuts(t), i=C.findIndex(x=>x[0]===g), nx=i>0?C[i-1]:null;
+  return `<span class="gbadge g-${g}" title="실전 최고 ${n}개${nx?` · ${nx[0]}까지 ${nx[1]-n}개 더`:''}">${g}</span>`; }
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
 let CFG={shop:{open:false},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
@@ -5629,7 +5676,7 @@ function topicCard(t){
   const T=topicOf(t), p=prog(t), r=rec(t), w=wrongOf(t).length, S=T.stages.length, cl=p.c.length;
   return `<div class="topic" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}">
     <div class="ttop"><span class="tsym">${symHTML(T)}</span>
-      <div class="tinfo"><h2>${T.n}</h2><p>${T.desc}</p></div></div>
+      <div class="tinfo"><h2>${T.n}${gradeBadge(t)}</h2><p>${T.desc}</p></div></div>
     <div class="tprog"><i style="width:${Math.round(cl/S*100)}%"></i></div>
     <div class="tprogl">연습 스테이지 <b>${cl} / ${S}</b> 클리어</div>
     ${T.school==='m'&&CFG.lock.on&&!(ME&&ME.hu)?`<div class="hskey${(r.best||0)>=hsGoal(t)?' ok':''}">${(r.best||0)>=hsGoal(t)?'✓':LOCKI}
@@ -5860,8 +5907,11 @@ function askQ(f){
       <div class="eq${eqSize(f)}" id="eq">${eqHTML(f,'','')}</div>
       <div class="qmsg" id="qmsg"></div>
     </div>`;
-  G.qStart=performance.now(); updHUD();
+  fitEq(); G.qStart=performance.now(); updHUD();
 }
+/* 휴대폰에서 식이 화면보다 넓으면 글씨를 한 단계씩 줄여 한 줄로 */
+function fitEq(){ const e=el('eq'); if(!e) return;
+  for(const c of ['eqs','eqxs']){ if(e.scrollWidth<=e.clientWidth+1) return; e.classList.remove('eqs'); e.classList.add(c); } }
 function paintTyped(state){ const e=el('eq'); if(e) e.innerHTML=eqHTML(G.ask,G.typed,state||''); }
 
 /* 숫자판 */
