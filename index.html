@@ -5570,13 +5570,15 @@ function logout(){
    기준은 최상위권 학생이 1분 동안 틀리지 않고 풀 수 있는 정도로 잡았고,
    선생님 모드 '고등 열쇠' 탭에서 바꾸거나 학생 기록의 상위 10%로 맞출 수 있습니다. */
 const HS_GOAL_DEF={int:20, subst:14, expo:18, power:25, root:16, pyth:15, trig:15};   /* 1분 실전 기준 */
-/* ═══ 실전 등급 B · A · S · SS · SSS — 닮은 삼각형 게임과 같은 비율 ═══
-   그 게임은 문제당 SSS 약 6초 · SS 약 10초 · S 약 15초, 시간 안에 끝내면 A 였어요.
-   여기서는 1분 동안 맞힌 개수라, SSS 개수를 N 으로 두고 SS = 0.6N · S = 0.4N · A = 0.25N, 1개 이상이면 B.
-   N 은 주제마다 최상위권이 1분 무실수로 닿는 개수 (중학교는 고등학교 열쇠 기준과 같게) */
-const GRADE_TOP={addsub:24, gugu:28, power:25, pyth:15};
-function gradeCuts(t){ const N=GRADE_TOP[t]; if(!N) return null;
-  return [['SSS',N],['SS',Math.round(N*.6)],['S',Math.round(N*.4)],['A',Math.max(2,Math.round(N*.25))],['B',1]]; }
+/* ═══ 실전 등급 B · A · S · SS · SSS (1분 무실수에서 맞힌 개수) ═══
+   A   : 내용을 충분히 알고 있다          — 1단계를 넘어 2단계 문제까지 안정적으로
+   S   : 내용을 매우 충분히 알고 있다      — 2단계를 넘어 마지막 단계에 닿음
+   SS  : 아주 잘한다                     — 최상위권이 실수 없이 1분을 거의 다 쓰는 수준
+   SSS : 아주 잘하는 친구도 문제 운이 따라야 나오는 개수 (마지막 단계 문제를 계속 빠르게)
+   B   : 1개 이상 */
+const GRADE_CUT={addsub:[26,20,15,10], gugu:[30,24,18,12], power:[23,18,14,9], pyth:[15,12,9,6]};   /* SSS · SS · S · A */
+function gradeCuts(t){ const c=GRADE_CUT[t]; if(!c) return null;
+  return [['SSS',c[0]],['SS',c[1]],['S',c[2]],['A',c[3]],['B',1]]; }
 function gradeOfRec(t,n){ const C=gradeCuts(t); if(!C||!(n>0)) return null; for(const [g,c] of C) if(n>=c) return g; return null; }
 function gradeBadge(t){ const n=(rec(t).best)||0, g=gradeOfRec(t,n); if(!gradeCuts(t)) return '';
   if(!g) return `<span class="gbadge g-none" title="실전 모드 기록이 생기면 등급이 붙어요">-</span>`;
