@@ -1111,7 +1111,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
       </div>
       <div class="fld">
         <label for="inPw">비밀번호 (4자리)</label>
-        <input type="tel" id="inPw" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="숫자 4자리">
+        <input type="password" id="inPw" maxlength="4" inputmode="numeric" autocomplete="new-password" placeholder="숫자 4자리">
       </div>
       <div class="err" id="gErr"></div>
       <div class="row">
@@ -1428,7 +1428,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
     <div class="sub">누적 랭킹은 암호를 넣어야 볼 수 있습니다.</div>
     <div class="fld">
       <label for="rkPw">암호 (4자리)</label>
-      <input type="tel" id="rkPw" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="숫자 4자리">
+      <input type="password" id="rkPw" maxlength="4" inputmode="numeric" autocomplete="new-password" placeholder="숫자 4자리">
     </div>
     <div class="err" id="rkErr"></div>
     <div class="row">
@@ -3278,7 +3278,7 @@ function areaSVG(a,b){
       x+=w; });
     g+=`<text x="${x0-7}" y="${(y+h/2+5).toFixed(1)}" font-size="13" font-weight="800" fill="${VC.dim}" text-anchor="end" font-family="${FONT}">${bv}</text>`;
     y+=h; });
-  return `<svg viewBox="0 0 ${W} ${H}" class="vis area" role="img" aria-label="${a} × ${b} 넓이 모형">${g}</svg>`;
+  return `<svg data-keep="1" viewBox="0 0 ${W} ${H}" class="vis area" role="img" aria-label="${a} × ${b} 넓이 모형">${g}</svg>`;
 }
 /* 직각삼각형 — 가로 a, 세로 b, 빗변 c.  unk 'a' 'b' 'c' 자리는 ? 로 */
 function pythSVG(a,b,c,unk,small){
@@ -5696,7 +5696,7 @@ function renderPreview(){
       <div class="pvs">${T.n} · ${G.need}문항</div></div></div>
     <div class="pvtip">${pv.tip}</div>
     <div class="pvbody">
-      ${pv.svg?`<div class="pvfig">${pv.svg}</div>`:''}
+      ${figOK(pv.svg)?`<div class="pvfig">${pv.svg}</div>`:''}
       <div class="pvtxt">
         ${pv.table?`<div class="ftabs">${pv.table}</div>`:''}
         ${pv.grid||''}
@@ -5911,8 +5911,12 @@ function showHint(f,typed,note,onNext,opt){
     </div>`;
   el('nextBtn').onclick=()=>G&&G.onNext&&G.onNext();
 }
+/* 그림은 '실제로 도움이 되는' 주제에만 보여 줍니다 — 피타고라스·삼각비·삼각함수, 그리고 곱셈 분배(넓이 모델).
+   구구단·제곱수·덧셈뺄셈 같은 계산 연습에서는 그림 없이 식과 설명만 보여요. */
+const FIG_TOPICS=['pyth','trig','tfn'];
+const figOK=svg=>!!svg&&(FIG_TOPICS.includes((G&&G.t)||CUR.topic)||/data-keep="1"/.test(svg));
 const hintBox=h=>`<div class="hbody">
-    ${h.svg?`<div class="hfig">${h.svg}</div>`:''}
+    ${figOK(h.svg)?`<div class="hfig">${h.svg}</div>`:''}
     <div class="htxt"><div class="htitle">${h.t}</div>${h.lines.map(l=>`<div class="hl">${l}</div>`).join('')}</div>
   </div>`;
 
