@@ -3251,6 +3251,8 @@ const IPOW=()=>[iP(-1,2),iP(-1,3),iP(-2,2),iP(-2,3),iP(-3,2),iP(-3,3),iP(-4,2),i
 
 const PY_BASE=[[3,4,5],[5,12,13],[8,15,17],[7,24,25]];
 const PY_MULT=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[30,40,50],[10,24,26],[15,36,39],[16,30,34],[14,48,50]];
+/* 연습용 배수: (3,4,5)는 2~5배, 나머지는 2배까지 */
+const PY_MULT_P=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[10,24,26],[16,30,34],[14,48,50]];
 const PY_BIG =[[20,21,29]];
 /* 분수·소수로 줄인 피타고라스 수 — 답은 늘 자연수가 되게 골랐어요.
    [종류 h(빗변)/l(다른 변), a, b, c, a², b², c², 바탕 피타고라스 수, 몇 배] — l 은 a 가 답 */
@@ -3265,8 +3267,12 @@ const PY_FD=[
   ['l','6','4.5','7.5','36','20.25','56.25',[3,4,5],'1.5배'],
   ['l','6','2.5','6.5','36','6.25','42.25',[5,12,13],'0.5배'],
   ['l','2','3/2','5/2','4','9/4','25/4',[3,4,5],'1/2배'],
-  ['l','6','5/2','13/2','36','25/4','169/4',[5,12,13],'1/2배']
+  ['l','6','5/2','13/2','36','25/4','169/4',[5,12,13],'1/2배'],
+  ['l','4','7.5','8.5','16','56.25','72.25',[8,15,17],'1/2배'],
+  ['l','12','3.5','12.5','144','12.25','156.25',[7,24,25],'1/2배']
 ];
+/* 연습용 분수·소수: 2 또는 5로 나눈 것만 (실전 최고 단계에는 모두 나옴) */
+const PY_FD_P=[0,3,6,8,9,10,11,12];
 const pyNum=x=>{ const m=String(x).split('/'); return m.length>1?(+m[0])/(+m[1]):+x; };
 const pyTok=x=>{ const m=String(x).split('/'); return m.length>1?{fr:[m[0],m[1]]}:String(x); };
 const yX=i=>{ const [k,a,b,c]=PY_FD[i];
@@ -3316,8 +3322,14 @@ Object.assign(TOPICS,{
       {n:2, name:'다른 한 변 구하기', ex:'□² + 12² = 13²', take:8,
        facts:()=>PY_BASE.flatMap(([a,b,c])=>[yL(c,a),yL(c,b)])},
       {n:3, name:'피타고라스 수 늘리기', ex:'0.6² + 0.8² = □²', take:12,
-       facts:()=>pyFacts(PY_MULT,true).concat(pyFacts(PY_BIG,true),PY_FD.map((_,i)=>yX(i))),
+       facts:()=>pyFacts(PY_MULT_P,true).concat(pyFacts(PY_BIG,true),PY_FD_P.map(yX)),
        pick:l=>sampleN(l.filter(f=>f.k!=='yX'&&f.c!==29),6).concat(sampleN(l.filter(f=>f.c===29),2),sampleN(l.filter(f=>f.k==='yX'),4))}
+    ],
+    /* 실전은 마지막 단계에서 배수·분수·소수가 더 다양하게 */
+    realStages:[
+      {n:1, name:'빗변 구하기', facts:()=>PY_BASE.flatMap(([a,b])=>[yH(a,b),yH(b,a)])},
+      {n:2, name:'다른 한 변 구하기', facts:()=>PY_BASE.flatMap(([a,b,c])=>[yL(c,a),yL(c,b)])},
+      {n:3, name:'피타고라스 수 늘리기', facts:()=>pyFacts(PY_MULT,true).concat(pyFacts(PY_BIG,true),PY_FD.map((_,i)=>yX(i)))}
     ],
     cats:[['빗변 구하기',sk=>/^yH/.test(sk)],['다른 한 변 구하기',sk=>/^yL/.test(sk)],['분수·소수',sk=>/^yX/.test(sk)],
           ['제곱의 합',sk=>/^yS/.test(sk)],['제곱의 차',sk=>/^yD/.test(sk)]]}
@@ -3511,7 +3523,7 @@ function extHint(f){
       const L=k==='h'
         ?[`□² = ${P(a)}² + ${P(b)}² = ${a2} + ${b2} = ${c2}`, `${c2} = ${c}² 이므로 □ = ${B(f.ans)}`]
         :[`□² = ${P(c)}² − ${P(b)}² = ${c2} − ${b2} = ${a2}`, `${a2} = ${a}² 이므로 □ = ${B(f.ans)}`];
-      L.push(tip(`(${T.join(', ')}) 의 ${x}예요 — 피타고라스 수를 알면 계산 없이 바로 보여요`));
+      L.push(tip(`(${T.join(', ')}) ${x==='1/2배'?'를 2로 나눈 수예요':x==='1/5배'||x==='0.2배'?'를 5로 나눈 수예요':'의 '+x+'예요'} — 피타고라스 수를 알면 계산 없이 바로 보여요`));
       return {t:k==='h'?'분수·소수도 똑같이 제곱해 더하기':'분수·소수도 빗변의 제곱에서 빼기', lines:L,
         svg:pythSVG(pyNum(a),pyNum(b),pyNum(c),k==='h'?'c':'a',false,labs)};
     }
@@ -3597,7 +3609,7 @@ function extPreview(t,n){
   if(n===2) return Object.assign(H(yL(13,12),'빗변이 주어졌으면, 빗변의 제곱에서 아는 변의 제곱을 빼요.'),
       {body:chipList(PY_BASE.map(([a,b,c])=>`(<b>${a}</b>, <b>${b}</b>, ${c})`))});
   return Object.assign(H(yX(0),'피타고라스 수에 같은 수를 곱해도(나눠도) 피타고라스 수예요. 분수·소수로 줄여도 마찬가지!'),
-      {body:chipList(PY_MULT.slice(0,6).concat(PY_BIG).map(t=>`(${t.join(', ')})`).concat(['(0.6, 0.8, 1)','(3/5, 4/5, 1)']))});
+      {body:chipList(PY_MULT_P.concat(PY_BIG).map(t=>`(${t.join(', ')})`).concat(['(0.6, 0.8, 1)','(3/5, 4/5, 1)','(1.5, 2, 2.5)']))});
 }
 
 /* ═══ 정리 노트 ═══ */
