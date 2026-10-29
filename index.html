@@ -1183,6 +1183,25 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .ovst i.g-SSS{background:linear-gradient(135deg,#FFD84D,#FF9F1C);color:#2a1d00} .ovst i.g-SS{background:#ff4f8b} .ovst i.g-S{background:#2f5bea} .ovst i.g-A{background:#18b07a}
 .ovr2 b{font-size:20px} .ovr2 b small{font-size:12px;color:var(--dim);font-weight:600} .ovr2 .gbadge{vertical-align:3px}
 @media(max-width:620px){ .ovh{display:none} .ovr{grid-template-columns:1fr auto;grid-template-areas:'n r' 'p p'} .ovn{grid-area:n} .ovr2{grid-area:r;text-align:right} .ovp{grid-area:p} }
+
+/* 공책 정리 */
+.note{position:relative;margin:4px 0 10px;padding:6px 16px 10px 34px;border-radius:14px;border:1px solid #e8e1cc;
+  background-color:#fffdf6;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 35px,#dfe7f5 35px,#dfe7f5 36px);
+  background-position:0 34px;box-shadow:0 1px 0 #efe9d8}
+.note::before{content:'';position:absolute;left:22px;top:0;bottom:0;width:2px;background:#f4b7b7}
+.note .nt{height:36px;line-height:38px;font-size:14px;font-weight:800;color:#c0563c;letter-spacing:.02em}
+.note .ngrid{display:grid;grid-template-columns:repeat(var(--nc),minmax(0,1fr));column-gap:14px}
+.note .ncell{height:36px;line-height:38px;font-size:18px;font-weight:600;color:#1f2433;white-space:nowrap;font-variant-numeric:tabular-nums}
+.note .ncell b{color:#2f5bea;font-weight:800}
+.note-gugu .ncell{font-size:19px}
+@media(max-width:620px){
+  .note{padding-left:28px}.note::before{left:17px}
+  .note-sq .ngrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .note .ncell{font-size:16px}
+}
+@media(max-width:380px){ .note-sq .ngrid,.note-gugu .ngrid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.pvtxt .note:first-child{margin-top:0}
+.pvtxt{flex:1 1 auto;min-width:0;width:100%} .pvtxt .note{width:100%;box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -3001,11 +3020,24 @@ function hintOf(f){
 /* ═══ 스테이지를 시작하기 전에 보는 '한눈에 보기' ═══ */
 function chipList(arr){ return `<div class="fchips">${arr.map(s=>`<span class="fchip">${s}</span>`).join('')}</div>`; }
 /* 스테이지를 합친 뒤에도 예전 미리보기를 그대로 씁니다 — old:[1,2] 이면 두 미리보기를 이어 붙여요 */
+/* 공책 정리 — 줄 공책 위에 외울 것을 칸 맞춰 적어요 */
+function noteSheet(title,items,cols,kind){
+  return `<div class="note note-${kind||''}" style="--nc:${cols}"><div class="nt">${title}</div>
+    <div class="ngrid">${items.map(x=>`<div class="ncell">${x}</div>`).join('')}</div></div>`; }
 function stagePreview(t,n){
   const st=stageOf(t,n);
   if(st&&st.pv&&t==='gugu'){ const a=st.pv;
-    return {tip:`${a}단은 ${a}씩 커져요. 헷갈리면 아는 칸에서 ${a}를 더하거나 빼서 만들어 보세요.`,
-      table:`<div class="ftab"><h4>${a}단</h4>${range(1,9).map(b=>`<div>${a} × ${b} = <b>${a*b}</b></div>`).join('')}</div>`}; }
+    return {tip:`${a}단은 ${a}씩 커져요.`,
+      body:noteSheet(`${a}단`, range(1,9).map(b=>`${a} × ${b} = <b>${a*b}</b>`), 3, 'gugu')}; }
+  if(t==='power'){
+    if(n===1) return {tip:'1² ~ 20² — 왼쪽부터 차례로 외워요.',
+      body:noteSheet('제곱수', range(1,20).map(k=>`${k}² = <b>${k*k}</b>`), 4, 'sq')};
+    if(n===2) return {tip:'1³ ~ 10³ — 같은 수를 세 번 곱한 수예요.',
+      body:noteSheet('세제곱수', range(1,10).map(k=>`${k}³ = <b>${k*k*k}</b>`), 2, 'cu')};
+    if(n===3) return {tip:'수를 보고 무엇의 제곱·세제곱인지 바로 떠올려요.',
+      body:noteSheet('이 수는 □의 제곱', range(2,20).map(k=>`${k*k} = <b>${k}</b>²`), 4, 'sq')+
+           noteSheet('이 수는 □의 세제곱', range(2,10).map(k=>`${k*k*k} = <b>${k}</b>³`), 3, 'cu')};
+  }
   const ids=(st&&st.old)||[n];
   if(ids.length===1) return previewOf(t,ids[0]);
   const P=ids.map(o=>previewOf(t,o)).filter(Boolean), uniq=a=>a.filter((x,i)=>x&&a.indexOf(x)===i);
