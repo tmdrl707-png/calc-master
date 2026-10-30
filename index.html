@@ -1250,6 +1250,17 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 
 .rk .sc.wl{font-size:20px;white-space:nowrap}.rk .sc.wl small{margin:0 3px 0 1px}
 .chip.btsch2{border-style:dashed}
+
+/* 실전 기록 그래프 — 요약 세 칸 + 막대 */
+.chartbox{background:#fff;border:1px solid var(--line,#e5e5ea);border-radius:18px;padding:14px 12px 8px}
+.rcsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 10px}
+.rcsum>div{background:var(--soft,#f5f5f7);border-radius:12px;padding:8px 6px;text-align:center}
+.rcsum b{display:flex;align-items:center;justify-content:center;gap:5px;font-size:20px;font-weight:800;letter-spacing:-.5px;line-height:1.2}
+.rcsum span{display:block;font-size:11px;color:var(--dim);margin-top:2px}
+.rcsum em{font-style:normal;font-size:11px;font-weight:700}.rcsum em.up{color:#18a058}.rcsum em.dn{color:#e5484d}
+.rcsum .gbadge.sm{font-size:10px;padding:1px 6px;transform:none}
+.rcsum .gbadge.sm{display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;line-height:1;height:18px;min-width:0;padding:0 6px;border-radius:6px;vertical-align:middle;transform:none}
+.rcsum .gbadge.g-SS,.rcsum .gbadge.g-S,.rcsum .gbadge.g-A,.rcsum .gbadge.g-B{color:#fff}
 </style>
 </head>
 <body>
@@ -5934,8 +5945,8 @@ function paintTStu(rows){
           <div><b>${r.avg.toFixed(1)}</b><span>평균 (${r.cnt}회)</span></div>
           <div><b>${r.clear}/${T.stages.length}</b><span>클리어한 스테이지</span></div>
         </div>
-        <div class="chartbox">${lineChart(r.hist,{h:150,mode:r.cnt>20?'day':'try'})}</div>
-        <div class="chartlab">가로축 날짜 · 세로축 맞힌 문항 수</div>
+        <div class="chartbox">${lineChart(r.hist,{h:150,mode:r.cnt>20?'day':'try',t:T.k})}</div>
+        <div class="chartlab">막대 하나가 도전 한 번 · 점선은 등급 기준</div>
         <div style="margin-top:10px"><b style="font-size:13px">자주 틀리는 계산</b>
           ${wk.length?`<div class="weak">${wk.map(x=>`<span class="wchip"><b>${skLabel(x.sk)}</b><i>${x.ok}/${x.n} · ${x.sec.toFixed(1)}초</i></span>`).join('')}</div>`
             :'<div class="hint">아직 없습니다.</div>'}</div>
@@ -7244,7 +7255,7 @@ async function finish(timeUp){
 
   await saveMe(); paintMe();
   const box=el('endChart'); box.style.display='';
-  box.innerHTML=lineChart(r.hist,{h:160,mode:'try'});
+  box.innerHTML=lineChart(r.hist,{h:160,mode:'try',t});
   const h=r.hist, prev=h.length>1?h[h.length-2].n:null;
   el('endDelta').textContent = prev==null?'첫 기록이에요. 다음에 얼마나 늘었는지 볼 수 있어요.'
     : score>prev?`지난번보다 ${score-prev}개 늘었어요!`
@@ -7321,50 +7332,44 @@ function byTry(hist){
   return (hist||[]).filter(r=>r&&typeof r.n==='number')
     .slice().sort((a,b)=>(a.ts||0)-(b.ts||0)).map(r=>({d:r.d,n:r.n,ts:r.ts}));
 }
+/* 실전 기록 그래프 — 막대 하나가 도전 한 번(또는 하루의 최고)
+   가장 높은 막대는 파란색, 나머지는 옅은 파란색. 점선은 등급 기준(다음 목표까지만). 위에는 최고·최근·평균 요약. */
 function lineChart(hist,opt){
   opt=opt||{};
-  const mode=(opt.mode==='day')?'day':'try';
-  const data=(mode==='day'?byDay(hist):byTry(hist)).slice(-(opt.max||(mode==='day'?14:26)));
+  const mode=(opt.mode==='day')?'day':'try', t=opt.t;
+  const data=(mode==='day'?byDay(hist):byTry(hist)).slice(-(opt.max||(mode==='day'?14:20)));
   if(!data.length) return `<div class="empty">아직 실전 기록이 없어요.</div>`;
-  const W=320, H=opt.h||150, L=32, R=14, T=18, B=26;
-  const pw=W-L-R, ph=H-T-B;
-  const vals=data.map(d=>d.n);
-  const vmax=Math.max(5,Math.ceil(Math.max.apply(null,vals)*1.15));
-  const x=i=>data.length===1?L+pw/2:L+pw*(i/(data.length-1));
-  const y=v=>T+ph-(v/vmax)*ph;
-  const LINE='#2f5bea', INK='#111', DIM='#8e8e93', GRID='#e4e4e7';
-  let g='';
-  for(let i=0;i<=4;i++){
-    const v=Math.round(vmax*i/4), yy=y(v);
-    g+=`<line x1="${L}" y1="${yy.toFixed(1)}" x2="${W-R}" y2="${yy.toFixed(1)}" stroke="${GRID}" stroke-width="1"/>`;
-    g+=`<text x="${L-7}" y="${(yy+3.5).toFixed(1)}" font-size="10" fill="${DIM}" text-anchor="end" font-family="${FONT}">${v}</text>`;
-  }
-  const pts=data.map((d,i)=>[x(i),y(d.n)]);
-  if(pts.length>1){
-    const area=`M${pts[0][0].toFixed(1)},${(T+ph).toFixed(1)} `+
-      pts.map(p=>`L${p[0].toFixed(1)},${p[1].toFixed(1)}`).join(' ')+
-      ` L${pts[pts.length-1][0].toFixed(1)},${(T+ph).toFixed(1)} Z`;
-    g+=`<path d="${area}" fill="${LINE}" opacity=".10"/>`;
-    g+=`<polyline points="${pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ')}"
-         fill="none" stroke="${LINE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
-  }
-  const bestI=vals.indexOf(Math.max.apply(null,vals)), lastI=data.length-1;
-  data.forEach((d,i)=>{
-    const last=i===lastI;
-    g+=`<circle cx="${x(i).toFixed(1)}" cy="${y(d.n).toFixed(1)}" r="${last?5:4}"
-         fill="${last?LINE:'#fff'}" stroke="${LINE}" stroke-width="2"><title>${esc(d.d)} · ${d.n}개</title></circle>`;
-  });
-  new Set([0,bestI,lastI]).forEach(i=>{ const d=data[i]; if(!d) return;
-    const first=i===0, last=i===lastI;
-    g+=`<text x="${(x(i)+(first?5:last?-5:0)).toFixed(1)}" y="${(y(d.n)-10).toFixed(1)}" font-size="11" font-weight="800"
-         fill="${INK}" text-anchor="${first?'start':last?'end':'middle'}" font-family="${FONT}">${d.n}</text>`; });
+  const vals=data.map(d=>d.n), best=Math.max(...vals), last=vals[vals.length-1];
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
+  const C=t?gradeCuts(t):null, g=t?gradeOfRec(t,best):null;
+  /* 등급 선: 지금 등급과 바로 위 등급까지 */
+  let cuts=[];
+  if(C){ const ups=C.filter(([k,c])=>k!=='B'); const nx=ups.filter(([k,c])=>c>best).pop();
+    cuts=ups.filter(([k,c])=>c<=best).slice(0,2).concat(nx?[nx]:[]); }
+  const top=Math.max(5,best,...cuts.map(x=>x[1]));
+  const W=320, H=opt.h||150, L=8, R=46, T=16, B=22, pw=W-L-R, ph=H-T-B;
+  const n=data.length, slot=pw/Math.max(n,6), bw=Math.min(22,slot*.62);
+  const x=i=>L+slot*i+(slot-bw)/2+(n<6?(pw-slot*n)/2:0);
+  const y=v=>T+ph-(v/top)*ph;
+  const BLUE='#2f5bea', SOFT='#c9d6fb', INK='#1d1d1f', DIM='#8e8e93';
+  let gsv='';
+  gsv+=`<line x1="${L}" y1="${T+ph}" x2="${W-R+4}" y2="${T+ph}" stroke="#d2d2d7" stroke-width="1"/>`;
+  cuts.forEach(([k,c])=>{ const yy=y(c).toFixed(1), got=best>=c;
+    gsv+=`<line x1="${L}" y1="${yy}" x2="${W-R+2}" y2="${yy}" stroke="${got?'#b9c6ee':'#e0a43b'}" stroke-width="1" stroke-dasharray="3 3"/>`;
+    gsv+=`<rect x="${W-R+5}" y="${(+yy-8).toFixed(1)}" width="38" height="16" rx="8" fill="${got?'#eef2fe':'#fff4df'}"/>`;
+    gsv+=`<text x="${W-R+24}" y="${(+yy+3.6).toFixed(1)}" font-size="9.5" font-weight="800" fill="${got?BLUE:'#b7791f'}" text-anchor="middle" font-family="${FONT}">${k} ${c}</text>`; });
+  const bi=vals.lastIndexOf(best), showAll=n<=12;
+  data.forEach((d,i)=>{ const yy=y(d.n), h=Math.max(2,T+ph-yy), isB=i===bi, isL=i===n-1;
+    const r=Math.min(6,bw/2);
+    gsv+=`<path d="M${x(i).toFixed(1)},${(T+ph).toFixed(1)} v${(-h+r).toFixed(1)} q0,${-r} ${r},${-r} h${(bw-2*r).toFixed(1)} q${r},0 ${r},${r} v${(h-r).toFixed(1)}z" fill="${isB?BLUE:SOFT}"><title>${esc(d.d||'')} · ${d.n}개</title></path>`;
+    if(showAll||isB||isL) gsv+=`<text x="${(x(i)+bw/2).toFixed(1)}" y="${(yy-5).toFixed(1)}" font-size="10.5" font-weight="${isB?800:600}" fill="${isB?BLUE:INK}" text-anchor="middle" font-family="${FONT}">${d.n}</text>`; });
   const short=s=>String(s||'').slice(5).replace('-','/');
-  const xi=data.length<=3?data.map((_,i)=>i):[0,Math.floor((data.length-1)/2),data.length-1];
-  [...new Set(xi)].forEach(i=>{
-    g+=`<text x="${x(i).toFixed(1)}" y="${H-8}" font-size="10" fill="${DIM}"
-         text-anchor="${i===0?'start':i===data.length-1?'end':'middle'}" font-family="${FONT}">${short(data[i].d)}</text>`; });
-  g+=`<line x1="${L}" y1="${T+ph}" x2="${W-R}" y2="${T+ph}" stroke="${DIM}" stroke-width="1" opacity=".45"/>`;
-  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="날짜별 맞힌 문항 수">${g}</svg>`;
+  const xi=[...new Set([0,n-1])];
+  xi.forEach(i=>{ gsv+=`<text x="${(x(i)+bw/2).toFixed(1)}" y="${H-6}" font-size="10" fill="${DIM}" text-anchor="middle" font-family="${FONT}">${short(data[i].d)}</text>`; });
+  const sum=`<div class="rcsum"><div><b>${best}${g?`<span class="gbadge g-${g} sm">${g}</span>`:''}</b><span>최고</span></div>
+    <div><b>${last}${n>1?`<em class="${last>=vals[n-2]?'up':'dn'}">${last>vals[n-2]?'▲':last<vals[n-2]?'▼':'–'}${last!==vals[n-2]?Math.abs(last-vals[n-2]):''}</em>`:''}</b><span>${mode==='day'?'최근 날':'최근'}</span></div>
+    <div><b>${avg.toFixed(1)}</b><span>평균 · ${n}${mode==='day'?'일':'회'}</span></div></div>`;
+  return sum+`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="실전 기록 막대그래프">${gsv}</svg>`;
 }
 
 /* ═══════════════════ 마이페이지 ═══════════════════ */
@@ -7433,14 +7438,14 @@ function paintMineBattle(){
 }
 function paintMineChart(){
   const h=rec(MP.topic).hist;
-  el('mineChart').innerHTML=lineChart(h,{h:180,mode:MP.mode});
+  el('mineChart').innerHTML=lineChart(h,{h:180,mode:MP.mode,t:MP.topic});
   el('mineToggle').innerHTML = h.length>1 ? `
     <button class="chbtn${MP.mode==='try'?' on':''}" data-m="try">도전별</button>
     <button class="chbtn${MP.mode==='day'?' on':''}" data-m="day">일자별 최고</button>` : '';
   el('mineToggle').querySelectorAll('.chbtn').forEach(b=>b.onclick=()=>{ MP.mode=b.dataset.m; paintMineChart(); });
   el('chartLab').textContent = MP.mode==='try'
-    ? '가로축 날짜 · 세로축 맞힌 문항 수 · 점 하나가 도전 한 번'
-    : '가로축 날짜 · 세로축 그날의 가장 좋은 기록';
+    ? '막대 하나가 도전 한 번 (최근 20번) · 파란 막대가 최고 기록 · 점선은 등급 기준'
+    : '막대 하나가 하루의 가장 좋은 기록 (최근 14일) · 점선은 등급 기준';
 }
 
 /* ═══════════════════ 랭킹 ═══════════════════
