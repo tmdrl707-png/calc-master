@@ -1261,6 +1261,23 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .rcsum .gbadge.sm{font-size:10px;padding:1px 6px;transform:none}
 .rcsum .gbadge.sm{display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;line-height:1;height:18px;min-width:0;padding:0 6px;border-radius:6px;vertical-align:middle;transform:none}
 .rcsum .gbadge.g-SS,.rcsum .gbadge.g-S,.rcsum .gbadge.g-A,.rcsum .gbadge.g-B{color:#fff}
+
+/* 학급 아이템 — 반 색 투표 · 단계별 두 가지 중 하나 */
+.cccols{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin:6px 0 14px}
+@media(max-width:520px){.cccols{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ccvote{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:1px solid var(--line,#e5e5ea);border-radius:14px;background:#fff;font:inherit;cursor:pointer}
+.ccvote i{width:26px;height:26px;border-radius:50%;background:var(--c);border:2px solid #fff;box-shadow:0 0 0 1px #d2d2d7}
+.ccvote b{font-size:13px}.ccvote small{font-size:11px;color:var(--dim)}
+.ccvote.on{border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset}.ccvote.mine small{color:var(--c);font-weight:700}
+.boxh small{font-size:11.5px;font-weight:500;color:var(--dim);margin-left:6px}
+.ctiers{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.ctier{border:1px solid var(--line,#e5e5ea);border-radius:16px;padding:10px;background:#fff}
+.ctier.done{border-color:var(--cc,#4f6bff);background:#fbfcff}
+.cth{display:flex;align-items:baseline;gap:8px;margin:0 2px 8px}.cth b{font-size:14px}.cth span{font-size:12px;color:var(--dim)}
+.ctopts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ctopt.lost{opacity:.45;filter:grayscale(.6)}
+.state.vote{color:var(--dim)}.state.vote.mine{color:var(--cc,#4f6bff);font-weight:800}
+.tagw.ttop{background:linear-gradient(135deg,#ffd84d,#ff9f1c);color:#2a1d00}
 </style>
 </head>
 <body>
@@ -1836,7 +1853,7 @@ async function dbTx(path,fn){
          gy 발 높이 · fdx 두 발 간격 반 · x0 x1 y0 y1 몸의 바깥 상자 }            */
 const FONT="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif";
 /* 그리기 도우미(P·C·R·G …)가 다른 파일의 이름과 부딪히지 않도록 한 덩어리로 감쌉니다 */
-const {BOX_ITEMS,CLASS_ITEMS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY}=(()=>{
+const {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY}=(()=>{
 const INK='#1f2433';
 
 /* ── 그리기 도우미 ── */
@@ -2512,33 +2529,84 @@ const BOX_ITEMS=[
   [[-20,-30],[40,-20],[200,-36],[236,60],[-26,150],[240,190],[60,226],[180,216]].forEach(([x,y],i)=>g+=C(x,y,i%3?1.4:2.2,'#fff',0,0,'.8'));
   return df+CLIPBG(g);}}
 ];
-/* ═══ 학급 아이템 — 우리 반이 함께 모은 코인이 기준을 넘으면 반 모두에게 열립니다 ═══
-   goal : 반 전체가 모은 코인(누적)   b.cl : '2-3' 처럼 반 이름                     */
+/* ═══ 학급 아이템 — 반마다 다르게 ═══
+   ① 우리 반 색 : 반 친구들의 투표로 정하고, 학급 아이템이 모두 그 색(b.cc)으로 칠해져요.
+   ② 단계마다 두 가지 가운데 하나 : 모금액이 그 단계에 닿는 순간, 표가 많은 쪽이 우리 반에 열려요.
+   그래서 반마다 열리는 아이템 조합과 색이 달라집니다.   b.cl : '2-3' 처럼 반 이름 · b.cc : 반 색  */
+const CLASS_COLS=[{k:'blue',n:'파랑',c:'#4f6bff'},{k:'red',n:'빨강',c:'#ff4f6d'},{k:'green',n:'초록',c:'#18b07a'},
+                  {k:'purple',n:'보라',c:'#7b61ff'},{k:'orange',n:'주황',c:'#ff8a1f'},{k:'sky',n:'하늘',c:'#22a7e0'}];
+const CC=b=>b.cc||'#4f6bff';
 const CLASS_ITEMS=[
-{id:'clsBadge',cat:'class',goal:600,n:'우리 반 배지',d:b=>{const x=Math.max(b.fx-b.ew-b.gr-12,b.x0+16), y=b.ny+2;
-  return G(`translate(${x} ${y}) scale(1.3) translate(${-x} ${-y})`,P(`M${x-7},${y+8} l-5,16 l7,-4 l4,6 l2,-16 Z M${x+7},${y+8} l5,16 l-7,-4 l-4,6 l-2,-16 Z`,'#4f6bff',INK,1.6)+
+/* 1단계 600 */
+{id:'clsBadge',cat:'class',tier:0,goal:600,n:'우리 반 배지',d:b=>{const x=Math.max(b.fx-b.ew-b.gr-12,b.x0+16), y=b.ny+2;
+  return G(`translate(${x} ${y}) scale(1.3) translate(${-x} ${-y})`,P(`M${x-7},${y+8} l-5,16 l7,-4 l4,6 l2,-16 Z M${x+7},${y+8} l5,16 l-7,-4 l-4,6 l-2,-16 Z`,CC(b),INK,1.6)+
     C(x,y,14,'#ffd23f',INK,2.2)+C(x,y,10,'#fff6c8',0)+T(x,y+4,b.cl,b.cl.length>3?8.5:10.5,INK,900));}},
-{id:'clsFlag',cat:'class',goal:1500,n:'우리 반 깃발',d:b=>{const x=Math.max(b.x0-14,-30), y0=b.gy+4, y1=Math.min(b.y0,40)-18;
+{id:'clsRosette',cat:'class',tier:0,goal:600,n:'우리 반 꽃 리본',d:b=>{const x=b.fx, y=b.ny+6; let g='';
+  g+=P(`M${x-9},${y+10} l-7,22 l9,-5 l5,8 l3,-22 Z M${x+9},${y+10} l7,22 l-9,-5 l-5,8 l-3,-22 Z`,CC(b),INK,1.6);
+  for(let k=0;k<10;k++){ const a=k*36*Math.PI/180; g+=C(x+Math.cos(a)*13,y+Math.sin(a)*13,7,CC(b),INK,1.6); }
+  return g+C(x,y,12,'#fff',INK,2)+T(x,y+4,b.cl,b.cl.length>3?8:10,CC(b),900);}},
+/* 2단계 1500 */
+{id:'clsFlag',cat:'class',tier:1,goal:1500,n:'우리 반 깃발',d:b=>{const x=Math.max(b.x0-14,-30), y0=b.gy+4, y1=Math.min(b.y0,40)-18;
   return P(`M${x},${y0} V${y1}`,'none',INK,5)+P(`M${x},${y0} V${y1}`,'none','#c9ced8',2.5)+C(x,y1-3,4,'#ffd23f',INK,1.6)+
-    P(`M${x+2},${y1+2} H${x+46} L${x+38},${y1+15} L${x+46},${y1+28} H${x+2} Z`,'#ff4f6d',INK,2.2)+T(x+21,y1+20,b.cl,12,'#fff',900);}},
-{id:'clsCape',cat:'class',under:1,goal:3000,n:'우리 반 망토',d:b=>{const cy=(b.y0+b.y1)/2;
-  return P(`M${110-48},${cy-30} Q${b.x0-28},${cy+40} ${b.x0-20},${b.y1+14} L${b.x1+20},${b.y1+14} Q${b.x1+28},${cy+40} ${110+48},${cy-30} Z`,'#4f6bff',INK,2.6)+
+    P(`M${x+2},${y1+2} H${x+46} L${x+38},${y1+15} L${x+46},${y1+28} H${x+2} Z`,CC(b),INK,2.2)+T(x+21,y1+20,b.cl,12,'#fff',900);}},
+{id:'clsStick',cat:'class',tier:1,goal:1500,n:'우리 반 응원봉',d:b=>{const x=Math.min(b.x1+22,232), y0=b.y1-4, y1=b.y0-6;
+  return E(x+8,y1-14,26,30,CC(b),0,0,'.18')+P(`M${x},${y0} L${x+8},${y1+14}`,'none',INK,7)+P(`M${x},${y0} L${x+8},${y1+14}`,'none','#e6e9f0',4)+
+    E(x+8,y1-6,15,21,'#fff',INK,2.4)+E(x+8,y1-6,11,17,CC(b),0,0,'.85')+T(x+8,y1-2,b.cl,b.cl.length>3?8:9.5,'#fff',900)+SPARK(x+28,y1-24,6,'#fff6c8');}},
+/* 3단계 3000 */
+{id:'clsCape',cat:'class',tier:2,under:1,goal:3000,n:'우리 반 망토',d:b=>{const cy=(b.y0+b.y1)/2;
+  return P(`M${110-48},${cy-30} Q${b.x0-28},${cy+40} ${b.x0-20},${b.y1+14} L${b.x1+20},${b.y1+14} Q${b.x1+28},${cy+40} ${110+48},${cy-30} Z`,CC(b),INK,2.6)+
     P(`M${b.x0-10},${b.y1+6} L${b.x1+10},${b.y1+6}`,'none','#ffd23f',3.4)+T(b.x1+4,b.y1-2,b.cl,13,'#fff',900);}},
-{id:'clsTrophy',cat:'class',goal:6000,n:'우리 반 트로피',d:b=>{const x=Math.min(b.x1+18,234), y=b.gy+4;
-  return G(`translate(${x} ${y}) scale(1.55) translate(${-x} ${-y})`,R(x-13,y-8,26,8,2,'#7a4a24',INK,1.8)+R(x-4,y-18,8,10,1,'#f0a400',INK,1.6)+
+{id:'clsWings',cat:'class',tier:2,under:1,goal:3000,n:'우리 반 날개',d:b=>{const cy=(b.y0+b.y1)/2-10; let g='';
+  [[b.x0+14,-1],[b.x1-14,1]].forEach(([x,s])=>{ g+=P(`M${x},${cy} C${x+s*30},${cy-58} ${x+s*92},${cy-50} ${x+s*96},${cy-18} C${x+s*80},${cy-12} ${x+s*84},${cy+6} ${x+s*70},${cy+12} C${x+s*60},${cy+30} ${x+s*30},${cy+30} ${x},${cy+14} Z`,CC(b),INK,2.4);
+    g+=P(`M${x+s*16},${cy-6} Q${x+s*48},${cy-30} ${x+s*80},${cy-20} M${x+s*16},${cy+6} Q${x+s*44},${cy-6} ${x+s*66},${cy+6}`,'none','#fff',2,' opacity=".7"'); });
+  return g+T(110,Math.max(b.y0-14,-38),b.cl,12,CC(b),900,` stroke="#fff" stroke-width="3" paint-order="stroke"`);}},
+/* 4단계 6000 */
+{id:'clsTrophy',cat:'class',tier:3,goal:6000,n:'우리 반 트로피',d:b=>{const x=Math.min(b.x1+18,234), y=b.gy+4;
+  return G(`translate(${x} ${y}) scale(1.55) translate(${-x} ${-y})`,R(x-13,y-8,26,8,2,CC(b),INK,1.8)+R(x-4,y-18,8,10,1,'#f0a400',INK,1.6)+
     P(`M${x-14},${y-44} H${x+14} V${y-34} Q${x+14},${y-18} ${x},${y-18} Q${x-14},${y-18} ${x-14},${y-34} Z`,'#ffd23f',INK,2)+
     P(`M${x-14},${y-40} q-9,0 -9,7 q0,7 9,7 M${x+14},${y-40} q9,0 9,7 q0,7 -9,7`,'none',INK,2.2)+T(x,y-28,b.cl,b.cl.length>3?7:8.5,'#a87400',900));}},
-{id:'clsStars',cat:'class',under:1,goal:10000,n:'우리 반 별빛',d:b=>{let g=E(110,(b.y0+b.y1)/2,128,110,'#fff6c8',0,0,'.35');
+{id:'clsMedal',cat:'class',tier:3,goal:6000,n:'우리 반 큰 메달',d:b=>{const x=b.fx, y=b.ny+20;
+  return P(`M${x-26},${b.ny-18} L${x-8},${y-14} M${x+26},${b.ny-18} L${x+8},${y-14}`,'none',INK,9)+P(`M${x-26},${b.ny-18} L${x-8},${y-14} M${x+26},${b.ny-18} L${x+8},${y-14}`,'none',CC(b),5.5)+
+    C(x,y,20,'#ffd23f',INK,2.4)+C(x,y,14,'none','#f0a400',2)+T(x,y+5,b.cl,b.cl.length>3?9:11.5,'#a87400',900)+SPARK(x+20,y-16,5,'#fff');}},
+/* 5단계 10000 */
+{id:'clsStars',cat:'class',tier:4,under:1,goal:10000,n:'우리 반 별빛',d:b=>{let g=E(110,(b.y0+b.y1)/2,128,110,'#fff6c8',0,0,'.35');
   for(let i=0;i<10;i++){const a=i*36*Math.PI/180; g+=STAR(110+Math.cos(a)*122,(b.y0+b.y1)/2+Math.sin(a)*104,i%2?7:10,i%2?'#ffe066':'#ffd23f');}
-  return g+R(110-30,-46,60,20,10,'#6b5cff',INK,2)+T(110,-31,'★ '+b.cl,12,'#fff',900);}},
-{id:'clsBanner',cat:'class',under:1,goal:15000,nw:1,n:'우리 반 현수막',d:b=>{const y=Math.max(b.y0-46,-46);
-  return P(`M-30,${y} H250 L242,${y+14} L250,${y+28} H-30 L-22,${y+14} Z`,'#ff4f6d',INK,2.4)+T(110,y+19.5,`${b.cl} 최고!`,14,'#fff',900)+C(-30,y,3,INK)+C(250,y,3,INK);}},
-{id:'clsAura',cat:'class',under:1,goal:22000,nw:1,n:'우리 반 오라',d:b=>{const cy=(b.y0+b.y1)/2;
-  return ['#ffd23f','#ff6b9a','#7b61ff'].map((c,i)=>E(110,cy,140-i*14,120-i*12,'none',c,4,'.55')).join('')+T(110,Math.min(b.y1+40,236),b.cl,13,'#7b61ff',900);}},
-{id:'clsCrown',cat:'class',goal:30000,nw:1,n:'우리 반 왕관',d:b=>{const x=b.hx,y=b.top+5;
+  return g+R(110-30,-46,60,20,10,CC(b),INK,2)+T(110,-31,'★ '+b.cl,12,'#fff',900);}},
+{id:'clsHearts',cat:'class',tier:4,under:1,goal:10000,n:'우리 반 하트비',d:b=>{const H=(x,y,r,f)=>P(`M${x},${y+r*.9} C${x-r*1.6},${y-r*.2} ${x-r*.7},${y-r*1.4} ${x},${y-r*.5} C${x+r*.7},${y-r*1.4} ${x+r*1.6},${y-r*.2} ${x},${y+r*.9} Z`,f,INK,1.6);
+  let g=''; [[-14,-20,9],[30,-36,7],[200,-30,9],[236,40,7],[-24,90,8],[244,130,9],[-10,190,7],[226,210,8],[60,220,6],[170,226,7]].forEach(([x,y,r],i)=>{ g+=H(x,y,r,i%2?'#fff':CC(b)); });
+  return g+R(110-30,-46,60,20,10,CC(b),INK,2)+T(110,-31,'♥ '+b.cl,12,'#fff',900);}},
+/* 6단계 15000 */
+{id:'clsBanner',cat:'class',tier:5,under:1,goal:15000,n:'우리 반 현수막',d:b=>{const y=Math.max(b.y0-46,-46);
+  return P(`M-30,${y} H250 L242,${y+14} L250,${y+28} H-30 L-22,${y+14} Z`,CC(b),INK,2.4)+T(110,y+19.5,`${b.cl} 최고!`,14,'#fff',900)+C(-30,y,3,INK)+C(250,y,3,INK);}},
+{id:'clsBalloon',cat:'class',tier:5,goal:15000,n:'우리 반 풍선',d:b=>{const x=Math.max(b.x0-18,0), y=Math.min(b.y0,40)-20; let g='';
+  [[x-14,y+8,'#ffd23f'],[x+16,y+4,'#fff']].forEach(([bx,by,f])=>{ g+=P(`M${bx},${by+16} Q${bx+4},${by+44} ${x+2},${b.y1+6}`,'none',INK,1.4)+E(bx,by,12,15,f,INK,2); });
+  return g+P(`M${x},${y+22} Q${x-4},${y+50} ${x+2},${b.y1+6}`,'none',INK,1.4)+E(x,y,17,21,CC(b),INK,2.4)+E(x-6,y-8,4,6,'#fff',0,0,'.6')+T(x,y+4,b.cl,b.cl.length>3?9:11,'#fff',900);}},
+/* 7단계 22000 */
+{id:'clsAura',cat:'class',tier:6,under:1,goal:22000,n:'우리 반 오라',d:b=>{const cy=(b.y0+b.y1)/2;
+  return [CC(b),'#ffd23f','#ff6b9a'].map((c,i)=>E(110,cy,140-i*14,120-i*12,'none',c,4,'.55')).join('')+T(110,Math.min(b.y1+40,236),b.cl,13,CC(b),900);}},
+{id:'clsRing',cat:'class',tier:6,under:1,goal:22000,n:'우리 반 빛 고리',d:b=>{const cy=(b.y0+b.y1)/2; let g='';
+  for(let k=0;k<24;k++){ const a=k*15*Math.PI/180; g+=C(110+Math.cos(a)*120,cy+Math.sin(a)*104,k%3?3.5:6,k%3?'#fff6c8':CC(b),INK,1.4); }
+  return C(110,cy,112,'none',CC(b),2,'.35').replace('<circle','<ellipse').replace(/r="112"/,'rx="120" ry="104"')+g+T(110,Math.min(b.y1+40,236),b.cl,13,CC(b),900);}},
+/* 8단계 30000 */
+{id:'clsCrown',cat:'class',tier:7,goal:30000,n:'우리 반 왕관',d:b=>{const x=b.hx,y=b.top+5;
   return G(`translate(${x} ${y}) scale(1.4) translate(${-x} ${-y})`,P(`M${x-27},${y} L${x-30},${y-24} L${x-14},${y-11} L${x},${y-30} L${x+14},${y-11} L${x+30},${y-24} L${x+27},${y} Z`,'#ffd23f',INK)+
-    R(x-25,y-9,50,9,2,'#ff4f6d')+T(x,y-1.5,b.cl,7.5,'#fff',900)+C(x,y-30,4,'#4f6bff',INK,1.6));}}
+    R(x-25,y-9,50,9,2,CC(b))+T(x,y-1.5,b.cl,7.5,'#fff',900)+C(x,y-30,4,CC(b),INK,1.6));}},
+{id:'clsSpot',cat:'class',tier:7,under:1,goal:30000,n:'우리 반 무대',d:b=>{const y=b.gy+8;
+  return P(`M-20,-48 L60,${y} H-40 Z`,'#fff6c8',0,0,' opacity=".55"')+P(`M240,-48 L160,${y} H260 Z`,'#fff6c8',0,0,' opacity=".55"')+
+    E(110,y+8,130,16,CC(b),INK,2.4)+E(110,y+4,118,10,'#fff',0,0,'.35')+T(110,y+14,`${b.cl} 무대`,12,'#fff',900)+
+    SPARK(-14,-30,7,'#ffd23f')+SPARK(234,-30,7,'#ffd23f');}}
 ];
+/* 단계 — 두 가지 가운데 하나 */
+const CLASS_TIERS=[...new Set(CLASS_ITEMS.map(i=>i.tier))].map(t=>{ const L=CLASS_ITEMS.filter(i=>i.tier===t); return {t, goal:L[0].goal, opts:L.map(i=>i.id)}; });
+/* ═══ 가격 다시 매기기 (2026-10 · 사각형 O·X 게임 구매 기록을 보고) ═══
+   사각형 게임에서는 가장 비싼 '자랑용' 물건(무지개색 6400 · 정사각형 3000 · 광선검 · 아기 티라노 · 불사조 날개)에
+   눈이 몰렸고, 산 학생 대부분이 실제로 입고 다녔어요(3000 이상 착용률 83%). 중간 가격 색은 거의 팔리지 않았고요.
+   그래서 눈에 띄는 물건 몇 가지를 '최고 인기' 등급(2400 이상)으로 올리고, 상징적인 모양(Σ·∞·π)도 올립니다. */
+const REPRICE={frRain:4800, bgGalaxy:3600, fairy:3600, pOwl:3200, wand:2400, infhalo:2600, jet:2600, rain:2400,
+  frNeon:2400, frGold:2200, cloud:2000, wizard:1400, fire:1400, medal:1400, bgSpot:1400, hSigma:3000, bkSpiral:3000};
+ITEMS.forEach(i=>{ if(REPRICE[i.id]) i.p=REPRICE[i.id]; });
+{ const CP={rainbow:6400, holo:7200}; CH_COLORS.forEach(c=>{ if(CP[c.k]) c.p=CP[c.k]; });
+  const SP={sigma:3600, inf:3200, pi:2400}; CH_SHAPES.forEach(c=>{ if(SP[c.k]){ c.p=SP[c.k]; if(BODY[c.k]) BODY[c.k].p=SP[c.k]; } }); }
 ITEMS.push(...BOX_ITEMS,...CLASS_ITEMS);
 const ITEM=id=>ITEMS.find(i=>i.id===id);
 const CATS=[{k:'hat',n:'머리'},{k:'face',n:'표정'},{k:'eye',n:'얼굴'},{k:'neck',n:'목·몸'},{k:'hand',n:'손'},
@@ -2564,7 +2632,7 @@ function avatarSVG(ch,opt){
   }
   b.px=Math.max(-10,Math.min(b.x0,30)-18);
   b.ftx=b.ftx!=null?b.ftx:b.fx;                        /* 발 자리 (몸 아래 가운데) */
-  b.cl=String(ch.cl||'우리 반');
+  b.cl=String(ch.cl||'우리 반'); b.cc=ch.cc||'#4f6bff';
   b.ny=Math.min(b.mouthY+16*KS(b), b.y1-8);           /* 목걸이·넥타이 자리 (입 아래) */
   /* 작게 붙는 자리는 조금 키워서 얹습니다 — 기준점을 중심으로 */
   const SC={hat:[1.35,()=>[b.hx,b.top+4]], hand:[1.3,()=>b.hand], pet:[1.4,()=>[b.px,b.gy]], foot:[1.15,()=>[b.ftx,b.gy]], neck:[1.35,()=>[b.fx,b.ny]]};
@@ -2576,8 +2644,8 @@ function avatarSVG(ch,opt){
   return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg"${opt.cls?` class="${opt.cls}"`:''}>${defs}${L(['stage'])}${worn.filter(id=>ITEM(id).under).map(one).join('')}${L(['back'])}${L(['frame'])}${
     bodySVG(k,fill,col.l)}${has('face')?'':faceSVG(b)}${L(['face','neck','foot','eye','hat','hand','pet','fx'])}${worn.filter(id=>ITEM(id).cat==='class'&&!ITEM(id).under).map(one).join('')}</svg>`;
 }
-const avatarWith=(ch,id)=>avatarSVG({s:ch.s,c:ch.c,cl:ch.cl,items:[id]});
-return {BOX_ITEMS,CLASS_ITEMS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY};
+const avatarWith=(ch,id)=>avatarSVG({s:ch.s,c:ch.c,cl:ch.cl,cc:ch.cc,items:[id]});
+return {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY};
 })();
 
 /* ═══════════════════ 계산 내용 ═══════════════════
@@ -6776,6 +6844,8 @@ function openSchool(){
   el('schoolHi').innerHTML=`<b>${esc(ME.sid)}</b> 님, 오늘은 어디서 시작할까요?`;
   paintSchools();
   loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')) paintSchools(); });
+  /* 우리 반 색이 바뀌었으면 내 캐릭터에도 반영 (학급 아이템이 그 색으로 그려져요) */
+  const cc0=ME.ch.cc; loadClass().then(()=>{ if(ME&&ME.ch.cc!==cc0) saveMe(); }).catch(()=>{});
 }
 function paintSchools(){
   el('schoolList').innerHTML=SCHOOLS.map(s=>{
@@ -7677,7 +7747,7 @@ function paintShop(){
   const mine=ownItems().length+ownShapes().length+ownColors().length;
   el('shopSub').innerHTML=`모은 것 <b>${mine}</b> / ${total} · 입은 꾸미기 ${(ME.ch.items||[]).length}개`;
   const cnt=k=>{ if(k==='box') return [ownItems().filter(id=>BOX_ITEMS.some(i=>i.id===id)).length,BOX_ITEMS.length];
-    if(k==='class') return [CLS?CLASS_ITEMS.filter(clsOpen).length:0,CLASS_ITEMS.length];
+    if(k==='class') return [CLS?CLASS_TIERS.filter(T=>clsPick(T.t)).length:0,CLASS_TIERS.length];
     const L=goodsList(k); return [L.filter(g=>g.has).length,L.length]; };
   const tab=c=>{ const [a,b]=cnt(c.k);
     return `<button class="tab${shopCat===c.k?' on':''}${c.k==='new'?' tnew':c.k==='hs'?' ths':''}" data-k="${c.k}">${c.n} <small>${a}/${b}</small></button>`; };
@@ -7692,6 +7762,8 @@ function paintShop(){
     box.querySelectorAll('.givebtn').forEach(b=>b.onclick=()=>giveClass(+b.dataset.v));
     box.querySelectorAll('.item[data-kind="item"]').forEach(b=>b.onclick=()=>tapGoods('item',b.dataset.k));
     box.querySelectorAll('.item[data-kind="class"]').forEach(b=>b.onclick=()=>tapClassItem(b.dataset.k));
+    box.querySelectorAll('.ccvote').forEach(b=>b.onclick=()=>voteClassColor(b.dataset.c));
+    box.querySelectorAll('.optvote').forEach(b=>b.onclick=()=>voteClassOpt(+b.dataset.t,b.dataset.k));
     el('shopStrip').onclick=async()=>{ endTry(); ME.ch.items=[]; await saveMe(); paintShop(); paintMe(); toast('꾸미기를 모두 벗었어요'); };
     paintTry(); return;
   }
@@ -7708,7 +7780,9 @@ function paintShop(){
               : avatarWith(ME.ch,g.k);
     const tag= g.on?'':g.box?'<span class="tagw">한정</span>':g.hs?'<span class="tagw ths">고등</span>':g.nw&&shopCat!=='new'?'<span class="tagw tnew">NEW</span>'
              : (g.kind==='color'&&g.t>=3)?`<span class="tagw">${TIERNAME2[g.t]}</span>`
-             : (g.kind==='shape'&&g.p>=1200)?'<span class="tagw">특별</span>':'';
+             : (g.kind==='shape'&&g.p>=2400)?'<span class="tagw ttop">최고 인기</span>'
+             : (g.kind==='shape'&&g.p>=1200)?'<span class="tagw">특별</span>'
+             : (g.kind==='item'&&g.p>=2400)?'<span class="tagw ttop">최고 인기</span>':'';
     const st= g.on?`<span class="state wear">${g.kind==='item'?'입는 중':'쓰는 중'}</span>`
             : g.has?`<span class="state own">가짐</span>`
             : g.box?`<span class="state">상자에서만</span>`
@@ -7844,55 +7918,94 @@ async function openBox(k){
 }
 
 /* ═══════════════════ 학급 아이템 ═══════════════════
-   우리 반 학생들이 코인을 모아(모금) 누적 금액이 기준을 넘으면
-   그 아이템이 반 모두에게 열립니다. 모금은 줄어들지 않고 계속 쌓입니다.
-   자료 : classes/203 = {fund:누적, gv:{학번:낸 코인}}                  */
+   우리 반 학생들이 코인을 모아(모금) 누적 금액이 단계 기준을 넘으면 그 단계의 아이템이 반 모두에게 열립니다.
+   반마다 다르게 :
+   ① 우리 반 색 — 반 친구들이 한 표씩 투표 (아무도 안 하면 반 번호에 따라 정해져요). 학급 아이템이 모두 그 색.
+   ② 단계마다 두 가지 가운데 하나 — 미리 투표해 두고, 모금액이 그 단계에 닿는 순간 표가 많은 쪽이 열려요(한 번 정해지면 그대로).
+   자료 : classes/203 = {fund:누적, gv:{학번:낸 코인}, col:{학번:색}, vt:{단계:{학번:아이템}}, pick:{단계:아이템}}  */
 let CLS=null;
 const clsKey=()=>classOf(ME.sid);
 const clsShort=()=>shortCls(ME.sid);
+const tally=o=>{ const n={}; Object.values(o||{}).forEach(v=>{ n[v]=(n[v]||0)+1; }); return n; };
+/* 우리 반 색 — 표가 가장 많은 색, 같으면 목록 앞쪽 */
+function clsColor(c){
+  const n=tally((c||{}).col), best=CLASS_COLS.slice().sort((a,b)=>(n[b.k]||0)-(n[a.k]||0))[0];
+  if(best&&n[best.k]) return best;
+  const num=parseInt(String(clsKey()).slice(1),10)||0; return CLASS_COLS[num%CLASS_COLS.length];
+}
 async function loadClass(){
   const d=(await dbGet('classes/'+clsKey(),null))||{};
-  CLS={fund:d.fund||0, gv:d.gv||{}};
-  ME.ch.cl=clsShort();
+  CLS={fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, vt:d.vt||{}, pick:d.pick||{}};
+  ME.ch.cl=clsShort(); ME.ch.cc=clsColor(CLS).c;
   return CLS;
 }
-const clsOpen=it=>CLS&&CLS.fund>=it.goal;
+const clsPick=t=>CLS&&CLS.pick&&CLS.pick[t];
+const clsOpen=it=>!!(CLS&&it&&clsPick(it.tier)===it.id);
+/* 단계에서 지금 표가 많은 쪽 (같으면 앞쪽) */
+function clsLead(c,T){ const n=tally(((c||{}).vt||{})[T.t]); return T.opts.slice().sort((a,b)=>(n[b]||0)-(n[a]||0))[0]; }
+/* 모금 막대 — 단계 사이를 같은 간격으로 (앞 단계 눈금이 겹치지 않게) */
+function clsBarPct(f){ const G=[0].concat(CLASS_TIERS.map(T=>T.goal)), n=G.length-1;
+  for(let i=1;i<=n;i++) if(f<G[i]) return ((i-1)+(f-G[i-1])/(G[i]-G[i-1]))/n*100;
+  return 100; }
 function classPanelHTML(){
   if(!CLS) return `<div class="empty">우리 반 모금함을 불러오는 중…</div>`;
-  const nextIt=CLASS_ITEMS.find(i=>!clsOpen(i)), top=CLASS_ITEMS[CLASS_ITEMS.length-1].goal;
+  const nextT=CLASS_TIERS.find(T=>!clsPick(T.t));
   const givers=Object.keys(CLS.gv).map(s=>({s,n:CLS.gv[s]})).sort((a,b)=>b.n-a.n);
-  const mine=CLS.gv[ME.sid]||0;
-  return `<div class="clspanel">
+  const mine=CLS.gv[ME.sid]||0, cc=clsColor(CLS), cn=tally(CLS.col), myCol=CLS.col[ME.sid];
+  return `<div class="clspanel" style="--cc:${cc.c}">
     <div class="clshead"><div><h3>${classLabel(clsKey())} 모금함</h3>
-      <div class="sub">반 친구들과 코인을 모아 <b>우리 반만의 아이템</b>을 열어요. 모은 코인은 줄지 않고 쌓이고, 열린 아이템은 반 모두가 입을 수 있어요.</div></div>
+      <div class="sub">반 친구들과 코인을 모아 <b>우리 반만의 아이템</b>을 열어요. 단계마다 <b>두 가지 중 하나</b>를 투표로 고르고, 아이템은 <b>우리 반 색</b>으로 칠해져요 — 그래서 반마다 달라요.</div></div>
       <div class="fundbox"><span>모은 코인</span><b>${CLS.fund}</b></div></div>
-    <div class="fundbar"><i style="width:${Math.min(100,CLS.fund/top*100)}%"></i>${CLASS_ITEMS.map(i=>
-      `<span class="tick${clsOpen(i)?' on':''}" style="left:${i.goal/top*100}%"><em>${i.goal}</em></span>`).join('')}</div>
-    <div class="fundnext">${nextIt?`<b>${nextIt.n}</b>까지 <b>${nextIt.goal-CLS.fund}코인</b> 남았어요`:'모든 학급 아이템을 열었어요! 🎉'}</div>
+    <h4 class="boxh">우리 반 색 <small>한 사람에 한 표 · 바꿀 수 있어요</small></h4>
+    <div class="cccols">${CLASS_COLS.map(c=>`<button class="ccvote${c.k===cc.k?' on':''}${myCol===c.k?' mine':''}" data-c="${c.k}" style="--c:${c.c}">
+      <i></i><b>${c.n}</b><small>${cn[c.k]||0}표${myCol===c.k?' · 내 표':''}</small></button>`).join('')}</div>
+    <div class="fundbar"><i style="width:${clsBarPct(CLS.fund)}%"></i>${CLASS_TIERS.map((T,i)=>
+      `<span class="tick${clsPick(T.t)?' on':''}" style="left:${(i+1)/CLASS_TIERS.length*100}%"><em>${T.goal>=10000?T.goal/10000+'만':T.goal}</em></span>`).join('')}</div>
+    <div class="fundnext">${nextT?`다음 단계까지 <b>${nextT.goal-CLS.fund}코인</b> 남았어요 — 지금 표가 많은 <b>${ITEM(clsLead(CLS,nextT)).n}</b>이(가) 열릴 차례예요`:'모든 단계를 열었어요! 🎉'}</div>
     <div class="give">${[10,50,100,300].map(v=>`<button class="btn givebtn" data-v="${v}" ${ME.coin<v?'disabled':''}>${v}코인 내기</button>`).join('')}</div>
     <div class="sub" style="margin-top:6px">내가 낸 코인 <b>${mine}</b> · 함께한 친구 <b>${givers.length}명</b></div>
     ${givers.length?`<div class="givers">${givers.slice(0,8).map((g,i)=>`<span class="gv${g.s===ME.sid?' me':''}">${i+1}. ${esc(g.s)} <b>${g.n}</b></span>`).join('')}</div>`:''}
-    <h4 class="boxh">학급 아이템</h4>
-    <div class="items">${CLASS_ITEMS.map(i=>{ const op=clsOpen(i), on=(ME.ch.items||[]).includes(i.id);
-      return `<button class="item${on?' wear':''}${op?'':' locked'}" data-kind="class" data-k="${i.id}">
-        <div class="ic">${avatarWith(ME.ch,i.id)}</div><div class="nm2">${i.n}</div>
-        ${on?'<span class="state wear">입는 중</span>':op?'<span class="state own">열림</span>':`<span class="state">${i.goal}코인 모이면</span>`}</button>`; }).join('')}</div>
+    <h4 class="boxh">단계별 학급 아이템 <small>열리기 전까지 어느 쪽이든 투표할 수 있어요</small></h4>
+    <div class="ctiers">${CLASS_TIERS.map((T,ti)=>{ const pk=clsPick(T.t), n=tally(CLS.vt[T.t]), my=(CLS.vt[T.t]||{})[ME.sid], lead=clsLead(CLS,T);
+      return `<div class="ctier${pk?' done':''}"><div class="cth"><b>${ti+1}단계</b><span>${T.goal}코인${pk?' · 열림':''}</span></div>
+        <div class="ctopts">${T.opts.map(id=>{ const it=ITEM(id), op=pk===id, on=(ME.ch.items||[]).includes(id), lost=pk&&!op;
+          return `<button class="item ctopt${on?' wear':''}${op?'':pk?' lost':' locked'}" ${op?`data-kind="class" data-k="${id}"`:pk?'disabled':`data-t="${T.t}" data-k="${id}"`}>
+            ${!pk&&lead===id&&n[id]?'<span class="tagw">1위</span>':''}
+            <div class="ic">${avatarWith(ME.ch,id)}</div><div class="nm2">${it.n}</div>
+            ${on?'<span class="state wear">입는 중</span>':op?'<span class="state own">우리 반 것</span>':lost?'<span class="state">다른 쪽이 열림</span>'
+              :`<span class="state vote${my===id?' mine':''}">${n[id]||0}표${my===id?' · 내 표':' · 투표'}</span>`}</button>`; }).join('').replace(/class="item ctopt([^"]*)" data-t=/g,'class="item ctopt optvote$1" data-t=')}</div></div>`; }).join('')}</div>
   </div>`;
 }
+/* 모금 — 단계를 넘는 순간 그 단계의 표를 세어 아이템을 정해요(트랜잭션 안에서 한 번만) */
 async function giveClass(v){
   if(!ME||ME.coin<v) return toast('코인이 모자라요');
   if(!confirm(`우리 반 모금함에 ${v}코인을 낼까요?\n낸 코인은 돌려받을 수 없어요.`)) return;
   ME.coin-=v; await saveMe();
+  const before=Object.assign({},(CLS&&CLS.pick)||{});
   const r=await dbTx('classes/'+clsKey(),cur=>{ cur=cur||{fund:0,gv:{}}; cur.fund=(cur.fund||0)+v;
-    cur.gv=cur.gv||{}; cur.gv[ME.sid]=(cur.gv[ME.sid]||0)+v; return cur; });
-  if(r&&r.val){ CLS={fund:r.val.fund||0,gv:r.val.gv||{}}; }
-  const opened=CLASS_ITEMS.filter(i=>CLS.fund>=i.goal&&CLS.fund-v<i.goal);
+    cur.gv=cur.gv||{}; cur.gv[ME.sid]=(cur.gv[ME.sid]||0)+v; cur.pick=cur.pick||{};
+    CLASS_TIERS.forEach(T=>{ if(cur.fund>=T.goal&&!cur.pick[T.t]) cur.pick[T.t]=clsLead(cur,T); });
+    return cur; });
+  if(r&&r.val){ const d=r.val; CLS={fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, vt:d.vt||{}, pick:d.pick||{}}; }
+  const opened=CLASS_TIERS.filter(T=>CLS.pick[T.t]&&!before[T.t]).map(T=>ITEM(CLS.pick[T.t]).n);
   paintShop(); paintMe();
-  toast(opened.length?`🎉 ${opened.map(i=>i.n).join(', ')}이(가) 우리 반에 열렸어요!`:`${v}코인을 냈어요. 고마워요!`);
+  toast(opened.length?`🎉 ${opened.join(', ')}이(가) 우리 반에 열렸어요!`:`${v}코인을 냈어요. 고마워요!`);
+}
+async function voteClassColor(k){
+  if(!ME||!CLASS_COLS.some(c=>c.k===k)) return;
+  await dbSet(`classes/${clsKey()}/col/${ME.sid}`,k);
+  await loadClass(); await saveMe(); paintShop(); paintMe();
+  toast(`우리 반 색으로 ${CLASS_COLS.find(c=>c.k===k).n}에 투표했어요`);
+}
+async function voteClassOpt(t,id){
+  if(!ME||clsPick(t)) return toast('이미 정해진 단계예요');
+  await dbSet(`classes/${clsKey()}/vt/${t}/${ME.sid}`,id);
+  await loadClass(); paintShop();
+  toast(`${ITEM(id).n}에 투표했어요`);
 }
 async function tapClassItem(id){
   const it=ITEM(id); if(!it) return;
-  if(!clsOpen(it)) return toast(`우리 반이 ${it.goal}코인을 모으면 열려요`);
+  if(!clsOpen(it)) return toast(`우리 반이 ${it.goal}코인을 모으고 이 아이템이 뽑히면 열려요`);
   const w=ME.ch.items||[];
   ME.ch.items=w.includes(id)?w.filter(x=>x!==id):w.filter(x=>CAT_OF(x)!=='class').concat([id]);
   await saveMe(); paintShop(); paintMe();
