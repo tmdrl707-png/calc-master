@@ -1300,6 +1300,65 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 @media(max-width:520px){.tstats.tcoin{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .chip.coinsch.on{background:#e8a800;border-color:#e8a800;color:#fff}
 .item.on{border-color:var(--blue)}
+
+/* ═══ 정리 노트 (새 모양) ═══ */
+.book.nb2{padding:0;overflow:hidden;background:#fff;border-radius:22px}
+.nb2 svg.ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nb2 .nbhero{background:var(--ts);padding:22px 18px 18px}
+.nb2 .nbtop{display:flex;align-items:center;gap:13px}
+.nb2 .nbtop .tsym{background:#fff}
+.nb2 .nbtt{min-width:0}
+.nb2 .nbkind{display:block;font-size:12.5px;font-weight:700;color:var(--tc);margin-bottom:2px}
+.nb2 .nbtt h2{font-size:23px;font-weight:800;letter-spacing:-.6px;line-height:1.25;word-break:keep-all}
+.nb2 .nbsub{margin-top:11px;font-size:13.5px;color:var(--ink2);line-height:1.55;word-break:keep-all}
+.nb2 .nbtoc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:15px}
+.nb2 .nbtoc button{background:#fff;border:none;border-radius:14px;padding:10px 4px 9px;display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;font:inherit;color:var(--ink)}
+.nb2 .nbtoc button:active{transform:scale(.97)}
+.nb2 .nbtoc svg{width:18px;height:18px;color:var(--tc)}
+.nb2 .nbtoc b{font-size:19px;font-weight:800;line-height:1.2}
+.nb2 .nbtoc span{font-size:11.5px;color:var(--dim);font-weight:600;white-space:nowrap}
+.nb2 .nbsec{padding:24px 16px 2px;scroll-margin-top:8px}
+.nb2 .nbsec>h3{display:flex;align-items:center;gap:9px;font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-.3px}
+.nb2 .nbsec>h3 svg{width:30px;height:30px;padding:6px;border-radius:10px;background:var(--ts);color:var(--tc)}
+.nb2 .nbmemo{border:1px solid var(--line);border-radius:16px;padding:14px 14px 15px;margin-bottom:10px;background:#fff}
+.nb2 .nbmemo h4{font-size:13.5px;font-weight:700;color:var(--tc);margin-bottom:10px;display:flex;align-items:center;gap:7px;word-break:keep-all}
+.nb2 .nbmemo h4::before{content:'';flex:none;width:6px;height:6px;border-radius:50%;background:var(--tc)}
+.nb2 .nbmc .vis{display:block;width:100%;max-width:320px;height:auto;max-height:220px;margin:2px auto 6px}
+.nb2 .nbmc .fchip{font-size:15px;padding:6px 10px;border-radius:10px;background:var(--paper);border-color:transparent}
+.nb2 .nbways{display:grid;gap:12px}
+@media(min-width:760px){.nb2 .nbways{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.nb2 .nbway{border:1px solid var(--line);border-radius:18px;padding:14px 14px 15px;background:#fff;min-width:0}
+.nb2 .nbway header{display:flex;align-items:center;gap:9px}
+.nb2 .nbn{flex:none;width:24px;height:24px;border-radius:8px;background:var(--tc);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.nb2 .nbway h4{font-size:16px;font-weight:700;letter-spacing:-.3px;word-break:keep-all;line-height:1.35}
+.nb2 .nbex{margin-top:10px;background:var(--paper);border-radius:12px;padding:12px 12px;font-size:21px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;word-break:keep-all;line-height:1.45}
+.nb2 .nbvis{margin:10px 0 0;display:flex;justify-content:center}
+.nb2 .nbvis .vis,.nb2 .nbvis>svg{width:100%;max-width:300px;height:auto;max-height:200px;display:block}
+.nb2 .nbsteps{list-style:none;margin:12px 0 0;padding:0}
+.nb2 .nbsteps li{position:relative;padding:3px 0 3px 20px;font-size:15.5px;line-height:1.6;font-weight:500;word-break:keep-all;font-variant-numeric:tabular-nums}
+.nb2 .nbsteps li::before{content:'';position:absolute;left:3px;top:12px;width:8px;height:8px;border-radius:50%;background:#d4d8e0}
+.nb2 .nbsteps li::after{content:'';position:absolute;left:6.5px;top:22px;bottom:-11px;width:1px;background:#e1e4ea}
+.nb2 .nbsteps li:last-child::after{display:none}
+.nb2 .nbsteps li.last{font-weight:700}
+.nb2 .nbsteps li.last::before{background:var(--tc)}
+.nb2 .nbsteps b{color:var(--tc);font-weight:800;font-size:1.1em;white-space:nowrap}
+.nb2 .nbtip{display:flex;gap:8px;align-items:flex-start;margin-top:10px;background:#fff8e1;border-radius:12px;padding:9px 12px;font-size:13.5px;line-height:1.55;color:#5a4300;font-weight:500;word-break:keep-all}
+.nb2 .nbtip svg{flex:none;width:17px;height:17px;color:#e09b00;margin-top:1px}
+.nb2 .nbmiss{border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:10px;background:#fff}
+.nb2 .nbmw,.nb2 .nbmr{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:16.5px;font-weight:700;font-variant-numeric:tabular-nums;word-break:keep-all;line-height:1.45}
+.nb2 .nbmw{background:#fff4f6;color:#b4234a}
+.nb2 .nbmr{background:#effaf3;color:#127a45}
+.nb2 .nbmw>i,.nb2 .nbmr>i{flex:none;font-style:normal;width:22px;height:22px;border-radius:50%;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:800}
+.nb2 .nbmw>i{background:var(--x)} .nb2 .nbmr>i{background:var(--o)}
+.nb2 .nbmiss p{padding:11px 14px 13px;font-size:14px;line-height:1.6;color:var(--ink2);word-break:keep-all}
+.nb2 .nbmiss p b{display:inline-block;color:var(--ink);font-weight:700;margin-right:6px;background:var(--soft);border-radius:6px;padding:0 6px;font-size:12.5px}
+.nb2 .nbfoot{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;padding:20px 16px 24px}
+.nb2 .nbex.long{font-size:15.5px;font-weight:600;text-align:left;line-height:1.65;padding:12px 14px}
+.colsvg{max-height:170px}
+.nb2 .nbmc .ftabs{gap:8px}
+.nb2 .nbmc .ftab{min-width:120px;padding:10px 11px;border:none}
+.nb2 .nbmc .ftab h4{font-size:13px;margin-bottom:6px}
+.nb2 .nbmc .ftab div{font-size:14.5px;line-height:1.65;word-break:keep-all}
 </style>
 </head>
 <body>
@@ -2625,6 +2684,93 @@ const CLASS_ITEMS=[
 ];
 /* 단계 — 두 가지 가운데 하나 */
 const CLASS_TIERS=[...new Set(CLASS_ITEMS.map(i=>i.tier))].map(t=>{ const L=CLASS_ITEMS.filter(i=>i.tier===t); return {t, goal:L[0].goal, opts:L.map(i=>i.id)}; });
+/* ═══ 새 꾸미기 (2026-10-31) — 사각형 게임에서 인기가 많았던 갈래(동물 친구 · 빛나는 검 · 불사조 날개)를 중심으로 ═══
+   그 전에 NEW 였던 물건은 NEW 표시를 떼고, 이번 묶음만 NEW 칸에 보여요. 값은 아래 REPRICE 에서 정해요.          */
+ITEMS.forEach(i=>{ delete i.nw; }); BOX_ITEMS.forEach(i=>{ delete i.nw; }); CH_COLORS.forEach(c=>{ delete c.nw; }); CH_SHAPES.forEach(c=>{ c.nw=false; });
+const FLOWER=(x,y,r,f,rot)=>G(`rotate(${rot||0} ${x} ${y})`,[0,1,2,3,4].map(i=>{ const a=(i*72-90)*Math.PI/180;
+  return E(x+Math.cos(a)*r*.62,y+Math.sin(a)*r*.62,r*.48,r*.36,f,'#e26a9a',1.2).replace('/>',` transform="rotate(${i*72} ${(x+Math.cos(a)*r*.62).toFixed(1)} ${(y+Math.sin(a)*r*.62).toFixed(1)})"/>`); }).join('')+C(x,y,r*.22,'#ffd23f'));
+const NEW3=[
+/* 머리 */
+{id:'hCatEar',cat:'hat',n:'고양이 귀',p:450,d:b=>{const x=b.hx,y=b.top+8;
+  const ear=s=>P(`M${x+s*6},${y} L${x+s*17},${y-30} L${x+s*31},${y+2} Z`,'#ffcf9e',INK)+P(`M${x+s*11},${y-3} L${x+s*17},${y-20} L${x+s*25},${y-1} Z`,'#ff9fb8');
+  return ear(-1)+ear(1);}},
+{id:'hBunny',cat:'hat',n:'토끼 귀',p:480,d:b=>{const x=b.hx,y=b.top+8;
+  const ear=s=>G(`rotate(${s*14} ${x+s*11} ${y})`,E(x+s*11,y-26,9,26,'#fff',INK,2.4)+E(x+s*11,y-24,4.5,18,'#ffb3c7'));
+  return ear(-1)+ear(1);}},
+{id:'hSprout',cat:'hat',n:'새싹',p:300,d:b=>{const x=b.hx,y=b.top+5;
+  return P(`M${x},${y} q-3,-11 0,-20`,'none','#3a9d23',3.2)+P(`M${x},${y-17} q-17,-12 -22,2 q13,7 22,-2 Z`,'#8ae06a',INK,1.8)+
+    P(`M${x},${y-19} q15,-16 24,-3 q-13,9 -24,3 Z`,'#8ae06a',INK,1.8)+P(`M${x-6},${y-15} l-9,0 M${x+6},${y-17} l10,-3`,'none','#3a9d23',1.2);}},
+/* 표정 · 얼굴 */
+{id:'fTongue',cat:'face',n:'메롱',p:240,d:b=>{const k=KS(b), [l,r]=EYES(b);
+  return eyeDot(l[0],l[1],b.er,b.ink)+P(`M${r[0]-6*k},${r[1]+1} q${6*k},${-7*k} ${12*k},0`,'none',b.ink,3*k)+cheekSVG(b)+
+    P(`M${b.fx-9*k},${b.mouthY-2*k} L${b.fx+9*k},${b.mouthY-2*k}`,'none',b.ink,2.8*k)+
+    P(`M${b.fx-5*k},${b.mouthY-2*k} v${6*k} q${5*k},${8*k} ${10*k},0 v${-6*k}`,'#ff7a8a',b.ink,2*k)+P(`M${b.fx},${b.mouthY} v${4*k}`,'none','#d94a62',1.4*k);}},
+{id:'eHeartGl',cat:'eye',n:'하트 선글라스',p:530,d:b=>{const [l,r]=EYES(b), g=b.gr+3;
+  return HEART(l[0],l[1]-g*.15,g*.95,'#ff4f6d')+HEART(r[0],r[1]-g*.15,g*.95,'#ff4f6d')+P(`M${l[0]+g*.75},${l[1]-g*.45} Q${b.fx},${l[1]-g*.75} ${r[0]-g*.75},${r[1]-g*.45}`,'none',INK,3)+
+    P(`M${l[0]-g*.55},${l[1]-g*.35} l${g*.3},-${g*.12}`,'none','#fff',2.2,' opacity=".8"')+P(`M${r[0]-g*.55},${r[1]-g*.35} l${g*.3},-${g*.12}`,'none','#fff',2.2,' opacity=".8"');}},
+/* 손 */
+{id:'hdSaber',cat:'hand',n:'빛의 검',p:3000,d:b=>{const [x,y]=b.hand, bl=`M${x+6},${y-8} L${x+46},${y-92}`;
+  return P(bl,'none','#55e6ff',22,' opacity=".2"')+P(bl,'none','#55e6ff',13,' opacity=".55"')+P(bl,'none','#e9fdff',6)+
+    P(`M${x-6},${y+14} L${x+6},${y-8}`,'none',INK,10)+P(`M${x-6},${y+14} L${x+6},${y-8}`,'none','#aab2c0',6.5)+
+    P(`M${x-1},${y+2} l6,3 M${x+2},${y-4} l6,3`,'none',INK,1.4)+P(`M${x},${y-10} L${x+12},${y-4}`,'none',INK,5)+SPARK(x+52,y-98,6,'#e9fdff')+SPARK(x+30,y-60,3.5,'#e9fdff');}},
+{id:'hdIce',cat:'hand',n:'아이스크림',p:360,d:b=>{const [x,y]=b.hand;
+  return P(`M${x-9},${y-12} L${x+9},${y-12} L${x},${y+14} Z`,'#f0b46a',INK,2)+P(`M${x-5},${y-6} l8,8 M${x+3},${y-11} l-7,10`,'none','#c98a3a',1.2)+
+    C(x-5,y-18,8,'#ffb3c7',INK,2)+C(x+5,y-18,8,'#9fe3c8',INK,2)+C(x,y-28,8,'#fff3c4',INK,2)+C(x+1,y-37,3,'#ff4f6d',INK,1.4);}},
+{id:'hdGame',cat:'hand',n:'게임기',p:650,d:b=>{const [x,y]=b.hand;
+  return R(x-16,y-26,32,44,6,'#7b61ff',INK)+R(x-11,y-21,22,15,3,'#bcd99c',INK,1.4)+P(`M${x-6},${y-12} l3,-4 l3,3 l4,-5`,'none','#3f5c22',1.6)+
+    P(`M${x-10},${y+6} h8 M${x-6},${y+2} v8`,'none',INK,2.6)+C(x+6,y+8,2.6,'#ff4f6d',INK,1.2)+C(x+11,y+3,2.6,'#ffd23f',INK,1.2);}},
+/* 등 */
+{id:'bkPhoenix',cat:'back',n:'불사조 날개',p:3200,d:b=>{const cy=(b.y0+b.y1)/2-16;
+  const layer=(x,s,k,f,st)=>P(`M${x},${cy+12} C${x-36*s*k},${cy-64*k} ${x-92*s*k},${cy-58*k} ${x-108*s*k},${cy-22*k} C${x-84*s*k},${cy-18*k} ${x-96*s*k},${cy+2} ${x-78*s*k},${cy+10*k} C${x-64*s*k},${cy+14*k} ${x-70*s*k},${cy+32*k} ${x-48*s*k},${cy+32*k} C${x-30*s},${cy+30} ${x-16*s},${cy+26} ${x},${cy+22} Z`,f,st,st?2.4:0);
+  const flame=(x,y,s)=>P(`M${x},${y} q${-6*s},-10 ${2*s},-22 q${2*s},9 ${7*s},11 q${3*s},-6 ${1*s},-14 q${8*s},10 ${4*s},25 q${-3*s},6 ${-14*s},0 Z`,'#ffd23f','#ff6a1f',1.6);
+  const w=(x,s)=>G(`translate(${x} ${cy}) scale(.7 1.2) translate(${-x} ${-cy})`,layer(x,s,1.1,'#ff5a36',INK)+layer(x,s,.88,'#ff9a2e')+layer(x,s,.64,'#ffd75a')+flame(x-116*s,cy-26,s)+flame(x-88*s,cy-52,s)+flame(x-54*s,cy-62,s));
+  return w(b.x0+40,1)+w(b.x1-40,-1);}},
+/* 친구 */
+{id:'pDino',cat:'pet',n:'아기 티라노',p:3000,d:b=>{const x=b.px, y=b.gy-2;
+  return G(`translate(${x} ${y}) scale(1.3) translate(${-x} ${-y})`,P(`M${x+10},${y-12} q16,4 22,-8 q-6,16 -22,18 Z`,'#5fcf6e',INK,2)+E(x+2,y-14,14,13,'#5fcf6e',INK)+
+    P(`M${x-6},${y-24} l3,-7 l4,5 l3,-7 l4,6 l3,-6 l3,7`,'#2f9d4a',INK,1.4)+E(x-6,y-34,15,11,'#5fcf6e',INK)+
+    E(x+2,y-12,8,8,'#c9f2c2')+C(x-11,y-36,4.4,'#fff',INK,1.4)+C(x-12,y-36,2,INK)+P(`M${x-19},${y-29} q6,4 12,0`,'none',INK,1.6)+
+    P(`M${x-16},${y-29} l1.5,2.5 l1.5,-2.5 M${x-11},${y-29} l1.5,2.5 l1.5,-2.5`,'#fff',INK,1)+P(`M${x-4},${y-18} l-6,3`,'none',INK,2.6)+
+    R(x-6,y-3,6,6,2,'#5fcf6e',INK,1.6)+R(x+5,y-3,6,6,2,'#5fcf6e',INK,1.6));}},
+{id:'pCat',cat:'pet',n:'아기 고양이',p:900,d:b=>{const x=b.px, y=b.gy-2;
+  return P(`M${x+12},${y-6} q14,-2 12,-18`,'none',INK,6)+P(`M${x+12},${y-6} q14,-2 12,-18`,'none','#ffb067',3)+E(x,y-9,13,10,'#ffb067',INK)+
+    P(`M${x-13},${y-30} l2,-12 l9,7 M${x+13},${y-30} l-2,-12 l-9,7`,'#ffb067',INK,2)+C(x,y-27,13,'#ffb067',INK)+
+    P(`M${x-6},${y-38} l2,5 M${x},${y-39} v5 M${x+6},${y-38} l-2,5`,'none','#e07511',1.6)+C(x-5,y-28,2,INK)+C(x+5,y-28,2,INK)+
+    P(`M${x-1.5},${y-24} h3 l-1.5,2 Z`,'#ff7aa2',INK,1)+P(`M${x-3},${y-21} q1.5,1.5 3,0 q1.5,1.5 3,0`,'none',INK,1.2)+
+    P(`M${x-8},${y-24} l-8,-1 M${x-8},${y-22} l-8,2 M${x+8},${y-24} l8,-1 M${x+8},${y-22} l8,2`,'none',INK,1);}},
+{id:'pPup',cat:'pet',n:'강아지',p:900,d:b=>{const x=b.px, y=b.gy-2;
+  return E(x+2,y-9,14,10,'#d9a36b',INK)+P(`M${x+15},${y-12} q8,-4 6,-12`,'none',INK,5)+P(`M${x+15},${y-12} q8,-4 6,-12`,'none','#d9a36b',2.6)+
+    C(x-2,y-27,13,'#e8bd8a',INK)+E(x-14,y-26,5,10,'#8a5a36',INK,1.8)+E(x+10,y-26,5,10,'#8a5a36',INK,1.8)+
+    E(x-2,y-22,6,4.5,'#f6dfc2')+C(x-2,y-24,2.4,INK)+C(x-7,y-30,2,INK)+C(x+3,y-30,2,INK)+P(`M${x-2},${y-21} q0,4 3,4`,'#ff7a8a',INK,1.2)+
+    C(x+2,y-18,3,'#ff4f6d',INK,1);}},
+{id:'pPeng',cat:'pet',n:'펭귄',p:1130,d:b=>{const x=b.px, y=b.gy-2;
+  return P(`M${x-6},${y} l-6,2 h10 Z M${x+6},${y} l6,2 h-10 Z`,'#ffa53b',INK,1.4)+E(x,y-20,15,20,'#2b3045',INK)+E(x,y-16,10,15,'#fff')+
+    P(`M${x-14},${y-22} q-8,10 -2,16 M${x+14},${y-22} q8,10 2,16`,'#2b3045',INK,1.6)+C(x-5,y-30,2.2,'#fff')+C(x+5,y-30,2.2,'#fff')+
+    C(x-5,y-30,1.2,INK)+C(x+5,y-30,1.2,INK)+P(`M${x-3},${y-26} h6 l-3,4 Z`,'#ffa53b',INK,1)+E(x-9,y-23,2.6,1.6,'#ff9fb8')+E(x+9,y-23,2.6,1.6,'#ff9fb8');}},
+{id:'pHam',cat:'pet',n:'햄스터',p:750,d:b=>{const x=b.px, y=b.gy-2;
+  return C(x-9,y-28,4.5,'#f3c58f',INK,1.8)+C(x+9,y-28,4.5,'#f3c58f',INK,1.8)+E(x,y-15,16,15,'#f3c58f',INK)+E(x,y-10,10,9,'#fff6e6')+
+    C(x-6,y-20,2,INK)+C(x+6,y-20,2,INK)+E(x-11,y-14,4,3,'#ff9fb8')+E(x+11,y-14,4,3,'#ff9fb8')+C(x,y-16,1.6,'#ff7aa2')+
+    P(`M${x-2},${y-13} q2,2 4,0`,'none',INK,1.2)+E(x-4,y-3,3,2,'#f3c58f',INK,1.2)+E(x+4,y-3,3,2,'#f3c58f',INK,1.2)+
+    P(`M${x-3},${y-7} l1,-3 l2,3 Z`,'#7ed957',INK,1);}},
+/* 효과 */
+{id:'fxSakura',cat:'fx',n:'벚꽃 비',p:750,d:b=>FLOWER(b.x0-10,b.y0+10,16,'#ffd1e3',10)+FLOWER(b.x1+14,(b.y0+b.y1)/2-14,13,'#ffc2da',-20)+
+  FLOWER(b.x1-6,b.y1+8,12,'#ffd9e8',30)+FLOWER(b.x0+2,b.y1-6,10,'#ffc2da',-8)+FLOWER(110,Math.max(b.y0-28,-34),10,'#ffd1e3',45)+
+  E(b.x0+30,b.y0-6,4,2.6,'#ffc2da','#e26a9a',1).replace('/>',' transform="rotate(30 '+(b.x0+30)+' '+(b.y0-6)+')"/>')+E(b.x1-34,b.y1+22,4,2.6,'#ffd1e3','#e26a9a',1)},
+{id:'fxStarfall',cat:'fx',n:'별똥별',p:1130,d:b=>{const st=(x,y,r,c)=>{ const id='sf'+(++UID);
+    return `<defs><linearGradient id="${id}" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity="0"/><stop offset="1" stop-color="${c}" stop-opacity=".9"/></linearGradient></defs>`+
+      P(`M${x+r*4.2},${y-r*3.2} L${x},${y}`,'none',`url(#${id})`,r*.9)+STAR(x,y,r,'#ffe066');};
+  return st(b.x0-12,b.y0+24,9,'#ffd23f')+st(b.x1+14,b.y0-4,8,'#ffb3c7')+st(b.x1+4,b.y1-10,7,'#8fd0ff')+st(b.x0+10,b.y1+12,6,'#c4b5fd');}},
+{id:'fxBubble',cat:'fx',n:'비눗방울',p:500,d:b=>{const bb=(x,y,r)=>C(x,y,r,'#dff4ff','#4dabf7',1.6,'.55')+P(`M${x-r*.55},${y-r*.2} q${r*.15},${-r*.45} ${r*.5},${-r*.5}`,'none','#fff',r*.22);
+  return bb(b.x0-10,b.y0+20,11)+bb(b.x0+6,b.y0-8,6)+bb(b.x1+14,(b.y0+b.y1)/2-16,13)+bb(b.x1+2,b.y1+6,8)+bb(b.x0-2,b.y1-4,7)+bb(b.x1-14,b.y0-14,5);}},
+/* 무대 */
+{id:'bgSea',cat:'stage',n:'바닷속',p:880,d:b=>{const [id,df]=VGRAD([[0,'#8fe0ff'],[.55,'#3fa3e8'],[1,'#1b5fa8']]);
+  const weed=(x,h,c)=>P(`M${x},250 q-10,${-h*.3} 0,${-h*.55} q10,${-h*.25} 0,${-h*.45}`,'none',c,7);
+  return df+CLIPBG(R(-40,-48,300,292,0,`url(#${id})`)+P(WAVE(-40,-30,300,4,6),'none','#e6fbff',3,' opacity=".6"')+
+    [[-10,90],[226,120],[246,70]].map(([x,h],i)=>weed(x,h,i%2?'#2f9d4a':'#46c46b')).join('')+
+    [[24,40,6],[200,10,8],[214,60,4],[-8,150,5],[150,-20,4]].map(([x,y,r])=>C(x,y,r,'none','#e6fbff',2,'.8')).join('')+
+    P(`M-40,232 q40,-12 80,0 t80,0 t80,0 t80,0 V250 H-40 Z`,'#f1d9a6'));}}
+];
+NEW3.forEach(i=>{ i.nw=1; }); ITEMS.push(...NEW3);
 /* ═══ 가격 다시 매기기 (2026-10 · 사각형 O·X 게임 구매 기록을 보고) ═══
    사각형 게임에서는 가장 비싼 '자랑용' 물건(무지개색 6400 · 정사각형 3000 · 광선검 · 아기 티라노 · 불사조 날개)에
    눈이 몰렸고, 산 학생 대부분이 실제로 입고 다녔어요(3000 이상 착용률 83%). 중간 가격 색은 거의 팔리지 않았고요.
@@ -2632,7 +2778,9 @@ const CLASS_TIERS=[...new Set(CLASS_ITEMS.map(i=>i.tier))].map(t=>{ const L=CLAS
 /* 계산 마스터도 본격적으로 열리면 코인이 빨리 모일 것이므로(사각형 게임과 같은 흐름), 가격 틀을 사각형 게임에 맞춥니다.
    · 싼 물건(300 미만) ×1.5, 보통(300~1000) ×1.25  — 사각형 게임은 300~800 이 가장 많은 구간
    · 아래 목록은 '최고 인기'(2400 이상) 등 따로 정한 값                                        */
-const REPRICE={frRain:4800, bgGalaxy:3600, fairy:3600, pOwl:3200, jet:3000, hSigma:3000, bkSpiral:3000,
+const REPRICE={hCatEar:450, hBunny:480, hSprout:300, fTongue:240, eHeartGl:530, hdSaber:3000, hdIce:360, hdGame:650, bkPhoenix:3200,
+  pDino:3000, pCat:900, pPup:900, pPeng:1130, pHam:750, fxSakura:750, fxStarfall:1130, fxBubble:500, bgSea:880,
+  frRain:4800, bgGalaxy:3600, fairy:3600, pOwl:3200, jet:3000, hSigma:3000, bkSpiral:3000,
   infhalo:2600, wand:2400, rain:2400, frNeon:2400, frSunset:2600, bkSine:2600, fxTrig:2400, hUnit:2400,
   frGold:2200, cloud:2000, frGlow:1800, bgUnit:1800, formula:1600, pearl:1600, bgPascal:1600,
   wizard:1400, fire:1400, medal:1400, bgSpot:1400};
@@ -2721,7 +2869,7 @@ function blankF(form,x,y){
 const mul  =(a,b)  =>F({key:'g'+a+'x'+b, t:'gugu', k:'mul',  a, b, eq:[a,'×',b,'=','?'], ans:a*b});
 const mulr =(a,b)  =>F({key:'r'+a+'x'+b, t:'gugu', k:'mulr', a, b, eq:[a,'×','?','=',a*b], ans:b});
 const sq   =n      =>F({key:'s'+n,  t:'power', k:'sq',  n, eq:[{b:n,e:2},'=','?'], ans:n*n});
-const sqr  =n      =>F({key:'rs'+n, t:'power', k:'sqr', n, eq:[{b:'?',e:2},'=',n*n], ans:n});
+const sqr  =n      =>F({key:'rs'+n, t:'power', k:'sqr', n, cond:'□ 는 자연수', eq:[{b:'?',e:2},'=',n*n], ans:n});
 const cu   =n      =>F({key:'c'+n,  t:'power', k:'cu',  n, eq:[{b:n,e:3},'=','?'], ans:n*n*n});
 const cur  =n      =>F({key:'rc'+n, t:'power', k:'cur', n, eq:[{b:'?',e:3},'=',n*n*n], ans:n});
 
@@ -2791,10 +2939,10 @@ const TOPICS={
   addsub:{k:'addsub', n:'더하기·빼기', sym:'+ −', school:'e', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'10 만들기부터 두 자리 수까지',
     stages:[
-      {n:1, name:'한 자리 수 덧셈', ex:'8 + 5', take:15, old:[1,2],
+      {n:1, name:'(몇) + (몇)', ex:'8 + 5', take:15, old:[1,2],
        facts:()=>MAKE10().concat(ADD1()),
        pick:l=>sampleN(l.filter(f=>f.k==='make10'),3).concat(sampleN(l.filter(f=>f.k==='add1'&&f.ans>10),9),sampleN(l.filter(f=>f.k==='add1'&&f.ans<=10),3))},
-      {n:2, name:'한 자리 수 뺄셈',     ex:'13 − 5',     facts:SUB1, take:15, old:[3],
+      {n:2, name:'(십몇) − (몇)',     ex:'13 − 5',     facts:SUB1, take:15, old:[3],
        pick:l=>sampleN(l.filter(f=>f.c>10),11).concat(sampleN(l.filter(f=>f.c<=10),4))},
       {n:3, name:'두 자리 수 덧셈·뺄셈', ex:'83 − 29', gen:()=>(Math.random()<.4?genP:genQ)(), take:12, old:[4,5]},
       {n:4, name:'빈칸 채우기',         ex:'□ + 26 = 61',gen:genB, take:10, old:[6]}
@@ -2937,7 +3085,7 @@ function eqHTML(f,typed,state){
     if(t==='…') return `<span class="opr rem">…</span>`;
     return fill(t);
   };
-  return (f.cond?`<span class="cond${f.cb==='w'?' cw':f.cb?' cb':''}">${f.cond}</span>`:'')+f.eq.map(tok).join('');
+  return (f.cond?`<span class="cond${f.cb==='w'?' cw':f.cb?' cb':''}">${mfmt(f.cond)}</span>`:'')+f.eq.map(tok).join('');
 }
 /* 글로 쓴 식 (해설·목록용) — 입력칸 자리에 답을 채웁니다 */
 function eqText(f,fill){
@@ -2989,10 +3137,15 @@ function framesSVG(cells){
 function jumpSVG(start,jumps){
   const pts=[start]; jumps.forEach(j=>pts.push(pts[pts.length-1]+j));
   const lo=Math.min(...pts), hi=Math.max(...pts), span=Math.max(1,hi-lo);
-  const W=320, L=24, R=24, y=70, x=v=>L+(v-lo)/span*(W-L-R);
+  const W=320, L=24, R=24, y=70;
+  /* 가까운 두 점(53 → 54)도 떨어져 보이게 — 간격은 최소 44 를 지키고 나머지를 줄여 맞춰요 */
+  const U=[...new Set(pts)].sort((p,q)=>p-q), av=W-L-R, gp=U.map((v,i)=>i?Math.max(44,(v-U[i-1])/span*av):0);
+  const sc=av/Math.max(1,gp.reduce((p,q)=>p+q,0)), PX={}; let acc=L;
+  U.forEach((v,i)=>{ acc+=gp[i]*sc; PX[v]=acc; });
+  const x=v=>PX[v];
   let g=`<line x1="8" y1="${y}" x2="${W-8}" y2="${y}" stroke="${VC.dim}" stroke-width="2"/>`;
   jumps.forEach((j,i)=>{
-    const x1=x(pts[i]), x2=x(pts[i+1]), mx=(x1+x2)/2, h=Math.min(46,16+Math.abs(x2-x1)*.35);
+    const x1=x(pts[i]), x2=x(pts[i+1]), mx=(x1+x2)/2, back=i>0&&Math.sign(j)!==Math.sign(jumps[i-1]), h=Math.min(46,16+Math.abs(x2-x1)*.35)*(back?.5:1);
     const col=i===0?VC.b:VC.c;
     g+=`<path d="M${x1.toFixed(1)},${y-3} Q${mx.toFixed(1)},${y-h} ${x2.toFixed(1)},${y-3}" fill="none" stroke="${col}" stroke-width="2.6" stroke-linecap="round"/>`;
     g+=`<path d="M${(x2-5*Math.sign(x2-x1||1)).toFixed(1)},${y-11} L${x2.toFixed(1)},${y-3} L${(x2-9*Math.sign(x2-x1||1)).toFixed(1)},${y-1}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -3090,6 +3243,23 @@ function cubeSVG(n){
 const BAT=n=>'013678'.includes(String(n).slice(-1));
 const jE=n=>n+(BAT(n)?'을':'를'), jN=n=>n+(BAT(n)?'은':'는'), jG=n=>n+(BAT(n)?'이':'가'),
       jW=n=>n+(BAT(n)?'과':'와'), jR=n=>n+(BAT(n)&&!'178'.includes(String(n).slice(-1))?'으로':'로');
+/* 글 속의 분수를 위아래 분수로 — 3/4 · 2와 1/3 · √3/2 · 3π/4
+   태그와 <svg> 안은 건드리지 않아요. 8^(2/3) 같은 지수는 그대로 둡니다.            */
+function mfmt(html){
+  if(html==null) return '';
+  const fr=(n,d)=>`<span class="ifr"><i>${n}</i><i>${d}</i></span>`;
+  let out='', inSvg=0;
+  html=String(html)
+    .replace(/<b>(\d+)<\/b>\/(\d+)(?![\d\/]|\.\d)/g,(m,n,d)=>fr(`<b>${n}</b>`,d))
+    .replace(/(?<![\d.\w\/])(\d+)\/<b>(\d+)<\/b>/g,(m,n,d)=>fr(n,`<b>${d}</b>`));
+  html.split(/(<[^>]+>)/).forEach(p=>{
+    if(p[0]==='<'){ if(/^<(svg|sup)\b/i.test(p)) inSvg++; else if(/^<\/(svg|sup)/i.test(p)) inSvg=Math.max(0,inSvg-1); out+=p; return; }
+    if(inSvg||p.indexOf('/')<0){ out+=p; return; }
+    out+=p.replace(/(?<![\d.\w\/])(\d+)(?:과|와) (\d+|□)\/(\d+|□)(?![\d\/]|\.\d)/g,(m,w,n,d)=>`${w}${fr(n,d)}`)
+          .replace(/(?<![\d.\w\/√]|\^\()(√\d+|\d*π|\d+|□)\/(\d+|□)(?![\d\/]|\.\d)/g,(m,n,d)=>fr(n,d));
+  });
+  return out;
+}
 const SQ_END={0:[0],1:[1,9],4:[2,8],5:[5],6:[4,6],9:[3,7]};
 const CU_END={0:0,1:1,8:2,7:3,4:4,5:5,6:6,3:7,2:8,9:9};
 function hintOf(f){
@@ -3104,11 +3274,10 @@ function hintOf(f){
       if(s<=10) return {t:'세어 올라가기', lines:[`${f.a}에서 ${f.b}만큼 세어 올라가요`,
               `${f.a} + ${f.b} = ${B(s)}`], svg:framesSVG(Array(f.a).fill('a').concat(Array(f.b).fill('b')))};
       const need=10-big, rest=sm-need;
-      return {t:'10을 먼저 만들기', lines:[
+      return {t:'10을 먼저 만들기', lines:(f.a<f.b?[`더하는 순서를 바꿔도 같아요: ${f.a} + ${f.b} = ${f.b} + ${f.a}`]:[]).concat([
         `${jN(big)} ${need}만 더하면 10이 돼요`,
         `${jE(sm)} ${jW(need)} ${jR(rest)} 나눠요`,
-        `${big} + ${sm} = ${big} + ${need} + ${rest} = 10 + ${rest} = ${B(s)}`].concat(
-        f.a<f.b?[`<span class="tip">더하는 순서를 바꿔도 같아요: ${f.a} + ${f.b} = ${f.b} + ${f.a}</span>`]:[]),
+        `${big} + ${sm} = ${big} + ${need} + ${rest} = 10 + ${rest} = ${B(s)}`]),
         svg:framesSVG(Array(big).fill('a').concat(Array(sm).fill('b')))};
     }
     case 'sub1':{
@@ -3127,8 +3296,8 @@ function hintOf(f){
       const a=f.a, b=f.b, s=a+b;
       if(f.lv==='P'){
         if(f.carry){ const need=10-a%10, rest=b-need;
-          return {t:'다음 몇십까지 먼저', lines:[`${a}에 ${jE(need)} 더하면 ${a+need}`,
-            `${b} = ${need} + ${rest}`, `${a+need} + ${rest} = ${B(s)}`], svg:jumpSVG(a,[need,rest])}; }
+          return {t:'다음 몇십까지 먼저', lines:[`${b} = ${need} + ${rest} 로 나눠요`, `${a}에 ${jE(need)} 더하면 ${a+need}`,
+            `${a+need} + ${rest} = ${B(s)}`], svg:jumpSVG(a,[need,rest])}; }
         return {t:'일의 자리끼리', lines:[`일의 자리: ${a%10} + ${b} = ${a%10+b}`,`${a} + ${b} = ${B(s)}`],svg:jumpSVG(a,[b])};
       }
       const tens=b-b%10, ones=b%10;
@@ -3140,8 +3309,8 @@ function hintOf(f){
       const a=f.a, b=f.b, r=a-b;
       if(f.lv==='P'){
         if(f.carry){ const o=a%10;
-          return {t:'몇십까지 먼저 빼기', lines:[`${a}에서 ${jE(o)} 빼면 ${a-o}`,
-            `${b} = ${o} + ${b-o}`, `${a-o} − ${b-o} = ${B(r)}`], svg:jumpSVG(a,[-o,-(b-o)])}; }
+          return {t:'몇십까지 먼저 빼기', lines:[`${b} = ${o} + ${b-o} 로 나눠요`, `${a}에서 ${jE(o)} 빼면 ${a-o}`,
+            `${a-o} − ${b-o} = ${B(r)}`], svg:jumpSVG(a,[-o,-(b-o)])}; }
         return {t:'일의 자리끼리', lines:[`일의 자리: ${a%10} − ${b} = ${a%10-b}`,`${a} − ${b} = ${B(r)}`],svg:jumpSVG(a,[-b])};
       }
       if(b%10>=7){ const up=b-b%10+10;
@@ -3166,8 +3335,8 @@ function hintOf(f){
     case 'mul':{
       const {a,b}=f, p=a*b, L=[];
       if(b<=5){ L.push(`${jE(a)} ${b}번 더해요`, `${Array(b).fill(a).join(' + ')} = ${B(p)}`); }
-      else{ L.push(`${a} × ${b} = ${a} × 5 + ${a} × ${b-5}`, `= ${a*5} + ${a*(b-5)} = ${B(p)}`); }
-      if(a===9&&b>1) L.push(`<span class="tip">9단은 10단에서 빼기: 10 × ${b} − ${b} = ${10*b} − ${b} = ${p}</span>`);
+      else{ L.push(`${a} × 5 = ${a*5}`, `여기에 ${jE(a)} ${b-5}번 더 더해요: ${a*5} + ${a*(b-5)} = ${B(p)}`); }
+      if(a===9&&b>1) L.push(`<span class="tip">9단은 10단에서 빼기: 10 × ${b} = ${10*b} 에서 ${jE(b)} 빼면 ${p}</span>`);
       else if(b<a&&b>=2) L.push(`<span class="tip">곱하는 순서를 바꿔도 같아요: ${b} × ${a} = ${p}</span>`);
       return {t:b<=5?'같은 수를 여러 번':'5단을 이용하기', lines:L, svg:arraySVG(a,b,b>5?5:0)};
     }
@@ -3244,8 +3413,8 @@ function previewOf(t,n){
     if(n===3){ const h=hintOf(sub1(13,5)); return {tip:'10보다 큰 수에서 뺄 때는 10을 거쳐 가요.', lines:h.lines, svg:h.svg}; }
     if(n===4){ const h=hintOf(asN('P',47,'+',8)); return {tip:'다음 몇십까지 먼저 가면 계산이 깔끔해져요.', lines:h.lines, svg:h.svg}; }
     if(n===5){ const h=hintOf(asN('Q',83,'-',29)); return {tip:'29는 30에 가까워요. 30을 빼고 1을 돌려줘요.', lines:h.lines, svg:h.svg}; }
-    if(n===7){ const h=hintOf(r3F(358,'+',267)); return {tip:'일의 자리부터 차례로 더해요. 받아올린 1 을 윗자리 위에 작게 적어 두면 잊지 않아요.', lines:h.lines, svg:''}; }
-    if(n===8){ const h=hintOf(r3F(503,'-',278)); return {tip:'일의 자리부터 빼요. 0 에서는 바로 빌릴 수 없으니 윗자리에서 빌려 와요.', lines:h.lines, svg:''}; }
+    if(n===7){ const h=hintOf(r3F(358,'+',267)); return {tip:'일의 자리부터 차례로 더해요. 받아올린 1 을 윗자리 위에 작게 적어 두면 잊지 않아요.', lines:h.lines, svg:h.svg}; }
+    if(n===8){ const h=hintOf(r3F(503,'-',278)); return {tip:'일의 자리부터 빼요. 0 에서는 바로 빌릴 수 없으니 윗자리에서 빌려 와요.', lines:h.lines, svg:h.svg}; }
     const h=hintOf(blankF(1,26,61)); return {tip:'덧셈과 뺄셈은 서로 거꾸로 하는 계산이에요.', lines:h.lines, svg:h.svg};
   }
   if(t==='gugu'){
@@ -3281,7 +3450,7 @@ function noteOf(t){
   const fromHint=(t2,ex,f,tip)=>{ const h=hintOf(f);
     return {t:t2, ex, svg:h.svg, lines:h.lines.concat(tip?[`<span class="tip">${tip}</span>`]:[])}; };
   if(t==='addsub') return {
-    sub:'10 만들기 · 받아올림 · 받아내림 · 빈칸 채우기 · 세 자리 수',
+    sub:'한 자리 수 · 두 자리 수 · 받아올림과 받아내림 · 빈칸 채우기 · 세 자리 수',
     memo:[
       {h:'10이 되는 짝 — 모든 받아올림의 출발점', html:chipList(range(1,9).map(a=>`${a} + <b>${10-a}</b>`))},
       {h:'덧셈과 뺄셈은 한 가족', html:`${tapeSVG(13,8,5,'')}
@@ -3492,7 +3661,7 @@ const M2TRICK=[[25,4],[25,8],[5,18],[5,46],[5,64],[15,6],[15,8],[99,3],[99,7],[9
 
 function genIA(){ const a=nz(-12,12); let b=nz(-12,12); if(a>0&&b>0&&Math.random()<.7) b=-b; return iA(a,b); }
 function genIS(){ const a=nz(-12,12), b=nz(-12,12); return iS(a,b); }
-function genIT(){ const a=nz(-15,15), b=sgn(ri(1,12)), c=sgn(ri(1,12)); return iT(a,b,c); }
+function genIT(){ for(let g=0;g<20;g++){ const a=nz(-15,15), b=sgn(ri(1,12)), c=sgn(ri(1,12)); if(a<0||b<0||c<0) return iT(a,b,c); } return iT(-3,8,-6); }   /* 음수 항이 하나는 있게 */
 function genIM(){ let a=sgn(ri(1,9)), b=sgn(ri(2,9)); if(a>0&&b>0) (Math.random()<.5?a=-a:b=-b); return iM(a,b); }
 function genID(){ let b=sgn(ri(2,9)), q=sgn(ri(2,9)); if(b>0&&q>0) b=-b; return iD(b*q,b); }
 const IPOW=()=>[iP(-1,2),iP(-1,3),iP(-2,2),iP(-2,3),iP(-3,2),iP(-3,3),iP(-4,2),iP(-5,2),iP(-4,3),iP(-6,2),
@@ -3570,7 +3739,7 @@ Object.assign(TOPICS,{
        facts:()=>PY_BASE.flatMap(([a,b])=>[yH(a,b),yH(b,a)])},
       {n:2, name:'다른 한 변 구하기', ex:'□² + 12² = 13²', take:8,
        facts:()=>PY_BASE.flatMap(([a,b,c])=>[yL(c,a),yL(c,b)])},
-      {n:3, name:'피타고라스 수 늘리기', ex:'0.6² + 0.8² = □²', take:12,
+      {n:3, name:'닮은 직각삼각형 (늘리기·줄이기)', ex:'0.6² + 0.8² = □²', take:12,
        facts:()=>pyFacts(PY_MULT_P,true).concat(pyFacts(PY_BIG,true),PY_FD_P.map(yX)),
        pick:l=>sampleN(l.filter(f=>f.k!=='yX'&&f.c!==29),6).concat(sampleN(l.filter(f=>f.c===29),2),sampleN(l.filter(f=>f.k==='yX'),4))}
     ],
@@ -3578,7 +3747,7 @@ Object.assign(TOPICS,{
     realStages:[
       {n:1, name:'빗변 구하기', facts:()=>PY_BASE.flatMap(([a,b])=>[yH(a,b),yH(b,a)])},
       {n:2, name:'다른 한 변 구하기', facts:()=>PY_BASE.flatMap(([a,b,c])=>[yL(c,a),yL(c,b)])},
-      {n:3, name:'피타고라스 수 늘리기', facts:()=>pyFacts(PY_MULT,true).concat(pyFacts(PY_BIG,true),PY_FD.map((_,i)=>yX(i)))}
+      {n:3, name:'닮은 직각삼각형', facts:()=>pyFacts(PY_MULT,true).concat(pyFacts(PY_BIG,true),PY_FD.map((_,i)=>yX(i)))}
     ],
     cats:[['빗변 구하기',sk=>/^yH/.test(sk)],['다른 한 변 구하기',sk=>/^yL/.test(sk)],['분수·소수',sk=>/^yX/.test(sk)],
           ['제곱의 합',sk=>/^yS/.test(sk)],['제곱의 차',sk=>/^yD/.test(sk)]]}
@@ -3726,45 +3895,46 @@ function extHint(f){
     case 'iT':{
       const ts=[f.a,f.b,f.c], P=ts.filter(v=>v>0), N=ts.filter(v=>v<0), sp=P.reduce((s,v)=>s+v,0), sn=N.reduce((s,v)=>s+v,0);
       const L=[`항을 부호와 함께 읽어요: ${ts.map(PN).join(', ')}`];
-      if(P.length&&N.length) L.push(`양수끼리 ${P.join(' + ')} = ${sp}`, `음수끼리 ${N.map(MI).join(' ')} = ${MI(sn)}`, `${sp} − ${-sn} = ${B(sp+sn)}`);
+      if(P.length&&N.length) L.push(P.length>1?`양수끼리 ${P.join(' + ')} = ${sp}`:`양수: ${sp}`, N.length>1?`음수끼리 ${N.map(MI).join(' ')} = ${MI(sn)}`:`음수: ${MI(sn)}`, `${sp} − ${-sn} = ${B(sp+sn)}`);
       else L.push(`모두 ${P.length?'양수':'음수'} → ${B(sp+sn)}`);
-      return {t:'양수끼리, 음수끼리 모으기', lines:L.concat([tip('− 앞에 있는 수는 음수로 읽어요. 8 − 6 은 (+8) + (−6)')]), svg:jumpSVG(f.a,[f.b,f.c])};
+      return {t:'양수끼리, 음수끼리 모으기', lines:L.concat([tip('앞에 − 가 붙은 수는 음수로 읽어요. 8 − 6 은 (+8) + (−6)')]), svg:jumpSVG(f.a,[f.b,f.c])};
     }
     case 'iM': case 'iD':{
       const {a,b}=f, op=f.k==='iM'?'×':'÷', k=(a<0)+(b<0), val=f.ans;
       return {t:'부호 먼저, 그다음 계산', lines:[`음수가 ${k}개 → 부호는 ${k%2?'−':'+'}`,
         `${Math.abs(a)} ${op} ${Math.abs(b)} = ${Math.abs(val)}`, `→ ${B(val)}`,
-        tip(f.k==='iM'?'(−) × (−) = (+) · (+) × (−) = (−)':`확인: ${PN(b)} × ${PN(val)} = ${PN(a)}`)], svg:''};
+        tip(f.k==='iM'?'(−) × (−) = (+) / (+) × (−) = (−)':`확인: ${PN(b)} × ${PN(val)} = ${PN(a)}`)], svg:''};
     }
     case 'iP':{
       const {a,n}=f, s=SUPN(n);
       return {t:'괄호 안 전체를 거듭', lines:[`(${MI(a)})${s} = ${Array(n).fill(PN(a)).join(' × ')}`,
         a<0?`음수를 ${n}번 곱하면 부호는 ${n%2?'−':'+'}`:`양수끼리 곱하면 양수`, `= ${B(f.ans)}`,
-        tip(a<0?`−${-a}${s} 와는 달라요: −${-a}${s} = ${MI(-Math.pow(-a,n))}`:'')].filter(x=>!/tip"><\/span>/.test(x)), svg:''};
+        tip(a<0?(n%2?'음수를 홀수 번 곱하면 −, 짝수 번 곱하면 + 예요':`−${-a}${s} 과는 달라요: −${-a}${s} = ${MI(-Math.pow(-a,n))}`):'')].filter(x=>!/tip"><\/span>/.test(x)), svg:''};
     }
     case 'iN':{
       const {a,n}=f, s=SUPN(n);
-      return {t:'괄호가 없으면 수에만 거듭', lines:[`−${a}${s} 의 지수 ${n}은 ${a}에만 붙어요`,
+      return {t:'괄호가 없으면 수에만 거듭', lines:[`−${a}${s} 의 지수 ${jN(n)} ${a}에만 붙어요`,
         `−${a}${s} = −(${Array(n).fill(a).join(' × ')}) = −${Math.pow(a,n)}`, `→ ${B(f.ans)}`,
-        tip(`(−${a})${s} = ${MI(Math.pow(-a,n))} 와 비교해 보세요`)], svg:''};
+        tip(`(−${a})${s} = ${MI(Math.pow(-a,n))}${BAT(Math.pow(a,n))?'과':'와'} 비교해 보세요`)], svg:''};
     }
     case 'yS': case 'yD':{
       const p=f.k==='yS', x=p?f.a:f.c, y=f.b, v=f.ans, r=Math.round(Math.sqrt(v)), sq=r*r===v;
       const L=[`${x}² = ${x*x}`, `${y}² = ${y*y}`, `${x*x} ${p?'+':'−'} ${y*y} = ${B(v)}`];
-      if(sq&&r>1) L.push(tip(p?`${jN(v)} ${r}²! (${Math.min(x,y)}, ${Math.max(x,y)}, ${r}) 는 피타고라스 수예요`
-                              :`${jN(v)} ${r}²! (${Math.min(r,y)}, ${Math.max(r,y)}, ${x}) 는 피타고라스 수예요`));
+      if(sq&&r>1) L.push(tip(p?`${jN(v)} ${r}²! (${Math.min(x,y)}, ${Math.max(x,y)}, ${r})${BAT(r)?'은':'는'} 피타고라스 수예요`
+                              :`${jN(v)} ${r}²! (${Math.min(r,y)}, ${Math.max(r,y)}, ${x})${BAT(x)?'은':'는'} 피타고라스 수예요`));
       return {t:p?'제곱해서 더하기':'제곱해서 빼기', lines:L,
         svg:sq&&r>1?(p?pythSVG(x,y,r,''):pythSVG(r,y,x,'')):''};
     }
     case 'yH':{
       const {a,b,c}=f, g=gcd(a,b), L=[`빗변² = ${a}² + ${b}² = ${a*a} + ${b*b} = ${c*c}`, `${c*c} = ${c}² 이므로 □ = ${B(c)}`];
-      if(g>1) L.push(tip(`(${a/g}, ${b/g}, ${c/g}) 의 ${g}배예요 — 작은 삼각형을 ${g}배로 늘린 닮은 삼각형`));
+      if(g>1){ L.unshift(`(${a/g}, ${b/g}, ${c/g})의 ${g}배 → □ = ${c/g} × ${g} = ${B(c)}`, '계산으로 확인:');
+        L.push(tip(`작은 삼각형을 ${g}배로 늘린 닮은 삼각형이에요. 큰 수를 제곱하지 않아도 돼요`)); }
       return {t:'두 직각변을 제곱해 더하기', lines:L, svg:pythSVG(a,b,c,'c')};
     }
     case 'yL':{
       const {a,b,c}=f, g=gcd(a,b), L=[`□² = ${c}² − ${b}² = ${c*c} − ${b*b} = ${a*a}`, `${a*a} = ${a}² 이므로 □ = ${B(a)}`,
         tip('빗변(직각의 맞은편, 가장 긴 변)의 제곱에서 빼요')];
-      if(g>1) L.push(tip(`(${a/g}, ${b/g}, ${c/g}) 의 ${g}배예요`));
+      if(g>1) L.unshift(`(${a/g}, ${b/g}, ${c/g})의 ${g}배 → □ = ${a/g} × ${g} = ${B(a)}`, '계산으로 확인:');
       return {t:'빗변의 제곱에서 빼기', lines:L, svg:pythSVG(a,b,c,'a')};
     }
     case 'yX':{
@@ -3772,7 +3942,8 @@ function extHint(f){
       const L=k==='h'
         ?[`□² = ${P(a)}² + ${P(b)}² = ${a2} + ${b2} = ${c2}`, `${c2} = ${c}² 이므로 □ = ${B(f.ans)}`]
         :[`□² = ${P(c)}² − ${P(b)}² = ${c2} − ${b2} = ${a2}`, `${a2} = ${a}² 이므로 □ = ${B(f.ans)}`];
-      L.push(tip(`(${T.join(', ')}) ${x==='1/2배'?'를 2로 나눈 수예요':x==='1/5배'||x==='0.2배'?'를 5로 나눈 수예요':'의 '+x+'예요'} — 피타고라스 수를 알면 계산 없이 바로 보여요`));
+      L.unshift(`(${T.join(', ')})${x==='1/2배'?'를 2로 나눈 수':x==='1/5배'||x==='0.2배'?'를 5로 나눈 수':'의 '+x} → □ = ${B(f.ans)}`, '계산으로 확인:');
+      L.push(tip('피타고라스 수를 알면 큰 계산 없이 바로 보여요'));
       return {t:k==='h'?'분수·소수도 똑같이 제곱해 더하기':'분수·소수도 빗변의 제곱에서 빼기', lines:L,
         svg:pythSVG(pyNum(a),pyNum(b),pyNum(c),k==='h'?'c':'a',false,labs)};
     }
@@ -4062,7 +4233,7 @@ Object.assign(TOPICS,{
       {n:1, name:'거듭제곱의 값',       ex:'2⁵ = □', take:12, old:[1],
        facts:()=>EV().concat(EL()), pick:l=>byPre(l,[[/^eV/,8],[/^eL/,4]])},
       {n:2, name:'지수의 합과 차',      ex:'a³ × a⁴ = a□', gen:()=>(Math.random()<.5?genEM:genED)(), take:12, old:[2,3]},
-      {n:3, name:'거듭제곱의 거듭제곱', ex:'(a³)⁴ = a□',     gen:()=>(Math.random()<.5?genEP:genEC)(), take:12, old:[4,5]}
+      {n:3, name:'거듭제곱의 거듭제곱 · 곱의 거듭제곱', ex:'(a³)⁴ = a□',     gen:()=>(Math.random()<.5?genEP:genEC)(), take:12, old:[4,5]}
     ],
     cats:[['거듭제곱의 값',sk=>/^eV/.test(sk)],['지수 찾기 (2□ = 32)',sk=>/^eL/.test(sk)],['aᵐ × aⁿ',sk=>/^eM/.test(sk)],
           ['aᵐ ÷ aⁿ',sk=>/^eD/.test(sk)],['(aᵐ)ⁿ',sk=>/^eP/.test(sk)],['(ka)ⁿ',sk=>/^eC/.test(sk)]]},
@@ -4146,12 +4317,12 @@ function midHint(f){
     case 'eM':{
       const {x,m,n}=f, ex=m+n<=8?[`(${Array(m).fill(x).join('×')}) × (${Array(n).fill(x).join('×')})`]:[];
       return {t:'곱하면 지수끼리 더하기', lines:[`${x}${sup(m)} × ${x}${sup(n)}`].concat(ex,
-        [`${x}를 모두 ${m} + ${n} = ${m+n}번 곱해요 → ${x}<sup>${B(m+n)}</sup>`, tip(`지수끼리 곱하면 안 돼요: ${x}${sup(m*n)} 이 아니에요`)]), svg:''};
+        [`${jE(x)} 모두 ${m} + ${n} = ${m+n}번 곱해요 → ${x}<sup>${B(m+n)}</sup>`, tip(`지수끼리 곱하면 안 돼요: ${x}${sup(m*n)} 이 아니에요`)]), svg:''};
     }
     case 'eD':{
       const {x,m,n}=f;
       return {t:'나누면 지수끼리 빼기', lines:[`${x}${sup(m)} ÷ ${x}${sup(n)} = ${x}${sup(m)} / ${x}${sup(n)}`,
-        `위의 ${x} ${m}개 가운데 ${n}개가 약분돼요`, `${m} − ${n} = ${m-n} → ${x}<sup>${B(m-n)}</sup>`,
+        `분자에는 ${x}${BAT(x)?'이':'가'} ${m}개, 분모에는 ${n}개 → ${n}개씩 약분돼요`, `${m} − ${n} = ${m-n} → ${x}<sup>${B(m-n)}</sup>`,
         tip(`지수끼리 나누면 안 돼요`)], svg:''};
     }
     case 'eP':{
@@ -4169,11 +4340,11 @@ function midHint(f){
     case 'qS':{
       const n=f.n;
       return {t:'제곱해서 그 수가 되는 양수', lines:[`${n}² = ${n*n}`, `그래서 √${n*n} = ${B(n)}`,
-        tip(`${n*n}의 제곱근은 ±${n} 이지만, √${n*n} 은 양수 ${n} 하나예요`)], svg:n<=20?squareSVG(n):''};
+        tip(`${n*n}의 제곱근은 ±${n} 이지만, √${jN(n*n)} 양수 ${n} 하나예요`)], svg:n<=20?squareSVG(n):''};
     }
     case 'qP': return {t:'√ 를 제곱하면 원래 수', lines:[`√${f.a} 는 제곱해서 ${f.a}가 되는 수`, `그래서 (√${f.a})² = ${B(f.a)}`], svg:''};
     case 'qN': return {t:'√ 의 값은 0 이상', lines:[`(−${f.a})² = ${f.a*f.a}`, `√${f.a*f.a} = ${B(f.a)}`,
-        tip(`−${f.a} 이 아니에요. √ 의 값은 음수가 될 수 없어요`)], svg:''};
+        tip(`−${jG(f.a)} 아니에요. √ 의 값은 음수가 될 수 없어요`)], svg:''};
     case 'qO':{
       const {a,b}=f;
       return {t:'제곱수를 찾아 밖으로', lines:[`${a*a*b} = ${a*a} × ${b}`, `√${a*a*b} = √${a*a} × √${b} = ${a}√${b}`,
@@ -4187,7 +4358,7 @@ function midHint(f){
     case 'qM': case 'qD':{
       const {x,y}=f, mul=f.k==='qM', v=mul?x*y:x/y;
       return {t:mul?'√ 끼리 곱하기':'√ 끼리 나누기', lines:[`√${x} ${mul?'×':'÷'} √${y} = √(${x} ${mul?'×':'÷'} ${y}) = √${v}`,
-        `${v} = ${f.ans}² → ${B(f.ans)}`, tip('√a × √b = √(ab) · √a ÷ √b = √(a ÷ b)')], svg:''};
+        `${v} = ${f.ans}² → ${B(f.ans)}`, tip('√a × √b = √(ab) / √a ÷ √b = √(a ÷ b)')], svg:''};
     }
   }
   return null;
@@ -4325,7 +4496,7 @@ const tR=(a,b,fn)=>{ const c=Math.round(Math.hypot(a,b));
 /* 빗변 c 와 ∠A 로 변 구하기 — side 'o' BC(맞은편) · 'j' AC(이웃) */
 const tS=(d,c,side)=>{ const fn=side==='o'?'s':'c', v=TVAL[fn+d], rt=v.includes('√')?v.match(/√\d/)[0]:'';
   return F({key:'tS'+d+'_'+c+'_'+side, t:'trig', k:'tS', d, c, side, fn, v, rt, fig:true,
-    cond:`AB = ${c}, ∠A = ${d}° 일 때`, eq:[side==='o'?'BC':'AC','=','?'].concat(rt?[rt]:[]), ans:c/2}); };
+    cond:`∠C = 90°, AB = ${c}, ∠A = ${d}° 일 때`, eq:[side==='o'?'BC':'AC','=','?'].concat(rt?[rt]:[]), ans:c/2}); };
 const TCALC=[
   ['sin 30° + cos 60°',1,0,['sin 30° = 1/2, cos 60° = 1/2','1/2 + 1/2 = 1']],
   ['tan 60° × tan 30°',1,0,['√3 × √3/3 = 3/3','= 1']],
@@ -4338,7 +4509,7 @@ const TCALC=[
   ['cos 30° × tan 60°',3,2,['√3/2 × √3 = 3/2']],
   ['sin 60° × cos 30°',3,4,['√3/2 × √3/2 = 3/4']],
   ['sin² 45° + cos² 45°',1,0,['(√2/2)² + (√2/2)² = 1/2 + 1/2','= 1']],
-  ['sin² 30° + cos² 30°',1,0,['(1/2)² + (√3/2)² = 1/4 + 3/4','= 1 — sin²A + cos²A 는 언제나 1']],
+  ['sin² 30° + cos² 30°',1,0,['(1/2)² + (√3/2)² = 1/4 + 3/4','= 1']],
   ['6 sin 30° − tan 45°',2,0,['6 × 1/2 − 1 = 3 − 1','= 2']],
   ['√3 tan 60°',3,0,['√3 × √3 = 3']],
   ['√2 sin 45°',1,0,['√2 × √2/2 = 2/2','= 1']],
@@ -4397,7 +4568,7 @@ const cF=n=>F({key:'cF'+n, t:'comb', k:'cF', n, eq:[`${n}!`,'=','?'], ans:fact(n
 const cG=(n,k)=>F({key:'cG'+n+'_'+k, t:'comb', k:'cG', n, kk:k, eq:[{fr:[`${n}!`,`${k}!`]},'=','?'], ans:fact(n)/fact(k)});
 const cP=(n,r)=>F({key:'cP'+n+'_'+r, t:'comb', k:'cP', n, r, eq:[PS(n,r),'=','?'], ans:nPr(n,r)});
 const cC=(n,r)=>F({key:'cC'+n+'_'+r, t:'comb', k:'cC', n, r, eq:[CS(n,r),'=','?'], ans:nCr(n,r)});
-const cS=(n,r)=>F({key:'cS'+n+'_'+r, t:'comb', k:'cS', n, r, eq:[CS(n,r),'=',{b:subN(n)+'C',s:'?'}], ans:n-r});
+const cS=(n,r)=>F({key:'cS'+n+'_'+r, t:'comb', k:'cS', n, r, cond:`단, □ ≠ ${r}`, eq:[CS(n,r),'=',{b:subN(n)+'C',s:'?'}], ans:n-r});
 const cN=(ty,n,r)=>{ const v=ty==='P'?nPr(n,r):nCr(n,r);
   return F({key:'cN'+ty+'_'+n+'_'+r, t:'comb', k:'cN', ty, n, r, v, cond:`ₙ${ty}${subN(r)} = ${v} 일 때`, eq:['n','=','?'], ans:n}); };
 const CWORD=[
@@ -4407,17 +4578,25 @@ const CWORD=[
   ['남학생 4명, 여학생 3명 중 남 2명, 여 1명을 뽑는 방법',18,['₄C₂ × ₃C₁ = 6 × 3','= 18 (곱의 법칙)']],
   ['서로 다른 동전 3개를 던질 때 나오는 경우',8,['동전마다 2가지: 2 × 2 × 2','= 8']],
   ['주사위 2개를 던져 눈의 합이 7인 경우',6,['(1,6) (2,5) (3,4) (4,3) (5,2) (6,1)','= 6']],
-  ['1~5 로 만드는 두 자리 자연수 (같은 숫자 두 번 X)',20,['₅P₂ = 5 × 4','= 20']],
-  ['0~4 로 만드는 두 자리 자연수 (같은 숫자 두 번 X)',16,['십의 자리에 0 은 못 와요: 4가지','일의 자리 4가지 → 4 × 4 = 16']],
-  ['원 위의 점 6개로 만드는 선분',15,['두 점을 고르면 선분 하나: ₆C₂','= 15']],
-  ['원 위의 점 6개로 만드는 삼각형',20,['세 점을 고르면 삼각형 하나: ₆C₃','= 6 × 5 × 4 ÷ 6 = 20']],
+  ['1부터 5까지의 숫자를 한 번씩만 써서 만드는 두 자리 자연수의 개수',20,['₅P₂ = 5 × 4','= 20']],
+  ['0부터 4까지의 숫자를 한 번씩만 써서 만드는 두 자리 자연수의 개수',16,['십의 자리에 0 은 못 와요: 4가지','일의 자리 4가지 → 4 × 4 = 16']],
+  ['원 위의 서로 다른 점 6개 중 두 점을 이어 만드는 선분의 개수',15,['두 점을 고르면 선분 하나: ₆C₂','= 15']],
+  ['원 위의 서로 다른 점 6개 중 세 점을 이어 만드는 삼각형의 개수',20,['세 점을 고르면 삼각형 하나: ₆C₃','= 6 × 5 × 4 ÷ 6 = 20']],
   ['8팀이 서로 한 번씩 경기하는 횟수',28,['두 팀을 고르면 경기 하나: ₈C₂','= 8 × 7 ÷ 2 = 28']],
   ['5명이 원탁에 둘러앉는 방법',24,['한 명을 고정하고 나머지 4명을 세워요','4! = 24']],
   ['A, B 를 포함한 5명이 한 줄로 설 때 A, B 가 이웃하는 방법',48,['A·B 를 한 묶음 → 4개를 세우기: 4! = 24','묶음 안에서 AB, BA: × 2 = 48']],
   ['티셔츠 4벌, 바지 3벌로 옷을 입는 방법',12,['곱의 법칙: 4 × 3','= 12']],
   ['10명 중 대표 3명을 뽑는 방법',120,['₁₀C₃ = 10 × 9 × 8 ÷ 6','= 120']],
-  ['a, b, c, d 가운데 2개를 골라 한 줄로 놓는 방법',12,['₄P₂ = 4 × 3','= 12']]
+  ['a, b, c, d 가운데 2개를 골라 한 줄로 놓는 방법',12,['₄P₂ = 4 × 3','= 12']],
+  ['A, B 를 포함한 5명이 한 줄로 설 때 A, B 가 이웃하지 않는 방법',72,['전체: 5! = 120','이웃하는 경우: 4! × 2 = 48','120 − 48 = 72']],
+  ['남학생 4명, 여학생 3명 중 3명을 뽑을 때 여학생이 적어도 1명 뽑히는 방법',31,['전체 ₇C₃ = 35','여학생이 없는 경우 ₄C₃ = 4','35 − 4 = 31']],
+  ['1, 2, 3, 4, 5 를 한 번씩만 써서 만드는 세 자리 짝수의 개수',24,['일의 자리: 2 또는 4 → 2가지','나머지 두 자리: ₄P₂ = 12','2 × 12 = 24']],
+  ['APPLE 의 다섯 글자를 한 줄로 늘어놓는 방법',60,['P 가 두 개 → 같은 것이 있는 순열','5! ÷ 2! = 120 ÷ 2 = 60']],
+  ['정육각형의 대각선의 개수',9,['꼭짓점 두 개를 잇는 선분: ₆C₂ = 15','그 가운데 변 6개를 빼요: 15 − 6 = 9']],
+  ['부모 2명과 자녀 3명이 한 줄로 설 때 부모가 양 끝에 서는 방법',12,['양 끝의 부모: 2! = 2','가운데 자녀: 3! = 6','2 × 6 = 12']]
 ];
+/* 중학교 경우의 수와 겹치는 쉬운 상황(대표 2명·회장 부회장·동전·주사위·옷 입기)은 고등 연습에서 빼요 */
+const CW_EASY=[1,2,4,5,13];
 const cW=i=>F({key:'cW'+i, t:'comb', k:'cW', i, cond:CWORD[i][0], eq:['?','가지'], ans:CWORD[i][1]});
 
 function hsFact(key){
@@ -4458,7 +4637,7 @@ const CP_ALL=()=>{ const o=[]; range(3,10).forEach(n=>range(1,4).forEach(r=>{ if
 const CC_ALL=()=>{ const o=[]; range(4,12).forEach(n=>range(2,4).forEach(r=>{ if(r<n) o.push(cC(n,r)); })); return o; };
 const CN_ALL=()=>range(4,10).flatMap(n=>[cN('C',n,2),cN('P',n,2)]).concat([cN('C',6,3),cN('C',7,3),cN('C',8,3)],
                   [[10,8],[12,9],[9,7],[20,18],[15,13],[8,5]].map(([n,r])=>cS(n,r)));
-const CW_ALL=()=>CWORD.map((_,i)=>cW(i));
+const CW_ALL=()=>CWORD.map((_,i)=>i).filter(i=>!CW_EASY.includes(i)).map(cW);
 
 Object.assign(TOPICS,{
   trig:{k:'trig', n:'삼각비', sym:'sin', school:'m', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
@@ -4488,7 +4667,7 @@ Object.assign(TOPICS,{
     stages:[
       {n:1, name:'팩토리얼과 순열',    ex:'₆P₃ = □',          facts:()=>CF_ALL().concat(CP_ALL()), take:12, old:[1,2],
        pick:l=>byPre(l,[[/^c[FG]/,5],[/^cP/,7]])},
-      {n:2, name:'조합',               ex:'₇C₃ = □',    facts:()=>CC_ALL().concat(CN_ALL()), take:12, old:[3,4],
+      {n:2, name:'조합 · n 구하기',     ex:'₇C₃ = □',    facts:()=>CC_ALL().concat(CN_ALL()), take:12, old:[3,4],
        pick:l=>byPre(l,[[/^cC/,7],[/^c[NS]/,5]])},
       {n:3, name:'상황 속 경우의 수',  ex:'6명 중 대표 2명',   facts:CW_ALL, take:10, old:[5]}
     ],
@@ -4553,7 +4732,7 @@ function hsHint(f){
       const {fn,d,v}=f, ratio={s:'높이 ÷ 빗변',c:'밑변 ÷ 빗변',t:'높이 ÷ 밑변'}[fn], [,,l]=SPECIAL[d];
       const num=fn==='c'?l.b:l.a, den=fn==='t'?l.b:l.c;
       return {t:`${d}° 의 직각삼각형으로`, lines:[`${FN[fn]} A = ${ratio}`, `∠A = ${d}° 인 삼각형: 세 변 ${l.a}, ${l.b}, ${l.c}`,
-        `${FN[fn]} ${d}° = ${num}/${den} = <b>${v}</b>`, tip(`□ = <b>${f.ans}</b>`)], svg:specialSVG(d)};
+        (`${num}/${den}`===String(v)?`${FN[fn]} ${d}° = <b>${v}</b>`:`${FN[fn]} ${d}° = ${num}/${den} = <b>${v}</b>`), `□ = ${B(f.ans)}`], svg:specialSVG(d)};
     }
     case 'tA': return {t:'삼각비 표에서 거꾸로', lines:[`${FN[f.fn]} ${f.d}° = ${f.v}`, `그래서 A = ${B(f.d)}°`,
         tip('sin 은 30° → 60° 로 갈수록 커지고, cos 은 작아져요')], svg:specialSVG(f.d)};
@@ -4571,12 +4750,12 @@ function hsHint(f){
     case 'lR':{
       const {n,a}=f;
       return {t:`${n}번 곱해서 되는 수`, lines:[`${PV(a)}${sup(n)} = ${Math.pow(a,n)}`, `→ ${B(a)}`].concat(
-        a<0?[tip('홀수 번 거듭제곱근은 음수도 될 수 있어요')]:[tip(`${n}제곱근 가운데 실수인 양수 하나`)]), svg:''};
+        a<0?[tip('홀수 번 거듭제곱근은 음수도 될 수 있어요')]:[tip(`${Math.pow(a,n)}의 ${['','','제곱근','세제곱근','네제곱근','다섯제곱근'][n]||n+'제곱근'} 가운데 실수인 양수`)]), svg:''};
     }
     case 'lQ':{
       const {a,p,q,kk}=f, P=Math.abs(p);
       return {t:'밑을 거듭제곱으로 바꾸기', lines:[`${a} = ${kk}${sup(q)}`, `(${kk}${sup(q)})의 ${p<0?'−':''}${P}/${q} 제곱 = ${kk}${supE(p)}`,
-        p<0?`= 1/${kk}${sup(P)} = 1/${B(f.ans)}`:`= ${B(f.ans)}`, tip('지수끼리 곱해요: q × p/q = p')], svg:''};
+        p<0?`= 1/${kk}${sup(P)} = 1/${B(f.ans)}`:`= ${B(f.ans)}`, tip(`지수끼리 곱해요: ${q} × ${p<0?'(−'+P+'/'+q+')':P+'/'+q} = ${p}`)], svg:''};
     }
     case 'lL': return {t:'몇 제곱하면 되나', lines:[`${f.b}${supE(f.e)} = ${f.arg.replace(/[()]/g,'')}`, `그래서 ${logS(f.b,f.arg)} = ${B(f.e)}`,
         tip('log 의 값은 "지수"예요: logₐ aⁿ = n')], svg:''};
@@ -4659,11 +4838,11 @@ function hsNote(t,fromHint){
     sub:'거듭제곱근 · 유리수 지수 · 로그의 값 · 로그의 성질 · 방정식',
     memo:[
       {h:'지수와 로그는 서로 거꾸로', html:`${chipList(['2⁵ = 32','log₂ 32 = 5'])}<div class="hl" style="font-size:14.5px;margin-top:6px">aˣ = N ⇔ x = logₐ N (a > 0, a ≠ 1, N > 0)</div>`},
-      {h:'로그의 성질', html:chipList(['logₐ MN = logₐ M + logₐ N','logₐ (M/N) = logₐ M − logₐ N','logₐ Mᵏ = k logₐ M','logₐ b = log_c b ÷ log_c a','logₐ a = 1 · logₐ 1 = 0'])}
+      {h:'로그의 성질', html:chipList(['logₐ MN = logₐ M + logₐ N','logₐ (M/N) = logₐ M − logₐ N','logₐ Mᵏ = k logₐ M','logₐ b = log<sub>c</sub> b ÷ log<sub>c</sub> a','logₐ a = 1 · logₐ 1 = 0'])}
     ],
     ways:[
       fromHint('n번 곱해서 되는 수','∛27',lR(3,3)),
-      fromHint('밑을 거듭제곱으로','8^(2/3)',lQ(8,2,3)),
+      fromHint('밑을 거듭제곱으로','8<sup>2/3</sup>',lQ(8,2,3)),
       fromHint('몇 제곱하면 되나','log₂ (1/8)',lL(2,-3)),
       fromHint('더하면 곱하기','log₆ 4 + log₆ 9',lP(1)),
       fromHint('밑을 맞추기','2ˣ⁺¹ = 16',lE(2))
@@ -4671,7 +4850,7 @@ function hsNote(t,fromHint){
     miss:[
       {w:'log₂ 8 = 4', r:'3', y:'8 을 2 로 나눈 것이 아니라, 2 를 몇 번 곱하면 8 인가: 2³ = 8.'},
       {w:'log 2 + log 5 = log 7', r:'1', y:'로그끼리 더하면 진수끼리 곱해요: log 10 = 1.'},
-      {w:'8^(2/3) = 16/3', r:'4', y:'지수가 분수면 거듭제곱근: 8 = 2³ 이므로 (2³)^(2/3) = 2² = 4.'},
+      {w:'8<sup>2/3</sup> = 16/3', r:'4', y:'지수가 분수면 거듭제곱근: 8 = 2³ 이므로 (2³)<sup>2/3</sup> = 2² = 4.'},
       {w:'2⁻³ = −8', r:'1/8', y:'음수 지수는 역수예요. 값이 음수가 되는 것이 아니에요.'}
     ]};
   return {
@@ -4694,7 +4873,7 @@ function hsNote(t,fromHint){
       {w:'₅C₂ = 20', r:'10', y:'20 은 ₅P₂ 예요. 순서 없이 뽑으면 (A,B) 와 (B,A) 가 같으니 2! 로 나눠요.'},
       {w:'6명 중 회장·부회장 = 15', r:'30', y:'회장과 부회장은 자리가 달라 순서가 있어요: ₆P₂ = 30.'},
       {w:'0! = 0', r:'0! = 1', y:'아무것도 없는 것을 늘어놓는 방법은 1가지로 약속해요.'},
-      {w:'0~4 로 두 자리 수 = ₅P₂ = 20', r:'16', y:'십의 자리에 0 이 올 수 없어요. 4 × 4 = 16.'}
+      {w:'0~4 로 두 자리 수 = ₅P₂ = 20', r:'0~4 로 두 자리 수 = 4 × 4 = 16', y:'십의 자리에 0 이 올 수 없어요. 십의 자리 4가지, 일의 자리도 (0 을 넣어) 4가지.'}
     ]};
 }
 
@@ -4769,20 +4948,20 @@ const fV=(fn,d)=>{ const v=exactOf(fn,d), [tok,ans]=valForm(v);
 
 /* ── 삼각함수 사이의 관계 : [조건, 식, 답, 풀이] ── */
 const RELF=[
-  ['sin θ = 3/5, θ 는 제2사분면의 각',['cos θ','=',{fr:['?','5']}],-4,['cos²θ = 1 − sin²θ = 1 − 9/25 = 16/25','제2사분면에서 cos θ < 0','cos θ = −4/5']],
-  ['sin θ = 3/5, θ 는 제2사분면의 각',['tan θ','=',{fr:['?','4']}],-3,['cos θ = −4/5 (제2사분면)','tan θ = sin θ ÷ cos θ = (3/5) ÷ (−4/5)','= −3/4']],
-  ['cos θ = 5/13, θ 는 제4사분면의 각',['sin θ','=',{fr:['?','13']}],-12,['sin²θ = 1 − 25/169 = 144/169','제4사분면에서 sin θ < 0','sin θ = −12/13']],
-  ['cos θ = 5/13, θ 는 제4사분면의 각',['tan θ','=',{fr:['?','5']}],-12,['sin θ = −12/13 (제4사분면)','tan θ = (−12/13) ÷ (5/13)','= −12/5']],
-  ['sin θ = −4/5, θ 는 제3사분면의 각',['cos θ','=',{fr:['?','5']}],-3,['cos²θ = 1 − 16/25 = 9/25','제3사분면에서 cos θ < 0','cos θ = −3/5']],
-  ['sin θ = 8/17, θ 는 제1사분면의 각',['cos θ','=',{fr:['?','17']}],15,['cos²θ = 1 − 64/289 = 225/289','제1사분면에서 cos θ > 0','cos θ = 15/17']],
-  ['tan θ = 3/4, θ 는 제3사분면의 각',['cos θ','=',{fr:['?','5']}],-4,['빗변이 5 인 3 : 4 : 5 직각삼각형','제3사분면에서 sin, cos 모두 음수','cos θ = −4/5']],
-  ['cos θ = −3/5, θ 는 제2사분면의 각',['tan θ','=',{fr:['?','3']}],-4,['sin θ = 4/5 (제2사분면에서 양수)','tan θ = (4/5) ÷ (−3/5)','= −4/3']],
-  ['tan θ = 2 일 때',[{fr:['1','cos²θ']},'=','?'],5,['1 + tan²θ = 1/cos²θ','1 + 2² = 5','= 5']],
+  ['sin θ = 3/5, θ가 제2사분면의 각일 때',['cos θ','=',{fr:['?','5']}],-4,['cos²θ = 1 − sin²θ = 1 − 9/25 = 16/25','제2사분면에서 cos θ < 0','cos θ = −4/5']],
+  ['sin θ = 3/5, θ가 제2사분면의 각일 때',['tan θ','=',{fr:['?','4']}],-3,['cos θ = −4/5 (제2사분면)','tan θ = sin θ ÷ cos θ = (3/5) ÷ (−4/5)','= −3/4']],
+  ['cos θ = 5/13, θ가 제4사분면의 각일 때',['sin θ','=',{fr:['?','13']}],-12,['sin²θ = 1 − 25/169 = 144/169','제4사분면에서 sin θ < 0','sin θ = −12/13']],
+  ['cos θ = 5/13, θ가 제4사분면의 각일 때',['tan θ','=',{fr:['?','5']}],-12,['sin θ = −12/13 (제4사분면)','tan θ = (−12/13) ÷ (5/13)','= −12/5']],
+  ['sin θ = −4/5, θ가 제3사분면의 각일 때',['cos θ','=',{fr:['?','5']}],-3,['cos²θ = 1 − 16/25 = 9/25','제3사분면에서 cos θ < 0','cos θ = −3/5']],
+  ['sin θ = 8/17, θ가 제1사분면의 각일 때',['cos θ','=',{fr:['?','17']}],15,['cos²θ = 1 − 64/289 = 225/289','제1사분면에서 cos θ > 0','cos θ = 15/17']],
+  ['tan θ = 3/4, θ가 제3사분면의 각일 때',['cos θ','=',{fr:['?','5']}],-4,['빗변이 5 인 3 : 4 : 5 직각삼각형','제3사분면에서 sin, cos 모두 음수','cos θ = −4/5']],
+  ['cos θ = −3/5, θ가 제2사분면의 각일 때',['tan θ','=',{fr:['?','3']}],-4,['sin θ = 4/5 (제2사분면에서 양수)','tan θ = (4/5) ÷ (−3/5)','= −4/3']],
+  ['tan θ = 2 일 때',[{fr:['1','cos²θ']},'=','?'],5,['sin²θ + cos²θ = 1 의 양변을 cos²θ 로 나누면 tan²θ + 1 = 1/cos²θ','1 + 2² = 5','= 5']],
   ['sin θ + cos θ = 1/2 일 때',['sin θ cos θ','=',{fr:['?','8']}],-3,['양변을 제곱: 1 + 2 sin θ cos θ = 1/4','2 sin θ cos θ = −3/4','sin θ cos θ = −3/8']],
   ['sin θ − cos θ = 1/2 일 때',['sin θ cos θ','=',{fr:['?','8']}],3,['양변을 제곱: 1 − 2 sin θ cos θ = 1/4','2 sin θ cos θ = 3/4','sin θ cos θ = 3/8']],
   ['sin θ + cos θ = 1/3 일 때',['sin θ cos θ','=',{fr:['?','9']}],-4,['양변을 제곱: 1 + 2 sin θ cos θ = 1/9','2 sin θ cos θ = −8/9','sin θ cos θ = −4/9']],
   ['sin θ cos θ = 1/4 일 때',['tan θ + '+'1/tan θ','=','?'],4,['tan θ + 1/tan θ = sin/cos + cos/sin','= (sin²θ + cos²θ) ÷ (sin θ cos θ) = 1 ÷ 1/4','= 4']],
-  ['(sin θ + cos θ)² + (sin θ − cos θ)² 은 θ 와 상관없이',['값','=','?'],2,['전개: (1 + 2 sin θ cos θ) + (1 − 2 sin θ cos θ)','sin²θ + cos²θ = 1 을 두 번','= 2']]
+  ['(sin θ + cos θ)² + (sin θ − cos θ)² 의 값은 θ에 관계없이',['?'],2,['전개: (1 + 2 sin θ cos θ) + (1 − 2 sin θ cos θ)','sin²θ + cos²θ = 1 을 두 번','= 2']]
 ];
 const fR=i=>F({key:'fR'+i, t:'tfn', k:'fR', i, cond:RELF[i][0]+(/일 때$|없이$/.test(RELF[i][0])?'':' 일 때'), eq:RELF[i][1], ans:RELF[i][2]});
 
@@ -4795,12 +4974,12 @@ const GRF=[
   ['y = 3 sin 2x + 1','최댓값','?',4,['진폭 3, 위로 1 만큼','최댓값 = 3 + 1','= 4']],
   ['y = 4 cos 2x','최댓값 − 최솟값','?',8,['최댓값 4, 최솟값 −4','4 − (−4)','= 8']],
   ['y = sin 3x','주기',{fr:['2π','?']},3,['sin bx 의 주기는 2π ÷ |b|','2π ÷ 3','= 2π/3']],
-  ['y = cos ½x','주기','?π',4,['주기 = 2π ÷ |b|','2π ÷ 1/2','= 4π']],
+  ['y = cos (1/2)x','주기','?π',4,['주기 = 2π ÷ |b|','2π ÷ 1/2','= 4π']],
   ['y = tan 2x','주기',{fr:['π','?']},2,['tan bx 의 주기는 π ÷ |b|','π ÷ 2','= π/2']],
-  ['y = tan ⅓x','주기','?π',3,['tan 의 주기는 π ÷ |b|','π ÷ 1/3','= 3π']],
+  ['y = tan (1/3)x','주기','?π',3,['tan 의 주기는 π ÷ |b|','π ÷ 1/3','= 3π']],
   ['y = 2 sin 4x','주기',{fr:['π','?']},2,['앞의 2 는 주기와 상관없어요','2π ÷ 4','= π/2']],
   ['y = sin πx','주기','?',2,['sin bx 의 주기 = 2π ÷ |b|','2π ÷ π','= 2']],
-  ['y = cos ⅓πx','주기','?',6,['주기 = 2π ÷ (π/3)','= 2π × 3/π','= 6']],
+  ['y = cos (π/3)x','주기','?',6,['주기 = 2π ÷ (π/3)','= 2π × 3/π','= 6']],
   ['y = a sin x + 2 의 최댓값이 7 (a > 0)','a','?',5,['최댓값 = a + 2','a + 2 = 7','a = 5']],
   ['y = 2 cos x + k 의 최솟값이 1','k','?',3,['최솟값 = −2 + k','−2 + k = 1','k = 3']],
   ['y = 3 sin (x − π/4) − 2','최솟값','?',-5,['평행이동은 최댓값·최솟값을 바꾸지 않아요 (x 쪽)','−3 − 2','= −5']]
@@ -4809,9 +4988,9 @@ const fG=i=>F({key:'fG'+i, t:'tfn', k:'fG', i, cond:GRF[i][0]+(/[이가] \d|이 
 
 /* ── 사인법칙 · 코사인법칙 · 넓이 : [조건, 식, 답, 풀이] ── */
 const LAWF=[
-  ['b = 3, c = 5, A = 120°',['a','=','?'],7,['코사인법칙: a² = b² + c² − 2bc cos A','= 9 + 25 − 2·3·5·(−1/2) = 34 + 15 = 49','a = 7']],
+  ['b = 3, c = 5, A = 120°',['a','=','?'],7,['코사인법칙: a² = b² + c² − 2bc cos A','= 9 + 25 − 2 × 3 × 5 × (−1/2) = 34 + 15 = 49','a = 7']],
   ['b = 5, c = 8, A = 60°',['a','=','?'],7,['a² = 25 + 64 − 2·5·8·(1/2)','= 89 − 40 = 49','a = 7']],
-  ['b = 8, c = 15, A = 60°',['a','=','?'],13,['a² = 64 + 225 − 2·8·15·(1/2)','= 289 − 120 = 169','a = 13']],
+  ['b = 8, c = 15, A = 60°',['a','=','?'],13,['a² = 64 + 225 − 2 × 8 × 15 × (1/2)','= 289 − 120 = 169','a = 13']],
   ['b = 6, c = 10, A = 120°',['a','=','?'],14,['a² = 36 + 100 − 2·6·10·(−1/2)','= 136 + 60 = 196','a = 14']],
   ['b = 7, c = 8, A = 120°',['a','=','?'],13,['a² = 49 + 64 − 2·7·8·(−1/2)','= 113 + 56 = 169','a = 13']],
   ['b = 3, c = 8, A = 60°',['a','=','?'],7,['a² = 9 + 64 − 2·3·8·(1/2)','= 73 − 24 = 49','a = 7']],
@@ -5030,8 +5209,8 @@ function tfnNote(t,fromHint){
     miss:[
       {w:'60° = π/6', r:'π/3', y:'60 ÷ 180 = 1/3. π/6 은 30° 예요.'},
       {w:'cos 2π/3 = 1/2', r:'−1/2', y:'2π/3 = 120° 는 제2사분면, 여기서 cos 은 음수예요.'},
-      {w:'y = sin 2x 의 주기 4π', r:'π', y:'x 앞의 수로 나눠요: 2π ÷ 2 = π. 곱하는 것이 아니에요.'},
-      {w:'y = 2 cos x − 1 의 최솟값 −1', r:'−3', y:'2 cos x 가 −2 까지 내려가요. −2 − 1 = −3.'},
+      {w:'y = sin 2x 의 주기 4π', r:'y = sin 2x 의 주기 π', y:'x 앞의 수로 나눠요: 2π ÷ 2 = π. 곱하는 것이 아니에요.'},
+      {w:'y = 2 cos x − 1 의 최솟값 −1', r:'y = 2 cos x − 1 의 최솟값 −3', y:'2 cos x 가 −2 까지 내려가요. −2 − 1 = −3.'},
       {w:'a² = b² + c² − 2bc (A = 120°)', r:'a² = b² + c² + bc', y:'cos 120° = −1/2 이라서 빼기가 더하기로 바뀌어요.'}
     ]};
 }
@@ -5114,7 +5293,10 @@ function qT(form,a,b,x){
   else if(form===3){ c=x/a+b; eq=['?','÷',a,'+',b,'=',c]; }
   else if(form===4){ c=(x+b)*a; eq=[P('?','+',b),'×',a,'=',c]; }
   else { c=(x-b)/a; eq=[P('?','−',b),'÷',a,'=',c]; }
-  return F({key:'EQt'+form+'_'+a+'_'+b+'_'+x, sk:'EQt', t:'boxq', k:'qT', form, a, b, x, c, eq, ans:x});
+  /* 저학년은 계산 순서를 식만 보고 읽기 어려워요 — 위에 한 줄로 순서를 적어 줘요 */
+  const cond=['',`□ 에 ${jE(a)} 곱한 다음 ${jE(b)} 더하면`,`□ 에 ${jE(a)} 곱한 다음 ${jE(b)} 빼면`,`□ 를 ${jR(a)} 나눈 다음 ${jE(b)} 더하면`,
+              `□ 에 ${jE(b)} 더한 다음 ${jE(a)} 곱하면`,`□ 에서 ${jE(b)} 뺀 다음 ${jR(a)} 나누면`][form];
+  return F({key:'EQt'+form+'_'+a+'_'+b+'_'+x, sk:'EQt', t:'boxq', k:'qT', form, a, b, x, c, cond, eq, ans:x});
 }
 function genQA(){
   const form=ri(1,4);
@@ -5459,7 +5641,7 @@ function elemHint0(f){
     }
     case 'qM':{
       const {form,u,v}=f;
-      if(form<=2) return {t:'곱셈의 □ 는 나눠서 찾기', lines:[`${u*v} ÷ ${u} = ${B(v)}`, tip(`확인: ${u} × ${v} = ${u*v}`)]};
+      if(form<=2) return {t:'곱셈의 □ 는 나눠서 찾기', lines:[`${u*v} ÷ ${u} = ${B(v)}`, tip(`확인: ${form===1?v+' × '+u:u+' × '+v} = ${u*v}`)]};
       if(form===3) return {t:'나누어지는 수는 곱해서 찾기', lines:[`${v} × ${u} = ${B(u*v)}`, tip(`확인: ${u*v} ÷ ${u} = ${v}`)]};
       return {t:'나누는 수는 나눠서 찾기', lines:[`${u*v} ÷ ${v} = ${B(u)}`, tip(`확인: ${u*v} ÷ ${u} = ${v}`)]};
     }
@@ -5504,11 +5686,11 @@ function elemHint0(f){
         tip('소수: 2, 3, 5, 7, 11, 13 … 1과 자기 자신만 약수인 수')]};
     }
     case 'fE':{
-      const {kind,a,b,c,d,p,q,pos}=f, R=frS(p,q), RB=q===1?B(p):pos==='n'?`${B(p)}/${q}`:`${p}/${B(q)}`;
+      const {kind,a,b,c,d,p,q,pos}=f, R=frS(p,q), RB=q===1?B(p):`<span class="ifr"><i>${pos==='n'?B(p):p}</i><i>${pos==='n'?q:B(q)}</i></span>`;
       if(kind==='e'){
         if(c<a){ const g=a/c; return {t:'분모·분자를 같은 수로 나누기', lines:[`${a}/${b} 의 분모와 분자를 ${jR(g)} 나눠요`,
           `${a} ÷ ${g} = ${c}, ${b} ÷ ${g} = ${d}`, `${a}/${b} = ${RB}`, tip('약분: 분모와 분자의 공약수로 나눠요')]}; }
-        const g=c/a; return {t:'분모·분자에 같은 수를 곱하기', lines:[`분모 ${b} 가 ${d} 가 되려면 × ${g}`,
+        const g=c/a; return {t:'분모·분자에 같은 수를 곱하기', lines:[`분모 ${jG(b)} ${jG(d)} 되려면 × ${g}`,
           `분자도 × ${g}: ${a} × ${g} = ${c}`, `${a}/${b} = ${RB}`, tip('통분: 분모를 같게 만들 때 써요')]};
       }
       if(kind==='a'||kind==='s'){
@@ -5521,7 +5703,7 @@ function elemHint0(f){
       }
       if(kind==='m'){
         const raw=frS(a*c,b*d);
-        return {t:'분자는 분자끼리, 분모는 분모끼리', lines:[`${frS(a,b)} × ${frS(c,d)} = ${a} × ${c} / ${b} × ${d}`,
+        return {t:'분자는 분자끼리, 분모는 분모끼리', lines:[`${frS(a,b)} × ${frS(c,d)} = <span class="ifr"><i>${a} × ${c}</i><i>${b} × ${d}</i></span>`,
           raw===R?`= ${RB}`:`= ${raw} = ${RB}`, tip('곱하기 전에 약분하면 수가 작아져요')]};
       }
       const raw=frS(a*d,b*c);
@@ -5810,7 +5992,7 @@ function r3F(a,op,b){
             eq:[a,add?'+':'−',b,'=','?'], ans:add?a+b:a-b});
 }
 function gen3a(){
-  const x=Math.random(), want=x<.15?0:x<.55?1:x<.88?2:3;
+  const x=Math.random(), want=x<.15?0:x<.58?1:x<.93?2:3;     /* 네 자리 합은 드물게 */
   for(let g=0;g<300;g++){
     const a=ri(102,898), b=ri(102,898);
     if(a%10===0||b%10===0) continue;
@@ -5830,6 +6012,34 @@ function gen3s(){
   }
   return r3F(503,'-',278);
 }
+/* 세로셈 — 받아올림은 윗자리 위에 작은 1, 받아내림은 바뀐 수를 위에 적고 원래 수에 빗금 */
+function colSVG(f){
+  const add=f.k==='add3', a=String(f.a), b=String(f.b), r=String(f.ans), n=Math.max(a.length,b.length,r.length);
+  const W=34, X0=58, w=X0+n*W+14, H=156, dig=(s,i)=>{ const k=s.length-n+i; return k>=0?s[k]:''; };
+  const mark=Array(n).fill(''), strike=Array(n).fill(false);
+  let k=0;
+  for(let i=n-1;i>=0;i--){
+    const ds=dig(a,i), x=+ds||0, y=+dig(b,i)||0;
+    if(add){ if(k) mark[i]='1'; k=(x+y+k)>=10?1:0; continue; }
+    if(ds==='') break;
+    let cur=x-k, nk=0; if(cur<y){ cur+=10; nk=1; }
+    if(cur!==x){ mark[i]=String(cur); strike[i]=true; } k=nk;
+  }
+  const cx=i=>X0+i*W+W/2, T=(x,y,s,o)=>`<text x="${x}" y="${y}" text-anchor="middle" ${o||''}>${s}</text>`;
+  let g='';
+  for(let i=0;i<n;i++){
+    if(mark[i]) g+=T(cx(i),24,mark[i],`font-size="${mark[i].length>1?13:15}" font-weight="700" fill="${add?'#2f5bea':'#e8590c'}"`);
+    const da=dig(a,i), db=dig(b,i), dr=dig(r,i);
+    if(da){ g+=T(cx(i),60,da,'font-size="27" font-weight="700" fill="#111"');
+      if(strike[i]) g+=`<line x1="${cx(i)-9}" y1="${62}" x2="${cx(i)+9}" y2="${40}" stroke="#e8590c" stroke-width="2.2" stroke-linecap="round"/>`; }
+    if(db) g+=T(cx(i),98,db,'font-size="27" font-weight="700" fill="#111"');
+    if(dr) g+=T(cx(i),144,dr,'font-size="27" font-weight="800" fill="#2f5bea"');
+  }
+  const bs=n-b.length;
+  g+=T(X0+bs*W-14,98,add?'+':'−','font-size="26" font-weight="700" fill="#555"');
+  g+=`<line x1="${X0+bs*W-30}" y1="112" x2="${X0+n*W+4}" y2="112" stroke="#333" stroke-width="2.2" stroke-linecap="round"/>`;
+  return `<svg class="vis colsvg" viewBox="0 0 ${w} ${H}" style="max-width:${w+40}px" font-family="Pretendard,system-ui,sans-serif" data-keep="1" aria-label="세로셈">${g}</svg>`;
+}
 function r3Hint(f){
   const add=f.k==='add3', A=String(f.a).split('').map(Number).reverse(), Bd=String(f.b).split('').map(Number).reverse();
   const NM=['일','십','백','천'], L=[]; let k=0;
@@ -5839,14 +6049,14 @@ function r3Hint(f){
     if(i===A.length-1&&x-k===0&&y===0) break;          /* 맨 앞자리가 0 이 되면 적지 않아요 */
     if(k&&x===0){ L.push(`${NM[i]}의 자리: 0 은 빌려 줄 수 없어 윗자리에서 10 을 빌려 오고, 1 을 내주면 9 → 9 − ${y} = ${9-y}`); k=1; continue; }
     const cur=x-k, pre=k?`빌려 줘서 ${x} → ${cur}, `:'';
-    if(cur<y){ L.push(`${NM[i]}의 자리: ${pre}${cur} − ${y} 는 안 돼요 → 10 을 빌려 와 ${cur+10} − ${y} = ${cur+10-y}`); k=1; }
+    if(cur<y){ L.push(`${NM[i]}의 자리: ${pre}${cur} − ${y}${BAT(y)?'은':'는'} 안 돼요 → ${A[i+1]===0&&i+1<A.length-1?'바로 윗자리가 0 이라 그 위 자리에서부터 빌려 와 ':'10 을 빌려 와 '}${cur+10} − ${y} = ${cur+10-y}`); k=1; }
     else { L.push(`${NM[i]}의 자리: ${pre}${cur} − ${y} = ${cur-y}`); k=0; }
   }
   if(add&&k) L.push(`${NM[A.length]}의 자리: 올린 1`);
   L.push(`${f.a} ${add?'+':'−'} ${f.b} = <b>${f.ans}</b>`);
-  L.push(cTip(add?'받아올린 1 을 윗자리 위에 작게 적어 두면 잊지 않아요':'받아내림을 해 준 자리는 1 작아져요. 0 이면 9 가 돼요'));
+  if(f.nc) L.push(cTip(add?'받아올린 1 을 윗자리 위에 작게 적어 두면 잊지 않아요':'받아내림을 해 준 자리는 1 작아져요. 0 이면 9 가 돼요'));
   const t= add ? (f.nc?'일의 자리부터, 받아올림 챙기기':'자리끼리 더하기') : (f.sk==='R-z'?'0 이 있는 수에서 받아내림':f.nc?'일의 자리부터, 받아내림 챙기기':'자리끼리 빼기');
-  return {t, lines:L, svg:''};
+  return {t, lines:L, svg:colSVG(f)};
 }
 
 /* ════════ 분수 ════════
@@ -5908,7 +6118,7 @@ function genNA1(){            /* 분모가 같은 진분수 */
   for(let g=0;g<80;g++){
     const d=ri(3,12), x=Math.random();
     if(x<.45){ const a=ri(1,d-2), c=ri(1,d-1-a); if(c<1) continue; return nfF('a',[0,a,d],[0,c,d],'F','n'); }
-    if(x<.65){ const a=ri(2,d-1), c=ri(d-a+1,d-1); if(c<1||a+c<=d) continue; return nfF('a',[0,a,d],[0,c,d],'M','n'); }
+    if(x<.55){ const a=ri(1,d-1); return nfF('a',[0,a,d],[0,d-a,d],'F','n'); }      /* 합이 1 */
     const a=ri(2,d-1), c=ri(1,a-1); return nfF('s',[0,a,d],[0,c,d],'F','n');
   }
   return nfF('a',[0,2,7],[0,3,7],'F','n');
@@ -5957,14 +6167,14 @@ function genNM2(){            /* (자연수) × (분수) · (대분수) × (자�
     if(Math.random()<.65){ const d=ri(2,9), n=ri(1,d-1), N=ri(2,12); if(!nfCo(n,d)||N*n>60) continue;
       return nfF('m',[N,0,1],[0,n,d],'m',pickOne(['n','n','w','d'])); }
     const d=ri(2,5), w=ri(1,3), n=ri(1,d-1), N=ri(2,6); if(!nfCo(n,d)||(w*d+n)*N>60) continue;
-    return nfF('m',[w,n,d],[N,0,1],'m',pickOne(['n','w']));
+    return nfF('m',[N,0,1],[w,n,d],'m',pickOne(['n','w']));
   }
   return nfF('m',[6,0,1],[0,2,3],'m','n');
 }
 function genNM3(){            /* (분수) × (분수) */
   for(let g=0;g<60;g++){
     const x=Math.random();
-    if(x<.3) return nfF('m',[0,1,ri(2,9)],[0,1,ri(2,9)],'m','d');
+    if(x<.12) return nfF('m',[0,1,ri(2,9)],[0,1,ri(2,9)],'m','d');
     const b=ri(2,9), a=ri(1,b-1), d=ri(2,9), c=ri(1,d-1);
     if(!nfCo(a,b)||!nfCo(c,d)) continue;
     if(x<.85){ const f=nfF('m',[0,a,b],[0,c,d],'m',pickOne(['n','d'])); if(f&&f.Q<=40) return f; continue; }
@@ -6036,13 +6246,23 @@ function nfHint(f){
         return {t:'자연수끼리, 분수끼리', lines:L.concat([cTip('분수 부분이 분모와 같거나 커지면 1 로 올려요')])};
       }
       let w1=A[0], n1=A[1]; const w2=B[0], n2=B[1], L=[], bor=n1<n2;
-      if(bor){ L.push(nfIsInt(A)?`${A[0]} = ${nfM(w1-1,d,d)} 로 바꿔요`:`${nfH(n1,d)} 에서 ${nfH(n2,d)} 를 뺄 수 없어요 → ${H(A)} = ${nfM(w1-1,n1+d,d)}`); w1--; n1+=d; }
-      if(w1||w2) L.push(`자연수끼리: ${w1} − ${w2} = ${w1-w2}`);
+      if(bor){ L.push(nfIsInt(A)?`${A[0]} = ${nfM(w1-1,d,d)}${jR(d).slice(String(d).length)} 바꿔요`:`${nfH(n1,d)} 에서 ${nfH(n2,d)}${BAT(n2)?'을':'를'} 뺄 수 없어요 → ${H(A)} = ${nfM(w1-1,n1+d,d)}`); w1--; n1+=d; }
+      if(w2) L.push(`자연수끼리: ${w1} − ${w2} = ${w1-w2}`);
       L.push(`분수끼리: ${nfH(n1,d)} − ${nfH(n2,d)} = ${nfH(n1-n2,d)}`, `${H(A)} − ${H(B)} = ${RB}`);
       return {t:bor?'자연수에서 1 을 받아내려요':'자연수끼리, 분수끼리', lines:L.concat(bor?[cTip(`1 = ${nfH(d,d)} 이에요`)]:[])};
     }
     const L0=lcm(dA,dB), [pA,qA]=nfIm(A), [pB,qB]=nfIm(B), xA=pA*L0/qA, xB=pB*L0/qB, s=op==='a'?xA+xB:xA-xB;
     const L=[`분모 ${jW(dA)} ${dB}의 최소공배수 ${jR(L0)} 통분해요`];
+    if(A[0]||B[0]){            /* 대분수는 가분수로 바꾸지 않고 자연수끼리, 분수끼리 — 수가 작게 유지돼요 */
+      let w=A[0], fa=A[1]*L0/dA; const fb=B[1]*L0/dB;
+      if(op==='s'&&fa<fb){ L.push(`분수끼리 뺄 수 없어 자연수에서 1 을 받아내려요: ${H(A)} = ${nfM(w-1,fa+L0,L0)}`); w--; fa+=L0; }
+      const W2=op==='a'?w+B[0]:w-B[0]; let S=op==='a'?fa+fb:fa-fb, W3=W2;
+      L.push(`자연수끼리: ${w} ${O} ${B[0]} = ${W2}`, `분수끼리: ${nfH(fa,L0)} ${O} ${nfH(fb,L0)} = ${nfH(S,L0)}`);
+      if(S>=L0){ L.push(`${nfH(S,L0)} = ${nfM(1,S-L0,L0)} 이니 자연수에 1 을 더해요`); W3++; S-=L0; }
+      const g=gcd(S,L0)||1;
+      L.push(S&&g>1?`${nfM(W3,S,L0)} → 약분하면 ${RB}`:`${H(A)} ${O} ${H(B)} = ${RB}`);
+      return {t:'자연수끼리, 분수끼리', lines:L.concat([cTip('대분수는 자연수 부분과 분수 부분을 따로 계산하면 수가 작아요')])};
+    }
     const cv=[A,B].filter(X=>X[0]&&X[1]).map(X=>`${H(X)} = ${nfH(...nfIm(X))}`);
     if(cv.length) L.push(`대분수는 가분수로: ${cv.join(', ')}`);
     return {t:'통분한 뒤 분자끼리', lines:L.concat(end(`${nfH(xA,L0)} ${O} ${nfH(xB,L0)}`,s,L0),[cTip('분모끼리 더하거나 빼면 안 돼요')])};
@@ -6062,11 +6282,11 @@ function nfHint(f){
       .concat([cTip('곱하기 전에 약분하면 수가 작아져요')])};
   }
   if(d===1){ const N=c;
-    if(a%N===0) return {t:'분자를 나눠요', lines:pre.concat([`분자 ${a} 를 ${jR(N)} 나눠요: ${a} ÷ ${N} = ${a/N}`]).concat(end(ex,a/N,b))};
-    return {t:`÷ ${N} 은 × ${nfH(1,N)}`, lines:pre.concat([`${nfH(a,b)} ÷ ${N} = ${nfH(a,b)} × ${nfH(1,N)}`]).concat(end(`${nfH(a,b)} × ${nfH(1,N)}`,a,b*N))};
+    if(a%N===0) return {t:'분자를 나눠요', lines:pre.concat([`분자 ${jE(a)} ${jR(N)} 나눠요: ${a} ÷ ${N} = ${a/N}`]).concat(end(ex,a/N,b))};
+    return {t:`÷ ${jN(N)} × ${nfH(1,N)}`, lines:pre.concat([`${nfH(a,b)} ÷ ${N} = ${nfH(a,b)} × ${nfH(1,N)}`]).concat(end(`${nfH(a,b)} × ${nfH(1,N)}`,a,b*N))};
   }
   if(b===1) return {t:'뒤집어서 곱해요', lines:[`나누는 분수의 분자와 분모를 바꿔 곱해요`].concat(end(`${a} × ${nfH(d,c)}`,a*d,c),
-      [cTip(`${a} 안에 ${nfH(c,d)} 가 몇 번 들어가는지와 같아요`)])};
+      [cTip(`${a} 안에 ${nfH(c,d)}${BAT(c)?'이':'가'} 몇 번 들어가는지와 같아요`)])};
   if(b===d) return {t:'분모가 같으면 분자끼리 나눠요', lines:[`${ex} = ${a} ÷ ${c}`].concat(end(`${a} ÷ ${c}`,a,c))};
   return {t:'뒤집어서 곱해요', lines:pre.concat([`나누는 분수의 분자와 분모를 바꿔 곱해요`]).concat(end(`${nfH(a,b)} × ${nfH(d,c)}`,a*d,b*c))};
 }
@@ -6091,7 +6311,7 @@ const RT_W=[   /* 비례식 문장 — 앞의 양 x 가 주어지고 뒤의 양�
 const RT_B=[   /* 비례배분 문장 */
   [(N,a,b,s)=>`사탕 ${N}개를 형과 동생이 ${a} : ${jR(b)} 나누어 가지면 ${s?'형':'동생'}은`,'개'],
   [(N,a,b,s)=>`색종이 ${N}장을 지민이와 서준이가 ${a} : ${jR(b)} 나누어 가지면 ${s?'지민이':'서준이'}는`,'장'],
-  [(N,a,b,s)=>`길이가 ${N} cm 인 끈을 ${a} : ${jR(b)} 자르면 ${s?'앞':'뒤'}쪽 끈의 길이는`,'cm'],
+  [(N,a,b,s)=>`길이가 ${N} cm 인 끈을 두 도막으로 잘라 길이의 비가 ${a} : ${b}${BAT(b)?'이':'가'} 되게 하면 ${(s?a:b)>(s?b:a)?'긴':'짧은'} 도막의 길이는`,'cm'],
   [(N,a,b,s)=>`구슬 ${N}개를 언니와 내가 ${a} : ${jR(b)} 나누어 가지면 ${s?'언니':'나'}는`,'개']
 ];
 const rtF=(key,sk,o)=>F(Object.assign({key, sk, t:'ratio', k:'rt'},o));
@@ -6176,7 +6396,7 @@ function rtHint(o){
     case 'd': return o.v ? {t:'분모를 100 으로', lines:[`${nfH(o.n,o.d)} = ${nfH(o.n*100/o.d,100)}`, `→ ${B(o.ans)}%`]}
                          : {t:'× 100', lines:[`${+(o.n/o.d).toFixed(3)} × 100 = ${B(o.ans)}`, `→ ${B(o.ans)}%`]};
     case 'k':{ const [s0,s1,s2,s3]=o.s, op=o.dir==='x'?`× ${o.kk}`:`÷ ${o.kk}`;
-      return {t:'비의 성질', lines:['비의 앞항과 뒤항에 같은 수를 곱하거나 같은 수로 나누어도 비율은 같아요',
+      return {t:'비의 성질', lines:['비의 앞항과 뒤항에 0 이 아닌 같은 수를 곱하거나 나누어도 비율은 같아요',
         `${s0} : ${s1} → 앞항·뒤항 모두 ${op} → ${s2} : ${s3}`, `□ = ${B(o.ans)}`]}; }
     case 's':{ const L=[];
       if(o.v) L.push(`분모 ${jW(o.d1)} ${o.d2}의 최소공배수 ${jE(o.L)} 곱해요 → ${o.x0} : ${o.y0}`);
@@ -6190,10 +6410,10 @@ function rtHint(o){
       return {t:'외항의 곱 = 내항의 곱', lines:[`${Ls[0]} × ${Ls[3]} = ${Ls[1]} × ${Ls[2]}`, `${mate} × □ = ${known}`, `□ = ${known} ÷ ${mate} = ${B(o.ans)}`]}; }
     case 'w':{ const k=o.x/o.a;
       return {t:'비례식 세우기', lines:[`${o.a} : ${o.b} = ${o.x} : □`, `${o.a} × □ = ${o.b} × ${o.x} = ${o.b*o.x}`, `□ = ${o.b*o.x} ÷ ${o.a} = ${B(o.ans)}`,
-        cTip(Number.isInteger(k)?`${o.x} 는 ${o.a} 의 ${k}배 → ${o.b} × ${k} = ${o.ans}`:'외항의 곱 = 내항의 곱')]}; }
+        cTip(Number.isInteger(k)?`${jN(o.x)} ${o.a}의 ${k}배 → ${o.b} × ${k} = ${o.ans}`:'외항의 곱 = 내항의 곱')]}; }
     case 'b':{ const u=o.N/(o.a+o.b), m=o.s?o.a:o.b;
       return {t:'비례배분', lines:[`전체를 ${o.a} + ${o.b} = ${o.a+o.b} 묶음으로 똑같이 나눠요`, `한 묶음: ${o.N} ÷ ${o.a+o.b} = ${u}`,
-        `${m}묶음: ${u} × ${m} = ${B(o.ans)}`, cTip(`${o.N} × ${nfH(m,o.a+o.b)} 와 같아요`)]}; }
+        `${m}묶음: ${u} × ${m} = ${B(o.ans)}`, cTip(`${o.N} × ${nfH(m,o.a+o.b)} ${BAT(m)?'과':'와'} 같아요`)]}; }
   }
   return null;
 }
@@ -6230,7 +6450,7 @@ const KC_OR=[
 ];
 const KC_AND=[
   (a,b)=>`티셔츠 ${a}벌과 바지 ${b}벌이 있어요. 티셔츠와 바지를 한 벌씩 골라 입는 경우의 수는`,
-  (a,b)=>`김밥 ${a}종류와 음료 ${b}종류 가운데 하나씩 골라 세트를 만드는 경우의 수는`,
+  (a,b)=>`김밥 ${a}종류 중 한 가지와 음료 ${b}종류 중 한 가지를 함께 골라 세트를 만드는 경우의 수는`,
   (a,b)=>`집에서 학교까지 가는 길이 ${a}가지, 학교에서 도서관까지 가는 길이 ${b}가지 있어요. 집에서 학교를 거쳐 도서관까지 가는 방법의 수는`,
   (a,b)=>`자음 (${KC_JA.slice(0,a).join(', ')}) 가운데 하나와 모음 (${KC_MO.slice(0,b).join(', ')}) 가운데 하나를 짝지어 만들 수 있는 글자의 수는`
 ];
@@ -6257,14 +6477,14 @@ const KC={
         lines:[`소수: ${P.join(', ')}`, `모두 ${B_(P.length)}가지`, cTip('1 은 소수가 아니에요')]}; }},
   c1:{sk:'KC1', gen:()=>{ const n=ri(2,3); return [n,n===2?1:ri(1,2)]; }, make:([n,k])=>{
       const L=[]; for(let m=0;m<(1<<n);m++){ const s=range(0,n-1).map(i=>(m>>(n-1-i))&1?'앞':'뒤'); if(s.filter(x=>x==='앞').length===k) L.push(`(${s.join(', ')})`); }
-      return {q:`동전 ${n}개를 동시에 던질 때 앞면이 ${k}개 나오는 경우의 수는`, ans:L.length, t:'모두 적어 보기', lines:[L.join(', '), `모두 ${B_(L.length)}가지`]}; }},
+      return {q:`서로 다른 동전 ${n}개를 동시에 던질 때 앞면이 ${k}개 나오는 경우의 수는`, ans:L.length, t:'모두 적어 보기', lines:[L.join(', '), `모두 ${B_(L.length)}가지`]}; }},
   ds:{sk:'KC1', gen:()=>[ri(3,11)], make:([s])=>{ const L=kcSum(s);
       return {q:`서로 다른 주사위 두 개를 동시에 던질 때, 나오는 두 눈의 수의 합이 ${s}인 경우의 수는`, ans:L.length, t:'순서쌍으로 세기',
         lines:[L.join(', '), `모두 ${B_(L.length)}가지`, cTip('(1, 2) 와 (2, 1) 은 서로 다른 경우예요')]}; }},
   dd:{sk:'KC1', gen:()=>[ri(1,5)], make:([d])=>{ const L=kcPairs((i,j)=>Math.abs(i-j)===d);
       return {q:`서로 다른 주사위 두 개를 동시에 던질 때, 나오는 두 눈의 수의 차가 ${d}인 경우의 수는`, ans:L.length, t:'순서쌍으로 세기',
         lines:[L.join(', '), `모두 ${B_(L.length)}가지`]}; }},
-  pay:{sk:'KC1', gen:()=>{ for(let g=0;g<60;g++){ const P=pickOne([200,300,400,500]), x=ri(2,5), y=ri(2,8), n=kcPay(P,x,y).length; if(n>=2&&n<=5) return [P,x,y]; } return [300,3,4]; },
+  pay:{sk:'KC4', gen:()=>{ for(let g=0;g<60;g++){ const P=pickOne([200,300,400,500]), x=ri(2,5), y=ri(2,8), n=kcPay(P,x,y).length; if(n>=2&&n<=5) return [P,x,y]; } return [300,3,4]; },
       make:([P,x,y])=>{ const L=kcPay(P,x,y);
       return {q:`100원짜리 동전 ${x}개와 50원짜리 동전 ${y}개가 있어요. 거스름돈 없이 ${P}원을 내는 방법의 수는`, ans:L.length, t:'100원짜리 개수부터 정해 보기',
         lines:L.map(([a,b])=>`100원 ${a}개 + 50원 ${b}개`).concat([`모두 ${B_(L.length)}가지`])}; }},
@@ -6282,13 +6502,13 @@ const KC={
         lines:[`${m1}의 배수: ${range(1,a).map(i=>i*m1).join(', ')} → ${a}가지`, `${m2}의 배수: ${range(1,b).map(i=>i*m2).join(', ')} → ${b}가지`,
           `겹치는 수가 없으니 ${a} + ${b} = ${B_(a+b)}`]}; }},
   or4:{sk:'KC2', gen:()=>[ri(0,1)], make:([v])=>v
-      ? {q:'동전 3개를 동시에 던질 때 앞면이 1개 이하로 나오는 경우의 수는', ans:4, t:'합의 법칙', lines:['앞면 0개: (뒤, 뒤, 뒤) → 1가지','앞면 1개: (앞, 뒤, 뒤), (뒤, 앞, 뒤), (뒤, 뒤, 앞) → 3가지',`1 + 3 = ${B_(4)}`]}
-      : {q:'동전 3개를 동시에 던질 때 앞면이 2개 이상 나오는 경우의 수는', ans:4, t:'합의 법칙', lines:['앞면 2개: (앞, 앞, 뒤), (앞, 뒤, 앞), (뒤, 앞, 앞) → 3가지','앞면 3개: (앞, 앞, 앞) → 1가지',`3 + 1 = ${B_(4)}`]}},
+      ? {q:'서로 다른 동전 3개를 동시에 던질 때 앞면이 1개 이하로 나오는 경우의 수는', ans:4, t:'합의 법칙', lines:['앞면 0개: (뒤, 뒤, 뒤) → 1가지','앞면 1개: (앞, 뒤, 뒤), (뒤, 앞, 뒤), (뒤, 뒤, 앞) → 3가지',`1 + 3 = ${B_(4)}`]}
+      : {q:'서로 다른 동전 3개를 동시에 던질 때 앞면이 2개 이상 나오는 경우의 수는', ans:4, t:'합의 법칙', lines:['앞면 2개: (앞, 앞, 뒤), (앞, 뒤, 앞), (뒤, 앞, 앞) → 3가지','앞면 3개: (앞, 앞, 앞) → 1가지',`3 + 1 = ${B_(4)}`]}},
   /* ── 3 곱의 법칙 ── */
   and1:{sk:'KC3', gen:()=>{ const c=ri(0,KC_AND.length-1); return [c,ri(2,c===3?5:6),ri(2,c===3?4:6)]; }, make:([c,a,b])=>({q:KC_AND[c](a,b), ans:a*b, t:'곱의 법칙 — 곱해요',
       lines:['두 가지를 함께(잇달아) 해요', `${a}가지 각각에 ${b}가지씩 → ${a} × ${b} = ${B_(a*b)}`]})},
   cd:{sk:'KC3', gen:()=>pickOne([[1,1],[2,1],[0,2],[3,0],[1,2],[4,0],[2,2],[3,1]]), make:([m,n])=>{ const ans=2**m*6**n, parts=[...Array(m).fill(2),...Array(n).fill(6)];
-      return {q:`${m?`동전 ${m}개`:''}${m&&n?'와 ':''}${n?`주사위 ${n}개`:''}를 동시에 던질 때 일어나는 모든 경우의 수는`, ans, t:'곱의 법칙',
+      return {q:`${m?`서로 다른 동전 ${m}개`:''}${m&&n?'와 ':''}${n?`${m?'':'서로 다른 '}주사위 ${n}개`:''}를 동시에 던질 때 일어나는 모든 경우의 수는`, ans, t:'곱의 법칙',
         lines:['동전 하나는 2가지, 주사위 하나는 6가지', `${parts.join(' × ')} = ${B_(ans)}`]}; }},
   and2:{sk:'KC3', gen:()=>[ri(0,KC_DIE.length-1),ri(0,KC_DIE.length-1)], make:([e1,e2])=>{ const [n1,L1]=KC_DIE[e1], [n2,L2]=KC_DIE[e2];
       return {q:`주사위 A, B 를 동시에 던질 때, A 는 ${n1}, B 는 ${n2}의 눈이 나오는 경우의 수는`, ans:L1.length*L2.length, t:'곱의 법칙',
@@ -6296,18 +6516,18 @@ const KC={
   and3:{sk:'KC3', gen:()=>[ri(0,KC_DIE.length-1),ri(0,1)], make:([e,s])=>{ const [n,L]=KC_DIE[e];
       return {q:`동전 한 개와 주사위 한 개를 동시에 던질 때, 동전은 ${s?'앞면':'뒷면'}이 나오고 주사위는 ${n}의 눈이 나오는 경우의 수는`, ans:L.length, t:'곱의 법칙',
         lines:[`동전: ${s?'앞면':'뒷면'} → 1가지`, `주사위: ${L.join(', ')} → ${L.length}가지`, `1 × ${L.length} = ${B_(L.length)}`]}; }},
-  and4:{sk:'KC3', gen:()=>[ri(2,4),ri(2,5),ri(2,3)], make:([a,b,c])=>({q:`모자 ${a}개, 티셔츠 ${b}벌, 신발 ${c}켤레 가운데 하나씩 골라 차려입는 경우의 수는`, ans:a*b*c, t:'곱의 법칙 — 셋도 곱해요',
+  and4:{sk:'KC3', gen:()=>[ri(2,4),ri(2,5),ri(2,3)], make:([a,b,c])=>({q:`모자 ${a}개 중 하나, 티셔츠 ${b}벌 중 하나, 신발 ${c}켤레 중 하나를 골라 함께 차려입는 경우의 수는`, ans:a*b*c, t:'곱의 법칙 — 셋도 곱해요',
       lines:[`${a} × ${b} × ${c} = ${B_(a*b*c)}`]})},
   /* ── 4 합과 곱 함께 ── */
   r2:{sk:'KC4', gen:()=>[ri(2,4),ri(2,4),ri(1,3)], make:([a,b,c])=>({q:`A 마을에서 B 마을로 가는 길은 ${a}가지, B 마을에서 C 마을로 가는 길은 ${b}가지, A 마을에서 C 마을로 바로 가는 길은 ${c}가지예요. A 마을에서 C 마을로 가는 방법의 수는? (같은 마을을 두 번 지나지 않아요)`,
       ans:a*b+c, t:'곱한 다음 더하기', lines:[`B 를 거쳐 가기: ${a} × ${b} = ${a*b} (곱의 법칙)`, `바로 가기: ${c}`, `둘은 동시에 일어나지 않으니 ${a*b} + ${c} = ${B_(a*b+c)} (합의 법칙)`]})},
-  r4:{sk:'KC4', gen:()=>[ri(1,3),ri(2,4),ri(1,3),ri(2,3)], make:([a,b,c,d])=>({q:`집에서 공원까지 ${a}가지, 공원에서 학교까지 ${b}가지 길이 있고, 집에서 시장까지 ${c}가지, 시장에서 학교까지 ${d}가지 길이 있어요. 집에서 학교로 가는 방법의 수는? (공원과 시장 사이에는 길이 없어요)`,
+  r4:{sk:'KC4', gen:()=>[ri(1,3),ri(2,4),ri(1,3),ri(2,3)], make:([a,b,c,d])=>({q:`집에서 공원까지 ${a}가지, 공원에서 학교까지 ${b}가지 길이 있고, 집에서 시장까지 ${c}가지, 시장에서 학교까지 ${d}가지 길이 있어요. 공원과 시장 사이에는 길이 없고, 같은 곳을 두 번 지나지 않아요. 집에서 학교로 가는 방법의 수는`,
       ans:a*b+c*d, t:'곱한 다음 더하기', lines:[`공원을 거쳐: ${a} × ${b} = ${a*b}`, `시장을 거쳐: ${c} × ${d} = ${c*d}`, `${a*b} + ${c*d} = ${B_(a*b+c*d)}`]})},
   set:{sk:'KC4', gen:()=>[ri(2,4),ri(2,4),ri(2,4)], make:([a,b,c])=>({q:`점심으로 한식 ${a}가지와 양식 ${b}가지 가운데 한 가지를 고르고, 후식 ${c}가지 가운데 한 가지를 고르는 경우의 수는`,
       ans:(a+b)*c, t:'더한 다음 곱하기', lines:[`식사: 한식 또는 양식 → ${a} + ${b} = ${a+b} (합의 법칙)`, `식사와 후식을 함께 → ${a+b} × ${c} = ${B_((a+b)*c)} (곱의 법칙)`]})},
   ds2:{sk:'KC4', gen:()=>[ri(0,KC_D2.length-1)], make:([v])=>{ const [c,ans,L]=KC_D2[v];
       return {q:`서로 다른 주사위 두 개를 동시에 던질 때, ${c} 경우의 수는`, ans, t:'나누어 센 뒤 더하거나 곱하기', lines:L}; }},
-  rt:{sk:'KC4', gen:()=>[ri(2,5),ri(0,1)], make:([a,v])=>({q:`A 와 B 사이에 길이 ${a}가지 있어요. A 에서 B 로 갔다가 ${v?'갈 때와 다른 길로 ':''}다시 A 로 돌아오는 방법의 수는`,
+  rt:{sk:'KC3', gen:()=>[ri(2,5),ri(0,1)], make:([a,v])=>({q:`A 와 B 사이에 길이 ${a}가지 있어요. A 에서 B 로 갔다가 ${v?'갈 때와 다른 길로 ':''}다시 A 로 돌아오는 방법의 수는`,
       ans:v?a*(a-1):a*a, t:'곱의 법칙', lines:[`갈 때 ${a}가지`, `올 때 ${v?`갈 때 쓴 길을 빼고 ${a-1}`:a}가지`, `${a} × ${v?a-1:a} = ${B_(v?a*(a-1):a*a)}`]})},
   /* ── 5 줄 세우기 · 대표 뽑기 · 수 만들기 ── */
   ln:{sk:'KC5', gen:()=>[ri(3,5)], make:([n])=>({q:`${n}명의 학생을 한 줄로 세우는 경우의 수는`, ans:kcFact(n), t:'자리마다 남은 사람 수를 곱해요',
@@ -6336,12 +6556,34 @@ const KC={
   hs:{sk:'KC5', gen:()=>[ri(4,10)], make:([n])=>({q:`${n}명이 서로 한 번씩 빠짐없이 악수를 할 때, 악수는 모두 몇 번 하나요?`, ans:n*(n-1)/2, unit:'번', t:'두 사람이 한 번 → ÷ 2',
       lines:[`한 사람이 ${n-1}명과 악수 → ${n} × ${n-1} = ${n*(n-1)}`, 'A–B 와 B–A 는 같은 악수 → ÷ 2', `${n*(n-1)} ÷ 2 = ${B_(n*(n-1)/2)}`]})}
 };
-const KC_ST=[['d1','k1','k2','c1','ds','ds','dd','pay'], ['or1','or1','or2','or3','or4'], ['and1','and1','cd','and2','and3','and4'],
-             ['r2','r4','set','ds2','ds2','rt'], ['ln','lr','lf','la','rp','r2c','r3c','n2','n0','n3','ne','hs']];
+const KC_ST=[['d1','k1','k2','c1','ds','ds','dd'], ['or1','or1','or2','or3','or4'], ['and1','and1','cd','and2','and3','and4','rt'],
+             ['r2','r4','set','ds2','ds2','pay'], ['ln','lr','lf','la','rp','r2c','r3c','n2','n0','n3','ne','hs']];
 function kcF(id,ps){
   const T=KC[id]; if(!T) return null;
   const o=T.make(ps); if(!o||!(o.ans>0)) return null;
   return F({key:'KC'+id+'_'+ps.join('_'), sk:T.sk, t:'cnt', k:'kc', id, ps, o, cond:o.q, cb:'w', eq:['?',{u:o.unit||'가지'}], ans:o.ans});
+}
+/* 경우의 수 그림 — 길 잇기(A→B→C 와 바로 가는 길) · 나뭇가지(하나씩 짝짓기) */
+function kcSVG(f){
+  const F2='font-family="Pretendard,system-ui,sans-serif"';
+  if(f.id==='r2'){ const [a,b,c]=f.ps, A=[34,96], B=[150,26], C=[266,96];
+    const paths=(P,Q,n,col,bend)=>range(1,n).map(i=>{ const t=n===1?0:(i-1)/(n-1)-.5, mx=(P[0]+Q[0])/2, my=(P[1]+Q[1])/2;
+      const nx=-(Q[1]-P[1]), ny=Q[0]-P[0], L=Math.hypot(nx,ny), off=bend+t*26;
+      return `<path d="M${P[0]},${P[1]} Q${(mx+nx/L*off).toFixed(1)},${(my+ny/L*off).toFixed(1)} ${Q[0]},${Q[1]}" fill="none" stroke="${col}" stroke-width="2.4" stroke-linecap="round"/>`; }).join('');
+    const node=(P,s)=>`<circle cx="${P[0]}" cy="${P[1]}" r="15" fill="#fff" stroke="#333" stroke-width="2"/><text x="${P[0]}" y="${P[1]+5.5}" text-anchor="middle" font-size="15" font-weight="800" fill="#111">${s}</text>`;
+    const lab=(x,y,s,col)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="14" font-weight="800" fill="${col}">${s}</text>`;
+    return `<svg class="vis" viewBox="0 0 300 160" ${F2} data-keep="1" aria-label="길 그림">${paths(A,B,a,'#f08c00',0)}${paths(B,C,b,'#2f5bea',0)}${paths(A,C,c,'#12a05c',38)}
+      ${node(A,'A')}${node(B,'B')}${node(C,'C')}${lab(70,46,a+'가지','#e8590c')}${lab(232,46,b+'가지','#2f5bea')}${lab(150,150,c+'가지','#0e8a4f')}</svg>`; }
+  if(f.id==='and1'&&f.ps[1]*f.ps[2]<=20){ const [c,a,b]=f.ps, N=a*b, H=Math.max(110,N*13+16)+22, y0=(H-22-N*13)/2+30;
+    const ly=i=>y0+(i*b+(b-1)/2)*13, ry=j=>y0+j*13;
+    let g='';
+    for(let i=0;i<a;i++) for(let j=0;j<b;j++) g+=`<line x1="78" y1="${ly(i).toFixed(1)}" x2="198" y2="${ry(i*b+j).toFixed(1)}" stroke="#c9d3f5" stroke-width="1.6"/>`;
+    for(let i=0;i<a;i++) g+=`<circle cx="70" cy="${ly(i).toFixed(1)}" r="9" fill="#f08c00"/><text x="70" y="${(ly(i)+4).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">${i+1}</text>`;
+    for(let k=0;k<N;k++) g+=`<circle cx="204" cy="${ry(k).toFixed(1)}" r="5.5" fill="#2f5bea"/><text x="216" y="${(ry(k)+4).toFixed(1)}" font-size="10.5" font-weight="700" fill="#555">${k%b+1}</text>`;
+    const nm=[['티셔츠','바지'],['김밥','음료'],['집→학교','학교→도서관'],['자음','모음']][c]||['앞','뒤'];
+    g+=`<text x="70" y="14" text-anchor="middle" font-size="12" font-weight="800" fill="#e8590c">${nm[0]} ${a}</text><text x="210" y="14" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">${nm[1]} ${b}씩</text>`;
+    return `<svg class="vis" viewBox="0 0 280 ${H+6}" ${F2} aria-label="나뭇가지 그림">${g}</svg>`; }
+  return '';
 }
 const genKC=s=>()=>{ const id=pickOne(KC_ST[s]); return kcF(id,KC[id].gen()); };
 function kcVariant(f){ for(let g=0;g<6;g++){ const v=kcF(f.id,KC[f.id].gen()); if(v&&v.key!==f.key) return v; } return f; }
@@ -6437,10 +6679,10 @@ function fcHint(o){
   switch(o.f){
     case 'c':{ const head=o.form===1?String(o.kk):fcTerm(o.kk,'x');
       const t1=o.form===1?fcTerm(o.kk*o.a,'x'):fcTerm(o.kk*o.a,'x²'), t2=o.form===1?String(Math.abs(o.kk*o.b)):fcTerm(Math.abs(o.kk*o.b),'x');
-      return {t:'공통인수로 묶기', lines:[`두 항에 공통으로 들어 있는 ${head} 를 앞으로 꺼내요`,
+      return {t:'공통인수로 묶기', lines:[`두 항에 공통으로 들어 있는 ${head}${/x$/.test(head)||BAT(head)?'을':'를'} 앞으로 꺼내요`,
         `${t1} = ${head} × ${fcTerm(o.a,'x')}, ${t2} = ${head} × ${Math.abs(o.b)}`, done, cTip('묶은 뒤 괄호 안에 더 묶을 수가 없어야 해요')]}; }
     case 's':{
-      const L=[`${o.p>1?`${fcTerm(o.A,'x²')} = (${px})², `:''}상수항 ${o.C} = ${Math.abs(o.q)}²`, `일차항: 2 × ${px} × ${Math.abs(o.q)} = ${fcTerm(Math.abs(o.M),'x')}`];
+      const L=[`${o.p>1?`${fcTerm(o.A,'x²')} = (${px})², `:''}상수항 ${o.C} = ${Math.abs(o.q)}²`, `일차항: ${o.q<0?'−':''}2 × ${px} × ${Math.abs(o.q)} = ${o.q<0?'−':''}${fcTerm(Math.abs(o.M),'x')}`];
       if(o.pos==='c'&&o.p===1) L.unshift(`x 의 계수의 절반을 제곱해요: (${Math.abs(o.M)} ÷ 2)² = ${Math.abs(o.q)}² = ${o.C}`);
       return {t:'완전제곱식', lines:L.concat([done, cTip(o.q<0?'a² − 2ab + b² = (a − b)²':'a² + 2ab + b² = (a + b)²')])}; }
     case 'd': return {t:'제곱 − 제곱', lines:[`${o.p>1?`${fcTerm(o.A,'x²')} = (${px})², `:''}${o.C} = ${o.q}²`, done, cTip('a² − b² = (a + b)(a − b)')]};
@@ -6448,7 +6690,7 @@ function fcHint(o){
       ? {t:'전개하면 일차항은 두 수의 합', lines:[`두 수 ${MI(o.a)}, ${MI(o.b)} → 합 ${MI(o.s)}, 곱 ${MI(o.P)}`, done]}
       : {t:'곱해서 상수항, 더해서 일차항의 계수', lines:[`곱해서 ${MI(o.P)}, 더해서 ${MI(o.s)} 인 두 수 → ${MI(o.a)}, ${MI(o.b)}`, done,
           cTip(o.P<0?'곱이 음수면 두 수의 부호가 달라요':o.s<0?'곱이 양수이고 합이 음수면 둘 다 음수':'곱과 합이 모두 양수면 둘 다 양수')]};
-    case 'a': return {t:'대각선으로 곱해 더하기', lines:[`x² 의 계수: ${o.p} × ${o.r} = ${o.A}`, `상수항: ${MI(o.q)} × ${MI(o.s)} = ${MI(o.C)}`,
+    case 'a': return {t:'대각선으로 곱해 더하기', lines:[`x² 의 계수: ${o.p} × ${o.r} = ${o.A}`, `상수항: ${PV(o.q)} × ${PV(o.s)} = ${MI(o.C)}`,
         `일차항: ${o.p} × ${PV(o.s)} + ${PV(o.q)} × ${o.r} = ${MI(o.M)}`, done, cTip('전개해서 원래 식이 나오는지 꼭 확인해요')]};
   }
   return null;
@@ -6491,7 +6733,7 @@ function currHint(f){
   if(f.k==='add3'||f.k==='sub3') return r3Hint(f);
   if(f.k==='nf') return nfHint(f);
   if(f.k==='rt') return rtHint(f);
-  if(f.k==='kc') return {t:f.o.t||'경우의 수', lines:f.o.lines.slice(), svg:''};
+  if(f.k==='kc') return {t:f.o.t||'경우의 수', lines:f.o.lines.slice(), svg:kcSVG(f)};
   if(f.k==='fc') return fcHint(f);
   return null;
 }
@@ -6538,11 +6780,11 @@ Object.assign(TOPICS,{
   fmul:Object.assign({k:'fmul', n:'분수의 곱셈과 나눗셈', sym:'½×', school:'e',
     desc:'분수 × 자연수 · 자연수 × 분수 · 분수 × 분수 · 분수의 나눗셈',
     stages:[
-      {n:1, name:'(분수) × (자연수)',  ex:'1/2 × 4 · 12의 2/3', gen:genNM1, take:12},
+      {n:1, name:'(분수) × (자연수)',  ex:'1/2 × 4', gen:genNM1, take:12},
       {n:2, name:'(자연수) × (분수)',  ex:'6 × 2/3',  gen:genNM2, take:12},
       {n:3, name:'(분수) × (분수)',    ex:'2/3 × 3/4', gen:genNM3, take:10},
       {n:4, name:'(분수) ÷ (자연수)',  ex:'4/5 ÷ 2',  gen:genNM4, take:10},
-      {n:5, name:'(분수) ÷ (분수)',    ex:'3/4 ÷ 3/8 · 6 ÷ 2/3', gen:genNM5, take:10}
+      {n:5, name:'(분수) ÷ (분수)',    ex:'3/4 ÷ 3/8', gen:genNM5, take:10}
     ],
     cats:[['NFo'],['NFmn'],['NFmf'],['NFdn'],['NFdf'],['NFdi']]},BLUE),
   ratio:Object.assign({k:'ratio', n:'비와 비례식', sym:'3:4', school:'e',
@@ -6655,49 +6897,74 @@ function currPreview(t,n){
 
 /* ════════ 정리 노트 ════════ */
 function currNote(t,fromHint){
-  if(t==='fadd') return {
-    sub:'분모가 같은 분수 · 가분수와 대분수 · 약분과 통분 · 분모가 다른 분수',
-    memo:[{h:'분수 덧셈·뺄셈 순서', html:chipList(['분모가 같으면 분자끼리','대분수: 자연수끼리, 분수끼리','뺄 수 없으면 1 을 받아내림','분모가 다르면 통분 먼저','답은 기약분수로'])}],
-    ways:[fromHint('분자끼리','2/7 + 3/7',nfF('a',[0,2,7],[0,3,7],'F','n')), fromHint('가분수 → 대분수','7/3',nfF('c',[0,7,3],null,'M','n')),
-          fromHint('받아내림','3과 1/4 − 1과 3/4',nfF('s',[3,1,4],[1,3,4],'M','n')), fromHint('1 을 분수로','1 − 3/8',nfF('s',[1,0,1],[0,3,8],'M','n')),
-          fromHint('약분','12/18',frF('e',12,18,2,3,'d')), fromHint('통분해서 더하기','1/2 + 1/3',nfF('a',[0,1,2],[0,1,3],'m','n'))],
-    miss:[{w:'2/7 + 3/7 = 5/14', r:'5/7', y:'분모끼리 더하면 안 돼요. 1/7 이 2개, 3개 → 1/7 이 5개.'},
-          {w:'1/2 + 1/3 = 2/5', r:'5/6', y:'분모가 다르면 6 으로 통분: 3/6 + 2/6 = 5/6.'},
-          {w:'3과 1/4 − 1과 3/4 = 2와 2/4', r:'1과 2/4', y:'1/4 에서 3/4 을 뺄 수 없어 자연수에서 1 을 받아내려요: 2와 5/4 − 1과 3/4.'}]};
-  if(t==='fmul') return {
-    sub:'분수 × 자연수 · 분수 × 분수 · ÷ 자연수 · ÷ 분수',
-    memo:[{h:'곱셈과 나눗셈', html:chipList(['× 자연수: 분자에 곱하기','분수 × 분수: 분자끼리, 분모끼리','÷ 자연수 = × 1/자연수','÷ 분수 = × 뒤집은 분수','대분수는 가분수로 바꾸고 계산'])}],
-    ways:[fromHint('몇 묶음 가운데 몇 묶음','12의 2/3',nfF('o',[12,0,1],[0,2,3],'i','i')), fromHint('분자에 곱하기','3/4 × 2',nfF('m',[0,3,4],[2,0,1],'m','n')),
-          fromHint('분자끼리, 분모끼리','2/3 × 3/4',nfF('m',[0,2,3],[0,3,4],'m','d')), fromHint('÷ 자연수','3/4 ÷ 2',nfF('d',[0,3,4],[2,0,1],'m','d')),
-          fromHint('뒤집어 곱하기','6 ÷ 2/3',nfF('d',[6,0,1],[0,2,3],'m','n'))],
-    miss:[{w:'1/2 × 4 = 4/8', r:'2', y:'자연수는 분자에만 곱해요: 4/2 = 2.'},
-          {w:'3/4 ÷ 3/8 = 9/32', r:'2', y:'나누는 수를 뒤집어 곱해요: 3/4 × 8/3 = 2.'},
-          {w:'1과 1/2 × 4 = 4와 1/2', r:'6', y:'대분수는 가분수로 바꿔 곱해요: 3/2 × 4 = 6.'}]};
-  if(t==='ratio') return {
-    sub:'비율과 백분율 · 비의 성질 · 비례식 · 비례배분',
-    memo:[{h:'기억할 것', html:chipList(['비율 = 비교하는 양 ÷ 기준량','백분율 = 비율 × 100','a : b 에서 b 가 기준량','외항의 곱 = 내항의 곱','비례배분: 전체 × 부분/합'])}],
-    ways:[fromHint('비율 → 백분율','20에 대한 5',rtP(5,20,1)), fromHint('비의 성질','3 : 4 = 9 : □',rtK(3,4,3,'x',3)),
-          fromHint('외항·내항','4 : 6 = 10 : □',rtR(4,6,10,15,3)), fromHint('비례배분','20 을 3 : 2 로',rtB(0,20,3,2,1))],
-    miss:[{w:'20에 대한 5의 비율 = 400%', r:'25%', y:'"20에 대한" → 20 이 기준량. 5 ÷ 20 = 0.25.'},
-          {w:'20 을 3 : 2 로 → 형 3 × 20 = 60', r:'12', y:'전체를 3 + 2 = 5 묶음으로: 20 ÷ 5 = 4, 형은 4 × 3 = 12.'}]};
-  if(t==='cnt') return {
-    sub:'합의 법칙 · 곱의 법칙 · 줄 세우기 · 대표 뽑기 · 수 만들기',
-    memo:[{h:'더할까, 곱할까', html:`<div class="hl" style="font-size:15px">동시에 일어나지 않는 두 사건 중 <b>하나</b> → <b>더하기</b> (합의 법칙)<br>두 사건이 <b>함께·잇달아</b> 일어남 → <b>곱하기</b> (곱의 법칙)</div>`},
-          {h:'자주 쓰는 수', html:chipList(['동전 1개: 2가지','주사위 1개: 6가지','주사위 2개: 36가지','n명 한 줄: n × (n−1) × … × 1','대표 2명: n × (n−1) ÷ 2'])}],
-    ways:[fromHint('합의 법칙','버스 3 또는 지하철 2',kcF('or1',[0,3,2])), fromHint('곱의 법칙','티셔츠 3 × 바지 4',kcF('and1',[0,3,4])),
-          fromHint('곱한 다음 더하기','두 갈래 길',kcF('r2',[2,3,1])), fromHint('줄 세우기','4명을 한 줄로',kcF('ln',[4])),
-          fromHint('회장·부회장','5명 가운데',kcF('rp',[5])), fromHint('대표 2명','5명 가운데',kcF('r2c',[5])), fromHint('0 이 있는 카드','0~3 으로 두 자리',kcF('n0',[4]))],
-    miss:[{w:'버스 3, 지하철 2 → 6가지', r:'5가지', y:'버스 또는 지하철 하나만 타니 더해요: 3 + 2.'},
-          {w:'5명 중 대표 2명 → 20가지', r:'10가지', y:'(A, B) 와 (B, A) 는 같은 대표라 ÷ 2.'},
-          {w:'0, 1, 2, 3 으로 두 자리 수 → 12개', r:'9개', y:'십의 자리에 0 은 올 수 없어요: 3 × 3.'}]};
-  if(t==='factor') return {
-    sub:'공통인수 · 완전제곱식 · 합과 차 · 두 수 찾기',
-    memo:[{h:'인수분해 공식', html:chipList(['ma + mb = m(a + b)','a² + 2ab + b² = (a + b)²','a² − 2ab + b² = (a − b)²','a² − b² = (a + b)(a − b)','x² + (a+b)x + ab = (x + a)(x + b)'])}],
-    ways:[fromHint('공통인수','6x + 9',fcC(1,3,2,3,'b')), fromHint('완전제곱식','x² + 6x + 9',fcS(1,3,'q')),
-          fromHint('합과 차','x² − 49',fcD(1,7,'q')), fromHint('두 수 찾기','x² + 2x − 15',fcT(5,-3,'b')), fromHint('대각선 곱','2x² + 7x + 3',fcA(2,1,1,3,'s'))],
-    miss:[{w:'x² + 2x − 15 = (x − 5)(x + 3)', r:'(x + 5)(x − 3)', y:'두 수의 합이 +2 여야 해요: 5 + (−3) = 2.'},
-          {w:'x² − 49 = (x − 7)²', r:'(x + 7)(x − 7)', y:'(x − 7)² 은 x² − 14x + 49 예요.'},
-          {w:'6x + 9 = 3(2x + 9)', r:'3(2x + 3)', y:'두 항을 모두 3 으로 나눠야 해요: 9 ÷ 3 = 3.'}]};
+  /* 예시 칸에는 실제 문제 모양(문장 + 식)을 그대로 보여 줘요 */
+  const W=(title,f,tip)=>f?fromHint(title,eqText(f,false),f,tip):null;
+  const done=o=>(o.ways=o.ways.filter(Boolean),o);
+  if(t==='fadd') return done({
+    sub:'분모가 같은 분수 · 가분수와 대분수 · 대분수의 덧셈과 뺄셈 · 약분과 통분 · 분모가 다른 분수',
+    memo:[{h:'계산 순서 한눈에', html:chipList(['분모가 같으면 → 분자끼리','대분수 → 자연수끼리, 분수끼리','분수끼리 뺄 수 없으면 → 1 을 받아내림','분모가 다르면 → 통분 먼저','분모가 다른 계산의 답 → 기약분수로'])},
+          {h:'1 은 분모와 분자가 같은 분수', html:chipList(['1 = 2/2','1 = 3/3','1 = 4/4','1 = 5/5','1 = 8/8'])+
+            `<div class="hl" style="font-size:14px;margin-top:8px">받아올림과 받아내림은 모두 이 1 을 자연수와 분수 사이에서 주고받는 거예요.</div>`},
+          {h:'가분수 ↔ 대분수', html:chipList(['7/3 = 2와 1/3 · 7 ÷ 3 = 2 … 1','2와 1/3 = 7/3 · 2 × 3 + 1 = 7'])}],
+    ways:[W('분모는 그대로, 분자끼리',nfF('a',[0,2,7],[0,3,7],'F','n')), W('가분수 → 대분수',nfF('c',[0,7,3],null,'M','n')),
+          W('대분수 → 가분수',nfF('c',[2,1,3],null,'F','n')), W('자연수끼리, 분수끼리',nfF('a',[2,4,5],[1,3,5],'M','n')),
+          W('1 을 받아내려 빼기',nfF('s',[3,1,4],[1,3,4],'M','n')), W('약분 — 공약수로 나누기',frF('e',12,18,2,3,'d')),
+          W('통분해서 더하기',nfF('a',[0,1,2],[0,1,3],'m','n')), W('통분한 뒤 대분수로',nfF('a',[0,4,5],[0,1,2],'m','d'))],
+    miss:[{w:'2/7 + 3/7 = 5/14', r:'5/7', y:'분모끼리 더하면 안 돼요. 1/7 이 2개와 3개 → 1/7 이 5개.'},
+          {w:'1/2 + 1/3 = 2/5', r:'5/6', y:'분모가 다르면 6 으로 통분해요: 3/6 + 2/6 = 5/6.'},
+          {w:'2와 4/5 + 1과 3/5 = 3과 7/5', r:'4와 2/5', y:'분수 부분 7/5 은 1 보다 커요. 5/5 = 1 을 자연수로 올려요.'},
+          {w:'3과 1/4 − 1과 3/4 = 2와 2/4', r:'1과 2/4', y:'1/4 에서 3/4 을 뺄 수 없어 자연수에서 1 을 받아내려요: 2와 5/4 − 1과 3/4 = 1과 2/4.'},
+          {w:'3 − 1과 1/4 = 2와 1/4', r:'1과 3/4', y:'3 을 2와 4/4 로 바꿔서 빼요: 2와 4/4 − 1과 1/4 = 1과 3/4.'}]});
+  if(t==='fmul') return done({
+    sub:'분수 × 자연수 · 자연수 × 분수 · 분수 × 분수 · 분수 ÷ 자연수 · 분수 ÷ 분수',
+    memo:[{h:'곱셈', html:chipList(['분수 × 자연수 → 분자에 곱하기','분수 × 분수 → 분자끼리, 분모끼리','대분수 → 가분수로 바꾼 뒤 곱하기','곱하기 전에 약분하면 수가 작아져요'])},
+          {h:'나눗셈', html:chipList(['÷ 자연수 → × 1/자연수','÷ 분수 → 뒤집어서 곱하기','분모가 같으면 → 분자끼리 나누기'])},
+          {h:'"■ 의 ▲" 는 곱하기', html:chipList(['12의 2/3 = 12 × 2/3 = 8','24의 3/4 = 24 × 3/4 = 18'])+
+            `<div class="hl" style="font-size:14px;margin-top:8px">12 를 3 묶음으로 나눈 것 가운데 2 묶음 — 12 ÷ 3 × 2 = 8</div>`}],
+    ways:[W('몇 묶음 가운데 몇 묶음',nfF('o',[12,0,1],[0,2,3],'i','i')), W('분자에 곱하기',nfF('m',[0,3,4],[2,0,1],'m','n')),
+          W('자연수 × 분수',nfF('m',[6,0,1],[0,2,3],'m','n')), W('분자끼리, 분모끼리',nfF('m',[0,2,3],[0,3,4],'m','d')),
+          W('대분수는 가분수로',nfF('m',[1,1,2],[0,2,3],'m','n')), W('÷ 자연수 = × 1/자연수',nfF('d',[0,3,4],[2,0,1],'m','d')),
+          W('뒤집어서 곱하기',nfF('d',[0,3,4],[0,3,8],'m','n')), W('자연수 ÷ 분수',nfF('d',[6,0,1],[0,2,3],'m','n'))],
+    miss:[{w:'1/2 × 4 = 4/8', r:'2', y:'자연수는 분자에만 곱해요: 1/2 × 4 = 4/2 = 2.'},
+          {w:'4/5 ÷ 2 = 8/5', r:'2/5', y:'÷ 2 는 × 1/2 이에요: 4/5 × 1/2 = 4/10 = 2/5.'},
+          {w:'3/4 ÷ 3/8 = 9/32', r:'2', y:'나누는 분수를 뒤집어 곱해요: 3/4 × 8/3 = 2.'},
+          {w:'6 ÷ 2/3 = 4', r:'9', y:'6 × 2/3 을 해 버렸어요. 나눌 때는 뒤집어 곱해요: 6 × 3/2 = 9.'},
+          {w:'1과 1/2 × 4 = 4와 1/2', r:'6', y:'자연수 부분에만 곱하면 안 돼요. 가분수로 바꿔 곱해요: 3/2 × 4 = 6.'}]});
+  if(t==='ratio') return done({
+    sub:'비율과 백분율 · 비의 성질 · 간단한 자연수의 비 · 비례식 · 비례배분',
+    memo:[{h:'비와 비율', html:chipList(['a : b 에서 b 가 기준량','비율 = 비교하는 양 ÷ 기준량','백분율 = 비율 × 100','"20에 대한 5" → 기준량 20'])},
+          {h:'비례식', html:chipList(['비의 성질: 앞항·뒤항에 같은 수를 곱하거나 나눠요','외항의 곱 = 내항의 곱','비례배분: 전체 × 부분/합'])+
+            `<div class="hl" style="font-size:14px;margin-top:8px">3 : 4 = 9 : 12 → 바깥쪽 3 × 12 = 36, 안쪽 4 × 9 = 36</div>`}],
+    ways:[W('비율 → 백분율',rtP(5,20,1)), W('백분율만큼 구하기',rtN(80,25)), W('비의 성질',rtK(3,4,3,'x',3)),
+          W('간단한 자연수의 비로',rtS(1,1,2,1,3,0)), W('외항의 곱 = 내항의 곱',rtR(4,6,10,15,3)),
+          W('문장을 비례식으로',rtW(2,3,4,12)), W('비례배분',rtB(0,20,3,2,1))],
+    miss:[{w:'20에 대한 5의 비율 = 400%', r:'25%', y:'"20에 대한" 이니 20 이 기준량이에요. 5 ÷ 20 = 0.25 → 25%.'},
+          {w:'3 : 4 = 9 : 10', r:'3 : 4 = 9 : 12', y:'3 → 9 는 6 을 더한 것이 아니라 × 3 이에요. 뒤항도 × 3: 4 × 3 = 12.'},
+          {w:'4 : 6 = 10 : □ → □ = 12', r:'□ = 15', y:'외항의 곱 = 내항의 곱: 4 × □ = 6 × 10 = 60, □ = 15.'},
+          {w:'사탕 20개를 3 : 2 로 → 형 20 × 3/2 = 30개', r:'사탕 20개를 3 : 2 로 → 형 20 × 3/5 = 12개', y:'전체를 3 + 2 = 5 묶음으로 나눠요. 형은 그 가운데 3 묶음이에요.'}]});
+  if(t==='cnt') return done({
+    sub:'한 사건의 경우의 수 · 합의 법칙 · 곱의 법칙 · 합과 곱 함께 · 줄 세우기 · 대표 뽑기 · 수 만들기',
+    memo:[{h:'더할까, 곱할까', html:`<div class="hl" style="font-size:15px;line-height:1.75">두 사건이 <b>동시에 일어나지 않고</b> 둘 중 하나 → <b>더하기</b> (합의 법칙)<br>두 사건이 <b>함께·잇달아</b> 일어남 → <b>곱하기</b> (곱의 법칙)</div>`},
+          {h:'자주 쓰는 수', html:chipList(['동전 1개: 2가지','주사위 1개: 6가지','동전 2개: 4가지','주사위 2개: 36가지','n명 한 줄: n × (n−1) × … × 1'])},
+          {h:'순서가 있나, 없나', html:chipList(['회장·부회장 (자격이 다름) → n × (n−1)','대표 2명 (자격이 같음) → n × (n−1) ÷ 2','두 자리 수 (순서 있음) → 십의 자리 × 일의 자리'])}],
+    ways:[W('빠짐없이, 겹치지 않게 세기',kcF('ds',[5])), W('합의 법칙 — 더하기',kcF('or1',[0,3,2])), W('곱의 법칙 — 곱하기',kcF('and1',[0,3,4])),
+          W('곱한 다음 더하기',kcF('r2',[2,3,1])), W('더한 다음 곱하기',kcF('set',[2,3,2])), W('한 줄로 세우기',kcF('ln',[4])),
+          W('자격이 다르면 줄 세우기처럼',kcF('rp',[5])), W('자격이 같으면 ÷ 2',kcF('r2c',[5])), W('0 이 있는 카드',kcF('n0',[4]))],
+    miss:[{w:'버스 3, 지하철 2 → 6가지', r:'5가지', y:'버스 또는 지하철 하나만 타니 동시에 일어나지 않아요. 더해요: 3 + 2 = 5.'},
+          {w:'주사위 두 개, 합이 5 → (1, 4), (2, 3) 2가지', r:'(1, 4), (2, 3), (3, 2), (4, 1) 4가지', y:'서로 다른 주사위 두 개에서는 (1, 4) 와 (4, 1) 이 다른 경우예요.'},
+          {w:'5명 중 대표 2명 → 20가지', r:'10가지', y:'(A, B) 와 (B, A) 는 같은 대표라 5 × 4 를 2 로 나눠요.'},
+          {w:'0, 1, 2, 3 으로 두 자리 수 → 12개', r:'9개', y:'십의 자리에 0 은 올 수 없어요: 3 × 3 = 9.'}]});
+  if(t==='factor') return done({
+    sub:'공통인수 · 완전제곱식 · 합과 차의 곱 · x² + (a+b)x + ab · acx² + (ad+bc)x + bd',
+    memo:[{h:'인수분해 공식', html:chipList(['ma + mb = m(a + b)','a² + 2ab + b² = (a + b)²','a² − 2ab + b² = (a − b)²','a² − b² = (a + b)(a − b)','x² + (a+b)x + ab = (x + a)(x + b)'])},
+          {h:'전개와 인수분해는 거꾸로', html:chipList(['(x + 2)(x + 3) → x² + 5x + 6 (전개)','x² + 5x + 6 → (x + 2)(x + 3) (인수분해)'])+
+            `<div class="hl" style="font-size:14px;margin-top:8px">답을 구하면 다시 전개해서 처음 식이 나오는지 확인해요.</div>`}],
+    ways:[W('공통인수로 묶기',fcC(1,3,2,3,'b')), W('완전제곱식',fcS(1,3,'q')), W('합과 차의 곱',fcD(1,7,'q')),
+          W('곱과 합으로 두 수 찾기',fcT(5,-3,'b')), W('대각선으로 곱해 더하기',fcA(2,1,1,3,'s'))],
+    miss:[{w:'6x + 9 = 3(2x + 9)', r:'3(2x + 3)', y:'두 항을 모두 3 으로 나눠야 해요: 9 ÷ 3 = 3.'},
+          {w:'x² + 6x + 9 = (x + 9)²', r:'(x + 3)²', y:'9 = 3², 6x = 2 × 3 × x. 괄호 안에는 3 이 들어가요.'},
+          {w:'x² − 49 = (x − 7)²', r:'(x + 7)(x − 7)', y:'(x − 7)² 을 전개하면 x² − 14x + 49 예요. 제곱의 차는 합과 차의 곱.'},
+          {w:'x² + 2x − 15 = (x − 5)(x + 3)', r:'(x + 5)(x − 3)', y:'곱이 −15, 합이 +2 인 두 수는 5 와 −3 이에요.'}]});
   return null;
 }
 
@@ -7972,7 +8239,7 @@ function renderStages(){
     const cnt=s.facts?Math.min(s.take,s.facts().length):s.take;
     return `<button class="st ${done?'done':''}" onclick="startStage('${t}',${s.n})">
       <div class="stamp">✓</div><div class="no">${s.n}</div>
-      <div class="ex${s.ex.length>13?' exs':s.ex.length>9?' exm':''}">${esc(s.ex)}</div>
+      <div class="ex${(n=>n>13?' exs':n>9?' exm':'')(s.ex.replace(/(\d+|□)\/(\d+|□)/g,'F').length)}">${mfmt(esc(s.ex))}</div>
       <div class="nm">${s.name}${gBadge(stageGrade(t,s.n))}</div>
       <div class="cn">${cnt}문항${bt?` · 최고 ${bt.toFixed(1)}초`:''}${td?' · 오늘 ✓':''}</div></button>`;
   }).join('');
@@ -7999,14 +8266,14 @@ function renderPreview(){
   el('card').innerHTML=`<div class="prev">
     <div class="pvhead"><span class="no">${n}</span><div><div class="pvt">${s.name}</div>
       <div class="pvs">${T.n} · ${G.need}문항</div></div></div>
-    ${pv.tip?`<div class="pvtip">${pv.tip}</div>`:''}
+    ${pv.tip?`<div class="pvtip">${mfmt(pv.tip)}</div>`:''}
     <div class="pvbody">
       ${figOK(pv.svg)?`<div class="pvfig">${pv.svg}</div>`:''}
       <div class="pvtxt">
         ${pv.table?`<div class="ftabs">${pv.table}</div>`:''}
         ${pv.grid||''}
-        ${pv.body||''}
-        ${pv.lines?`<div class="pvlines">${pv.lines.map(l=>`<div class="hl">${l}</div>`).join('')}</div>`:''}
+        ${mfmt(pv.body||'')}
+        ${pv.lines?`<div class="pvlines">${pv.lines.map(l=>`<div class="hl">${mfmt(l)}</div>`).join('')}</div>`:''}
       </div>
     </div>
     <div class="nextrow"><span class="hnote">준비되면 시작! 맞히면 바로 다음 문제로 넘어가요.</span>
@@ -8225,7 +8492,7 @@ const FIG_TOPICS=['pyth','trig','tfn'];
 const figOK=svg=>!!svg&&(FIG_TOPICS.includes((G&&G.t)||CUR.topic)||/data-keep="1"/.test(svg));
 const hintBox=h=>`<div class="hbody">
     ${figOK(h.svg)?`<div class="hfig">${h.svg}</div>`:''}
-    <div class="htxt"><div class="htitle">${h.t}</div>${h.lines.map(l=>`<div class="hl">${l}</div>`).join('')}</div>
+    <div class="htxt"><div class="htitle">${mfmt(h.t)}</div>${h.lines.map(l=>`<div class="hl">${mfmt(l)}</div>`).join('')}</div>
   </div>`;
 
 function quitPlay(){
@@ -8710,6 +8977,21 @@ function paintRkClass(){
 
 /* ═══════════════════ 정리 노트 ═══════════════════
    주제 하나를 한 장에 — ① 외워 둘 것 ② 생각하는 방법 ③ 자주 하는 실수   */
+const BK_IC={
+  memo:'<svg class="ic" viewBox="0 0 24 24"><path d="M7 3h10a1 1 0 0 1 1 1v17l-6-4-6 4V4a1 1 0 0 1 1-1z"/></svg>',
+  ways:'<svg class="ic" viewBox="0 0 24 24"><path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.1v.1h5v-.1c0-.8.4-1.6 1.1-2.1A6 6 0 0 0 12 3z"/></svg>',
+  miss:'<svg class="ic" viewBox="0 0 24 24"><path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5M12 17.3v.2"/></svg>'};
+const BK_TIP=/^<span class="tip">([\s\S]*)<\/span>$/;
+/* 실수 카드의 바른 답 — 답만 적어 둔 것은 틀린 식의 앞부분을 이어 붙여 온전한 식으로 */
+function bookRight(w,r){
+  w=String(w); r=String(r);
+  if(/^\s*=/.test(r)){ const i=w.lastIndexOf('='); return i>0?w.slice(0,i).trimEnd()+' '+r.trim():r; }
+  const j=w.lastIndexOf('→');
+  if(/[=→]/.test(r)) return j>0&&!r.includes('→')?w.slice(0,j+1)+' '+r:r;
+  const i=w.lastIndexOf('=');
+  if(i>0) return w.slice(0,i+1)+' '+r;
+  return j>0?w.slice(0,j+1)+' '+r:r;
+}
 function openBook(t){
   if(!ME) return;
   if(t) CUR.topic=t; t=CUR.topic;
@@ -8717,24 +8999,38 @@ function openBook(t){
   const T=topicOf(t), N=noteOf(t), p=prog(t);
   const nx=(T.stages.find(s=>!p.c.includes(s.n))||T.stages[0]).n;
   setTopicVars(t);
-  el('book').innerHTML=`
-    <div class="bookhead"><span class="tsym sm">${symHTML(T)}</span>
-      <h2>${T.n} 정리 노트<small>${N.sub}</small></h2></div>
-    <div class="bsec"><h3><em>①</em>외워 둘 것</h3>
-      <div class="bmemo">${N.memo.map(m=>`<div class="bm"><h4>${m.h}</h4>${m.html}</div>`).join('')}</div></div>
-    <div class="bsec"><h3><em>②</em>생각하는 방법</h3>
-      <div class="bways">${N.ways.map((w,i)=>`<div class="bway">
-        <div class="bwh"><span class="bwn">${i+1}</span><span class="bwt">${w.t}</span></div>
-        <div class="bwex">${w.ex}</div>${w.svg||''}
-        ${w.lines.map(l=>`<div class="hl">${l}</div>`).join('')}</div>`).join('')}</div></div>
-    <div class="bsec"><h3><em>③</em>자주 하는 실수</h3>
-      <div class="bmiss">${N.miss.map(m=>`<div class="bx">
-        <div class="bxw"><i>✗</i><s>${m.w}</s></div><div class="bxr"><i>✓</i>${m.r}</div>
-        <div class="bxy">${m.y}</div></div>`).join('')}</div></div>
-    <div style="margin-top:24px;display:flex;gap:9px;justify-content:center;flex-wrap:wrap">
+  const way=(w,i)=>{ const tips=[], steps=[];
+    (w.lines||[]).forEach(l=>{ const m=String(l).match(BK_TIP); if(m) tips.push(m[1]); else steps.push(l); });
+    return `<article class="nbway">
+      <header><span class="nbn">${i+1}</span><h4>${mfmt(w.t)}</h4></header>
+      <div class="nbex${(x=>/[가-힣]/.test(x)&&x.length>18)(String(w.ex||'').replace(/<[^>]+>/g,''))?' long':''}">${mfmt(w.ex)}</div>
+      ${w.svg?`<div class="nbvis">${w.svg}</div>`:''}
+      ${steps.length?`<ol class="nbsteps">${steps.map((l,j)=>`<li${j===steps.length-1?' class="last"':''}>${mfmt(l)}</li>`).join('')}</ol>`:''}
+      ${tips.map(x=>`<div class="nbtip">${BK_IC.ways}<span>${mfmt(x)}</span></div>`).join('')}
+    </article>`; };
+  const bk=el('book'); bk.className='book nb2';
+  bk.innerHTML=`
+    <div class="nbhero">
+      <div class="nbtop"><span class="tsym sm">${symHTML(T)}</span>
+        <div class="nbtt"><span class="nbkind">정리 노트${T.gr?` · ${T.gr}`:''}</span><h2>${T.n}</h2></div></div>
+      <p class="nbsub">${N.sub}</p>
+      <div class="nbtoc">${[['memo','외워 둘 것',N.memo.length],['ways','생각하는 방법',N.ways.length],['miss','자주 하는 실수',N.miss.length]]
+        .map(([k,n,c])=>`<button data-go="${k}">${BK_IC[k]}<b>${c}</b><span>${n}</span></button>`).join('')}</div>
+    </div>
+    <section class="nbsec" id="nb-memo"><h3>${BK_IC.memo}외워 둘 것</h3>
+      ${N.memo.map(m=>`<div class="nbmemo"><h4>${mfmt(m.h)}</h4><div class="nbmc">${mfmt(m.html)}</div></div>`).join('')}</section>
+    <section class="nbsec" id="nb-ways"><h3>${BK_IC.ways}생각하는 방법</h3>
+      <div class="nbways">${N.ways.map(way).join('')}</div></section>
+    <section class="nbsec" id="nb-miss"><h3>${BK_IC.miss}자주 하는 실수</h3>
+      ${N.miss.map(m=>`<div class="nbmiss">
+        <div class="nbmw"><i>✕</i><span>${mfmt(m.w)}</span></div>
+        <div class="nbmr"><i>✓</i><span>${mfmt(bookRight(m.w,m.r))}</span></div>
+        <p><b>왜?</b>${mfmt(m.y)}</p></div>`).join('')}</section>
+    <div class="nbfoot">
       <button class="btn" onclick="openStages('${t}')">← 스테이지 고르기</button>
       <button class="btn primary" style="flex:0 0 auto" onclick="startStage('${t}',${nx})">${nx}단계 연습하기 →</button>
     </div>`;
+  bk.querySelectorAll('.nbtoc button').forEach(b=>b.onclick=()=>{ const s=el('nb-'+b.dataset.go); if(s) s.scrollIntoView({behavior:'smooth',block:'start'}); });
   show('s-book');
 }
 
@@ -8825,7 +9121,7 @@ function paintShop(){
   box.className='items';
   const list=goodsList(shopCat), grouped=shopCat==='new'||shopCat==='hs';
   let lastGrp='';
-  const intro= shopCat==='new'?`<div class="shopnote"><span>고등학교 교육과정까지 넣으면서 새로 들어온 물건 <b>${list.length}가지</b> — 초등(구구단·분수), 중학교(피타고라스·삼각자·좌표), 고등(삼각함수·지수·로그·Σ·경우의 수) 테마예요. <b>고등</b> 표시는 고등학교가 열리면 살 수 있어요.</span></div>`
+  const intro= shopCat==='new'?`<div class="shopnote"><span>새로 들어온 꾸미기 <b>${list.length}가지</b> — 동물 친구(아기 티라노·고양이·강아지·펭귄·햄스터), 빛의 검, 불사조 날개, 고양이·토끼 귀, 벚꽃 비, 별똥별, 바닷속 무대까지. 랜덤 상자에서도 나와요.</span></div>`
     : shopCat==='hs'?`<div class="shopnote">${hsOpen()?'고등학교가 열려 있어요. 고등 전용 물건을 모두 살 수 있어요.'
         :`${LOCKI}<span><b>고등학교가 열리면</b> 살 수 있어요 — 중학교 주제마다 실전 모드 목표를 넘어 열쇠 ${hsKeys().length}개를 모으면 열려요. 지금 ${hsKeys().filter(x=>x.ok).length}개. 입어 보기는 지금도 할 수 있어요.</span>`}</div>`:'';
   el('shopItems').innerHTML=intro+list.map(g=>{
