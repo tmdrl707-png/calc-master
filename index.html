@@ -1789,7 +1789,7 @@ const serverNow=()=>Date.now()+SRV_OFF;
 /* 여러 학생이 동시에 고치는 값(학급 모금)은 트랜잭션으로 — 서로 덮어쓰지 않게 */
 async function dbTx(path,fn){
   try{ const db=await fbInit();
-    if(db){ const r=await db.ref(ROOT+'/'+path).transaction(cur=>fn(cur));
+    if(db){ const r=await db.ref(ROOT+'/'+path).transaction(cur=>fn(cur),undefined,false);   /* false : 서버가 확정하기 전에는 내 화면에 미리 보이지 않게 */
       const v=r.snapshot.val(); lset(path,v); return {ok:r.committed,val:v}; } }
   catch(e){ console.warn('트랜잭션 실패',path,e); }
   const v=fn(lget(path,null)); if(v!==undefined) lset(path,v); return {ok:v!==undefined,val:v};
@@ -5977,8 +5977,11 @@ async function teacherWipe(){
    자료 : battles/{번호} = {code, host, t, kind, sec, nq, gap, st:'wait'|'run', made, at, rd,
             cur:{i(문제 번호), at(보이는 시각), k(문항 열쇠), u:[이미 낸 문항]}, w/{i}=먼저 맞힌 학번,
             p:{학번:{ch, rd, done, j(들어온 시각), hb(최근 신호)}}}
+   판정 — 서버(싱가포르)에 먼저 도착한 사람이 아니라, '문제가 보인 순간부터 정답을 누를 때까지 걸린 시간(rt)'이
+   가장 짧은 사람이 이겨요. 정답을 맞히면 a/{i}/{학번}=rt 를 올리고, 첫 정답이 보이고 0.8초 기다린 뒤
+   가장 짧은 rt 의 주인을 w/{i} 에 적어요(누가 적어도 한 번만). 통신이 느린 친구도 손해 보지 않게.
    코인 : 2명 이상이 한 판을 끝내면 1위 20 · 2위 12 · 3위 8 · 그 밖 4 (1개 이상 맞혔을 때), 하루 5판까지. */
-const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_COIN=[20,12,8], BT_COIN_ELSE=4, BT_DAY_MAX=5;
+const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[20,12,8], BT_COIN_ELSE=4, BT_DAY_MAX=5;
 const BT_KINDS=[['t','시간제'],['n','개수제'],['s','서바이벌']];
 const BT_VALS={t:range(1,10).map(k=>k*30), n:range(5,30), s:range(2,10)};
 const BT_DEF={t:60, n:10, s:5};
@@ -6269,7 +6272,7 @@ async function btStart(){
   if(Object.keys(room.p||{}).length<2) return toast('친구가 한 명 이상 들어와야 시작할 수 있어요');
   el('btGo').disabled=true;
   const at=serverNow()+4200, k=btPickKey(room.t,0,[]);
-  const upd={st:'run', at, rd:(room.rd||0)+1, cur:{i:0,at,k,u:[k]}, w:null, x:null};
+  const upd={st:'run', at, rd:(room.rd||0)+1, cur:{i:0,at,k,u:[k]}, w:null, x:null, a:null};
   Object.keys(room.p||{}).forEach(s=>{ upd[`p/${s}/rd`]=upd.rd; upd[`p/${s}/done`]=false; });   /* 지금 방에 있는 사람이 이번 판 선수 */
   await dbUpdate('battles/'+room.code,upd);
 }
@@ -6282,7 +6285,7 @@ function btStartPlay(room){
   G={mode:'battle', t:room.t, code:room.code, rd:room.rd, at:room.at, kind, v, len:btLenLabel(room),
      sec:kind==='t'?v:60, endAt:kind==='t'?room.at+v*1000:Infinity,
      qi:-1, shown:-1, score:0, ans:0, combo:0, best:0, solved:0, right:0,
-     phase:'cd', cdS:0, typed:'', clean:true, locked:false, tId:null, rev:-1, out:false};
+     phase:'cd', cdS:0, typed:'', clean:true, locked:false, tId:null, rev:-1, out:false, seen:{}, judged:{}};
   if(!((room.p||{})[ME.sid]||{}).rd||room.p[ME.sid].rd!==room.rd) dbUpdate(`battles/${room.code}/p/${ME.sid}`,{rd:room.rd});
   setupHUD(); show('s-play');
   el('keypad').style.display='none'; cardScr(false);
@@ -6325,28 +6328,45 @@ function btTick(){
     const s=Math.ceil((cur.at-now)/1000);
     if(G.cdS!==s){ G.cdS=s; el('card').innerHTML=btCdHTML(s); } return; }
   if(cur.i!==G.shown&&now>=cur.at){                            /* 새 문제 */
-    G.shown=cur.i; G.qi=cur.i; G.rev=-1;
+    G.shown=cur.i; G.qi=cur.i; G.rev=-1; G.shownSrv=serverNow();   /* 내 화면에 문제가 보인 순간 (서버 시계) */
     const f=factFromKey(cur.k)||realPick(G.t,cur.i+1,[]);
     askQ(f); paintBLive();
     if(G.out){ G.phase='out'; G.locked=true; el('keypad').style.display='none';
       const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML='탈락했어요 — 끝까지 친구들을 응원해요'; } }
   }
   const i=G.shown; if(i<0) return;
-  const win=(room.w||{})[i];
-  if(win&&G.rev!==i){ G.rev=i; btReveal(win); return; }
-  if(cur.i!==i){ if(G.rev!==i){ G.rev=i; btReveal(null,'시간이 끝났어요'); } return; }
+  const win=(room.w||{})[i], A=((room.a||{})[i])||{};
+  if(win&&G.rev!==i){ G.rev=i; btReveal(win,null,A); return; }
+  if(cur.i!==i){ if(G.rev!==i){ G.rev=i; btReveal(null,'시간이 끝났어요',A); } return; }
   const left=Math.max(0,(cur.at+BT_RT*1000-now)/1000);
   el('tbar').querySelector('i').style.width=(left/BT_RT*100)+'%';
   el('tbar').classList.toggle('warn',left<=3);
-  if(!win&&G.rev!==i&&left<=0){ G.rev=i; btReveal(null,'아무도 못 맞혔어요'); btAdvance(i); }
+  /* 판정 — 첫 정답이 보이고 0.8초 뒤, 걸린 시간이 가장 짧은 사람 */
+  if(!win&&Object.keys(A).length){
+    if(!G.seen[i]) G.seen[i]=Date.now();
+    if(!G.judged[i]&&Date.now()-G.seen[i]>=BT_JUDGE){ G.judged[i]=1; btJudge(i,A); }
+    return;
+  }
+  if(!win&&G.rev!==i&&left<=0){ G.rev=i; btReveal(null,'아무도 못 맞혔어요',A); btAdvance(i); }
 }
-function btReveal(win,why){
+const btFastest=A=>Object.keys(A).sort((x,y)=>(+A[x])-(+A[y])||x.localeCompare(y))[0];
+async function btJudge(i,A){
+  if(!G||G.mode!=='battle') return;
+  const code=G.code, w=btFastest(A);
+  const r=await dbTx(`battles/${code}/w/${i}`, c=>c?undefined:w);
+  if(r&&r.ok) btAdvance(i);
+}
+const btSecTxt=ms=>(Math.max(0,+ms)/1000).toFixed(2)+'초';
+function btReveal(win,why,A){
   const wasOut=G.phase==='out';
   G.locked=true; G.phase=wasOut?'out':'rev';
   const f=G.ask, m=el('qmsg'), me=win===ME.sid;
   paintTyped(me?'ok':'');
   if(m){ m.className='qmsg '+(me?'good':'bad');
-    m.innerHTML=win?(me?`내가 가장 빨랐어요! <b>+1</b>`:`<b>${esc(win)}</b>이(가) 먼저 맞혔어요 · 정답 <b>${MI(f.ans)}</b>`)
+    A=A||{}; const mine=A[ME.sid];
+    m.innerHTML=win?(me?`내가 가장 빨랐어요! <b>+1</b> · ${btSecTxt(A[win])}`
+                      :mine!=null?`정답! 하지만 <b>${esc(win)}</b>이(가) 더 빨랐어요 · ${btSecTxt(A[win])} &lt; 나 ${btSecTxt(mine)}`
+                      :`<b>${esc(win)}</b>이(가) 먼저 맞혔어요 (${btSecTxt(A[win])}) · 정답 <b>${MI(f.ans)}</b>`)
                    :`${why} · 정답 <b>${MI(f.ans)}</b>`; }
   if(me){ G.combo++; G.best=Math.max(G.best,G.combo); } else G.combo=0;
   paintBLive(); updHUD();
@@ -6355,10 +6375,11 @@ async function btAnswer(ok,f){
   if(!G||G.phase!=='q') return;
   const i=G.qi; G.ans++;
   if(ok){
-    G.right++; flashOk();
-    const r=await dbTx(`battles/${G.code}/w/${i}`, c=>c?undefined:ME.sid);
-    if(r&&r.ok) btAdvance(i);
-    else{ const m=el('qmsg'); if(m&&G.rev!==i){ m.className='qmsg'; m.textContent='맞혔지만 한 발 늦었어요…'; } }
+    /* 문제가 보인 순간부터 걸린 시간을 올려요 — 판정은 btJudge 가 (가장 짧은 사람) */
+    const cur=(BT.room||{}).cur||{}, rt=Math.max(0,Math.round(serverNow()-Math.max(cur.at||0,G.shownSrv||0)));
+    G.right++; G.phase='wait'; G.locked=true; paintTyped('ok');
+    const m=el('qmsg'); if(m){ m.className='qmsg'; m.innerHTML=`정답! <b>${btSecTxt(rt)}</b> — 누가 가장 빨랐는지 보는 중…`; }
+    dbSet(`battles/${G.code}/a/${i}/${ME.sid}`,rt);
   }else{
     /* 틀리면 아무 일 없이 입력칸만 비워요 — 다시 쓸 수 있어요 */
     G.typed=''; G.clean=true; G.locked=false; paintTyped('');
