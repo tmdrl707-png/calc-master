@@ -1234,6 +1234,22 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 @media(max-width:640px){.btgrid{grid-template-columns:minmax(0,1fr)}}
 .btsch .chips{margin:0}
 .btwrap .btbar .btt small{white-space:normal}
+
+/* 마이페이지 — 친구 대전 기록 */
+.mpbt{grid-template-columns:repeat(4,minmax(0,1fr));margin:0 0 10px}
+@media(max-width:520px){.mpbt{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bthist{display:flex;flex-direction:column;gap:6px}
+.bth{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line,#e5e5ea);border-radius:14px;background:#fff}
+.bth.win{border-color:#ffd66b;background:#fffaeb}
+.bthr{flex:none;width:48px;text-align:center;font-weight:800;font-size:15px}.bthr small{display:block;font-size:10.5px;font-weight:600;color:var(--dim)}
+.bth.win .bthr{color:#b7791f}
+.bthm{flex:1;min-width:0}.bthm b{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bthm small{display:block;font-size:11.5px;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bthn{flex:none;font-size:20px;font-weight:800;text-align:right}.bthn small{font-size:11px;font-weight:600;color:var(--dim);margin-left:1px}
+.bthn em{display:block;font-style:normal;font-size:11px;font-weight:700;color:#b7791f}
+
+.rk .sc.wl{font-size:20px;white-space:nowrap}.rk .sc.wl small{margin:0 3px 0 1px}
+.chip.btsch2{border-style:dashed}
 </style>
 </head>
 <body>
@@ -1430,6 +1446,10 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
           <button class="btn" onclick="openRank()">랭킹 보기</button>
         </div>
       </div>
+    </div>
+    <div class="mpbox">
+      <h3>친구 대전 기록</h3>
+      <div id="mpBattle"></div>
     </div>
     <div class="tabs" id="mpTopics" style="margin-top:18px"></div>
     <div class="mpgrid" id="mpStats"></div>
@@ -6422,7 +6442,7 @@ function btPaintResult(){
   const curI=((room.cur||{}).i)||0;
   const final=my.quit||serverNow()>my.endAt+2500||(my.kind==='n'&&curI>=my.v);
   const R=rankList(P,p=>p.rk), mr=R.find(x=>x.r.sid===ME.sid).rank, T=topicOf(my.t);
-  if(final&&!BT.paid[my.rd]){ BT.paid[my.rd]=1; BT.gain[my.rd]=btReward(mr,P.length,my.n); }
+  if(final&&!BT.paid[my.rd]){ BT.paid[my.rd]=1; BT.gain[my.rd]=btReward(mr,P.length,my.n,my); }
   const gain=BT.gain[my.rd];
   const host=live&&BT.room.host===ME.sid;
   const sub=p=>my.kind==='s'?(p.out?`${p.out}번째 문제에서 탈락 · 맞힌 문제 ${p.n}개`:`끝까지 살아남음 · 맞힌 문제 ${p.n}개`):`맞힌 문제 ${p.n}개`;
@@ -6451,8 +6471,9 @@ function btPaintResult(){
   if(el('btMenu')) el('btMenu').onclick=()=>{ BT.view='menu'; BT.closed=false; btPaint(); };
   if(el('btAgain')) el('btAgain').onclick=()=>{ el('btAgain').disabled=true; dbUpdate('battles/'+room.code,{st:'wait'}); };
 }
-function btReward(rank,n,score){
+function btReward(rank,n,score,my){
   if(n<2) return {coin:0,msg:'혼자 남은 판이라 코인은 없어요.'};
+  const H=ME.bh||(ME.bh=[]);
   ME.bp=(ME.bp||0)+1; if(rank===1) ME.bw=(ME.bw||0)+1;
   const d=todayKey(); if(!ME.bt||ME.bt.d!==d) ME.bt={d,n:0};
   let coin=0, msg='';
@@ -6460,6 +6481,8 @@ function btReward(rank,n,score){
   else if(ME.bt.n>=BT_DAY_MAX) msg=`오늘 대전 코인은 다 받았어요 (하루 ${BT_DAY_MAX}판). 내일 또 겨뤄요!`;
   else{ coin=rank<=3?BT_COIN[rank-1]:BT_COIN_ELSE; ME.bt.n++; ME.coin+=coin;
     msg=`${n}명 중 <b>${rank}위</b> — <b>+${coin}코인</b> (오늘 ${ME.bt.n} / ${BT_DAY_MAX}판)`; }
+  /* 마이페이지 대전 기록 — 최근 30판 */
+  if(my){ H.push({d:Date.now(), t:my.t, len:my.len||'', n:score, r:rank, np:n, c:coin}); if(H.length>30) H.splice(0,H.length-30); }
   saveMe(); paintMe(); if(coin) toast(`+${coin}코인!`);
   return {coin,msg};
 }
@@ -6526,7 +6549,7 @@ function meFrom(sid,u){
   return {sid, ch:Object.assign(cleanCh(u.ch),{cl:shortCls(sid)}), coin:u.coin||0, own:arr(u.own).filter(id=>ITEM(id)),
           ownS:ownS.length?ownS:null, ownC:ownC.length?ownC:null,
           sc:u.sc||'', boxN:u.boxN||0, R:u.R||{}, P:u.P||{}, pc:u.pc||null, W:u.W||{}, fs:u.fs||{},
-          hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, h:u.h||''};
+          hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, bh:arr(u.bh), h:u.h||''};
 }
 function rec(t){ const R=ME.R||(ME.R={}); const r=R[t]||(R[t]={best:0,hist:[]});
   if(!Array.isArray(r.hist)) r.hist=[]; return r; }
@@ -6550,7 +6573,7 @@ async function saveMe(){
   await dbUpdate('users/'+ME.sid,{ch:ME.ch,coin:ME.coin,own:ME.own||[],
     ownS:ownShapes(),ownC:ownColors(),sc:ME.sc||'',R:ME.R||{},P:ME.P||{},
     pc:ME.pc||null,W:ME.W||{},fs:ME.fs||{},boxN:ME.boxN||0,
-    hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,
+    hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,bh:(ME.bh||[]).slice(-30),
     h:ME.h||((LS.get(MEKEY,{})||{}).h)||''});
 }
 /* ═══ 서버 연결이 끊겼다가 다시 이어지면 — 이 휴대폰에만 있던 기록을 서버로 올립니다 ═══
@@ -7356,8 +7379,8 @@ function openMine(){
     <span class="mpchip coinchip"><span class="coin"><i></i>${ME.coin}</span></span>
     <span class="mpchip">${classLabel(classOf(ME.sid))}</span>
     <span class="mpchip">가진 것 ${ownItems().length+ownShapes().length+ownColors().length}개</span>
-    <span class="mpchip">친구 대전 ${ME.bw||0}승 / ${ME.bp||0}판</span>`;
-  paintMine();
+    <span class="mpchip">친구 대전 ${ME.bw||0}승 ${Math.max(0,(ME.bp||0)-(ME.bw||0))}패</span>`;
+  paintMine(); paintMineBattle();
   show('s-mine');
 }
 function paintMine(){
@@ -7390,6 +7413,23 @@ function paintMine(){
       <span class="bar3"><i style="width:${done?100:0}%"></i></span>
       <span class="cnt3 ${done?'ok':''}">${done?(bt?bt.toFixed(1)+'초':'클리어'):'도전 전'}</span></button>`;
   }).join('');
+}
+/* 친구 대전 기록 — 최근 30판까지 이 학생 기록(users/학번/bh)에 남아요 */
+function paintMineBattle(){
+  const H=(ME.bh||[]).slice().reverse(), bp=ME.bp||0, bw=ME.bw||0;
+  const best=H.reduce((a,x)=>Math.max(a,x.n||0),0);
+  const tm=d=>{ const x=new Date(d); return `${x.getMonth()+1}/${x.getDate()} ${String(x.getHours()).padStart(2,'0')}:${String(x.getMinutes()).padStart(2,'0')}`; };
+  el('mpBattle').innerHTML=`<div class="mpgrid mpbt">
+      <div class="mpcell hi"><b>${bp}</b><span>대전 판 수</span></div>
+      <div class="mpcell"><b>${bw}승 ${Math.max(0,bp-bw)}패</b><span>우승 · 우승 못 한 판</span></div>
+      <div class="mpcell"><b>${bp?Math.round(bw/bp*100)+'%':'—'}</b><span>우승률</span></div>
+      <div class="mpcell"><b>${best}</b><span>한 판에 가장 많이 맞힘</span></div></div>
+    ${H.length?`<div class="bthist">${H.slice(0,12).map(x=>`<div class="bth${x.r===1?' win':''}">
+        <span class="bthr">${x.r===1?'우승':x.r+'위'}<small>${x.np}명 중</small></span>
+        <span class="bthm"><b>${esc((TOPICS[x.t]||{}).n||x.t)}</b><small>${esc(x.len||'')} · ${tm(x.d)}</small></span>
+        <span class="bthn">${x.n}<small>개</small>${x.c?`<em>+${x.c}</em>`:''}</span></div>`).join('')}</div>
+      ${H.length>12?`<div class="chartlab">최근 12판만 보여 줘요 (모두 ${H.length}판 저장)</div>`:''}`
+    :`<div class="empty" style="padding:16px 0">${bp?'이제부터 대전 기록이 여기에 쌓여요.':'아직 친구 대전 기록이 없어요. 학교 고르기 화면의 <b>친구와 대전</b>에서 시작해 보세요.'}</div>`}`;
 }
 function paintMineChart(){
   const h=rec(MP.topic).hist;
@@ -7434,8 +7474,11 @@ function paintRank(){
   if(!rkTopicsOf(RK.school).length){ const k=SCHOOLS.map(x=>x.k).find(k=>rkTopicsOf(k).length); if(k) RK.school=k; }
   el('rkSchools').innerHTML=SCHOOLS.map(x=>{ const n=rkTopicsOf(x.k).length;
     return n?`<button class="chip sch${x.k===RK.school?' on':''}" data-k="${x.k}">${x.n}</button>`
-            :`<button class="chip sch chlock" disabled>${LOCKI}${x.n}</button>`; }).join('');
-  el('rkSchools').querySelectorAll('.chip[data-k]').forEach(b=>b.onclick=()=>{ RK.school=b.dataset.k; RK.topic=null; RK.scope='school'; paintRank(); });
+            :`<button class="chip sch chlock" disabled>${LOCKI}${x.n}</button>`; }).join('')+
+    `<button class="chip sch btsch2${RK.battle?' on':''}" data-b="1">친구 대전</button>`;
+  el('rkSchools').querySelectorAll('.chip[data-k]').forEach(b=>b.onclick=()=>{ RK.battle=false; RK.school=b.dataset.k; RK.topic=null; RK.scope='school'; paintRank(); });
+  el('rkSchools').querySelector('.chip[data-b]').onclick=()=>{ RK.battle=true; paintRank(); };
+  if(RK.battle){ el('rkSchools').querySelectorAll('.chip[data-k]').forEach(b=>b.classList.remove('on')); return paintRkBattle(); }
   const tops=rkTopicsOf(RK.school);
   if(!tops.length){ el('rkSub').innerHTML='아직 열린 실전 모드가 없어요.'; el('rkTopics').innerHTML=''; el('rkTabs').innerHTML='';
     el('rkBody').innerHTML='<div class="empty">선생님이 실전 모드를 열면 랭킹이 보여요.</div>'; return; }
@@ -7452,6 +7495,26 @@ function paintRank(){
   if(RK.tab==='class')    paintRkClass();
   else if(RK.tab==='all') paintRkAll(rows);
   else                    paintRkToday(rows);
+}
+/* 친구 대전 랭킹 — 몇 승 몇 패 (패 = 우승하지 못한 판) */
+function paintRkBattle(){
+  el('rkTopics').innerHTML=''; el('rkTabs').innerHTML='';
+  el('rkSub').innerHTML=`${online()?'반 전체가 함께 보는 기록':'이 기기에 저장된 기록'} · <b>친구 대전</b>에서 우승한 횟수로 매깁니다`;
+  const u=RK.users||{};
+  const rows=Object.keys(u).map(sid=>{ const x=u[sid]||{}, p=x.bp||0, w=Math.min(p,x.bw||0);
+      return {sid, ch:cleanCh(x.ch), w, l:p-w, p, rate:p?w/p:0}; }).filter(r=>r.p>0)
+    .sort((a,b)=>b.w-a.w||b.rate-a.rate||a.l-b.l||a.sid.localeCompare(b.sid));
+  const list=rows.slice(0,50), mi=ME?rows.findIndex(r=>r.sid===ME.sid):-1;
+  el('rkBody').innerHTML=`<div class="chartlab" style="margin:0 0 10px">우승한 횟수가 많은 순 · 같으면 우승률이 높은 순 · 2명 이상이 끝까지 한 판만 세요</div>`+
+    (list.length?rankList(list,r=>r.w+'/'+r.rate).map(({r,rank})=>{ const me=ME&&r.sid===ME.sid;
+      return `<div class="rk${rank<=3?' top':''}${me?' me':''}">
+        <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
+        <div class="av2">${avatarSVG(r.ch,{tight:true})}</div>
+        <div class="who"><b>${esc(r.sid)}${me?' <em class="mytag">나</em>':''}</b><span>대전 ${r.p}판 · 우승률 ${Math.round(r.rate*100)}%</span></div>
+        <div class="sc wl">${r.w}<small>승</small> ${r.l}<small>패</small></div></div>`; }).join('')
+      :`<div class="empty">아직 친구 대전 기록이 없어요.</div>`)+
+    (ME?`<div class="myplace">${mi<0?'아직 친구 대전 기록이 없어요. 학교 고르기 화면의 친구와 대전에서 시작해 보세요!'
+      :`${esc(ME.sid)} 님은 <b>${rows[mi].w}승 ${rows[mi].l}패</b> · ${rows.length}명 중 ${rankList(rows,r=>r.w+'/'+r.rate)[mi].rank}위예요.`}</div>`:'');
 }
 function pickRankTab(k){ if(k==='all'&&!RK.open) return askRankPw(); RK.tab=k; paintRank(); }
 function askRankPw(){
