@@ -1278,6 +1278,28 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .ctopt.lost{opacity:.45;filter:grayscale(.6)}
 .state.vote{color:var(--dim)}.state.vote.mine{color:var(--cc,#4f6bff);font-weight:800}
 .tagw.ttop{background:linear-gradient(135deg,#ffd84d,#ff9f1c);color:#2a1d00}
+
+/* 학교 홈 — 학년 묶음 머리글 · 잠긴 주제 접기 */
+.grh{grid-column:1/-1;font-size:13px;font-weight:800;color:var(--dim);margin:6px 2px -2px;letter-spacing:-.2px}
+.shutbox .shuth{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer;padding:0}
+.shutbox .shuth .shutarr{margin-left:auto;font-style:normal;font-size:12.5px;font-weight:700;color:var(--blue);white-space:nowrap}
+.shutbox:not(.open) .shuth span{display:none}
+@media(min-width:521px){.shutbox:not(.open) .shuth span{display:inline}}
+.shutchip small{display:block;font-size:10px;color:var(--dim);font-weight:600;line-height:1.1}
+
+/* 문장으로 된 문제(경우의 수 · 비례식) · 대분수 · 비 기호 */
+.eq .cond.cw{font-size:21px;font-weight:600;color:var(--ink);line-height:1.5;letter-spacing:-.3px;margin:0 auto 8px;text-align:left;max-width:600px;word-break:keep-all}
+.eq.small .cond.cw{font-size:15px;margin-bottom:4px}
+@media(max-width:520px){.eq .cond.cw{font-size:17px;line-height:1.45}}
+.eq .mxn{display:inline-flex;align-items:center;gap:.05em}
+.eq .opr.colon{margin:0 -.04em}
+
+/* 선생님 — 학생 코인 · 코인 랭킹 */
+.tstats.tcoin{grid-template-columns:repeat(5,minmax(0,1fr))}
+.tstats.tcoin b{font-size:18px}
+@media(max-width:520px){.tstats.tcoin{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.chip.coinsch.on{background:#e8a800;border-color:#e8a800;color:#fff}
+.item.on{border-color:var(--blue)}
 </style>
 </head>
 <body>
@@ -1474,6 +1496,11 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
           <button class="btn" onclick="openRank()">랭킹 보기</button>
         </div>
       </div>
+    </div>
+    <div class="mpbox">
+      <h3>내가 가진 꾸미기 <span class="mpown-n" id="mpOwnN"></span></h3>
+      <div class="chartlab" style="margin:-2px 0 8px">누르면 입고, 한 번 더 누르면 벗어요 · 랜덤 상자에서 얻은 것도 여기 있어요</div>
+      <div class="items" id="mpOwn"></div>
     </div>
     <div class="mpbox">
       <h3>친구 대전 기록</h3>
@@ -2822,22 +2849,38 @@ function stageRun(t,n){
   return out;
 }
 
-/* ═══ 실전 출제 — 맞힌 개수가 늘수록 어려워집니다 ═══
-   REAL_STEP 문항마다 한 스테이지씩 올라가고, 지금 단계 문제가 가장 자주 나옵니다.
-   마지막 단계까지 오른 뒤에도 더 맞히면 앞 단계는 점점 빠지고 마지막 단계만 남아요. */
+/* ═══ 실전 출제 — 뒤로 갈수록 조금씩 어려워집니다 ═══
+   L(난이도, 1 부터 시작하는 실수)이 맞힐 때마다 올라가는데, 빨리 맞힐수록 많이 올라갑니다(realGain).
+   잘하는 학생은 금방 어려운 단계에 닿고, 천천히 푸는 학생은 쉬운 단계에 오래 머물러요.
+   지금 단계 문제가 가장 자주, 다음 단계 문제가 L 이 오를수록 조금씩 섞여 나옵니다.
+   L 을 주지 않으면(친구 대전 등) 맞힌 개수로 어림합니다.                                    */
 const REAL_STEP=4;
 const realStagesOf=t=>{ const T=topicOf(t); return T.realStages||T.stages; };
-function realLevel(t,n){ return Math.min(realStagesOf(t).length, 1+Math.floor((n-1)/REAL_STEP)); }
-function realPick(t,n,recent){
-  const S=realStagesOf(t), lv=realLevel(t,n);
-  const over=Math.max(0,Math.floor((n-1)/REAL_STEP)+1-S.length);   /* 마지막 단계에 오른 뒤 더 맞힌 정도 */
-  const w=S.slice(0,lv).map((s,i)=>i===lv-1?4+2*over:i===lv-2?(over>1?1:2):(over>0?0:1));
+const realLOf=n=>1+(n-1)/REAL_STEP;
+function realLevel(t,n,L){ return Math.min(realStagesOf(t).length, Math.floor(L!=null?L:realLOf(n))); }
+/* 한 문항을 맞힌 뒤 L 이 오르는 만큼 — 1분 실전 'S' 등급 속도를 기준으로 */
+function realGain(t,sec){
+  const c=(typeof GRADE_CUT!=='undefined'&&GRADE_CUT[t])||null, T0=c?60/c[2]:6;
+  return sec<=T0*.55?.55 : sec<=T0?.36 : sec<=T0*1.7?.22 : .12;
+}
+function realWeights(S,L){
+  const top=S.length, lv=Math.min(top,Math.max(1,Math.floor(L))), fr=L-Math.floor(L);
+  return S.map((_,i)=>{ const k=i+1;
+    if(k===lv) return 1;
+    if(k===lv+1) return .8*fr;
+    if(k===lv-1) return L>=top+1?0:.2;
+    return 0; });
+}
+function realPick(t,n,recent,L){
+  const S=realStagesOf(t), w=realWeights(S,L!=null?L:realLOf(n));
   let f=null;
   for(let g=0;g<30;g++){
     let r=Math.random()*w.reduce((a,b)=>a+b,0), i=0;
     while(i<w.length-1&&(r-=w[i])>0) i++;
+    while(!w[i]&&i>0) i--;
     const st=S[i];
     f= st.facts ? pickOne(st.facts()) : st.gen();
+    f._rl=i+1;
     if(!recent||!recent.includes(f.key)) break;
   }
   return f;
@@ -2881,17 +2924,20 @@ function eqHTML(f,typed,state){
     if(t&&t.u) return `<span class="opr unit">${t.u}</span>`;
     if(t&&t.fr){ const part=x=>x==='?'?box:x==='√?'?`<span class="rt">√${box}</span>`:fill(x);
       return `<span class="frac"><span class="fn">${part(t.fr[0])}</span><span class="fd">${part(t.fr[1])}</span></span>`; }
+    /* 대분수 — {mx:[자연수, 분자, 분모]} 어느 칸이든 '?' 가 될 수 있어요 */
+    if(t&&t.mx){ const part=x=>x==='?'?box:fill(x);
+      return `<span class="mxn">${part(t.mx[0])}<span class="frac"><span class="fn">${part(t.mx[1])}</span><span class="fd">${part(t.mx[2])}</span></span></span>`; }
     if(t&&t.s!==undefined) return `<span class="pw"><span class="num">${t.b}</span><sub>${t.s==='?'?box.replace('abox','abox esup'):t.s}</sub></span>`;
     if(typeof t==='object'){
       const base=t.b==='?'?box:typeof t.b==='object'?`<span class="opr par">(</span>${tok(t.b)}<span class="opr par">)</span>`:`<span class="num">${t.b}</span>`;
       return `<span class="pw">${base}<sup>${t.e==='?'?box.replace('abox','abox esup'):t.e}</sup></span>`;
     }
     if(t==='('||t===')') return `<span class="opr par">${t}</span>`;
-    if(t==='='||t==='+'||t==='−'||t==='×'||t==='÷') return `<span class="opr">${t}</span>`;
+    if(t==='='||t==='+'||t==='−'||t==='×'||t==='÷'||t===':') return `<span class="opr${t===':'?' colon':''}">${t}</span>`;
     if(t==='…') return `<span class="opr rem">…</span>`;
     return fill(t);
   };
-  return (f.cond?`<span class="cond${f.cb?' cb':''}">${f.cond}</span>`:'')+f.eq.map(tok).join('');
+  return (f.cond?`<span class="cond${f.cb==='w'?' cw':f.cb?' cb':''}">${f.cond}</span>`:'')+f.eq.map(tok).join('');
 }
 /* 글로 쓴 식 (해설·목록용) — 입력칸 자리에 답을 채웁니다 */
 function eqText(f,fill){
@@ -2906,6 +2952,7 @@ function eqText(f,fill){
     if(t&&t.g) return t.g.map(tok).join(' ');
     if(t&&t.u) return t.u;
     if(t&&t.fr){ return mix(t.fr[0])+'/'+mix(t.fr[1]); }
+    if(t&&t.mx){ return mix(t.mx[0])+`<span class="ifr"><i>${mix(t.mx[1])}</i><i>${mix(t.mx[2])}</i></span>`; }
     if(t&&t.s!==undefined) return t.b+(t.s==='?'?(fill?`<sub><b>${A}</b></sub>`:'□'):t.s);
     if(t&&typeof t==='object') return (t.b==='?'?B:typeof t.b==='object'?'('+tok(t.b)+')':t.b)+
       (t.e==='?'?(fill?`<sup><b>${A}</b></sup>`:'<sup>□</sup>'):sup(t.e));
@@ -3197,6 +3244,8 @@ function previewOf(t,n){
     if(n===3){ const h=hintOf(sub1(13,5)); return {tip:'10보다 큰 수에서 뺄 때는 10을 거쳐 가요.', lines:h.lines, svg:h.svg}; }
     if(n===4){ const h=hintOf(asN('P',47,'+',8)); return {tip:'다음 몇십까지 먼저 가면 계산이 깔끔해져요.', lines:h.lines, svg:h.svg}; }
     if(n===5){ const h=hintOf(asN('Q',83,'-',29)); return {tip:'29는 30에 가까워요. 30을 빼고 1을 돌려줘요.', lines:h.lines, svg:h.svg}; }
+    if(n===7){ const h=hintOf(r3F(358,'+',267)); return {tip:'일의 자리부터 차례로 더해요. 받아올린 1 을 윗자리 위에 작게 적어 두면 잊지 않아요.', lines:h.lines, svg:''}; }
+    if(n===8){ const h=hintOf(r3F(503,'-',278)); return {tip:'일의 자리부터 빼요. 0 에서는 바로 빌릴 수 없으니 윗자리에서 빌려 와요.', lines:h.lines, svg:''}; }
     const h=hintOf(blankF(1,26,61)); return {tip:'덧셈과 뺄셈은 서로 거꾸로 하는 계산이에요.', lines:h.lines, svg:h.svg};
   }
   if(t==='gugu'){
@@ -3232,7 +3281,7 @@ function noteOf(t){
   const fromHint=(t2,ex,f,tip)=>{ const h=hintOf(f);
     return {t:t2, ex, svg:h.svg, lines:h.lines.concat(tip?[`<span class="tip">${tip}</span>`]:[])}; };
   if(t==='addsub') return {
-    sub:'10 만들기 · 받아올림 · 받아내림 · 빈칸 채우기',
+    sub:'10 만들기 · 받아올림 · 받아내림 · 빈칸 채우기 · 세 자리 수',
     memo:[
       {h:'10이 되는 짝 — 모든 받아올림의 출발점', html:chipList(range(1,9).map(a=>`${a} + <b>${10-a}</b>`))},
       {h:'덧셈과 뺄셈은 한 가족', html:`${tapeSVG(13,8,5,'')}
@@ -3245,7 +3294,9 @@ function noteOf(t){
       fromHint('다음 몇십까지 먼저','47 + 8',asN('P',47,'+',8)),
       fromHint('십씩 먼저, 그다음 일','47 + 36',asN('Q',47,'+',36)),
       fromHint('넉넉히 빼고 돌려주기','83 − 29',asN('Q',83,'-',29),'빼는 수의 일의 자리가 7, 8, 9이면 이 방법이 빨라요'),
-      fromHint('거꾸로 계산하기','□ + 26 = 61',blankF(1,26,61))
+      fromHint('거꾸로 계산하기','□ + 26 = 61',blankF(1,26,61)),
+      fromHint('세 자리 덧셈 — 일의 자리부터','358 + 267',r3F(358,'+',267)),
+      fromHint('0 이 있는 수에서 빼기','503 − 278',r3F(503,'-',278))
     ],
     miss:[
       {w:'53 − 27 = 34', r:'53 − 27 = 26', y:'일의 자리 3 − 7 이 안 된다고 7 − 3 을 하면 안 돼요. 십의 자리에서 10을 빌려 와 13 − 7 = 6, 십의 자리는 4 − 2 = 2.'},
@@ -3621,7 +3672,7 @@ function qFigOf(f){
 function eqSize(f){
   const L=x=>x==='?'?3:x==='√?'?4:String(x).replace(/\?/g,'___').replace(/[가-힣]/g,'mm').length;   /* 한글은 숫자보다 넓게 */
   const w=t=>t==='?'?3:t==='√?'?4:t&&t.u?1:t&&t.g?t.g.map(w).reduce((s,v)=>s+v,0)+t.g.length*.15:
-    t&&t.fr?Math.max(L(t.fr[0]),L(t.fr[1]))*.65+1:t&&t.s!==undefined?L(t.b)+2:
+    t&&t.fr?Math.max(L(t.fr[0]),L(t.fr[1]))*.65+1:t&&t.mx?L(t.mx[0])+Math.max(L(t.mx[1]),L(t.mx[2]))*.65+1:t&&t.s!==undefined?L(t.b)+2:
     typeof t==='object'?(t.b==='?'?3:typeof t.b==='object'?w(t.b)+1.2:String(t.b).length)+String(t.e).length*.5+.5:L(t);
   const len=f.eq.map(w).reduce((s,v)=>s+v,0)+f.eq.length*.5;      /* 사이 간격도 셉니다 */
   return len>=16?' eqxs':len>=11?' eqs':'';
@@ -5241,7 +5292,7 @@ function frF(k,a,b,c,d,pos){
   const OP={a:'+',s:'−',m:'×',d:'÷'};
   const right= q===1 ? '?' : pos==='n' ? {fr:['?',String(q)]} : {fr:[String(p),'?']};
   const eq= k==='e' ? [frT(a,b),'=',right] : [frT(a,b),OP[k],frT(c,d),'=',right];
-  return F({key:'EF'+k+'_'+a+'_'+b+'_'+c+'_'+d+'_'+pos, sk, t:'frac', k:'fE', kind:k, a, b, c, d, p, q, pos, eq,
+  return F({key:'EF'+k+'_'+a+'_'+b+'_'+c+'_'+d+'_'+pos, sk, t:(k==='m'||k==='d')?'fmul':'fadd', k:'fE', kind:k, a, b, c, d, p, q, pos, eq,
             ans:q===1?p:pos==='n'?p:q});
 }
 const FR_D=[2,3,4,5,6,8,9,10,12];
@@ -5374,7 +5425,7 @@ Object.assign(TOPIC_SYMH,{
 function elemVariant(f){
   switch(f.k){
     case 'bK': return bK(f.kind==='p'?'m':'p',f.T,f.kind==='p'?f.a:f.a);
-    case 'qA': return f.form<=2?qA(3,f.y,f.x):f.form===3?qA(1,f.y,f.x):qA(2,f.x,f.y);
+    case 'qA': return f.form<=2?qA(3,f.y,f.x):f.form===3?qA(1,f.y,f.x):qA(3,f.x+f.y,f.x);
     case 'qM': return f.form<=2?qMd(4,f.v,f.u):f.form===3?qMd(3,f.v,f.u):qMd(1,f.v,f.u);   /* 답이 같은 다른 모양 */
     case 'qT': { const a=f.a; return f.form===1?qT(1,a,f.b+1,f.x):qT(f.form,a,f.b,f.x); }
     case 'fE': return f.q>1?frF(f.kind,f.a,f.b,f.c,f.d,f.pos==='n'?'d':'n'):f;
@@ -5731,11 +5782,941 @@ function lineqNote(t,fromHint){
   extPreview=(t,n)=>LQT.includes(t)?lineqPreview(t,n):p0(t,n);
   extNote=(t,fh)=>LQT.includes(t)?lineqNote(t,fh):n0(t,fh); }
 
+/* ═══════════════════ 교육과정에 맞춘 주제 정리 · 새 주제 (2026.10.31) ═══════════════════
+   초등   저학년(1~3학년) : 더하기·빼기(세 자리까지) · 구구단 · □ 구하기
+          고학년(4~6학년) : 분수의 덧셈과 뺄셈 · 분수의 곱셈과 나눗셈 · 비와 비례식
+   중학교 1학년 : 정수의 사칙연산 · 제곱수 · 일차방정식
+          2학년 : 지수법칙 · 피타고라스 수 · 경우의 수
+          3학년 : 제곱근 · 인수분해 · 삼각비
+   고등학교     : 지수와 로그 · 삼각함수 · 순열과 조합
+   목록에서 빠진 주제(10·100 만들기 · 나눗셈 · 곱셈 암산 · 혼합 계산 · 약수와 배수 · 식의 값 · 분수의 계산)는
+   코드가 남아 있어 예전 오답노트·기록에 남은 문항도 그대로 열립니다.
+   열쇠 머리글자 : R 세 자리 덧셈·뺄셈 · NF 분수 · RT 비와 비례식 · KC 경우의 수 · FC 인수분해        */
+
+const CURR=['fadd','fmul','ratio','cnt','factor'];
+const cTip=s=>`<span class="tip">${s}</span>`;
+
+/* ════════ 세 자리 수 덧셈·뺄셈 ════════
+   sk : R+0 R+1 R+2 (받아올림 0·1·2번 이상) · R-0 R-1 R-2 (받아내림) · R-z (0 이 있는 수에서 받아내림) */
+function r3F(a,op,b){
+  const add=op==='+';
+  let c=0, k=0;
+  for(let x=a,y=b;x||y;x=Math.floor(x/10),y=Math.floor(y/10)){
+    k= add ? ((x%10+y%10+k)>=10?1:0) : ((x%10-k)<(y%10)?1:0);
+    c+=k;
+  }
+  const z=!add&&String(a).length===3&&String(a)[1]==='0'&&a%10<b%10;
+  return F({key:'R'+a+op+b, sk:'R'+op+(z?'z':Math.min(c,2)), t:'addsub', k:add?'add3':'sub3', a, b, op, nc:c,
+            eq:[a,add?'+':'−',b,'=','?'], ans:add?a+b:a-b});
+}
+function gen3a(){
+  const x=Math.random(), want=x<.15?0:x<.55?1:x<.88?2:3;
+  for(let g=0;g<300;g++){
+    const a=ri(102,898), b=ri(102,898);
+    if(a%10===0||b%10===0) continue;
+    const f=r3F(a,'+',b);
+    if(want<3 ? (f.nc===want&&f.ans<1000) : (f.ans>=1000&&f.nc>=2)) return f;
+  }
+  return r3F(358,'+',267);
+}
+function gen3s(){
+  const x=Math.random(), want=x<.15?'0':x<.5?'1':x<.82?'2':'z';
+  for(let g=0;g<300;g++){
+    let a,b;
+    if(want==='z'){ a=ri(2,9)*100+(Math.random()<.45?0:ri(1,8)); b=ri(102,a-12); }
+    else { a=ri(203,989); b=ri(102,a-12); }
+    if(b%10===0) continue;
+    const f=r3F(a,'-',b); if(f.sk==='R-'+want) return f;
+  }
+  return r3F(503,'-',278);
+}
+function r3Hint(f){
+  const add=f.k==='add3', A=String(f.a).split('').map(Number).reverse(), Bd=String(f.b).split('').map(Number).reverse();
+  const NM=['일','십','백','천'], L=[]; let k=0;
+  for(let i=0;i<A.length;i++){
+    const x=A[i], y=Bd[i]||0;
+    if(add){ const s=x+y+k; L.push(`${NM[i]}의 자리: ${x} + ${y}${k?' + 1':''} = ${s}${s>=10?` → ${s-10} 쓰고 1 올림`:''}`); k=s>=10?1:0; continue; }
+    if(i===A.length-1&&x-k===0&&y===0) break;          /* 맨 앞자리가 0 이 되면 적지 않아요 */
+    if(k&&x===0){ L.push(`${NM[i]}의 자리: 0 은 빌려 줄 수 없어 윗자리에서 10 을 빌려 오고, 1 을 내주면 9 → 9 − ${y} = ${9-y}`); k=1; continue; }
+    const cur=x-k, pre=k?`빌려 줘서 ${x} → ${cur}, `:'';
+    if(cur<y){ L.push(`${NM[i]}의 자리: ${pre}${cur} − ${y} 는 안 돼요 → 10 을 빌려 와 ${cur+10} − ${y} = ${cur+10-y}`); k=1; }
+    else { L.push(`${NM[i]}의 자리: ${pre}${cur} − ${y} = ${cur-y}`); k=0; }
+  }
+  if(add&&k) L.push(`${NM[A.length]}의 자리: 올린 1`);
+  L.push(`${f.a} ${add?'+':'−'} ${f.b} = <b>${f.ans}</b>`);
+  L.push(cTip(add?'받아올린 1 을 윗자리 위에 작게 적어 두면 잊지 않아요':'받아내림을 해 준 자리는 1 작아져요. 0 이면 9 가 돼요'));
+  const t= add ? (f.nc?'일의 자리부터, 받아올림 챙기기':'자리끼리 더하기') : (f.sk==='R-z'?'0 이 있는 수에서 받아내림':f.nc?'일의 자리부터, 받아내림 챙기기':'자리끼리 빼기');
+  return {t, lines:L, svg:''};
+}
+
+/* ════════ 분수 ════════
+   수 하나를 [자연수, 분자, 분모] 로 다룹니다 : 2와 1/3 = [2,1,3] · 3/4 = [0,3,4] · 5 = [5,0,1] · 7/3 = [0,7,3]
+   op : c 바꾸기 · a 덧셈 · s 뺄셈 · m 곱셈 · d 나눗셈 · o 자연수의 분수만큼(12의 2/3)
+   fm : F 가분수(약분 안 함) · M 대분수(약분 안 함) · f 기약분수 · m 기약 대분수 · i 자연수
+   pos : 물어볼 칸 n 분자 · d 분모 · w 자연수 부분 (답이 자연수면 i)
+   초4 의 분모가 같은 분수 계산은 약분을 배우기 전이라 분모를 그대로 둡니다(F·M).                  */
+const nfH=(n,d)=>d===1?String(n):`<span class="ifr"><i>${n}</i><i>${d}</i></span>`;
+const nfM=(w,n,d)=>!n?String(w):(w?`${w}${nfH(n,d)}`:nfH(n,d));
+const nfHt=A=>nfM(A[0],A[1],A[2]);
+const nfIm=A=>[A[0]*A[2]+A[1],A[2]];
+const nfIsInt=A=>!A[1];
+const nfTok=A=>{ const [w,n,d]=A; if(!n) return w; if(d===1) return w+n;
+  return w?{mx:[String(w),String(n),String(d)]}:{fr:[String(n),String(d)]}; };
+const nfCmp=(A,B)=>{ const [p,q]=nfIm(A), [r,s]=nfIm(B); return p*s-r*q; };
+const nfOpd=(P,Q)=>Q===1?[P,0,1]:[Math.floor(P/Q),P%Q,Q];
+const NF_OP={a:'+',s:'−',m:'×',d:'÷'};
+function nfRes(op,A,B){
+  const [p1,q1]=nfIm(A);
+  if(op==='c') return [p1,q1];
+  const [p2,q2]=nfIm(B);
+  if(op==='a'||op==='s'){ const L=lcm(q1,q2), x=p1*L/q1, y=p2*L/q2; return [op==='a'?x+y:x-y, L]; }
+  if(op==='m'||op==='o') return [p1*p2,q1*q2];
+  return [p1*q2,q1*p2];
+}
+function nfSk(op,A,B){
+  if(op==='c') return 'NFc';
+  if(op==='o') return 'NFo';
+  if(op==='a'||op==='s'){ const dA=nfIsInt(A)?0:A[2], dB=nfIsInt(B)?0:B[2];
+    if(dA&&dB&&dA!==dB) return 'NFa';
+    return (!A[0]&&!B[0]&&dA&&dB)?'NFs':'NFw'; }
+  if(op==='m') return nfIsInt(A)||nfIsInt(B)?'NFmn':'NFmf';
+  return nfIsInt(B)?'NFdn':nfIsInt(A)?'NFdi':'NFdf';
+}
+function nfF(op,A,B,fm,pos){
+  let [P,Q]=nfRes(op,A,B);
+  if(!(P>0)||!(Q>0)) return null;
+  const raw=fm==='F'||fm==='M';
+  if(!raw){ const g=gcd(P,Q); P/=g; Q/=g; }
+  let shape, right, ans;
+  if(P%Q===0){ shape='i'; pos='i'; right='?'; ans=P/Q; }
+  else if((fm==='m'||fm==='M')&&P>Q){ shape='m'; const W=Math.floor(P/Q), r=P%Q;
+    if(pos==='w'){ right={mx:['?',String(r),String(Q)]}; ans=W; }
+    else if(pos==='d'&&!raw){ right={mx:[String(W),String(r),'?']}; ans=Q; }
+    else { pos='n'; right={mx:[String(W),'?',String(Q)]}; ans=r; } }
+  else { shape='f';
+    if(pos==='d'&&!raw){ right={fr:[String(P),'?']}; ans=Q; }
+    else { pos='n'; right={fr:['?',String(Q)]}; ans=P; } }
+  const eq= op==='c' ? [nfTok(A),'=',right]
+          : op==='o' ? [A[0],{u:'의'},nfTok(B),'=',right]
+          : [nfTok(A),NF_OP[op],nfTok(B),'=',right];
+  return F({key:'NF'+op+'_'+A.join('.')+'_'+(B?B.join('.'):'x')+'_'+fm+pos, sk:nfSk(op,A,B),
+            t:(op==='m'||op==='d'||op==='o')?'fmul':'fadd', k:'nf', op, A, B, fm, pos, P, Q, shape, raw, eq, ans});
+}
+const nfCo=(n,d)=>gcd(n,d)===1;
+/* ── 분수의 덧셈과 뺄셈 ── */
+function genNA1(){            /* 분모가 같은 진분수 */
+  for(let g=0;g<80;g++){
+    const d=ri(3,12), x=Math.random();
+    if(x<.45){ const a=ri(1,d-2), c=ri(1,d-1-a); if(c<1) continue; return nfF('a',[0,a,d],[0,c,d],'F','n'); }
+    if(x<.65){ const a=ri(2,d-1), c=ri(d-a+1,d-1); if(c<1||a+c<=d) continue; return nfF('a',[0,a,d],[0,c,d],'M','n'); }
+    const a=ri(2,d-1), c=ri(1,a-1); return nfF('s',[0,a,d],[0,c,d],'F','n');
+  }
+  return nfF('a',[0,2,7],[0,3,7],'F','n');
+}
+function genNA2(){            /* 가분수 ↔ 대분수 */
+  const d=ri(2,9), W=ri(1,d<=4?5:3), r=ri(1,d-1), x=Math.random();
+  if(x<.45) return nfF('c',[0,W*d+r,d],null,'M',Math.random()<.5?'w':'n');
+  if(x<.9)  return nfF('c',[W,r,d],null,'F','n');
+  return nfF('c',[0,W*d,d],null,'M','n');
+}
+function genNA3(){            /* 분모가 같은 대분수·자연수 */
+  for(let g=0;g<80;g++){
+    const d=ri(3,9), x=Math.random();
+    if(x<.3) return nfF('a',[ri(1,4),ri(1,d-1),d],[ri(1,3),ri(1,d-1),d],'M',Math.random()<.35?'w':'n');
+    if(x<.6){ const w1=ri(2,6), w2=ri(1,w1-1), n1=ri(1,d-1), n2=ri(1,d-1); if(n1===n2) continue;
+      return nfF('s',[w1,n1,d],[w2,n2,d],'M',Math.random()<.35?'w':'n'); }
+    if(x<.8){ const N=ri(1,5), n=ri(1,d-1); return nfF('s',[N,0,1],[0,n,d],'M',N>1&&Math.random()<.3?'w':'n'); }
+    const N=ri(3,7), w=ri(1,N-1), n=ri(1,d-1); return nfF('s',[N,0,1],[w,n,d],'M',Math.random()<.3?'w':'n');
+  }
+  return nfF('s',[3,1,4],[1,3,4],'M','n');
+}
+const NF_D=[2,3,4,5,6,8,9,10,12];
+function genNA5(){            /* 분모가 다른 분수 (기약분수로) */
+  for(let g=0;g<80;g++){
+    const b=pickOne(NF_D), d=pickOne(NF_D); if(b===d||lcm(b,d)>30) continue;
+    const a=ri(1,b-1), c=ri(1,d-1); if(!nfCo(a,b)||!nfCo(c,d)) continue;
+    const k=Math.random()<.55?'a':'s';
+    let A=[0,a,b], B=[0,c,d];
+    if(Math.random()<.3){ A=[ri(1,3),a,b]; B=[ri(1,2),c,d]; }
+    if(k==='s'&&nfCmp(A,B)<=0) [A,B]=[B,A];
+    const f=nfF(k,A,B,'m',pickOne(['n','n','d'])); if(f&&f.Q<=36) return f;
+  }
+  return nfF('a',[0,1,2],[0,1,3],'m','n');
+}
+/* ── 분수의 곱셈과 나눗셈 ── */
+function genNM1(){            /* (분수) × (자연수) · 자연수의 분수만큼 */
+  for(let g=0;g<60;g++){
+    if(Math.random()<.3){ const d=ri(2,6), n=ri(1,d-1); if(!nfCo(n,d)) continue; return nfF('o',[d*ri(2,7),0,1],[0,n,d],'i','i'); }
+    const b=ri(2,9), a=ri(1,b-1), N=ri(2,9); if(!nfCo(a,b)||a*N>60) continue;
+    return nfF('m',[0,a,b],[N,0,1],'m',pickOne(['n','n','w','d']));
+  }
+  return nfF('m',[0,1,2],[4,0,1],'m','n');
+}
+function genNM2(){            /* (자연수) × (분수) · (대분수) × (자연수) */
+  for(let g=0;g<60;g++){
+    if(Math.random()<.65){ const d=ri(2,9), n=ri(1,d-1), N=ri(2,12); if(!nfCo(n,d)||N*n>60) continue;
+      return nfF('m',[N,0,1],[0,n,d],'m',pickOne(['n','n','w','d'])); }
+    const d=ri(2,5), w=ri(1,3), n=ri(1,d-1), N=ri(2,6); if(!nfCo(n,d)||(w*d+n)*N>60) continue;
+    return nfF('m',[w,n,d],[N,0,1],'m',pickOne(['n','w']));
+  }
+  return nfF('m',[6,0,1],[0,2,3],'m','n');
+}
+function genNM3(){            /* (분수) × (분수) */
+  for(let g=0;g<60;g++){
+    const x=Math.random();
+    if(x<.3) return nfF('m',[0,1,ri(2,9)],[0,1,ri(2,9)],'m','d');
+    const b=ri(2,9), a=ri(1,b-1), d=ri(2,9), c=ri(1,d-1);
+    if(!nfCo(a,b)||!nfCo(c,d)) continue;
+    if(x<.85){ const f=nfF('m',[0,a,b],[0,c,d],'m',pickOne(['n','d'])); if(f&&f.Q<=40) return f; continue; }
+    const f=nfF('m',[ri(1,2),a,b],[0,c,d],'m',pickOne(['n','w'])); if(f&&f.P<=60&&f.Q<=20) return f;
+  }
+  return nfF('m',[0,2,3],[0,3,4],'m','d');
+}
+function genNM4(){            /* (분수) ÷ (자연수) */
+  for(let g=0;g<60;g++){
+    const x=Math.random();
+    if(x<.4){ const N=ri(2,4), b=ri(N+2,11), a=N*ri(1,Math.floor((b-1)/N)); if(!nfCo(a,b)) continue;
+      return nfF('d',[0,a,b],[N,0,1],'m','n'); }
+    if(x<.8){ const b=ri(2,9), a=ri(1,b-1), N=ri(2,6); if(!nfCo(a,b)) continue;
+      const f=nfF('d',[0,a,b],[N,0,1],'m',pickOne(['n','d'])); if(f&&f.Q<=45) return f; continue; }
+    const d=ri(2,5), w=ri(1,3), n=ri(1,d-1), N=ri(2,5); if(!nfCo(n,d)) continue;
+    const f=nfF('d',[w,n,d],[N,0,1],'m',pickOne(['n','d'])); if(f&&f.Q<=30) return f;
+  }
+  return nfF('d',[0,4,5],[2,0,1],'m','n');
+}
+function genNM5(){            /* (분수) ÷ (분수) · (자연수) ÷ (분수) */
+  for(let g=0;g<60;g++){
+    const x=Math.random();
+    if(x<.35){ const d=ri(3,12), c=ri(1,d-2), a=ri(c+1,d-1); return nfF('d',[0,a,d],[0,c,d],'m',pickOne(['n','w'])); }
+    if(x<.65){ const d=ri(2,9), n=ri(1,d-1); if(!nfCo(n,d)) continue;
+      const N=Math.random()<.6?n*ri(1,4):ri(2,8); return nfF('d',[N,0,1],[0,n,d],'m',pickOne(['n','w'])); }
+    const b=ri(2,9), a=ri(1,b-1), d=ri(2,9), c=ri(1,d-1); if(!nfCo(a,b)||!nfCo(c,d)||b===d) continue;
+    const f=nfF('d',[0,a,b],[0,c,d],'m',pickOne(['n','d'])); if(f&&f.P<=40&&f.Q<=30) return f;
+  }
+  return nfF('d',[0,3,4],[0,3,8],'m','n');
+}
+/* 답 글자 — 묻는 칸을 굵게 */
+function nfAnsH(f){
+  const B=v=>`<b>${v}</b>`, {P,Q,shape,pos}=f;
+  if(shape==='i') return B(P/Q);
+  if(shape==='m'){ const W=Math.floor(P/Q), r=P%Q; return `${pos==='w'?B(W):W}${nfH(pos==='n'?B(r):r,pos==='d'?B(Q):Q)}`; }
+  return nfH(pos==='n'?B(P):P,pos==='d'?B(Q):Q);
+}
+function nfHint(f){
+  const RB=nfAnsH(f), {op,A,B,P,Q,raw}=f, H=nfHt, O=NF_OP[op];
+  /* 계산해서 나온 p/q 에서 답 모양(기약분수·대분수·자연수)까지 */
+  const end=(pre,p,q)=>{
+    if((f.shape==='f'&&p===P&&q===Q)||(f.shape==='i'&&q===1)) return [`${pre} = ${RB}`];
+    const L=[`${pre} = ${nfH(p,q)}`], g=raw?1:gcd(p,q), pp=p/g, qq=q/g;
+    if(f.shape==='i') L.push(`${nfH(p,q)} = ${RB}`);
+    else if(f.shape==='f') L.push(`약분하면 ${RB}`);
+    else L.push(`${g>1?`약분하면 ${nfH(pp,qq)}, `:''}가분수를 대분수로: ${pp} ÷ ${qq} = ${Math.floor(pp/qq)} … ${pp%qq} → ${RB}`);
+    return L;
+  };
+  if(op==='c'){
+    if(A[0]){ const q=A[2]; return {t:'대분수를 가분수로', lines:[`자연수 ${A[0]} = ${nfH(A[0]*q,q)}`, `${nfH(A[0]*q,q)} + ${nfH(A[1],q)} = ${RB}`,
+      cTip(`분자는 ${A[0]} × ${q} + ${A[1]} = ${P}`)]}; }
+    const n=A[1], d=A[2];
+    if(f.shape==='i') return {t:'분자 ÷ 분모', lines:[`${n} ÷ ${d} = ${n/d}`, `${nfH(n,d)} = ${RB}`]};
+    return {t:'가분수를 대분수로', lines:[`${n} ÷ ${d} = ${Math.floor(n/d)} … ${n%d}`, '몫은 자연수 부분, 나머지는 분자', `${nfH(n,d)} = ${RB}`]};
+  }
+  if(op==='a'||op==='s'){
+    const dA=nfIsInt(A)?1:A[2], dB=nfIsInt(B)?1:B[2], verb=op==='a'?'더해요':'빼요';
+    if(dA===dB&&!A[0]&&!B[0]){
+      const s=op==='a'?A[1]+B[1]:A[1]-B[1];
+      return {t:'분모가 같으면 분자끼리', lines:[`분모는 그대로, 분자끼리 ${verb}: ${A[1]} ${O} ${B[1]} = ${s}`]
+        .concat(end(`${H(A)} ${O} ${H(B)}`,s,dA),[cTip('분모끼리 더하거나 빼지 않아요')])};
+    }
+    if(dA===dB||dA===1||dB===1){
+      const d=Math.max(dA,dB);
+      if(op==='a'){ const w=A[0]+B[0], s=A[1]+B[1];
+        const L=[`자연수끼리: ${A[0]} + ${B[0]} = ${w}`, `분수끼리: ${nfH(A[1],d)} + ${nfH(B[1],d)} = ${nfH(s,d)}`];
+        if(s>=d) L.push(`${nfH(s,d)} = ${nfM(1,s-d,d)} 이니 자연수에 1 을 더해요`);
+        L.push(`${H(A)} + ${H(B)} = ${RB}`);
+        return {t:'자연수끼리, 분수끼리', lines:L.concat([cTip('분수 부분이 분모와 같거나 커지면 1 로 올려요')])};
+      }
+      let w1=A[0], n1=A[1]; const w2=B[0], n2=B[1], L=[], bor=n1<n2;
+      if(bor){ L.push(nfIsInt(A)?`${A[0]} = ${nfM(w1-1,d,d)} 로 바꿔요`:`${nfH(n1,d)} 에서 ${nfH(n2,d)} 를 뺄 수 없어요 → ${H(A)} = ${nfM(w1-1,n1+d,d)}`); w1--; n1+=d; }
+      if(w1||w2) L.push(`자연수끼리: ${w1} − ${w2} = ${w1-w2}`);
+      L.push(`분수끼리: ${nfH(n1,d)} − ${nfH(n2,d)} = ${nfH(n1-n2,d)}`, `${H(A)} − ${H(B)} = ${RB}`);
+      return {t:bor?'자연수에서 1 을 받아내려요':'자연수끼리, 분수끼리', lines:L.concat(bor?[cTip(`1 = ${nfH(d,d)} 이에요`)]:[])};
+    }
+    const L0=lcm(dA,dB), [pA,qA]=nfIm(A), [pB,qB]=nfIm(B), xA=pA*L0/qA, xB=pB*L0/qB, s=op==='a'?xA+xB:xA-xB;
+    const L=[`분모 ${jW(dA)} ${dB}의 최소공배수 ${jR(L0)} 통분해요`];
+    const cv=[A,B].filter(X=>X[0]&&X[1]).map(X=>`${H(X)} = ${nfH(...nfIm(X))}`);
+    if(cv.length) L.push(`대분수는 가분수로: ${cv.join(', ')}`);
+    return {t:'통분한 뒤 분자끼리', lines:L.concat(end(`${nfH(xA,L0)} ${O} ${nfH(xB,L0)}`,s,L0),[cTip('분모끼리 더하거나 빼면 안 돼요')])};
+  }
+  if(op==='o'){ const N=A[0], n=B[1], d=B[2], u=N/d;
+    return {t:'몇 묶음 가운데 몇 묶음', lines:[`${N}의 ${nfH(n,d)} → ${jE(N)} 똑같이 ${d}묶음으로 나눈 것 가운데 ${n}묶음`,
+      `한 묶음: ${N} ÷ ${d} = ${n===1?RB:u}`].concat(n>1?[`${n}묶음: ${u} × ${n} = ${RB}`]:[]).concat([cTip(`${N} × ${nfH(n,d)} 를 계산한 것과 같아요`)])};
+  }
+  const [a,b]=nfIm(A), [c,d]=nfIm(B), pre=[A,B].filter(X=>X[0]&&X[1]).map(X=>`대분수는 가분수로: ${H(X)} = ${nfH(...nfIm(X))}`);
+  const ex=`${nfH(a,b)} ${O} ${nfH(c,d)}`;
+  if(op==='m'){
+    if(b===1||d===1){ const [fn,fd,N]=b===1?[c,d,a]:[a,b,c], g=gcd(N,fd);
+      return {t:'분자에 자연수를 곱해요', lines:pre.concat([`분모는 그대로, 분자 × 자연수: ${fn} × ${N} = ${fn*N}`]).concat(end(ex,fn*N,fd))
+        .concat([cTip(g>1?`먼저 약분하면 편해요: ${jW(N)} 분모 ${jE(fd)} ${jR(g)} 나눠요`:'자연수는 분모가 1 인 분수예요')])};
+    }
+    return {t:'분자끼리, 분모끼리', lines:pre.concat([`분자: ${a} × ${c} = ${a*c}, 분모: ${b} × ${d} = ${b*d}`]).concat(end(ex,a*c,b*d))
+      .concat([cTip('곱하기 전에 약분하면 수가 작아져요')])};
+  }
+  if(d===1){ const N=c;
+    if(a%N===0) return {t:'분자를 나눠요', lines:pre.concat([`분자 ${a} 를 ${jR(N)} 나눠요: ${a} ÷ ${N} = ${a/N}`]).concat(end(ex,a/N,b))};
+    return {t:`÷ ${N} 은 × ${nfH(1,N)}`, lines:pre.concat([`${nfH(a,b)} ÷ ${N} = ${nfH(a,b)} × ${nfH(1,N)}`]).concat(end(`${nfH(a,b)} × ${nfH(1,N)}`,a,b*N))};
+  }
+  if(b===1) return {t:'뒤집어서 곱해요', lines:[`나누는 분수의 분자와 분모를 바꿔 곱해요`].concat(end(`${a} × ${nfH(d,c)}`,a*d,c),
+      [cTip(`${a} 안에 ${nfH(c,d)} 가 몇 번 들어가는지와 같아요`)])};
+  if(b===d) return {t:'분모가 같으면 분자끼리 나눠요', lines:[`${ex} = ${a} ÷ ${c}`].concat(end(`${a} ÷ ${c}`,a,c))};
+  return {t:'뒤집어서 곱해요', lines:pre.concat([`나누는 분수의 분자와 분모를 바꿔 곱해요`]).concat(end(`${nfH(a,b)} × ${nfH(d,c)}`,a*d,b*c))};
+}
+function nfVariant(f){
+  const R=nfOpd(f.P,f.Q), {op,A,B}=f, fm=f.raw?'M':'m'; let v=null;
+  if(op==='c') v= A[0] ? nfF('c',[0,f.P,f.Q],null,'M','n') : (f.shape==='i'?null:nfF('c',R,null,'F','n'));
+  else if(op==='a') v=nfF('s',R,B,fm,'n');
+  else if(op==='s') v=nfF('a',R,B,fm,'n');
+  else if(op==='o') v=nfF('m',[A[0],0,1],B,'m','n');
+  else if(op==='m') v=nfIsInt(A)?nfF('d',R,A,'m','n'):nfF('d',R,B,'m','n');
+  else if(op==='d') v=nfF('m',R,B,'m','n');
+  return v||f;
+}
+
+/* ════════ 비와 비례식 ════════ */
+const RT_W=[   /* 비례식 문장 — 앞의 양 x 가 주어지고 뒤의 양을 묻기 · 단위 · 앞의 양 배율 */
+  [(a,b,x)=>`물과 오렌지 주스를 ${a} : ${jR(b)} 섞어 음료를 만들어요. 물을 ${x}컵 넣으면 오렌지 주스는`,'컵',1],
+  [(a,b,x)=>`가로와 세로의 길이의 비가 ${a} : ${b} 인 직사각형이 있어요. 가로가 ${x} cm 이면 세로는`,'cm',1],
+  [(a,b,x)=>`어느 동아리의 남학생 수와 여학생 수의 비는 ${a} : ${b}${BAT(b)?'이에요':'예요'}. 남학생이 ${x}명이면 여학생은`,'명',1],
+  [(a,b,x)=>`빵 반죽에 밀가루와 설탕을 ${a} : ${jR(b)} 넣어요. 밀가루를 ${x} g 넣으면 설탕은`,'g',50]
+];
+const RT_B=[   /* 비례배분 문장 */
+  [(N,a,b,s)=>`사탕 ${N}개를 형과 동생이 ${a} : ${jR(b)} 나누어 가지면 ${s?'형':'동생'}은`,'개'],
+  [(N,a,b,s)=>`색종이 ${N}장을 지민이와 서준이가 ${a} : ${jR(b)} 나누어 가지면 ${s?'지민이':'서준이'}는`,'장'],
+  [(N,a,b,s)=>`길이가 ${N} cm 인 끈을 ${a} : ${jR(b)} 자르면 ${s?'앞':'뒤'}쪽 끈의 길이는`,'cm'],
+  [(N,a,b,s)=>`구슬 ${N}개를 언니와 내가 ${a} : ${jR(b)} 나누어 가지면 ${s?'언니':'나'}는`,'개']
+];
+const rtF=(key,sk,o)=>F(Object.assign({key, sk, t:'ratio', k:'rt'},o));
+function rtP(a,b,v){
+  const cond= v===0?`${a} : ${b} 의 비율을 백분율로 나타내면` : v===1?`${b}에 대한 ${a}의 비율을 백분율로 나타내면`
+            : `기준량이 ${b}, 비교하는 양이 ${a}일 때 비율을 백분율로 나타내면`;
+  return rtF('RTp'+a+'_'+b+'_'+v,'RTp',{f:'p', a, b, v, cond, cb:'w', eq:['?',{u:'%'}], ans:a*100/b});
+}
+const rtN=(N,p)=>rtF('RTn'+N+'_'+p,'RTn',{f:'n', N, p, cond:`${N}의 ${p}% 는`, cb:'w', eq:['?'], ans:N*p/100});
+function rtD(n,d,v){
+  const x=v?nfH(n,d):String(+(n/d).toFixed(3));
+  return rtF('RTd'+n+'_'+d+'_'+v,'RTd',{f:'d', n, d, v, cond:`비율이 ${x} 일 때 백분율은`, cb:'w', eq:['?',{u:'%'}], ans:n*100/d});
+}
+const RT_SLOT=[0,2,4,6];
+function rtK(a,b,k,dir,pos){            /* 비의 성질 — dir x : a:b = ak:bk · d : ak:bk = a:b */
+  const s= dir==='x'?[a,b,a*k,b*k]:[a*k,b*k,a,b], eq=[s[0],':',s[1],'=',s[2],':',s[3]]; eq[RT_SLOT[pos]]='?';
+  return rtF('RTk'+a+'_'+b+'_'+k+'_'+dir+pos,'RTk',{f:'k', a, b, kk:k, dir, pos, s, eq, ans:s[pos]});
+}
+function rtS(v,n1,d1,n2,d2,pos){        /* 간단한 자연수의 비 — v 0 소수 · 1 분수 */
+  const L=lcm(d1,d2), x0=n1*L/d1, y0=n2*L/d2, g=gcd(x0,y0), x=x0/g, y=y0/g;
+  const T=(n,d)=>v?{fr:[String(n),String(d)]}:String(+(n/d).toFixed(2));
+  const eq=[T(n1,d1),':',T(n2,d2),'=',pos?x:'?',':',pos?'?':y];
+  return rtF('RTs'+v+'_'+n1+'_'+d1+'_'+n2+'_'+d2+'_'+pos,'RTs',{f:'s', v, n1, d1, n2, d2, pos, L, x0, y0, g, x, y, eq, ans:pos?y:x});
+}
+function rtR(s0,s1,s2,s3,pos){
+  const s=[s0,s1,s2,s3], eq=[s0,':',s1,'=',s2,':',s3]; eq[RT_SLOT[pos]]='?';
+  return rtF('RTr'+s.join('_')+'_'+pos,'RTr',{f:'r', s, pos, eq, ans:s[pos]});
+}
+function rtW(c,a,b,x){
+  const C=RT_W[c];
+  return rtF('RTw'+c+'_'+a+'_'+b+'_'+x,'RTw',{f:'w', c, a, b, x, cond:C[0](a,b,x), cb:'w', eq:['?',{u:C[1]}], ans:x*b/a});
+}
+function rtB(c,N,a,b,s){
+  const C=RT_B[c];
+  return rtF('RTb'+c+'_'+N+'_'+a+'_'+b+'_'+s,'RTb',{f:'b', c, N, a, b, s, cond:C[0](N,a,b,s), cb:'w', eq:['?',{u:C[1]}], ans:N*(s?a:b)/(a+b)});
+}
+function genRT1(){
+  for(let g=0;g<40;g++){
+    const x=Math.random();
+    if(x<.45){ const b=pickOne([2,4,5,10,20,25,50]), a=ri(1,b-1); return rtP(a,b,ri(0,2)); }
+    if(x<.75){ const p=pickOne([5,10,15,20,25,30,40,50,60,75]), N=pickOne([20,40,60,80,100,120,200,300,400,500]); if((N*p)%100) continue; return rtN(N,p); }
+    if(Math.random()<.5) return rtD(ri(1,99),100,0);
+    const d=pickOne([2,4,5,10,20,25]), n=ri(1,d-1); if(!nfCo(n,d)) continue; return rtD(n,d,1);
+  }
+  return rtP(3,4,0);
+}
+function genRT2(){
+  for(let g=0;g<40;g++){
+    const x=Math.random();
+    if(x<.6){ const a=ri(1,9), b=ri(1,9); if(a===b||gcd(a,b)!==1) continue; const k=ri(2,9);
+      return rtK(a,b,k,Math.random()<.55?'x':'d',ri(2,3)); }
+    if(x<.8){ const n1=ri(1,19), n2=ri(1,19); if(n1===n2||n1%10===0||n2%10===0) continue; return rtS(0,n1,10,n2,10,ri(0,1)); }
+    const d1=ri(2,6), d2=ri(2,6), n1=ri(1,d1-1), n2=ri(1,d2-1); if(d1===d2||!nfCo(n1,d1)||!nfCo(n2,d2)) continue;
+    return rtS(1,n1,d1,n2,d2,ri(0,1));
+  }
+  return rtK(3,4,3,'x',3);
+}
+function genRT3(){
+  for(let g=0;g<40;g++){
+    if(Math.random()<.6){ const a=ri(1,5), b=ri(1,6); if(a===b||gcd(a,b)!==1) continue;
+      const m=ri(2,4), t=ri(2,9); if(t%m===0||t===m) continue;
+      const s=[a*m,b*m,a*t,b*t]; if(Math.max(...s)>60) continue; return rtR(...s,ri(0,3)); }
+    const c=ri(0,RT_W.length-1), a=ri(1,5), b=ri(1,6); if(a===b||gcd(a,b)!==1) continue;
+    return rtW(c,a,b,a*ri(2,8)*RT_W[c][2]);
+  }
+  return rtR(4,6,10,15,3);
+}
+function genRT4(){
+  for(let g=0;g<40;g++){
+    const a=ri(1,5), b=ri(1,5); if(a===b||gcd(a,b)!==1) continue;
+    const N=(a+b)*ri(2,10); if(N>100) continue; return rtB(ri(0,RT_B.length-1),N,a,b,ri(0,1));
+  }
+  return rtB(0,20,3,2,1);
+}
+function rtHint(o){
+  const B=v=>`<b>${v}</b>`;
+  switch(o.f){
+    case 'p': return {t:'비율 = 비교하는 양 ÷ 기준량', lines:[`기준량 ${o.b}, 비교하는 양 ${o.a}`, `${o.a} ÷ ${o.b} = ${nfH(o.a,o.b)}`,
+        `백분율은 × 100 → ${B(o.ans)}%`, cTip(o.v===1?'"~에 대한" 쪽이 기준량이에요':o.v===0?'a : b 에서 뒤에 있는 b 가 기준량이에요':'백분율 = 비율 × 100')]};
+    case 'n': return {t:'백분율만큼 구하기', lines:[`${o.p}% = ${nfH(o.p,100)}`, `${o.N} × ${nfH(o.p,100)} = ${o.N} × ${o.p} ÷ 100 = ${B(o.ans)}`,
+        cTip('10% 는 ÷ 10, 50% 는 절반, 25% 는 ÷ 4')]};
+    case 'd': return o.v ? {t:'분모를 100 으로', lines:[`${nfH(o.n,o.d)} = ${nfH(o.n*100/o.d,100)}`, `→ ${B(o.ans)}%`]}
+                         : {t:'× 100', lines:[`${+(o.n/o.d).toFixed(3)} × 100 = ${B(o.ans)}`, `→ ${B(o.ans)}%`]};
+    case 'k':{ const [s0,s1,s2,s3]=o.s, op=o.dir==='x'?`× ${o.kk}`:`÷ ${o.kk}`;
+      return {t:'비의 성질', lines:['비의 앞항과 뒤항에 같은 수를 곱하거나 같은 수로 나누어도 비율은 같아요',
+        `${s0} : ${s1} → 앞항·뒤항 모두 ${op} → ${s2} : ${s3}`, `□ = ${B(o.ans)}`]}; }
+    case 's':{ const L=[];
+      if(o.v) L.push(`분모 ${jW(o.d1)} ${o.d2}의 최소공배수 ${jE(o.L)} 곱해요 → ${o.x0} : ${o.y0}`);
+      else L.push(`× 10 하면 → ${o.x0} : ${o.y0}`);
+      if(o.g>1) L.push(`${o.g} 로 나누면 → ${o.x} : ${o.y}`);
+      L.push(`□ = ${B(o.ans)}`);
+      return {t:'간단한 자연수의 비로', lines:L.concat([cTip('비의 성질: 앞항과 뒤항에 같은 수를 곱하거나 나눠요')])}; }
+    case 'r':{ const s=o.s, p=o.pos, outer=p===0||p===3;
+      const known=outer?s[1]*s[2]:s[0]*s[3], mate=s[3-p];
+      const Ls=[0,1,2,3].map(i=>i===p?'□':s[i]);
+      return {t:'외항의 곱 = 내항의 곱', lines:[`${Ls[0]} × ${Ls[3]} = ${Ls[1]} × ${Ls[2]}`, `${mate} × □ = ${known}`, `□ = ${known} ÷ ${mate} = ${B(o.ans)}`]}; }
+    case 'w':{ const k=o.x/o.a;
+      return {t:'비례식 세우기', lines:[`${o.a} : ${o.b} = ${o.x} : □`, `${o.a} × □ = ${o.b} × ${o.x} = ${o.b*o.x}`, `□ = ${o.b*o.x} ÷ ${o.a} = ${B(o.ans)}`,
+        cTip(Number.isInteger(k)?`${o.x} 는 ${o.a} 의 ${k}배 → ${o.b} × ${k} = ${o.ans}`:'외항의 곱 = 내항의 곱')]}; }
+    case 'b':{ const u=o.N/(o.a+o.b), m=o.s?o.a:o.b;
+      return {t:'비례배분', lines:[`전체를 ${o.a} + ${o.b} = ${o.a+o.b} 묶음으로 똑같이 나눠요`, `한 묶음: ${o.N} ÷ ${o.a+o.b} = ${u}`,
+        `${m}묶음: ${u} × ${m} = ${B(o.ans)}`, cTip(`${o.N} × ${nfH(m,o.a+o.b)} 와 같아요`)]}; }
+  }
+  return null;
+}
+function rtVariant(o){
+  switch(o.f){
+    case 'p': return rtP(o.a,o.b,(o.v+1)%3);
+    case 'n': return rtP(o.ans,o.N,1);
+    case 'd': { const g=gcd(o.n,o.d); return o.v?rtD(o.n,o.d,0):rtD(o.n/g,o.d/g,1); }
+    case 'k': return rtK(o.a,o.b,o.kk,o.dir,o.pos===2?3:2);
+    case 's': return rtS(o.v,o.n1,o.d1,o.n2,o.d2,1-o.pos);
+    case 'r': return rtR(...o.s,(o.pos+1)%4);
+    case 'w': return rtR(o.a,o.b,o.x,o.ans,3);
+    case 'b': return rtB(o.c,o.N,o.a,o.b,1-o.s);
+  }
+  return o;
+}
+
+/* ════════ 경우의 수 (중2) ════════
+   문장 틀(KC)에 수를 넣어 만듭니다. 열쇠 : KC + 틀 이름 + _수_수…
+   KC1 한 사건 · KC2 합의 법칙 · KC3 곱의 법칙 · KC4 합과 곱 함께 · KC5 줄 세우기·뽑기·수 만들기          */
+const KC_DIE=[['짝수',[2,4,6]],['홀수',[1,3,5]],['소수',[2,3,5]],['3의 배수',[3,6]],['4 이상인 수',[4,5,6]],
+              ['6의 약수',[1,2,3,6]],['5 이하인 수',[1,2,3,4,5]],['2 이하인 수',[1,2]]];
+const kcPairs=fn=>{ const o=[]; for(let i=1;i<=6;i++) for(let j=1;j<=6;j++) if(fn(i,j)) o.push(`(${i}, ${j})`); return o; };
+const kcSum=s=>kcPairs((i,j)=>i+j===s);
+const kcFact=n=>n<=1?1:n*kcFact(n-1);
+const kcDown=(n,r)=>range(n-r+1,n).reverse();
+const kcPay=(P,x,y)=>range(0,x).map(a=>[a,(P-100*a)/50]).filter(([a,b])=>b>=0&&b<=y&&Number.isInteger(b));
+const KC_JA=['ㄱ','ㄴ','ㄷ','ㄹ','ㅁ'], KC_MO=['ㅏ','ㅗ','ㅜ','ㅣ'];
+const KC_OR=[
+  (a,b)=>`학교에서 도서관까지 가는 버스 노선이 ${a}가지, 지하철 노선이 ${b}가지 있어요. 버스 또는 지하철을 한 번 타고 가는 방법의 수는`,
+  (a,b)=>`서점에서 소설책 ${a}종류와 만화책 ${b}종류 가운데 한 권을 사는 경우의 수는`,
+  (a,b)=>`분식집에서 김밥 ${a}종류와 라면 ${b}종류 가운데 한 가지만 주문하는 경우의 수는`,
+  (a,b)=>`방과 후 수업으로 운동 프로그램 ${a}개와 미술 프로그램 ${b}개 가운데 하나를 고르는 경우의 수는`
+];
+const KC_AND=[
+  (a,b)=>`티셔츠 ${a}벌과 바지 ${b}벌이 있어요. 티셔츠와 바지를 한 벌씩 골라 입는 경우의 수는`,
+  (a,b)=>`김밥 ${a}종류와 음료 ${b}종류 가운데 하나씩 골라 세트를 만드는 경우의 수는`,
+  (a,b)=>`집에서 학교까지 가는 길이 ${a}가지, 학교에서 도서관까지 가는 길이 ${b}가지 있어요. 집에서 학교를 거쳐 도서관까지 가는 방법의 수는`,
+  (a,b)=>`자음 (${KC_JA.slice(0,a).join(', ')}) 가운데 하나와 모음 (${KC_MO.slice(0,b).join(', ')}) 가운데 하나를 짝지어 만들 수 있는 글자의 수는`
+];
+const KC_D2=[  /* 주사위 두 개 — [조건, 답, 풀이 줄] */
+  ['두 눈의 수의 합이 짝수인', 18, ['합이 짝수 → (홀수, 홀수) 또는 (짝수, 짝수)','(홀, 홀): 3 × 3 = 9 · (짝, 짝): 3 × 3 = 9','9 + 9 = <b>18</b>']],
+  ['두 눈의 수의 합이 홀수인', 18, ['합이 홀수 → (홀수, 짝수) 또는 (짝수, 홀수)','(홀, 짝): 3 × 3 = 9 · (짝, 홀): 3 × 3 = 9','9 + 9 = <b>18</b>']],
+  ['두 눈의 수의 곱이 홀수인', 9, ['곱이 홀수 → 두 눈이 모두 홀수','3 × 3 = <b>9</b>']],
+  ['두 눈의 수가 모두 소수인', 9, ['소수: 2, 3, 5 → 3가지씩','3 × 3 = <b>9</b>']],
+  ['두 눈의 수의 합이 4 이하인', 6, ['합이 2: 1가지 · 합이 3: 2가지 · 합이 4: 3가지','1 + 2 + 3 = <b>6</b>']],
+  ['두 눈의 수의 합이 10 이상인', 6, ['합이 10: 3가지 · 합이 11: 2가지 · 합이 12: 1가지','3 + 2 + 1 = <b>6</b>']],
+  ['두 눈의 수의 합이 5의 배수인', 7, ['합이 5: 4가지 · 합이 10: 3가지','4 + 3 = <b>7</b>']],
+  ['두 눈의 수의 합이 3의 배수인', 12, ['합이 3: 2 · 합이 6: 5 · 합이 9: 4 · 합이 12: 1','2 + 5 + 4 + 1 = <b>12</b>']]
+];
+const B_=v=>`<b>${v}</b>`;
+const KC={
+  /* ── 1 한 사건 ── */
+  d1:{sk:'KC1', gen:()=>[ri(0,KC_DIE.length-1)], make:([e])=>{ const [n,L]=KC_DIE[e];
+      return {q:`주사위 한 개를 던질 때 ${n}의 눈이 나오는 경우의 수는`, ans:L.length, t:'하나씩 세기', lines:[`${n}: ${L.join(', ')}`, `모두 ${B_(L.length)}가지`]}; }},
+  k1:{sk:'KC1', gen:()=>[pickOne([10,12,15,20,24,30]),ri(2,6)], make:([N,m])=>{ const L=range(1,Math.floor(N/m)).map(i=>i*m);
+      return {q:`1부터 ${N}까지의 수가 하나씩 적힌 카드 ${N}장 가운데 한 장을 뽑을 때, ${m}의 배수가 나오는 경우의 수는`, ans:L.length, t:'배수 세기',
+        lines:[`${m}의 배수: ${L.join(', ')}`, `모두 ${B_(L.length)}가지`, cTip(`${N} ÷ ${m} 의 몫과 같아요`)]}; }},
+  k2:{sk:'KC1', gen:()=>[pickOne([10,15,20,30])], make:([N])=>{ const P=range(2,N).filter(n=>range(2,n-1).every(d=>n%d));
+      return {q:`1부터 ${N}까지의 수가 하나씩 적힌 카드 ${N}장 가운데 한 장을 뽑을 때, 소수가 나오는 경우의 수는`, ans:P.length, t:'소수 세기',
+        lines:[`소수: ${P.join(', ')}`, `모두 ${B_(P.length)}가지`, cTip('1 은 소수가 아니에요')]}; }},
+  c1:{sk:'KC1', gen:()=>{ const n=ri(2,3); return [n,n===2?1:ri(1,2)]; }, make:([n,k])=>{
+      const L=[]; for(let m=0;m<(1<<n);m++){ const s=range(0,n-1).map(i=>(m>>(n-1-i))&1?'앞':'뒤'); if(s.filter(x=>x==='앞').length===k) L.push(`(${s.join(', ')})`); }
+      return {q:`동전 ${n}개를 동시에 던질 때 앞면이 ${k}개 나오는 경우의 수는`, ans:L.length, t:'모두 적어 보기', lines:[L.join(', '), `모두 ${B_(L.length)}가지`]}; }},
+  ds:{sk:'KC1', gen:()=>[ri(3,11)], make:([s])=>{ const L=kcSum(s);
+      return {q:`서로 다른 주사위 두 개를 동시에 던질 때, 나오는 두 눈의 수의 합이 ${s}인 경우의 수는`, ans:L.length, t:'순서쌍으로 세기',
+        lines:[L.join(', '), `모두 ${B_(L.length)}가지`, cTip('(1, 2) 와 (2, 1) 은 서로 다른 경우예요')]}; }},
+  dd:{sk:'KC1', gen:()=>[ri(1,5)], make:([d])=>{ const L=kcPairs((i,j)=>Math.abs(i-j)===d);
+      return {q:`서로 다른 주사위 두 개를 동시에 던질 때, 나오는 두 눈의 수의 차가 ${d}인 경우의 수는`, ans:L.length, t:'순서쌍으로 세기',
+        lines:[L.join(', '), `모두 ${B_(L.length)}가지`]}; }},
+  pay:{sk:'KC1', gen:()=>{ for(let g=0;g<60;g++){ const P=pickOne([200,300,400,500]), x=ri(2,5), y=ri(2,8), n=kcPay(P,x,y).length; if(n>=2&&n<=5) return [P,x,y]; } return [300,3,4]; },
+      make:([P,x,y])=>{ const L=kcPay(P,x,y);
+      return {q:`100원짜리 동전 ${x}개와 50원짜리 동전 ${y}개가 있어요. 거스름돈 없이 ${P}원을 내는 방법의 수는`, ans:L.length, t:'100원짜리 개수부터 정해 보기',
+        lines:L.map(([a,b])=>`100원 ${a}개 + 50원 ${b}개`).concat([`모두 ${B_(L.length)}가지`])}; }},
+  /* ── 2 합의 법칙 ── */
+  or1:{sk:'KC2', gen:()=>[ri(0,KC_OR.length-1),ri(2,7),ri(2,6)], make:([c,a,b])=>({q:KC_OR[c](a,b), ans:a+b, t:'합의 법칙 — 더해요',
+      lines:['두 가지 가운데 하나만 일어나요 (동시에 일어나지 않아요)', `${a} + ${b} = ${B_(a+b)}`]})},
+  or2:{sk:'KC2', gen:()=>{ for(let g=0;g<40;g++){ const s1=ri(2,12), s2=ri(2,12); if(s1<s2) return [s1,s2]; } return [4,9]; },
+      make:([s1,s2])=>{ const L1=kcSum(s1), L2=kcSum(s2);
+      return {q:`서로 다른 주사위 두 개를 동시에 던질 때, 나오는 두 눈의 수의 합이 ${s1} 또는 ${s2}인 경우의 수는`, ans:L1.length+L2.length, t:'합의 법칙',
+        lines:[`합이 ${s1}: ${L1.join(', ')} → ${L1.length}가지`, `합이 ${s2}: ${L2.join(', ')} → ${L2.length}가지`,
+          `동시에 일어나지 않으니 ${L1.length} + ${L2.length} = ${B_(L1.length+L2.length)}`]}; }},
+  or3:{sk:'KC2', gen:()=>{ for(let g=0;g<60;g++){ const N=pickOne([10,12,15,20]), m1=ri(2,6), m2=ri(3,9); if(m1<m2&&lcm(m1,m2)>N) return [N,m1,m2]; } return [10,3,5]; },
+      make:([N,m1,m2])=>{ const a=Math.floor(N/m1), b=Math.floor(N/m2);
+      return {q:`1부터 ${N}까지의 수가 하나씩 적힌 카드 ${N}장 가운데 한 장을 뽑을 때, ${m1}의 배수 또는 ${m2}의 배수가 나오는 경우의 수는`, ans:a+b, t:'합의 법칙',
+        lines:[`${m1}의 배수: ${range(1,a).map(i=>i*m1).join(', ')} → ${a}가지`, `${m2}의 배수: ${range(1,b).map(i=>i*m2).join(', ')} → ${b}가지`,
+          `겹치는 수가 없으니 ${a} + ${b} = ${B_(a+b)}`]}; }},
+  or4:{sk:'KC2', gen:()=>[ri(0,1)], make:([v])=>v
+      ? {q:'동전 3개를 동시에 던질 때 앞면이 1개 이하로 나오는 경우의 수는', ans:4, t:'합의 법칙', lines:['앞면 0개: (뒤, 뒤, 뒤) → 1가지','앞면 1개: (앞, 뒤, 뒤), (뒤, 앞, 뒤), (뒤, 뒤, 앞) → 3가지',`1 + 3 = ${B_(4)}`]}
+      : {q:'동전 3개를 동시에 던질 때 앞면이 2개 이상 나오는 경우의 수는', ans:4, t:'합의 법칙', lines:['앞면 2개: (앞, 앞, 뒤), (앞, 뒤, 앞), (뒤, 앞, 앞) → 3가지','앞면 3개: (앞, 앞, 앞) → 1가지',`3 + 1 = ${B_(4)}`]}},
+  /* ── 3 곱의 법칙 ── */
+  and1:{sk:'KC3', gen:()=>{ const c=ri(0,KC_AND.length-1); return [c,ri(2,c===3?5:6),ri(2,c===3?4:6)]; }, make:([c,a,b])=>({q:KC_AND[c](a,b), ans:a*b, t:'곱의 법칙 — 곱해요',
+      lines:['두 가지를 함께(잇달아) 해요', `${a}가지 각각에 ${b}가지씩 → ${a} × ${b} = ${B_(a*b)}`]})},
+  cd:{sk:'KC3', gen:()=>pickOne([[1,1],[2,1],[0,2],[3,0],[1,2],[4,0],[2,2],[3,1]]), make:([m,n])=>{ const ans=2**m*6**n, parts=[...Array(m).fill(2),...Array(n).fill(6)];
+      return {q:`${m?`동전 ${m}개`:''}${m&&n?'와 ':''}${n?`주사위 ${n}개`:''}를 동시에 던질 때 일어나는 모든 경우의 수는`, ans, t:'곱의 법칙',
+        lines:['동전 하나는 2가지, 주사위 하나는 6가지', `${parts.join(' × ')} = ${B_(ans)}`]}; }},
+  and2:{sk:'KC3', gen:()=>[ri(0,KC_DIE.length-1),ri(0,KC_DIE.length-1)], make:([e1,e2])=>{ const [n1,L1]=KC_DIE[e1], [n2,L2]=KC_DIE[e2];
+      return {q:`주사위 A, B 를 동시에 던질 때, A 는 ${n1}, B 는 ${n2}의 눈이 나오는 경우의 수는`, ans:L1.length*L2.length, t:'곱의 법칙',
+        lines:[`A: ${L1.join(', ')} → ${L1.length}가지`, `B: ${L2.join(', ')} → ${L2.length}가지`, `동시에 일어나니 ${L1.length} × ${L2.length} = ${B_(L1.length*L2.length)}`]}; }},
+  and3:{sk:'KC3', gen:()=>[ri(0,KC_DIE.length-1),ri(0,1)], make:([e,s])=>{ const [n,L]=KC_DIE[e];
+      return {q:`동전 한 개와 주사위 한 개를 동시에 던질 때, 동전은 ${s?'앞면':'뒷면'}이 나오고 주사위는 ${n}의 눈이 나오는 경우의 수는`, ans:L.length, t:'곱의 법칙',
+        lines:[`동전: ${s?'앞면':'뒷면'} → 1가지`, `주사위: ${L.join(', ')} → ${L.length}가지`, `1 × ${L.length} = ${B_(L.length)}`]}; }},
+  and4:{sk:'KC3', gen:()=>[ri(2,4),ri(2,5),ri(2,3)], make:([a,b,c])=>({q:`모자 ${a}개, 티셔츠 ${b}벌, 신발 ${c}켤레 가운데 하나씩 골라 차려입는 경우의 수는`, ans:a*b*c, t:'곱의 법칙 — 셋도 곱해요',
+      lines:[`${a} × ${b} × ${c} = ${B_(a*b*c)}`]})},
+  /* ── 4 합과 곱 함께 ── */
+  r2:{sk:'KC4', gen:()=>[ri(2,4),ri(2,4),ri(1,3)], make:([a,b,c])=>({q:`A 마을에서 B 마을로 가는 길은 ${a}가지, B 마을에서 C 마을로 가는 길은 ${b}가지, A 마을에서 C 마을로 바로 가는 길은 ${c}가지예요. A 마을에서 C 마을로 가는 방법의 수는? (같은 마을을 두 번 지나지 않아요)`,
+      ans:a*b+c, t:'곱한 다음 더하기', lines:[`B 를 거쳐 가기: ${a} × ${b} = ${a*b} (곱의 법칙)`, `바로 가기: ${c}`, `둘은 동시에 일어나지 않으니 ${a*b} + ${c} = ${B_(a*b+c)} (합의 법칙)`]})},
+  r4:{sk:'KC4', gen:()=>[ri(1,3),ri(2,4),ri(1,3),ri(2,3)], make:([a,b,c,d])=>({q:`집에서 공원까지 ${a}가지, 공원에서 학교까지 ${b}가지 길이 있고, 집에서 시장까지 ${c}가지, 시장에서 학교까지 ${d}가지 길이 있어요. 집에서 학교로 가는 방법의 수는? (공원과 시장 사이에는 길이 없어요)`,
+      ans:a*b+c*d, t:'곱한 다음 더하기', lines:[`공원을 거쳐: ${a} × ${b} = ${a*b}`, `시장을 거쳐: ${c} × ${d} = ${c*d}`, `${a*b} + ${c*d} = ${B_(a*b+c*d)}`]})},
+  set:{sk:'KC4', gen:()=>[ri(2,4),ri(2,4),ri(2,4)], make:([a,b,c])=>({q:`점심으로 한식 ${a}가지와 양식 ${b}가지 가운데 한 가지를 고르고, 후식 ${c}가지 가운데 한 가지를 고르는 경우의 수는`,
+      ans:(a+b)*c, t:'더한 다음 곱하기', lines:[`식사: 한식 또는 양식 → ${a} + ${b} = ${a+b} (합의 법칙)`, `식사와 후식을 함께 → ${a+b} × ${c} = ${B_((a+b)*c)} (곱의 법칙)`]})},
+  ds2:{sk:'KC4', gen:()=>[ri(0,KC_D2.length-1)], make:([v])=>{ const [c,ans,L]=KC_D2[v];
+      return {q:`서로 다른 주사위 두 개를 동시에 던질 때, ${c} 경우의 수는`, ans, t:'나누어 센 뒤 더하거나 곱하기', lines:L}; }},
+  rt:{sk:'KC4', gen:()=>[ri(2,5),ri(0,1)], make:([a,v])=>({q:`A 와 B 사이에 길이 ${a}가지 있어요. A 에서 B 로 갔다가 ${v?'갈 때와 다른 길로 ':''}다시 A 로 돌아오는 방법의 수는`,
+      ans:v?a*(a-1):a*a, t:'곱의 법칙', lines:[`갈 때 ${a}가지`, `올 때 ${v?`갈 때 쓴 길을 빼고 ${a-1}`:a}가지`, `${a} × ${v?a-1:a} = ${B_(v?a*(a-1):a*a)}`]})},
+  /* ── 5 줄 세우기 · 대표 뽑기 · 수 만들기 ── */
+  ln:{sk:'KC5', gen:()=>[ri(3,5)], make:([n])=>({q:`${n}명의 학생을 한 줄로 세우는 경우의 수는`, ans:kcFact(n), t:'자리마다 남은 사람 수를 곱해요',
+      lines:[`첫째 자리 ${n}명, 둘째 자리 ${n-1}명, …`, `${kcDown(n,n).join(' × ')} = ${B_(kcFact(n))}`]})},
+  lr:{sk:'KC5', gen:()=>{ const n=ri(4,7); return [n,n>=6?2:ri(2,3)]; }, make:([n,r])=>{ const s=kcDown(n,r), ans=s.reduce((x,y)=>x*y,1);
+      return {q:`${n}명 가운데 ${r}명을 뽑아 한 줄로 세우는 경우의 수는`, ans, t:'자리마다 남은 사람 수를 곱해요', lines:[`${r}자리만 채워요`, `${s.join(' × ')} = ${B_(ans)}`]}; }},
+  lf:{sk:'KC5', gen:()=>[ri(4,5),ri(0,1)], make:([n,v])=>({q:`A 를 포함한 ${n}명을 한 줄로 세울 때, A 가 맨 ${v?'뒤':'앞'}에 서는 경우의 수는`, ans:kcFact(n-1), t:'정해진 자리를 빼고 세기',
+      lines:['A 의 자리는 정해져 있어요', `나머지 ${n-1}명을 한 줄로: ${kcDown(n-1,n-1).join(' × ')} = ${B_(kcFact(n-1))}`]})},
+  la:{sk:'KC5', gen:()=>[ri(3,5)], make:([n])=>({q:`A, B 를 포함한 ${n}명을 한 줄로 세울 때, A 와 B 가 이웃하여 서는 경우의 수는`, ans:2*kcFact(n-1), t:'이웃하면 한 묶음으로',
+      lines:[`A, B 를 한 묶음으로 보면 ${n-1}명을 세우는 것: ${kcDown(n-1,n-1).join(' × ')} = ${kcFact(n-1)}`, '묶음 안에서 A, B 가 자리를 바꾸는 2가지', `${kcFact(n-1)} × 2 = ${B_(2*kcFact(n-1))}`]})},
+  rp:{sk:'KC5', gen:()=>[ri(4,8)], make:([n])=>({q:`후보 ${n}명 가운데 회장 1명, 부회장 1명을 뽑는 경우의 수는`, ans:n*(n-1), t:'자격이 다르면 줄 세우기처럼',
+      lines:[`회장 ${n}가지, 부회장은 회장을 뺀 ${n-1}가지`, `${n} × ${n-1} = ${B_(n*(n-1))}`]})},
+  r2c:{sk:'KC5', gen:()=>[ri(4,8)], make:([n])=>({q:`후보 ${n}명 가운데 대표 2명을 뽑는 경우의 수는`, ans:n*(n-1)/2, t:'자격이 같으면 ÷ 2',
+      lines:[`순서대로 뽑으면 ${n} × ${n-1} = ${n*(n-1)}`, '(A, B) 와 (B, A) 는 같은 대표 → ÷ 2', `${n*(n-1)} ÷ 2 = ${B_(n*(n-1)/2)}`]})},
+  r3c:{sk:'KC5', gen:()=>[ri(4,6)], make:([n])=>({q:`후보 ${n}명 가운데 대표 3명을 뽑는 경우의 수는`, ans:n*(n-1)*(n-2)/6, t:'자격이 같으면 ÷ (3 × 2 × 1)',
+      lines:[`순서대로 뽑으면 ${n} × ${n-1} × ${n-2} = ${n*(n-1)*(n-2)}`, '뽑힌 3명을 줄 세우는 3 × 2 × 1 = 6가지는 모두 같은 대표 → ÷ 6', `${n*(n-1)*(n-2)} ÷ 6 = ${B_(n*(n-1)*(n-2)/6)}`]})},
+  n2:{sk:'KC5', gen:()=>[ri(3,6)], make:([n])=>({q:`1부터 ${n}까지의 숫자가 하나씩 적힌 카드 ${n}장 가운데 2장을 뽑아 만들 수 있는 두 자리 자연수의 개수는`, ans:n*(n-1), unit:'개', t:'자리마다 남은 카드 수',
+      lines:[`십의 자리 ${n}가지, 일의 자리는 남은 ${n-1}가지`, `${n} × ${n-1} = ${B_(n*(n-1))}`]})},
+  n0:{sk:'KC5', gen:()=>[ri(4,6)], make:([n])=>({q:`0부터 ${n-1}까지의 숫자가 하나씩 적힌 카드 ${n}장 가운데 2장을 뽑아 만들 수 있는 두 자리 자연수의 개수는`, ans:(n-1)*(n-1), unit:'개', t:'0 은 맨 앞에 올 수 없어요',
+      lines:[`십의 자리: 0 을 뺀 ${n-1}가지`, `일의 자리: 십의 자리 숫자를 뺀 ${n-1}가지 (0 도 돼요)`, `${n-1} × ${n-1} = ${B_((n-1)*(n-1))}`]})},
+  n3:{sk:'KC5', gen:()=>[ri(4,5)], make:([n])=>({q:`1부터 ${n}까지의 숫자가 하나씩 적힌 카드 ${n}장 가운데 3장을 뽑아 만들 수 있는 세 자리 자연수의 개수는`, ans:n*(n-1)*(n-2), unit:'개', t:'자리마다 남은 카드 수',
+      lines:[`백의 자리 ${n}, 십의 자리 ${n-1}, 일의 자리 ${n-2}가지`, `${n} × ${n-1} × ${n-2} = ${B_(n*(n-1)*(n-2))}`]})},
+  ne:{sk:'KC5', gen:()=>[ri(4,6)], make:([n])=>{ const E=range(1,n).filter(x=>x%2===0);
+      return {q:`1부터 ${n}까지의 숫자가 하나씩 적힌 카드 ${n}장 가운데 2장을 뽑아 만들 수 있는 두 자리 자연수 가운데 짝수의 개수는`, ans:E.length*(n-1), unit:'개', t:'조건이 있는 자리부터',
+        lines:[`일의 자리가 짝수: ${E.join(', ')} → ${E.length}가지`, `십의 자리: 일의 자리 숫자를 뺀 ${n-1}가지`, `${E.length} × ${n-1} = ${B_(E.length*(n-1))}`]}; }},
+  hs:{sk:'KC5', gen:()=>[ri(4,10)], make:([n])=>({q:`${n}명이 서로 한 번씩 빠짐없이 악수를 할 때, 악수는 모두 몇 번 하나요?`, ans:n*(n-1)/2, unit:'번', t:'두 사람이 한 번 → ÷ 2',
+      lines:[`한 사람이 ${n-1}명과 악수 → ${n} × ${n-1} = ${n*(n-1)}`, 'A–B 와 B–A 는 같은 악수 → ÷ 2', `${n*(n-1)} ÷ 2 = ${B_(n*(n-1)/2)}`]})}
+};
+const KC_ST=[['d1','k1','k2','c1','ds','ds','dd','pay'], ['or1','or1','or2','or3','or4'], ['and1','and1','cd','and2','and3','and4'],
+             ['r2','r4','set','ds2','ds2','rt'], ['ln','lr','lf','la','rp','r2c','r3c','n2','n0','n3','ne','hs']];
+function kcF(id,ps){
+  const T=KC[id]; if(!T) return null;
+  const o=T.make(ps); if(!o||!(o.ans>0)) return null;
+  return F({key:'KC'+id+'_'+ps.join('_'), sk:T.sk, t:'cnt', k:'kc', id, ps, o, cond:o.q, cb:'w', eq:['?',{u:o.unit||'가지'}], ans:o.ans});
+}
+const genKC=s=>()=>{ const id=pickOne(KC_ST[s]); return kcF(id,KC[id].gen()); };
+function kcVariant(f){ for(let g=0;g<6;g++){ const v=kcF(f.id,KC[f.id].gen()); if(v&&v.key!==f.key) return v; } return f; }
+
+/* ════════ 인수분해 (중3) ════════
+   부호는 보여 주고 크기 하나만 묻습니다 — 답은 언제나 자연수.  */
+const fcX=(p,blank)=>blank?'?x':(p===1?'x':p+'x');
+const fcLin=(p,q,bp,bq)=>({g:['(',fcX(p,bp),q<0?'−':'+',bq?'?':Math.abs(q),')']});
+const fcSq=(p,q,bp,bq)=>({b:{g:[fcX(p,bp),q<0?'−':'+',bq?'?':Math.abs(q)]},e:2});
+const fcTerm=(c,v)=>(c===1?'':c)+v;
+const fcF=(key,sk,o)=>F(Object.assign({key, sk, t:'factor', k:'fc', cb:true},o));
+/* 공통인수 — form 1: k(ax + b) · form 2: kx(ax + b)   pos k 공통인수 · b 괄호 안 상수 */
+function fcC(form,k,a,b,pos){
+  const cond= form===1?poly([[k*a,'x'],[k*b,'']]):poly([[k*a,'x²'],[k*b,'x']]);
+  const head= form===1?(pos==='k'?'?':String(k)):(pos==='k'?'?x':fcTerm(k,'x'));
+  return fcF('FCc'+form+'_'+k+'_'+a+'_'+b+'_'+pos,'FCc',{f:'c', form, kk:k, a, b, pos, cond,
+    eq:['=',{g:[head,'(',fcTerm(a,'x'),b<0?'−':'+',pos==='b'?'?':Math.abs(b),')']}], ans:pos==='k'?k:Math.abs(b)});
+}
+/* 완전제곱식 (px + q)² — pos q · p · c(상수항) · m(일차항 계수) */
+function fcS(p,q,pos){
+  const A=p*p, M=2*p*q, C=q*q, o={f:'s', p, q, A, M, C, pos};
+  if(pos==='c'){ o.eq=[fcTerm(A,'x²'),M<0?'−':'+',fcTerm(Math.abs(M),'x'),'+','?','=',fcSq(p,q)]; o.ans=C; }
+  else if(pos==='m'){ o.eq=[fcTerm(A,'x²'),M<0?'−':'+','?x','+',C,'=',fcSq(p,q)]; o.ans=Math.abs(M); }
+  else { o.cond=poly([[A,'x²'],[M,'x'],[C,'']]); o.eq=['=',fcSq(p,q,pos==='p',pos==='q')]; o.ans=pos==='p'?p:Math.abs(q); }
+  return fcF('FCs'+p+'_'+q+'_'+pos,'FCs',o);
+}
+/* 합과 차의 곱 p²x² − q² = (px + q)(px − q) — pos q · a(x² 의 계수) · c(상수항) */
+function fcD(p,q,pos){
+  const A=p*p, C=q*q, o={f:'d', p, q, A, C, pos}, two=(bq)=>({g:[fcLin(p,q),fcLin(p,-q,false,bq)]});
+  if(pos==='c'){ o.eq=[fcTerm(A,'x²'),'−','?','=',two(false)]; o.ans=C; }
+  else if(pos==='a'){ o.eq=['?x²','−',C,'=',two(false)]; o.ans=A; }
+  else { o.cond=poly([[A,'x²'],[-C,'']]); o.eq=['=',two(true)]; o.ans=q; }
+  return fcF('FCd'+p+'_'+q+'_'+pos,'FCd',o);
+}
+/* x² + (a+b)x + ab = (x + a)(x + b) — pos b · a · m(일차항 계수) */
+function fcT(a,b,pos){
+  const s=a+b, P=a*b, o={f:'t', a, b, s, P, pos};
+  if(pos==='m'){ o.eq=['x²',s<0?'−':'+','?x',P<0?'−':'+',Math.abs(P),'=',{g:[fcLin(1,a),fcLin(1,b)]}]; o.ans=Math.abs(s); }
+  else { o.cond=poly([[1,'x²'],[s,'x'],[P,'']]); o.eq=['=',{g:[fcLin(1,a,false,pos==='a'),fcLin(1,b,false,pos==='b')]}]; o.ans=Math.abs(pos==='a'?a:b); }
+  return fcF('FCt'+a+'_'+b+'_'+pos,'FCt',o);
+}
+/* (px + q)(rx + s) — pos q · s */
+function fcA(p,q,r,s,pos){
+  const A=p*r, M=p*s+q*r, C=q*s;
+  return fcF('FCa'+p+'_'+q+'_'+r+'_'+s+'_'+pos,'FCa',{f:'a', p, q, r, s, A, M, C, pos, cond:poly([[A,'x²'],[M,'x'],[C,'']]),
+    eq:['=',{g:[fcLin(p,q,false,pos==='q'),fcLin(r,s,false,pos==='s')]}], ans:Math.abs(pos==='q'?q:s)});
+}
+const sgnR=()=>Math.random()<.5?1:-1;
+function genFC1(){
+  for(let g=0;g<40;g++){
+    if(Math.random()<.6){ const k=ri(2,9), a=ri(1,6), b=sgnR()*ri(1,9); if(gcd(a,Math.abs(b))!==1||k*a>60||k*Math.abs(b)>60) continue;
+      return fcC(1,k,a,b,Math.random()<.5?'k':'b'); }
+    const k=ri(1,6), a=ri(1,6), b=sgnR()*ri(1,9); if(gcd(a,Math.abs(b))!==1||k*a>40||k*Math.abs(b)>40) continue;
+    return fcC(2,k,a,b,k>1&&Math.random()<.5?'k':'b');
+  }
+  return fcC(1,3,2,3,'b');
+}
+function genFC2(){
+  for(let g=0;g<40;g++){
+    const p=Math.random()<.65?1:ri(2,3), q=sgnR()*ri(1,p>1?7:9); if(gcd(p,Math.abs(q))!==1) continue;
+    const x=Math.random(), pos=x<.45?'q':x<.6&&p>1?'p':x<.8?'c':'m';
+    return fcS(p,q,pos);
+  }
+  return fcS(1,3,'q');
+}
+function genFC3(){
+  for(let g=0;g<40;g++){
+    const p=Math.random()<.6?1:ri(2,5), q=ri(1,p>1?7:9); if(gcd(p,q)!==1) continue;
+    const x=Math.random(); return fcD(p,q,x<.6?'q':x<.75&&p>1?'a':'c');
+  }
+  return fcD(1,7,'q');
+}
+function genFC4(){
+  for(let g=0;g<60;g++){
+    const a=sgnR()*ri(1,9), b=sgnR()*ri(1,9); if(a+b===0||Math.abs(a*b)>60) continue;
+    const x=Math.random(); if(x<.2&&Math.abs(a+b)>=2) return fcT(a,b,'m');
+    return fcT(a,b,x<.3?'a':'b');
+  }
+  return fcT(2,3,'b');
+}
+function genFC5(){
+  for(let g=0;g<60;g++){
+    const p=ri(2,5), r=Math.random()<.7?1:ri(2,3), q=sgnR()*ri(1,7), s=sgnR()*ri(1,7);
+    if(gcd(p,Math.abs(q))!==1||gcd(r,Math.abs(s))!==1) continue;
+    const M=p*s+q*r; if(M===0||Math.abs(M)>40||Math.abs(q*s)>40) continue;
+    return fcA(p,q,r,s,Math.random()<.5?'q':'s');
+  }
+  return fcA(2,1,1,3,'s');
+}
+function fcHint(o){
+  const done=eqText(o,true).replace(/([0-9x]) \(/g,'$1(').replace(/\) \(/g,')(');
+  const px=fcTerm(o.p||1,'x');
+  switch(o.f){
+    case 'c':{ const head=o.form===1?String(o.kk):fcTerm(o.kk,'x');
+      const t1=o.form===1?fcTerm(o.kk*o.a,'x'):fcTerm(o.kk*o.a,'x²'), t2=o.form===1?String(Math.abs(o.kk*o.b)):fcTerm(Math.abs(o.kk*o.b),'x');
+      return {t:'공통인수로 묶기', lines:[`두 항에 공통으로 들어 있는 ${head} 를 앞으로 꺼내요`,
+        `${t1} = ${head} × ${fcTerm(o.a,'x')}, ${t2} = ${head} × ${Math.abs(o.b)}`, done, cTip('묶은 뒤 괄호 안에 더 묶을 수가 없어야 해요')]}; }
+    case 's':{
+      const L=[`${o.p>1?`${fcTerm(o.A,'x²')} = (${px})², `:''}상수항 ${o.C} = ${Math.abs(o.q)}²`, `일차항: 2 × ${px} × ${Math.abs(o.q)} = ${fcTerm(Math.abs(o.M),'x')}`];
+      if(o.pos==='c'&&o.p===1) L.unshift(`x 의 계수의 절반을 제곱해요: (${Math.abs(o.M)} ÷ 2)² = ${Math.abs(o.q)}² = ${o.C}`);
+      return {t:'완전제곱식', lines:L.concat([done, cTip(o.q<0?'a² − 2ab + b² = (a − b)²':'a² + 2ab + b² = (a + b)²')])}; }
+    case 'd': return {t:'제곱 − 제곱', lines:[`${o.p>1?`${fcTerm(o.A,'x²')} = (${px})², `:''}${o.C} = ${o.q}²`, done, cTip('a² − b² = (a + b)(a − b)')]};
+    case 't': return o.pos==='m'
+      ? {t:'전개하면 일차항은 두 수의 합', lines:[`두 수 ${MI(o.a)}, ${MI(o.b)} → 합 ${MI(o.s)}, 곱 ${MI(o.P)}`, done]}
+      : {t:'곱해서 상수항, 더해서 일차항의 계수', lines:[`곱해서 ${MI(o.P)}, 더해서 ${MI(o.s)} 인 두 수 → ${MI(o.a)}, ${MI(o.b)}`, done,
+          cTip(o.P<0?'곱이 음수면 두 수의 부호가 달라요':o.s<0?'곱이 양수이고 합이 음수면 둘 다 음수':'곱과 합이 모두 양수면 둘 다 양수')]};
+    case 'a': return {t:'대각선으로 곱해 더하기', lines:[`x² 의 계수: ${o.p} × ${o.r} = ${o.A}`, `상수항: ${MI(o.q)} × ${MI(o.s)} = ${MI(o.C)}`,
+        `일차항: ${o.p} × ${PV(o.s)} + ${PV(o.q)} × ${o.r} = ${MI(o.M)}`, done, cTip('전개해서 원래 식이 나오는지 꼭 확인해요')]};
+  }
+  return null;
+}
+function fcVariant(o){
+  switch(o.f){
+    case 'c': return fcC(o.form,o.kk,o.a,o.b,o.pos==='k'?'b':(o.form===2&&o.kk===1?'b':'k'));
+    case 's': return fcS(o.p,o.q,{q:'c',c:'m',m:'q',p:'q'}[o.pos]);
+    case 'd': return fcD(o.p,o.q,o.pos==='q'?'c':'q');
+    case 't': return fcT(o.a,o.b,o.pos==='b'?'a':'b');
+    case 'a': return fcA(o.p,o.q,o.r,o.s,o.pos==='q'?'s':'q');
+  }
+  return o;
+}
+
+/* ════════ 열쇠 → 문항 ════════ */
+function currFact(key){
+  let m; const N='(-?\\d+)', R=p=>key.match(new RegExp('^'+p+'$'));
+  if(m=R('R(\\d+)([+-])(\\d+)')) return r3F(+m[1],m[2],+m[3]);
+  if(m=R('NF([acsmdo])_([\\d.]+)_([\\d.]+|x)_([FMfmi])([nwdi])')){
+    const P=s=>s.split('.').map(Number), A=P(m[2]), B=m[3]==='x'?null:P(m[3]);
+    if(A.length!==3||(B&&B.length!==3)) return null; return nfF(m[1],A,B,m[4],m[5]); }
+  if(m=R('RTp(\\d+)_(\\d+)_(\\d)')) return rtP(+m[1],+m[2],+m[3]);
+  if(m=R('RTn(\\d+)_(\\d+)')) return rtN(+m[1],+m[2]);
+  if(m=R('RTd(\\d+)_(\\d+)_(\\d)')) return rtD(+m[1],+m[2],+m[3]);
+  if(m=R('RTk(\\d+)_(\\d+)_(\\d+)_([xd])(\\d)')) return rtK(+m[1],+m[2],+m[3],m[4],+m[5]);
+  if(m=R('RTs(\\d)_(\\d+)_(\\d+)_(\\d+)_(\\d+)_(\\d)')) return rtS(+m[1],+m[2],+m[3],+m[4],+m[5],+m[6]);
+  if(m=R('RTr(\\d+)_(\\d+)_(\\d+)_(\\d+)_(\\d)')) return rtR(+m[1],+m[2],+m[3],+m[4],+m[5]);
+  if(m=R('RTw(\\d)_(\\d+)_(\\d+)_(\\d+)')) return rtW(+m[1],+m[2],+m[3],+m[4]);
+  if(m=R('RTb(\\d)_(\\d+)_(\\d+)_(\\d+)_(\\d)')) return rtB(+m[1],+m[2],+m[3],+m[4],+m[5]);
+  if(m=R('KC([a-z][a-z0-9]*)_([0-9_]+)')) return KC[m[1]]?kcF(m[1],m[2].split('_').map(Number)):null;
+  if(m=R('FCc([12])_(\\d+)_(\\d+)_'+N+'_([kb])')) return fcC(+m[1],+m[2],+m[3],+m[4],m[5]);
+  if(m=R('FCs(\\d+)_'+N+'_([qpcm])')) return fcS(+m[1],+m[2],m[3]);
+  if(m=R('FCd(\\d+)_(\\d+)_([qac])')) return fcD(+m[1],+m[2],m[3]);
+  if(m=R('FCt'+N+'_'+N+'_([abm])')) return fcT(+m[1],+m[2],m[3]);
+  if(m=R('FCa(\\d+)_'+N+'_(\\d+)_'+N+'_([qs])')) return fcA(+m[1],+m[2],+m[3],+m[4],m[5]);
+  return null;
+}
+function currHint(f){
+  if(f.k==='add3'||f.k==='sub3') return r3Hint(f);
+  if(f.k==='nf') return nfHint(f);
+  if(f.k==='rt') return rtHint(f);
+  if(f.k==='kc') return {t:f.o.t||'경우의 수', lines:f.o.lines.slice(), svg:''};
+  if(f.k==='fc') return fcHint(f);
+  return null;
+}
+function currVariant(f){
+  if(f.k==='add3') return r3F(f.ans,'-',f.b);
+  if(f.k==='sub3') return r3F(f.ans,'+',f.b);
+  if(f.k==='nf') return nfVariant(f);
+  if(f.k==='rt') return rtVariant(f);
+  if(f.k==='kc') return kcVariant(f);
+  if(f.k==='fc') return fcVariant(f);
+  return f;
+}
+
+/* ════════ 통계 이름 ════════ */
+Object.assign(SK_EXT,{
+  NFs:{t:'fadd',n:'분모가 같은 분수의 덧셈·뺄셈'}, NFc:{t:'fadd',n:'가분수와 대분수'}, NFw:{t:'fadd',n:'대분수·자연수의 덧셈·뺄셈'},
+  NFa:{t:'fadd',n:'분모가 다른 분수의 덧셈·뺄셈'},
+  NFo:{t:'fmul',n:'자연수의 분수만큼'}, NFmn:{t:'fmul',n:'분수와 자연수의 곱셈'}, NFmf:{t:'fmul',n:'분수끼리의 곱셈'},
+  NFdn:{t:'fmul',n:'(분수) ÷ (자연수)'}, NFdf:{t:'fmul',n:'(분수) ÷ (분수)'}, NFdi:{t:'fmul',n:'(자연수) ÷ (분수)'},
+  RTp:{t:'ratio',n:'비율 → 백분율'}, RTn:{t:'ratio',n:'몇 % 는 얼마'}, RTd:{t:'ratio',n:'소수·분수 → 백분율'},
+  RTk:{t:'ratio',n:'비의 성질'}, RTs:{t:'ratio',n:'간단한 자연수의 비'}, RTr:{t:'ratio',n:'비례식'}, RTw:{t:'ratio',n:'비례식 활용'}, RTb:{t:'ratio',n:'비례배분'},
+  KC1:{t:'cnt',n:'한 사건의 경우의 수'}, KC2:{t:'cnt',n:'합의 법칙'}, KC3:{t:'cnt',n:'곱의 법칙'}, KC4:{t:'cnt',n:'합과 곱 함께'},
+  KC5:{t:'cnt',n:'줄 세우기 · 대표 뽑기 · 수 만들기'},
+  FCc:{t:'factor',n:'공통인수로 묶기'}, FCs:{t:'factor',n:'완전제곱식'}, FCd:{t:'factor',n:'합과 차의 곱'},
+  FCt:{t:'factor',n:'x² + (a+b)x + ab'}, FCa:{t:'factor',n:'acx² + (ad+bc)x + bd'}
+});
+/* 예전 '분수의 계산' 통계는 새 두 주제로 나눠서 봅니다 */
+['EFe','EFs','EFa'].forEach(k=>{ if(SK_EXT[k]) SK_EXT[k].t='fadd'; });
+['EFm','EFd'].forEach(k=>{ if(SK_EXT[k]) SK_EXT[k].t='fmul'; });
+
+/* ════════ 주제와 스테이지 ════════ */
+const BLUE={col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea'};
+Object.assign(TOPICS,{
+  fadd:Object.assign({k:'fadd', n:'분수의 덧셈과 뺄셈', sym:'½+', school:'e',
+    desc:'분모가 같은 분수 · 가분수와 대분수 · 약분과 통분 · 분모가 다른 분수',
+    stages:[
+      {n:1, name:'분모가 같은 분수',            ex:'2/7 + 3/7',     gen:genNA1, take:12},
+      {n:2, name:'가분수와 대분수',             ex:'7/3 = 2와 □/3', gen:genNA2, take:12},
+      {n:3, name:'대분수·자연수의 덧셈과 뺄셈', ex:'3 − 1과 1/4',   gen:genNA3, take:10},
+      {n:4, name:'약분과 통분',                 ex:'12/18 = 2/□',   gen:genFE,  take:12},
+      {n:5, name:'분모가 다른 분수',            ex:'1/2 + 1/3',     gen:genNA5, take:10}
+    ],
+    cats:[['NFs'],['NFc'],['NFw'],['EFe'],['NFa']]},BLUE),
+  fmul:Object.assign({k:'fmul', n:'분수의 곱셈과 나눗셈', sym:'½×', school:'e',
+    desc:'분수 × 자연수 · 자연수 × 분수 · 분수 × 분수 · 분수의 나눗셈',
+    stages:[
+      {n:1, name:'(분수) × (자연수)',  ex:'1/2 × 4 · 12의 2/3', gen:genNM1, take:12},
+      {n:2, name:'(자연수) × (분수)',  ex:'6 × 2/3',  gen:genNM2, take:12},
+      {n:3, name:'(분수) × (분수)',    ex:'2/3 × 3/4', gen:genNM3, take:10},
+      {n:4, name:'(분수) ÷ (자연수)',  ex:'4/5 ÷ 2',  gen:genNM4, take:10},
+      {n:5, name:'(분수) ÷ (분수)',    ex:'3/4 ÷ 3/8 · 6 ÷ 2/3', gen:genNM5, take:10}
+    ],
+    cats:[['NFo'],['NFmn'],['NFmf'],['NFdn'],['NFdf'],['NFdi']]},BLUE),
+  ratio:Object.assign({k:'ratio', n:'비와 비례식', sym:'3:4', school:'e',
+    desc:'비율과 백분율 · 비의 성질 · 비례식 · 비례배분',
+    stages:[
+      {n:1, name:'비율과 백분율', ex:'3 : 4 → □%',     gen:genRT1, take:12},
+      {n:2, name:'비의 성질',     ex:'3 : 4 = 9 : □',  gen:genRT2, take:12},
+      {n:3, name:'비례식',        ex:'4 : 6 = 10 : □', gen:genRT3, take:10},
+      {n:4, name:'비례배분',      ex:'20 을 3 : 2 로', gen:genRT4, take:10}
+    ],
+    cats:[['RTp'],['RTn'],['RTd'],['RTk'],['RTs'],['RTr'],['RTw'],['RTb']]},BLUE),
+  cnt:Object.assign({k:'cnt', n:'경우의 수', sym:'2×3', school:'m',
+    desc:'합의 법칙 · 곱의 법칙 · 줄 세우기 · 대표 뽑기 · 수 만들기',
+    stages:[
+      {n:1, name:'한 사건의 경우의 수', ex:'주사위 두 개, 합이 5',     gen:genKC(0), take:8},
+      {n:2, name:'합의 법칙',           ex:'버스 3가지 또는 지하철 2가지', gen:genKC(1), take:8},
+      {n:3, name:'곱의 법칙',           ex:'티셔츠 3벌 × 바지 4벌',    gen:genKC(2), take:8},
+      {n:4, name:'합과 곱 함께',        ex:'거쳐 가기 + 바로 가기',     gen:genKC(3), take:8},
+      {n:5, name:'줄 세우기 · 뽑기 · 수 만들기', ex:'4명을 한 줄로 · 대표 2명', gen:genKC(4), take:10}
+    ],
+    cats:[['KC1'],['KC2'],['KC3'],['KC4'],['KC5']]},BLUE),
+  factor:Object.assign({k:'factor', n:'인수분해', sym:'( )( )', school:'m',
+    desc:'공통인수 · 완전제곱식 · 합과 차 · x² + (a+b)x + ab · acx² + …',
+    stages:[
+      {n:1, name:'공통인수로 묶기',   ex:'6x + 9 = 3(2x + □)',       gen:genFC1, take:10},
+      {n:2, name:'완전제곱식',        ex:'x² + 6x + 9 = (x + □)²',   gen:genFC2, take:10},
+      {n:3, name:'합과 차의 곱',      ex:'x² − 49 = (x + 7)(x − □)', gen:genFC3, take:10},
+      {n:4, name:'x² + (a+b)x + ab',  ex:'x² + 5x + 6',              gen:genFC4, take:12},
+      {n:5, name:'acx² + (ad+bc)x + bd', ex:'2x² + 7x + 3',          gen:genFC5, take:10}
+    ],
+    cats:[['FCc'],['FCs'],['FCd'],['FCt'],['FCa']]},BLUE)
+});
+Object.assign(TOPIC_SYMH,{
+  fadd:'<span style="font-size:.7em">½+</span>', fmul:'<span style="font-size:.7em">½×</span>',
+  ratio:'<span style="font-size:.6em;letter-spacing:-.5px">3:4</span>',
+  cnt:'<span style="font-size:.56em;letter-spacing:-.5px">2×3</span>',
+  factor:'<span style="font-size:.5em;letter-spacing:-.5px;font-style:italic">(x+a)</span>'
+});
+
+/* 더하기·빼기 — 세 자리 수까지 (5·6단계를 뒤에 붙여 예전 클리어 기록은 그대로) */
+{ const T=TOPICS.addsub;
+  T.desc='한 자리 수부터 세 자리 수까지 · 받아올림과 받아내림';
+  T.stages.push({n:5, name:'세 자리 수 덧셈', ex:'358 + 267', gen:gen3a, take:10, old:[7]},
+                {n:6, name:'세 자리 수 뺄셈', ex:'503 − 278', gen:gen3s, take:10, old:[8]});
+  T.realStages=[
+    {n:1, name:'한 자리 수 덧셈·뺄셈', facts:()=>ADD1().filter(f=>f.a+f.b>=8).concat(SUB1().filter(f=>f.c>=10))},
+    {n:2, name:'두 자리 ± 한 자리',   gen:genP},
+    {n:3, name:'두 자리 ± 두 자리',   gen:genQ},
+    {n:4, name:'세 자리 수 덧셈',     gen:gen3a},
+    {n:5, name:'세 자리 수 뺄셈',     gen:gen3s}
+  ]; }
+if(TOPICS.comb){ TOPICS.comb.n='순열과 조합'; }
+
+/* 학교별 주제 — 교육과정 순서, 학년 묶음(gr) */
+{ const sc=k=>SCHOOLS.find(s=>s.k===k);
+  const E=sc('e'), M=sc('m'), H=sc('h');
+  E.topics=['addsub','gugu','boxq','fadd','fmul','ratio'];
+  E.sub='더하기·빼기 · 구구단 · □ 구하기 · 분수의 계산 · 비와 비례식';
+  M.topics=['int','power','lineq','expo','pyth','cnt','root','factor','trig'];
+  M.sub='정수 · 제곱수 · 일차방정식 · 지수법칙 · 피타고라스 수 · 경우의 수 · 제곱근 · 인수분해 · 삼각비';
+  if(H){ H.topics=['logx','tfn','comb']; H.sub='지수와 로그 · 삼각함수 · 순열과 조합'; }
+  const GR={addsub:'저학년 · 1~3학년', gugu:'저학년 · 1~3학년', boxq:'저학년 · 1~3학년',
+            fadd:'고학년 · 4~6학년', fmul:'고학년 · 4~6학년', ratio:'고학년 · 4~6학년',
+            int:'1학년', power:'1학년', lineq:'1학년', expo:'2학년', pyth:'2학년', cnt:'2학년',
+            root:'3학년', factor:'3학년', trig:'3학년'};
+  Object.keys(GR).forEach(k=>{ if(TOPICS[k]) TOPICS[k].gr=GR[k]; });
+  TOPIC_ORDER.length=0;
+  TOPIC_ORDER.push(...E.topics, ...M.topics, ...(H?H.topics:[]));
+}
+
+/* ════════ 미리보기 ════════ */
+function currPreview(t,n){
+  const H=(f,tip,extra)=>{ const h=hintOf(f); return Object.assign({tip, lines:h.lines, svg:''},extra||{}); };
+  if(t==='fadd'){
+    if(n===1) return H(nfF('a',[0,2,7],[0,3,7],'F','n'),'분모가 같으면 분모는 그대로 두고 분자끼리 계산해요.');
+    if(n===2) return H(nfF('c',[0,7,3],null,'M','n'),'가분수 → 대분수: 분자 ÷ 분모의 몫이 자연수, 나머지가 분자. 대분수 → 가분수: 자연수 × 분모 + 분자.');
+    if(n===3) return H(nfF('s',[3,1,4],[1,3,4],'M','n'),'분수 부분끼리 뺄 수 없으면 자연수에서 1 을 받아내려요.');
+    if(n===4) return H(frF('e',12,18,2,3,'d'),'분모와 분자에 같은 수를 곱하거나 같은 수로 나누어도 크기가 같아요.');
+    return H(nfF('a',[0,1,2],[0,1,3],'m','n'),'분모가 다르면 최소공배수로 통분한 뒤 분자끼리. 답은 기약분수로 써요.');
+  }
+  if(t==='fmul'){
+    if(n===1) return H(nfF('o',[12,0,1],[0,2,3],'i','i'),'12의 2/3 는 12 를 3묶음으로 나눈 것 가운데 2묶음이에요. (분수) × (자연수)는 분자에 자연수를 곱해요.');
+    if(n===2) return H(nfF('m',[6,0,1],[0,2,3],'m','n'),'자연수는 분모가 1 인 분수예요. 약분할 수 있으면 먼저 약분해요.');
+    if(n===3) return H(nfF('m',[0,2,3],[0,3,4],'m','d'),'분자는 분자끼리, 분모는 분모끼리 곱해요.');
+    if(n===4) return H(nfF('d',[0,3,4],[2,0,1],'m','d'),'÷ 2 는 × 1/2 과 같아요. 분자가 나누어떨어지면 분자만 나눠도 돼요.');
+    return H(nfF('d',[0,3,4],[0,3,8],'m','n'),'나누는 분수의 분자와 분모를 바꾸어 곱해요.');
+  }
+  if(t==='ratio'){
+    if(n===1) return H(rtP(3,4,1),'비율 = 비교하는 양 ÷ 기준량. 백분율은 비율 × 100.');
+    if(n===2) return H(rtK(3,4,3,'x',3),'비의 앞항과 뒤항에 같은 수를 곱하거나 나누어도 비율은 같아요.');
+    if(n===3) return H(rtR(4,6,10,15,3),'비례식에서 외항의 곱과 내항의 곱은 같아요.');
+    return H(rtB(0,20,3,2,1),'전체를 비의 합만큼 똑같이 나눈 뒤, 필요한 묶음 수만큼.');
+  }
+  if(t==='cnt'){
+    if(n===1) return H(kcF('ds',[5]),'빠뜨리지 않고, 겹치지 않게 순서쌍으로 적어 세요.');
+    if(n===2) return H(kcF('or1',[0,3,2]),'"또는" — 동시에 일어나지 않는 두 사건이면 더해요.');
+    if(n===3) return H(kcF('and1',[0,3,4]),'"그리고"·"동시에"·"잇달아" — 두 사건이 함께 일어나면 곱해요.');
+    if(n===4) return H(kcF('r2',[2,3,1]),'경우를 나누어 각각 곱한 뒤 더하거나, 더한 뒤 곱해요.');
+    return H(kcF('r2c',[5]),'줄 세우기는 자리마다 남은 수를 곱하고, 자격이 같은 대표는 겹치는 만큼 나눠요.');
+  }
+  if(t==='factor'){
+    if(n===1) return H(fcC(1,3,2,3,'b'),'각 항에 공통으로 들어 있는 수·문자를 괄호 밖으로 꺼내요.');
+    if(n===2) return H(fcS(1,3,'q'),'a² ± 2ab + b² = (a ± b)². 상수항이 제곱수이고 일차항이 2 × (곱)인지 봐요.');
+    if(n===3) return H(fcD(1,7,'q'),'a² − b² = (a + b)(a − b).');
+    if(n===4) return H(fcT(2,3,'b'),'곱해서 상수항, 더해서 x 의 계수가 되는 두 수를 찾아요.');
+    return H(fcA(2,1,1,3,'s'),'(px + q)(rx + s) 를 전개해 대각선으로 곱한 합이 일차항이 되는지 확인해요.');
+  }
+  return null;
+}
+
+/* ════════ 정리 노트 ════════ */
+function currNote(t,fromHint){
+  if(t==='fadd') return {
+    sub:'분모가 같은 분수 · 가분수와 대분수 · 약분과 통분 · 분모가 다른 분수',
+    memo:[{h:'분수 덧셈·뺄셈 순서', html:chipList(['분모가 같으면 분자끼리','대분수: 자연수끼리, 분수끼리','뺄 수 없으면 1 을 받아내림','분모가 다르면 통분 먼저','답은 기약분수로'])}],
+    ways:[fromHint('분자끼리','2/7 + 3/7',nfF('a',[0,2,7],[0,3,7],'F','n')), fromHint('가분수 → 대분수','7/3',nfF('c',[0,7,3],null,'M','n')),
+          fromHint('받아내림','3과 1/4 − 1과 3/4',nfF('s',[3,1,4],[1,3,4],'M','n')), fromHint('1 을 분수로','1 − 3/8',nfF('s',[1,0,1],[0,3,8],'M','n')),
+          fromHint('약분','12/18',frF('e',12,18,2,3,'d')), fromHint('통분해서 더하기','1/2 + 1/3',nfF('a',[0,1,2],[0,1,3],'m','n'))],
+    miss:[{w:'2/7 + 3/7 = 5/14', r:'5/7', y:'분모끼리 더하면 안 돼요. 1/7 이 2개, 3개 → 1/7 이 5개.'},
+          {w:'1/2 + 1/3 = 2/5', r:'5/6', y:'분모가 다르면 6 으로 통분: 3/6 + 2/6 = 5/6.'},
+          {w:'3과 1/4 − 1과 3/4 = 2와 2/4', r:'1과 2/4', y:'1/4 에서 3/4 을 뺄 수 없어 자연수에서 1 을 받아내려요: 2와 5/4 − 1과 3/4.'}]};
+  if(t==='fmul') return {
+    sub:'분수 × 자연수 · 분수 × 분수 · ÷ 자연수 · ÷ 분수',
+    memo:[{h:'곱셈과 나눗셈', html:chipList(['× 자연수: 분자에 곱하기','분수 × 분수: 분자끼리, 분모끼리','÷ 자연수 = × 1/자연수','÷ 분수 = × 뒤집은 분수','대분수는 가분수로 바꾸고 계산'])}],
+    ways:[fromHint('몇 묶음 가운데 몇 묶음','12의 2/3',nfF('o',[12,0,1],[0,2,3],'i','i')), fromHint('분자에 곱하기','3/4 × 2',nfF('m',[0,3,4],[2,0,1],'m','n')),
+          fromHint('분자끼리, 분모끼리','2/3 × 3/4',nfF('m',[0,2,3],[0,3,4],'m','d')), fromHint('÷ 자연수','3/4 ÷ 2',nfF('d',[0,3,4],[2,0,1],'m','d')),
+          fromHint('뒤집어 곱하기','6 ÷ 2/3',nfF('d',[6,0,1],[0,2,3],'m','n'))],
+    miss:[{w:'1/2 × 4 = 4/8', r:'2', y:'자연수는 분자에만 곱해요: 4/2 = 2.'},
+          {w:'3/4 ÷ 3/8 = 9/32', r:'2', y:'나누는 수를 뒤집어 곱해요: 3/4 × 8/3 = 2.'},
+          {w:'1과 1/2 × 4 = 4와 1/2', r:'6', y:'대분수는 가분수로 바꿔 곱해요: 3/2 × 4 = 6.'}]};
+  if(t==='ratio') return {
+    sub:'비율과 백분율 · 비의 성질 · 비례식 · 비례배분',
+    memo:[{h:'기억할 것', html:chipList(['비율 = 비교하는 양 ÷ 기준량','백분율 = 비율 × 100','a : b 에서 b 가 기준량','외항의 곱 = 내항의 곱','비례배분: 전체 × 부분/합'])}],
+    ways:[fromHint('비율 → 백분율','20에 대한 5',rtP(5,20,1)), fromHint('비의 성질','3 : 4 = 9 : □',rtK(3,4,3,'x',3)),
+          fromHint('외항·내항','4 : 6 = 10 : □',rtR(4,6,10,15,3)), fromHint('비례배분','20 을 3 : 2 로',rtB(0,20,3,2,1))],
+    miss:[{w:'20에 대한 5의 비율 = 400%', r:'25%', y:'"20에 대한" → 20 이 기준량. 5 ÷ 20 = 0.25.'},
+          {w:'20 을 3 : 2 로 → 형 3 × 20 = 60', r:'12', y:'전체를 3 + 2 = 5 묶음으로: 20 ÷ 5 = 4, 형은 4 × 3 = 12.'}]};
+  if(t==='cnt') return {
+    sub:'합의 법칙 · 곱의 법칙 · 줄 세우기 · 대표 뽑기 · 수 만들기',
+    memo:[{h:'더할까, 곱할까', html:`<div class="hl" style="font-size:15px">동시에 일어나지 않는 두 사건 중 <b>하나</b> → <b>더하기</b> (합의 법칙)<br>두 사건이 <b>함께·잇달아</b> 일어남 → <b>곱하기</b> (곱의 법칙)</div>`},
+          {h:'자주 쓰는 수', html:chipList(['동전 1개: 2가지','주사위 1개: 6가지','주사위 2개: 36가지','n명 한 줄: n × (n−1) × … × 1','대표 2명: n × (n−1) ÷ 2'])}],
+    ways:[fromHint('합의 법칙','버스 3 또는 지하철 2',kcF('or1',[0,3,2])), fromHint('곱의 법칙','티셔츠 3 × 바지 4',kcF('and1',[0,3,4])),
+          fromHint('곱한 다음 더하기','두 갈래 길',kcF('r2',[2,3,1])), fromHint('줄 세우기','4명을 한 줄로',kcF('ln',[4])),
+          fromHint('회장·부회장','5명 가운데',kcF('rp',[5])), fromHint('대표 2명','5명 가운데',kcF('r2c',[5])), fromHint('0 이 있는 카드','0~3 으로 두 자리',kcF('n0',[4]))],
+    miss:[{w:'버스 3, 지하철 2 → 6가지', r:'5가지', y:'버스 또는 지하철 하나만 타니 더해요: 3 + 2.'},
+          {w:'5명 중 대표 2명 → 20가지', r:'10가지', y:'(A, B) 와 (B, A) 는 같은 대표라 ÷ 2.'},
+          {w:'0, 1, 2, 3 으로 두 자리 수 → 12개', r:'9개', y:'십의 자리에 0 은 올 수 없어요: 3 × 3.'}]};
+  if(t==='factor') return {
+    sub:'공통인수 · 완전제곱식 · 합과 차 · 두 수 찾기',
+    memo:[{h:'인수분해 공식', html:chipList(['ma + mb = m(a + b)','a² + 2ab + b² = (a + b)²','a² − 2ab + b² = (a − b)²','a² − b² = (a + b)(a − b)','x² + (a+b)x + ab = (x + a)(x + b)'])}],
+    ways:[fromHint('공통인수','6x + 9',fcC(1,3,2,3,'b')), fromHint('완전제곱식','x² + 6x + 9',fcS(1,3,'q')),
+          fromHint('합과 차','x² − 49',fcD(1,7,'q')), fromHint('두 수 찾기','x² + 2x − 15',fcT(5,-3,'b')), fromHint('대각선 곱','2x² + 7x + 3',fcA(2,1,1,3,'s'))],
+    miss:[{w:'x² + 2x − 15 = (x − 5)(x + 3)', r:'(x + 5)(x − 3)', y:'두 수의 합이 +2 여야 해요: 5 + (−3) = 2.'},
+          {w:'x² − 49 = (x − 7)²', r:'(x + 7)(x − 7)', y:'(x − 7)² 은 x² − 14x + 49 예요.'},
+          {w:'6x + 9 = 3(2x + 9)', r:'3(2x + 3)', y:'두 항을 모두 3 으로 나눠야 해요: 9 ÷ 3 = 3.'}]};
+  return null;
+}
+
+/* ════════ 고리 잇기 ════════ */
+{ const f0=extFact, v0=extVariant, h0=extHint, p0=extPreview, n0=extNote;
+  const mine=f=>f&&(f.k==='add3'||f.k==='sub3'||CURR.includes(f.t));
+  const efr=f=>f&&f.k==='fE'&&/^EF/.test(f.key);       /* 예전 분수 문항 (삼각함수의 fE 와 구별) */
+  extFact=k=>f0(k)||currFact(k);
+  extVariant=f=>efr(f)?elemVariant(f):mine(f)?currVariant(f):v0(f);
+  extHint=f=>{ if(!(efr(f)||mine(f))) return h0(f); const h=efr(f)?elemHint(f):currHint(f); if(h&&h.svg==null) h.svg=''; return h; };
+  extPreview=(t,n)=>CURR.includes(t)?currPreview(t,n):p0(t,n);
+  extNote=(t,fh)=>CURR.includes(t)?currNote(t,fh):n0(t,fh); }
+
 /* ═══════════════════ 선생님 모드 ═══════════════════
    학번 칸에 00000, 비밀번호 0815를 넣으면 들어옵니다.
    ① 랭킹  ② 계산별 정답률(학생 전체 기록을 모아서)  ③ 학생 정보          */
 
 const TEACHER_ID='00000', TEACHER_PW='0815';
+let tClasses={};
 let isTeacher=false, tTab='rank', tTopic='gugu', tOpen=null, tUsers={}, tClass='', tHm='g', tCb='m';
 
 async function enterTeacher(){
@@ -5751,6 +6732,7 @@ function leaveTeacher(){ isTeacher=false; LS.del(MEKEY);
 async function loadTeacher(){
   el('tSub').textContent='불러오는 중…';
   try{ tUsers=(await dbGet('users',{}))||{}; }catch(e){ tUsers={}; }
+  try{ tClasses=(await dbGet('classes',{}))||{}; }catch(e){ tClasses={}; }
   delete tUsers[TEACHER_ID];
   await loadCfg();
   paintTeacher();
@@ -6003,15 +6985,23 @@ function paintTStu(rows){
   el('tBody').innerHTML=rows.length?rows.map(r=>{
     const open=tOpen===r.sid, u=r.u, fs=u.fs||{};
     const bests=TOPIC_ORDER.filter(k=>topicOpen(k)||(((u.R||{})[k]||{}).best||0)>0).map(k=>`${topicOf(k).n} ${((u.R||{})[k]||{}).best||0}`).join(' · ');
-    const wk=open?weakList(fs,tTopic,8):[];
+    const wk=open?weakList(fs,tTopic,8):[], cu=coinUse(u,r.sid,tClasses);
     return `<div class="stu${open?' open':''}">
       <button class="stuhead" data-sid="${esc(r.sid)}">
         <span class="av2">${avatarSVG(r.ch,{tight:true})}</span>
         <span class="who"><b>${esc(r.sid)}</b>
-          <span>${bests} · 코인 ${r.coin}${r.wrong?` · ${T.n} 오답노트 ${r.wrong}`:''}</span></span>
+          <span>${bests} · 코인 ${cn(r.coin)} (쓴 코인 ${cu.exact?'':'약 '}${cn(cu.spent)})${r.wrong?` · ${T.n} 오답노트 ${r.wrong}`:''}</span></span>
         <span class="arw">${open?'▲':'▼'}</span>
       </button>
       ${open?`<div class="studet">
+        <div class="chartlab" style="margin:10px 0 6px;text-align:left">코인 — 쓴 코인은 오늘(10월 31일)부터 정확히 세고, 그 전 것은 가진 물건 값·상자 횟수로 어림해요</div>
+        <div class="tstats tcoin">
+          <div><b>${cn(cu.have)}</b><span>가진 코인</span></div>
+          <div><b>${cn(cu.total)}</b><span>모은 코인${cu.exact?'':' (약)'}</span></div>
+          <div><b>${cn(cu.shop)}</b><span>상점 · 물건 ${cu.nOwn}개</span></div>
+          <div><b>${cn(cu.box)}</b><span>랜덤 상자 ${cu.boxN}번</span></div>
+          <div><b>${cn(cu.gift)}</b><span>우리 반 모금</span></div>
+        </div>
         <div class="chartlab" style="margin:10px 0 6px;text-align:left">주제별 한눈에 — 연습 등급은 스테이지 최고 시간, 실전 등급은 1분 최고 기록</div>
         ${tOverview(u)}
         <div class="chartlab" style="margin:16px 0 6px;text-align:left">${T.n} 자세히 (위 주제 버튼으로 바꿀 수 있어요)</div>
@@ -6597,12 +7587,11 @@ const classLabel=c=>c.length===3?`${c[0]}학년 ${+c.slice(1)}반`:c;
 const symHTML=T=>TOPIC_SYMH[T.k]||T.sym;
 
 /* ═══════════════════ 규칙 · 코인 ═══════════════════
-   실전 : 1분 무실수. 오늘 이 주제에서 세운 기록을 '넘어선' 문항마다 2코인,
-          내 최고 기록을 깨면 그 판 코인이 2배.
-          (쉬운 앞부분만 풀고 그만두기를 되풀이해도 코인이 쌓이지 않게)
+   실전 : 1분 무실수. 판마다 맞힌 문항마다 3코인,
+          내 최고 기록을 깨면 넘어선 문항은 한 번 더(그 부분 2배).
    연습 : 스테이지를 처음 클리어하면 30코인, 그 뒤로는 날마다 첫 클리어에 10코인.
    오답노트 : 다시 풀어 통과한 문항마다 5코인.                                 */
-const REAL_SEC=60, COIN_PER=2, CLEAR_FIRST=30, CLEAR_DAY=10, NOTE_COIN=5;
+const REAL_SEC=60, COIN_PER=3, CLEAR_FIRST=30, CLEAR_DAY=10, NOTE_COIN=5;
 /* 바르게 다 쓰면 '확인'을 누르지 않아도 넘어갑니다.
    단, 지우기를 한 번이라도 누른 문항은 '확인'을 눌러야 합니다 —
    숫자를 바꿔 가며 넣어 보는 것으로 답을 맞히지 못하게.                  */
@@ -6636,7 +7625,7 @@ function meFrom(sid,u){
   return {sid, ch:Object.assign(cleanCh(u.ch),{cl:shortCls(sid)}), coin:u.coin||0, own:arr(u.own).filter(id=>ITEM(id)),
           ownS:ownS.length?ownS:null, ownC:ownC.length?ownC:null,
           sc:u.sc||'', boxN:u.boxN||0, R:u.R||{}, P:u.P||{}, pc:u.pc||null, W:u.W||{}, fs:u.fs||{},
-          hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, bh:arr(u.bh), h:u.h||''};
+          hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, bh:arr(u.bh), h:u.h||'', cu:Object.assign({},u.cu||{})};
 }
 function rec(t){ const R=ME.R||(ME.R={}); const r=R[t]||(R[t]={best:0,hist:[]});
   if(!Array.isArray(r.hist)) r.hist=[]; return r; }
@@ -6660,7 +7649,7 @@ async function saveMe(){
   await dbUpdate('users/'+ME.sid,{ch:ME.ch,coin:ME.coin,own:ME.own||[],
     ownS:ownShapes(),ownC:ownColors(),sc:ME.sc||'',R:ME.R||{},P:ME.P||{},
     pc:ME.pc||null,W:ME.W||{},fs:ME.fs||{},boxN:ME.boxN||0,
-    hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,bh:(ME.bh||[]).slice(-30),
+    hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,bh:(ME.bh||[]).slice(-30),cu:ME.cu||{},
     h:ME.h||((LS.get(MEKEY,{})||{}).h)||''});
 }
 /* ═══ 서버 연결이 끊겼다가 다시 이어지면 — 이 휴대폰에만 있던 기록을 서버로 올립니다 ═══
@@ -6691,7 +7680,9 @@ setInterval(async()=>{
 /* 통계 열쇠의 이름 — 두 자리 계산은 문항이 끝없이 많아 갈래로 묶어 셉니다 */
 const SK_NAME={'P+c':'두 자리 + 한 자리 (받아올림)','P+n':'두 자리 + 한 자리','P-c':'두 자리 − 한 자리 (받아내림)',
   'P-n':'두 자리 − 한 자리','Q+c':'두 자리 + 두 자리 (받아올림)','Q+n':'두 자리 + 두 자리',
-  'Q-c':'두 자리 − 두 자리 (받아내림)','Q-n':'두 자리 − 두 자리','B+':'빈칸 채우기 (덧셈 꼴)','B-':'빈칸 채우기 (뺄셈 꼴)'};
+  'Q-c':'두 자리 − 두 자리 (받아내림)','Q-n':'두 자리 − 두 자리','B+':'빈칸 채우기 (덧셈 꼴)','B-':'빈칸 채우기 (뺄셈 꼴)',
+  'R+0':'세 자리 덧셈','R+1':'세 자리 덧셈 (받아올림 한 번)','R+2':'세 자리 덧셈 (받아올림 두 번 이상)',
+  'R-0':'세 자리 뺄셈','R-1':'세 자리 뺄셈 (받아내림 한 번)','R-2':'세 자리 뺄셈 (받아내림 두 번)','R-z':'세 자리 뺄셈 (0 이 있는 수)'};
 function skLabel(sk){ if(SK_EXT[sk]) return SK_EXT[sk].n; if(SK_NAME[sk]) return SK_NAME[sk]; const f=factFromKey(sk); return f?eqText(f,true):sk; }
 function skTopic(sk){ if(SK_EXT[sk]) return SK_EXT[sk].t; if(SK_NAME[sk]) return 'addsub'; const f=factFromKey(sk); return f?f.t:''; }
 /* 자주 틀리는 계산 — 두 번 이상 풀었고 정답률이 낮은 것부터 */
@@ -6783,14 +7774,14 @@ function logout(){
    일곱 개를 모두 모으면 고등학교가 열립니다. 한 번 열리면 계속 열려 있습니다(ME.hu).
    기준은 최상위권 학생이 1분 동안 틀리지 않고 풀 수 있는 정도로 잡았고,
    선생님 모드 '고등 열쇠' 탭에서 바꾸거나 학생 기록의 상위 10%로 맞출 수 있습니다. */
-const HS_GOAL_DEF={int:20, subst:14, expo:18, power:25, root:16, pyth:15, trig:15};   /* 1분 실전 기준 */
+const HS_GOAL_DEF={int:20, expo:18, power:25, root:16, pyth:15, trig:15};   /* 1분 실전 기준 */
 /* ═══ 실전 등급 B · A · S · SS · SSS (1분 무실수에서 맞힌 개수) ═══
    A   : 내용을 충분히 알고 있다          — 1단계를 넘어 2단계 문제까지 안정적으로
    S   : 내용을 매우 충분히 알고 있다      — 2단계를 넘어 마지막 단계에 닿음
    SS  : 아주 잘한다                     — 최상위권이 실수 없이 1분을 거의 다 쓰는 수준
    SSS : 아주 잘하는 친구도 문제 운이 따라야 나오는 개수 (마지막 단계 문제를 계속 빠르게)
    B   : 1개 이상 */
-const GRADE_CUT={addsub:[26,20,15,10], gugu:[30,24,18,12], power:[23,18,14,9], pyth:[15,12,9,6],
+const GRADE_CUT={addsub:[24,19,14,9], fadd:[15,12,9,6], fmul:[15,12,9,6], ratio:[14,11,8,5], cnt:[12,9,7,4], factor:[15,12,9,6], gugu:[30,24,18,12], power:[23,18,14,9], pyth:[15,12,9,6],
   lineq:[18,14,10,6], bond:[24,19,14,9], boxq:[20,16,12,8], mixc:[16,13,10,6], divm:[16,13,10,6], frac:[15,12,9,6]};   /* SSS · SS · S · A */
 function gradeCuts(t){ const c=GRADE_CUT[t]; if(!c) return null;
   return [['SSS',c[0]],['SS',c[1]],['S',c[2]],['A',c[3]],['B',1]]; }
@@ -6887,13 +7878,18 @@ function goHome(){
 }
 
 /* ═══════════════════ 학교별 메인 ═══════════════════ */
+let HOME_SHUT_OPEN=false;
 function paintHome(){
   const sc=schoolOf(CUR.school);
   el('homeSchool').textContent=sc.n;
   const open=sc.topics.filter(t=>modeOpen(t,'p')||modeOpen(t,'r')), shut=sc.topics.filter(t=>!open.includes(t));
-  el('topicList').innerHTML=open.map(topicCard).join('')+(shut.length?`<div class="shutbox">
-      <div class="shuth">${LOCKI}<b>잠긴 주제 ${shut.length}개</b><span>선생님이 열면 위로 올라와요</span></div>
-      <div class="shutchips">${shut.map(t=>`<button class="shutchip" onclick="topicShut('${t}')">${topicOf(t).n}</button>`).join('')}</div></div>`:'');
+  /* 학년 묶음(저학년·고학년 / 1·2·3학년) 머리글 — 열린 주제만, 같은 묶음이 이어지면 한 번만 */
+  let lastG='';
+  const cards=open.map(t=>{ const g=topicOf(t).gr||''; const h=g&&g!==lastG?`<div class="grh">${g}</div>`:''; lastG=g; return h+topicCard(t); }).join('');
+  /* 잠긴 주제는 접어 두고, 누르면 펼쳐져요 */
+  el('topicList').innerHTML=cards+(shut.length?`<div class="shutbox${HOME_SHUT_OPEN?' open':''}">
+      <button class="shuth" onclick="HOME_SHUT_OPEN=!HOME_SHUT_OPEN; paintHome()">${LOCKI}<b>잠긴 주제 ${shut.length}개</b><span>선생님이 열면 위로 올라와요</span><i class="shutarr">${HOME_SHUT_OPEN?'접기 ▴':'펼치기 ▾'}</i></button>
+      ${HOME_SHUT_OPEN?`<div class="shutchips">${shut.map(t=>`<button class="shutchip" onclick="topicShut('${t}')">${topicOf(t).gr?`<small>${topicOf(t).gr}</small>`:''}${topicOf(t).n}</button>`).join('')}</div>`:''}</div>`:'');
   paintHomeMe();
 }
 function topicCard(t){
@@ -6904,7 +7900,7 @@ function topicCard(t){
         <span class="tlk" aria-label="잠김">${LOCKI}</span></div>
       <div class="tlnote">${LOCKI}<span>잠겨 있어요 · 선생님이 열어 주면 시작할 수 있어요</span></div></div>`; }
   const T=topicOf(t), p=prog(t), r=rec(t), w=wrongOf(t).length, S=T.stages.length, cl=p.c.length;
-  const key=T.school==='m'&&CFG.lock.on&&!(ME&&ME.hu), kok=(r.best||0)>=hsGoal(t);
+  const key=(t in HS_GOAL_DEF)&&CFG.lock.on&&!(ME&&ME.hu), kok=(r.best||0)>=hsGoal(t);
   return `<div class="topic tc2" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}">
     <div class="ttop"><span class="tsym">${symHTML(T)}</span>
       <div class="tinfo"><h2>${T.n}${gradeBadge(t)}</h2>
@@ -7038,15 +8034,14 @@ function tryReal(t){
   el('startTitle').textContent=`${T.n} · 실전 모드`;
   el('startSub').innerHTML=`<b>${REAL_SEC/60}분</b> 동안 <b>한 문제도 틀리지 않고</b> 몇 문제까지 갈 수 있는지 겨룹니다.
     한 문제라도 틀리면 거기서 끝나고, 그때까지 맞힌 개수가 기록이 됩니다.<br><br>
-    <b>맞힐수록 어려워져요</b> — ${REAL_STEP}문항을 맞힐 때마다 한 단계씩 어려운 문제가 나와요.<br>
-    코인 : 오늘 이 주제에서 세운 기록을 <b>넘어선 문항마다 ${COIN_PER}코인</b>, 내 최고 기록을 깨면 <b>2배</b>.`+
-    (T.school==='m'&&CFG.lock.on&&!ME.hu?`<br><br>고등학교 열쇠 : <b>${hsGoal(t)}개</b> 이상 맞히면 얻어요 (지금 최고 ${rec(t).best||0}개).`:'');
+    코인 : <b>맞힌 문항마다 ${COIN_PER}코인</b>, 내 최고 기록을 깨면 넘어선 문항은 <b>2배</b>.`+
+    ((t in HS_GOAL_DEF)&&CFG.lock.on&&!ME.hu?`<br><br>고등학교 열쇠 : <b>${hsGoal(t)}개</b> 이상 맞히면 얻어요 (지금 최고 ${rec(t).best||0}개).`:'');
   el('startGo').onclick=()=>{ close_('ovStart'); startReal(t); };
   openM('ovStart');
 }
 function startReal(t){
   stopTimer();
-  G={mode:'real', t, qi:0, score:0, combo:0, best:0, solved:0, right:0, tLeft:REAL_SEC,
+  G={mode:'real', t, qi:0, score:0, combo:0, best:0, solved:0, right:0, tLeft:REAL_SEC, L:1, qLv:1,
      tId:null, recent:[], phase:'q', typed:'', clean:true, locked:false};
   setupHUD(); show('s-play');
   G.last=performance.now(); G.tId=setInterval(tick,100); next();
@@ -7110,7 +8105,7 @@ function next(){
     askQ(G.queue.shift());
   }else if(G.mode==='real'){
     if(G.tLeft<=0){ finish(true); return; }
-    const f=realPick(G.t,G.qi+1,G.recent);
+    const f=realPick(G.t,G.qi+1,G.recent,G.L); G.qLv=f._rl||1;
     G.recent.push(f.key); if(G.recent.length>12) G.recent.shift();
     askQ(f);
   }else if(G.mode==='battle'){
@@ -7118,9 +8113,8 @@ function next(){
   }
 }
 function qLabel(){
-  if(G.mode==='real'){ const lv=realLevel(G.t,G.qi+1);
-    const RS=realStagesOf(G.t), S=RS.length;
-    return `난이도 ${lv} / ${S} · ${RS[lv-1].name}${lv>=S&&G.qi+1>S*REAL_STEP?' · 최고 단계':''}`; }
+  if(G.mode==='real'){ const RS=realStagesOf(G.t), S=RS.length, lv=Math.min(S,G.qLv||1);
+    return `난이도 ${lv} / ${S} · ${RS[lv-1].name}`; }
   if(G.mode==='battle') return btQLabel();
   if(G.mode==='note') return G.step===2?'확인 문제 — 같은 계산을 다른 모양으로 한 번 더!':'다시 풀기 — 방금 본 풀이대로';
   return `${G.st}단계 · ${stageOf(G.t,G.st).name}`;
@@ -7146,7 +8140,8 @@ function paintTyped(state){ const e=el('eq'); if(e) e.innerHTML=eqHTML(G.ask,G.t
 let KP_NEG=null;
 function buildKeypad(neg){
   neg=!!neg; if(KP_NEG===neg) return; KP_NEG=neg;
-  const K=neg?['7','8','9','del','4','5','6','neg','1','2','3','ok','0']:['7','8','9','4','5','6','1','2','3','del','0','ok'];
+  /* 휴대폰 숫자판처럼 1 2 3 이 맨 위 (계산기식 7 8 9 위가 아니라) */
+  const K=neg?['1','2','3','del','4','5','6','neg','7','8','9','ok','0']:['1','2','3','4','5','6','7','8','9','del','0','ok'];
   const lab=x=>x==='del'?'⌫':x==='ok'?'확인':x==='neg'?'−':x;
   el('keypad').classList.toggle('neg',neg);
   el('keypad').innerHTML=K.map(x=>`<button class="kb${x==='del'?' del':x==='ok'?' okk':x==='neg'?' negk':''}${neg&&x==='0'?' zero':''}" data-k="${x}"
@@ -7174,7 +8169,7 @@ function submit(){
   const f=G.ask, ok=(+G.typed===f.ans), sec=(performance.now()-G.qStart)/1000;
   G.locked=true; G.solved++;
   logFact(f,ok,sec);
-  if(G.mode==='real') return realAnswer(ok,f);
+  if(G.mode==='real') return realAnswer(ok,f,sec);
   if(G.mode==='battle') return btAnswer(ok,f);
   if(G.mode==='note') return noteAnswer(ok,f);
   practiceAnswer(ok,f);
@@ -7194,8 +8189,9 @@ function practiceAnswer(ok,f){
   updHUD();
   showHint(f,G.typed,'이 문제는 조금 뒤에 다시 나와요',()=>next());
 }
-function realAnswer(ok,f){
+function realAnswer(ok,f,sec){
   if(ok){
+    G.L=(G.L||1)+realGain(G.t,sec);
     G.qi++; G.score++; G.right++; G.combo++; G.best=Math.max(G.best,G.combo);
     flashOk(); updHUD();
     setTimeout(()=>{ if(G&&G.mode==='real'&&!G.over) next(); },160);
@@ -7289,11 +8285,11 @@ async function finish(timeUp){
   G.over=true; stopTimer();
   const t=G.t, T=topicOf(t), r=rec(t), score=G.score, prevBest=r.best||0, day=todayKey();
   const tb=(r.tb&&r.tb.d===day)?(r.tb.n||0):0;
-  const grow=Math.max(0,score-tb), beat=score>prevBest&&score>0;
-  const coin=grow*COIN_PER*(beat?2:1);
+  const beat=score>prevBest&&score>0, over=beat?score-prevBest:0;
+  const coin=(score+over)*COIN_PER;
   const used=Math.min(REAL_SEC,REAL_SEC-Math.max(0,G.tLeft));
   const miss=G.miss?factFromKey(G.miss.key):null;
-  const hsWas=hsOpen(), keyNew=T.school==='m'&&CFG.lock.on&&!ME.hu&&prevBest<hsGoal(t)&&score>=hsGoal(t);
+  const hsWas=hsOpen(), keyNew=(t in HS_GOAL_DEF)&&CFG.lock.on&&!ME.hu&&prevBest<hsGoal(t)&&score>=hsGoal(t);
 
   r.best=Math.max(prevBest,score);
   const hsNow=!hsWas&&hsOpen();
@@ -7315,8 +8311,8 @@ async function finish(timeUp){
     <div class="stat"><b>${clock(used)}</b><span>걸린 시간</span></div>
     <div class="stat"><b>+${coin}</b><span>받은 코인</span></div>`;
   el('byLv').innerHTML = beat
-    ? `<div class="gainbox good">최고 기록 갱신! 코인 <b>2배</b> — <b>+${coin}코인</b></div>`
-    : (score>0&&!grow?`<div class="gainbox">실전 코인은 오늘 이 주제에서 세운 기록(<b>${tb}개</b>)을 넘어선 만큼 받아요.</div>`:'');
+    ? `<div class="gainbox good">최고 기록 갱신! 넘어선 ${over}문항은 코인 <b>2배</b> — <b>+${coin}코인</b></div>`
+    : '';
   if(hsNow) el('byLv').innerHTML+=`<div class="gainbox hsopen"><b>고등학교가 열렸어요!</b> 중학교 열쇠 ${hsKeys().length}개를 모두 모았어요. 처음 화면에서 고등학교를 골라 보세요.</div>`;
   else if(keyNew){ const K=hsKeys(); el('byLv').innerHTML+=`<div class="gainbox hskeybox">${LOCKI}<span><b>고등학교 열쇠</b>를 얻었어요 — ${K.filter(x=>x.ok).length} / ${K.length}</span></div>`; }
   el('endMiss').innerHTML = miss
@@ -7463,8 +8459,18 @@ function openMine(){
     <span class="mpchip">${classLabel(classOf(ME.sid))}</span>
     <span class="mpchip">가진 것 ${ownItems().length+ownShapes().length+ownColors().length}개</span>
     <span class="mpchip">친구 대전 ${ME.bw||0}승 ${Math.max(0,(ME.bp||0)-(ME.bw||0))}패</span>`;
-  paintMine(); paintMineBattle();
+  paintMine(); paintMineBattle(); paintMineOwn();
   show('s-mine');
+}
+function paintMineOwn(){
+  const ids=ownItems().filter(id=>ITEM(id)), w=ME.ch.items||[];
+  el('mpOwnN').textContent=ids.length?`${ids.length}개`:'';
+  el('mpOwn').innerHTML=ids.length?ids.map(id=>{ const i=ITEM(id), on=w.includes(id);
+    return `<button class="item${on?' on':''}" data-id="${id}">${i.box?'<span class="tagw">한정</span>':''}<div class="ic">${avatarWith(ME.ch,id)}</div><div class="nm2">${i.n}</div><span class="state${on?' wear':''}">${on?'입는 중':'입기'}</span></button>`; }).join('')
+    :`<div class="empty" style="grid-column:1/-1;padding:14px 0">아직 산 꾸미기가 없어요. 상점이나 랜덤 상자에서 얻어 보세요.</div>`;
+  el('mpOwn').querySelectorAll('.item').forEach(b=>b.onclick=async()=>{ const id=b.dataset.id, w=ME.ch.items||[];
+    ME.ch.items=w.includes(id)?w.filter(x=>x!==id):w.filter(x=>CAT_OF(x)!==CAT_OF(id)).concat([id]);
+    await saveMe(); el('mpAv').innerHTML=avatarSVG(ME.ch); paintMineOwn(); paintMe(); });
 }
 function paintMine(){
   const t=MP.topic, T=topicOf(t), r=rec(t), p=prog(t), h=r.hist, day=todayKey();
@@ -7526,6 +8532,26 @@ function paintMineChart(){
     : '막대 하나가 하루의 가장 좋은 기록 (최근 14일) · 점선은 등급 기준';
 }
 
+/* ═══ 코인을 쓴 곳 — 상점 · 랜덤 상자 · 우리 반 모금 ═══
+   cu : {s 상점, b 상자(겹쳐서 돌려받은 코인은 뺀 값), bn 셈한 상자 수, g 모금} — 2026.10.31 부터 정확히 셉니다.
+   그 전에 쓴 코인은 가진 물건의 값(상점 정가)과 상자 횟수(일반 상자 값)로 어림합니다.
+   모금은 학급 자료(classes/반/gv)에 학생마다 남아 있어 그 값을 씁니다.                     */
+function spendLog(k,v){ if(!ME||!(v>0)) return; const cu=ME.cu||(ME.cu={}); cu[k]=(cu[k]||0)+v; if(k==='b') cu.bn=(cu.bn||0)+1; }
+function coinUse(u,sid,classes){
+  const cu=u.cu||{};
+  const goods=arr(u.own).map(ITEM).filter(it=>it&&!it.box&&it.cat!=='class')
+    .concat(arr(u.ownS).map(k=>CH_SHAPES.find(x=>x.k===k)), arr(u.ownC).map(k=>CH_COLORS.find(x=>x.k===k))).filter(Boolean);
+  const nOwn=goods.length, worth=goods.reduce((a,x)=>a+(x.p||0),0);
+  const shop=Math.max(cu.s||0,worth), boxN=Math.max(u.boxN||0,cu.bn||0);
+  const box=(cu.b||0)+Math.max(0,boxN-(cu.bn||0))*300;
+  const cg=classes&&classes[classOf(sid)]&&classes[classOf(sid)].gv;
+  const gift=Math.max(cu.g||0,(cg&&cg[sid])||0);
+  const exact=!!u.cu&&!(u.boxN>(cu.bn||0))&&shop===(cu.s||0);
+  const have=u.coin||0, spent=shop+box+gift;
+  return {have, shop, nOwn, box, boxN, gift, spent, total:have+spent, exact};
+}
+const cn=v=>Number(v||0).toLocaleString('ko-KR');
+
 /* ═══════════════════ 랭킹 ═══════════════════
    주제마다 ① 오늘의 랭킹 ② 누적 랭킹(암호) ③ 학급 랭킹             */
 const RANK_PW='0815';
@@ -7541,6 +8567,7 @@ async function openRank(){
 async function loadRank(){
   el('rkBody').innerHTML='<div class="empty">불러오는 중…</div>';
   try{ RK.users=(await dbGet('users',{}))||{}; }catch(e){ RK.users={}; }
+  try{ RK.classes=(await dbGet('classes',{}))||{}; }catch(e){ RK.classes={}; }
   if(RK.users&&RK.users[TEACHER_ID]) delete RK.users[TEACHER_ID];
   paintRank();
 }
@@ -7558,10 +8585,11 @@ function paintRank(){
   el('rkSchools').innerHTML=SCHOOLS.map(x=>{ const n=rkTopicsOf(x.k).length;
     return n?`<button class="chip sch${x.k===RK.school?' on':''}" data-k="${x.k}">${x.n}</button>`
             :`<button class="chip sch chlock" disabled>${LOCKI}${x.n}</button>`; }).join('')+
-    `<button class="chip sch btsch2${RK.battle?' on':''}" data-b="1">친구 대전</button>`;
+    `<button class="chip sch btsch2${RK.battle==='b'?' on':''}" data-b="b">친구 대전</button>`+
+    `<button class="chip sch coinsch${RK.battle==='c'?' on':''}" data-b="c">코인</button>`;
   el('rkSchools').querySelectorAll('.chip[data-k]').forEach(b=>b.onclick=()=>{ RK.battle=false; RK.school=b.dataset.k; RK.topic=null; RK.scope='school'; paintRank(); });
-  el('rkSchools').querySelector('.chip[data-b]').onclick=()=>{ RK.battle=true; paintRank(); };
-  if(RK.battle){ el('rkSchools').querySelectorAll('.chip[data-k]').forEach(b=>b.classList.remove('on')); return paintRkBattle(); }
+  el('rkSchools').querySelectorAll('.chip[data-b]').forEach(b=>b.onclick=()=>{ RK.battle=b.dataset.b; paintRank(); });
+  if(RK.battle){ el('rkSchools').querySelectorAll('.chip[data-k]').forEach(b=>b.classList.remove('on')); return RK.battle==='c'?paintRkCoin():paintRkBattle(); }
   const tops=rkTopicsOf(RK.school);
   if(!tops.length){ el('rkSub').innerHTML='아직 열린 실전 모드가 없어요.'; el('rkTopics').innerHTML=''; el('rkTabs').innerHTML='';
     el('rkBody').innerHTML='<div class="empty">선생님이 실전 모드를 열면 랭킹이 보여요.</div>'; return; }
@@ -7598,6 +8626,25 @@ function paintRkBattle(){
       :`<div class="empty">아직 친구 대전 기록이 없어요.</div>`)+
     (ME?`<div class="myplace">${mi<0?'아직 친구 대전 기록이 없어요. 학교 고르기 화면의 친구와 대전에서 시작해 보세요!'
       :`${esc(ME.sid)} 님은 <b>${rows[mi].w}승 ${rows[mi].l}패</b> · ${rows.length}명 중 ${rankList(rows,r=>r.w+'/'+r.rate)[mi].rank}위예요.`}</div>`:'');
+}
+/* 코인 랭킹 — 지금까지 모은 코인(가진 코인 + 쓴 코인) · 지금 가진 코인 */
+function paintRkCoin(){
+  el('rkTopics').innerHTML=''; const by=RK.coinBy||'total';
+  el('rkTabs').innerHTML=[['total','모은 코인'],['have','가진 코인']].map(([k,n])=>`<button class="tab${by===k?' on':''}" data-k="${k}">${n}</button>`).join('');
+  el('rkTabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ RK.coinBy=b.dataset.k; paintRkCoin(); });
+  el('rkSub').innerHTML=`${online()?'반 전체가 함께 보는 기록':'이 기기에 저장된 기록'} · ${by==='total'?'<b>모은 코인</b> = 가진 코인 + 상점·상자·우리 반 모금에 쓴 코인':'<b>지금 가진 코인</b>'}`;
+  const u=RK.users||{};
+  const rows=Object.keys(u).map(sid=>{ const x=u[sid]||{}, c=coinUse(x,sid,RK.classes); return {sid, ch:cleanCh(x.ch), c, v:by==='total'?c.total:c.have}; })
+    .filter(r=>r.v>0).sort((a,b)=>b.v-a.v||a.sid.localeCompare(b.sid));
+  const list=rows.slice(0,50), mi=ME?rows.findIndex(r=>r.sid===ME.sid):-1, R=rankList(rows,r=>r.v);
+  el('rkBody').innerHTML=(list.length?R.slice(0,50).map(({r,rank})=>{ const me=ME&&r.sid===ME.sid;
+      return `<div class="rk${rank<=3?' top':''}${me?' me':''}">
+        <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
+        <div class="av2">${avatarSVG(r.ch,{tight:true})}</div>
+        <div class="who"><b>${esc(r.sid)}${me?' <em class="mytag">나</em>':''}</b><span>${by==='total'?`가진 코인 ${cn(r.c.have)} · 쓴 코인 ${cn(r.c.spent)}`:`모은 코인 ${cn(r.c.total)}`}</span></div>
+        <div class="sc">${cn(r.v)}<small>코인</small></div></div>`; }).join('')
+      :`<div class="empty">아직 코인 기록이 없어요.</div>`)+
+    (ME&&mi>=0?`<div class="myplace">${esc(ME.sid)} 님은 <b>${cn(rows[mi].v)}코인</b> · ${rows.length}명 중 ${R[mi].rank}위예요.</div>`:'');
 }
 function pickRankTab(k){ if(k==='all'&&!RK.open) return askRankPw(); RK.tab=k; paintRank(); }
 function askRankPw(){
@@ -7845,7 +8892,7 @@ async function buyTry(){
   if(g.box) return toast('랜덤 상자에서만 나오는 아이템이에요');
   if(hsLocked(g)) return toast('고등학교가 열리면 살 수 있어요');
   if(ME.coin<g.p) return toast(`코인이 ${g.p-ME.coin}개 모자라요`);
-  ME.coin-=g.p;
+  ME.coin-=g.p; spendLog('s',g.p);
   if(g.kind==='shape') ownShapes().push(g.k);
   else if(g.kind==='color') ownColors().push(g.k);
   else ownItems().push(g.k);
@@ -7905,7 +8952,7 @@ async function openBox(k){
   ME.coin-=B.p;
   const it=rollBox(B), dup=ownItems().includes(it.id), back=dup?Math.min(Math.round(it.p*REFUND),Math.round(B.p*.5)):0;   /* 돌려받는 코인은 상자 값의 절반까지 */
   if(dup) ME.coin+=back; else ownItems().push(it.id);
-  ME.boxN=(ME.boxN||0)+1;
+  ME.boxN=(ME.boxN||0)+1; spendLog('b',B.p-back);
   await saveMe(); paintMe();
   const R=RARITY.find(x=>x.k===rarityOf(it));
   el('boxTitle').textContent=B.n;
@@ -7992,7 +9039,7 @@ function classPanelHTML(){
 async function giveClass(v){
   if(!ME||ME.coin<v) return toast('코인이 모자라요');
   if(!confirm(`우리 반 모금함에 ${v}코인을 낼까요?\n낸 코인은 돌려받을 수 없어요.`)) return;
-  ME.coin-=v; await saveMe();
+  ME.coin-=v; spendLog('g',v); await saveMe();
   const before=Object.assign({},(CLS&&CLS.pick)||{});
   const r=await dbTx('classes/'+clsKey(),cur=>{ cur=cur||{fund:0,gv:{}}; cur.fund=(cur.fund||0)+v;
     cur.gv=cur.gv||{}; cur.gv[ME.sid]=(cur.gv[ME.sid]||0)+v; cur.pick=cur.pick||{};
