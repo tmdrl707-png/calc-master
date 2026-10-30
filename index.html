@@ -2602,11 +2602,19 @@ const CLASS_TIERS=[...new Set(CLASS_ITEMS.map(i=>i.tier))].map(t=>{ const L=CLAS
    사각형 게임에서는 가장 비싼 '자랑용' 물건(무지개색 6400 · 정사각형 3000 · 광선검 · 아기 티라노 · 불사조 날개)에
    눈이 몰렸고, 산 학생 대부분이 실제로 입고 다녔어요(3000 이상 착용률 83%). 중간 가격 색은 거의 팔리지 않았고요.
    그래서 눈에 띄는 물건 몇 가지를 '최고 인기' 등급(2400 이상)으로 올리고, 상징적인 모양(Σ·∞·π)도 올립니다. */
-const REPRICE={frRain:4800, bgGalaxy:3600, fairy:3600, pOwl:3200, wand:2400, infhalo:2600, jet:2600, rain:2400,
-  frNeon:2400, frGold:2200, cloud:2000, wizard:1400, fire:1400, medal:1400, bgSpot:1400, hSigma:3000, bkSpiral:3000};
-ITEMS.forEach(i=>{ if(REPRICE[i.id]) i.p=REPRICE[i.id]; });
-{ const CP={rainbow:6400, holo:7200}; CH_COLORS.forEach(c=>{ if(CP[c.k]) c.p=CP[c.k]; });
-  const SP={sigma:3600, inf:3200, pi:2400}; CH_SHAPES.forEach(c=>{ if(SP[c.k]){ c.p=SP[c.k]; if(BODY[c.k]) BODY[c.k].p=SP[c.k]; } }); }
+/* 계산 마스터도 본격적으로 열리면 코인이 빨리 모일 것이므로(사각형 게임과 같은 흐름), 가격 틀을 사각형 게임에 맞춥니다.
+   · 싼 물건(300 미만) ×1.5, 보통(300~1000) ×1.25  — 사각형 게임은 300~800 이 가장 많은 구간
+   · 아래 목록은 '최고 인기'(2400 이상) 등 따로 정한 값                                        */
+const REPRICE={frRain:4800, bgGalaxy:3600, fairy:3600, pOwl:3200, jet:3000, hSigma:3000, bkSpiral:3000,
+  infhalo:2600, wand:2400, rain:2400, frNeon:2400, frSunset:2600, bkSine:2600, fxTrig:2400, hUnit:2400,
+  frGold:2200, cloud:2000, frGlow:1800, bgUnit:1800, formula:1600, pearl:1600, bgPascal:1600,
+  wizard:1400, fire:1400, medal:1400, bgSpot:1400};
+const R10=v=>Math.round(v/10)*10;
+ITEMS.forEach(i=>{ if(REPRICE[i.id]) i.p=REPRICE[i.id]; else if(i.p<300) i.p=R10(i.p*1.5); else if(i.p<1000) i.p=R10(i.p*1.25); });
+{ const CP={silver:1800, night:2400, sunset:2400, neon:2600, aurora:3000, gold:3200, rainbow:6400, holo:7200};
+  CH_COLORS.forEach(c=>{ if(CP[c.k]) c.p=CP[c.k]; else if(c.p>0&&c.p<300) c.p=R10(c.p*1.5); else if(c.p>=300&&c.p<1000) c.p=R10(c.p*1.25); });
+  const SP={sigma:3600, inf:3200, pi:2400, equal:600, pct:1200};
+  CH_SHAPES.forEach(c=>{ if(SP[c.k]){ c.p=SP[c.k]; if(BODY[c.k]) BODY[c.k].p=SP[c.k]; } }); }
 ITEMS.push(...BOX_ITEMS,...CLASS_ITEMS);
 const ITEM=id=>ITEMS.find(i=>i.id===id);
 const CATS=[{k:'hat',n:'머리'},{k:'face',n:'표정'},{k:'eye',n:'얼굴'},{k:'neck',n:'목·몸'},{k:'hand',n:'손'},
@@ -7856,9 +7864,9 @@ async function buyTry(){
 const RARITY=[{k:'n',n:'일반',col:'#6f7489'},{k:'r',n:'희귀',col:'#4f6bff'},{k:'l',n:'전설',col:'#e8700a'}];
 const rarityOf=it=>it.box||it.p>=900?'l':it.p>=300?'r':'n';
 const BOXES=[
-  {k:'basic',n:'일반 상자',p:150,odds:{n:.8,r:.18,l:.02},col:'#18b07a',desc:'가볍게 한 번! 대부분 일반 아이템'},
-  {k:'shiny',n:'반짝 상자',p:600,odds:{n:0,r:.7,l:.3},col:'#6b5cff',desc:'희귀 이상만! 한정 아이템이 나올 수 있어요'},
-  {k:'gold',n:'황금 상자',p:1500,odds:{n:0,r:.35,l:.65},col:'#e8a800',desc:'전설이 훨씬 자주! 새 한정(황금 Σ 왕관·오로라 하늘…)을 노려 보세요'}
+  {k:'basic',n:'일반 상자',p:300,odds:{n:.8,r:.18,l:.02},bx:0,col:'#18b07a',desc:'가볍게 한 번! 대부분 일반 아이템'},
+  {k:'shiny',n:'반짝 상자',p:1000,odds:{n:0,r:.7,l:.3},bx:.25,col:'#6b5cff',desc:'희귀 이상만! 전설이 나오면 4번 중 1번은 상자 한정'},
+  {k:'gold',n:'황금 상자',p:2000,odds:{n:0,r:.35,l:.65},bx:.5,col:'#e8a800',desc:'전설이 훨씬 자주! 전설이 나오면 2번 중 1번은 상자 한정(황금 Σ 왕관·오로라 하늘…)'}
 ];
 /* 고등 전용 물건은 고등학교가 열린 뒤에만 상자에서 나옵니다 */
 const boxPool=k=>ITEMS.filter(i=>i.cat!=='class'&&rarityOf(i)===k&&(!i.hs||hsOpen()));
@@ -7866,19 +7874,23 @@ const REFUND=.4;
 function rollBox(box){
   let r=Math.random(), k='n';
   for(const R of RARITY){ const o=box.odds[R.k]||0; if(r<o){ k=R.k; break; } r-=o; k=R.k; }
-  const pool=boxPool(k);
+  /* 전설이 나오면 bx 비율만큼은 상자 한정 아이템에서 — 한정 아이템을 노릴 수 있게 */
+  const lim=k==='l'&&Math.random()<(box.bx||0);
+  const pool=lim?BOX_ITEMS:boxPool(k).filter(i=>!(box.bx&&i.box));
   return pool[Math.floor(Math.random()*pool.length)];
 }
 const pct=v=>(Math.round(v*1000)/10)+'%';
 function boxPanelHTML(){
   return `<div class="boxpanel">
-    <div class="boxintro">상자를 열면 아이템 하나가 무작위로 나와요. 이미 가진 것이 나오면 <b>값의 ${REFUND*100}%</b>를 코인으로 돌려받아요.</div>
+    <div class="boxintro">상자를 열면 아이템 하나가 무작위로 나와요. 이미 가진 것이 나오면 <b>값의 ${REFUND*100}%</b>(상자 값의 절반까지)를 코인으로 돌려받아요.</div>
     <div class="boxes">${BOXES.map(B=>`<div class="boxcard" style="--bc:${B.col}">
       <div class="boxart" aria-hidden="true"><span class="lid"></span><span class="body"><b>?</b></span></div>
       <h3>${B.n}</h3><div class="sub">${B.desc}</div>
       <table class="odds"><tr><th>등급</th><th>확률</th><th>들어 있는 수</th></tr>${RARITY.map(R=>
         `<tr${B.odds[R.k]?'':' class="zero"'}><td><i style="background:${R.col}"></i>${R.n}</td><td>${pct(B.odds[R.k]||0)}</td><td>${boxPool(R.k).length}가지</td></tr>`).join('')}</table>
-      <div class="oddsnote">전설 등급의 아이템 하나가 나올 확률 = ${pct(B.odds.l||0)} × 1/${boxPool('l').length} ≈ ${((B.odds.l||0)/boxPool('l').length*100).toFixed(2)}%</div>
+      <div class="oddsnote">${(()=>{ const l=B.odds.l||0, nb=BOX_ITEMS.length, nl=boxPool('l').filter(i=>!i.box).length;
+        return B.bx?`한정 아이템 하나 ≈ <b>${(l*B.bx/nb*100).toFixed(2)}%</b> · 다른 전설 하나 ≈ ${(l*(1-B.bx)/nl*100).toFixed(2)}%`
+                   :`전설 아이템 하나 ≈ ${(l/boxPool('l').length*100).toFixed(2)}%`; })()}</div>
       <button class="btn primary boxbuy" data-b="${B.k}" ${ME.coin<B.p?'disabled':''}>열기 · ${B.p}코인</button>
     </div>`).join('')}</div>
     <h4 class="boxh">상자에서만 나오는 한정 아이템</h4>
@@ -7891,7 +7903,7 @@ async function openBox(k){
   const B=BOXES.find(x=>x.k===k); if(!B||!ME) return;
   if(ME.coin<B.p) return toast(`코인이 ${B.p-ME.coin}개 모자라요`);
   ME.coin-=B.p;
-  const it=rollBox(B), dup=ownItems().includes(it.id), back=dup?Math.round(it.p*REFUND):0;
+  const it=rollBox(B), dup=ownItems().includes(it.id), back=dup?Math.min(Math.round(it.p*REFUND),Math.round(B.p*.5)):0;   /* 돌려받는 코인은 상자 값의 절반까지 */
   if(dup) ME.coin+=back; else ownItems().push(it.id);
   ME.boxN=(ME.boxN||0)+1;
   await saveMe(); paintMe();
