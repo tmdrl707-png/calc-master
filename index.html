@@ -1206,6 +1206,8 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 /* 초등 새 주제 — 단위 글자(개)는 작게, 혼합 계산 풀이의 한 단계 계산은 옆에 작은 꼬리표로 */
 .eq .opr.unit,.scr .eq .opr.unit{font-size:.5em;color:var(--ink);font-weight:600;letter-spacing:0;align-self:flex-end;margin-bottom:.3em}
 .mxc{display:inline-block;margin-left:6px;padding:0 7px;border-radius:7px;background:#eef2fe;color:#2f5bea;font-size:.8em;font-weight:600;white-space:nowrap}
+
+.btp .btaway{display:block;font-size:11px;font-weight:600;color:#a1a1a6;margin-top:2px}
 </style>
 </head>
 <body>
@@ -5814,7 +5816,38 @@ const btMiss=(room,sid)=>Object.values((room&&room.x)||{}).filter(r=>r&&r[sid]).
 const btScore=(room,sid)=>btWins(room,sid)-btMiss(room,sid);
 const PEOPLE='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M2.8 19c.6-3.4 3.1-5.4 6.2-5.4s5.6 2 6.2 5.4z" fill="currentColor"/><circle cx="16.6" cy="9" r="2.6" fill="currentColor" opacity=".55"/><path d="M14.6 14.2c.6-.2 1.3-.3 2-.3 2.6 0 4.4 1.7 4.9 4.6h-4.6c-.3-1.7-1.1-3.2-2.3-4.3z" fill="currentColor" opacity=".55"/></svg>';
 
-const btMe=()=>({ch:{s:ME.ch.s,c:ME.ch.c,items:(ME.ch.items||[]).slice()}, n:0, a:0, rd:0, done:false, j:Date.now()});
+const btMe=()=>({ch:{s:ME.ch.s,c:ME.ch.c,items:(ME.ch.items||[]).slice()}, n:0, a:0, rd:0, done:false, j:Date.now(), hb:serverNow()});
+/* ── 방 지키기 ──
+   휴대폰에서 카톡·메시지로 잠깐 나가면 연결이 끊겨요. 예전에는 끊기는 순간 방에서 빠졌지만,
+   이제는 자리를 그대로 두고(15초마다 '여기 있어요' 신호 hb), 돌아오면 바로 이어서 해요.
+   새로고침되거나 브라우저가 페이지를 다시 열어도 이 휴대폰에 방 번호를 적어 두어 3시간 안이면 다시 들어가요. */
+const BT_SAVE='cmBattle', BT_AWAY=45000;
+const btAway=p=>!!(p&&p.hb)&&serverNow()-p.hb>BT_AWAY;
+function btBeat(){ if(BT.code&&ME) dbUpdate(`battles/${BT.code}/p/${ME.sid}`,{hb:serverNow()}); }
+/* 다시 돌아왔을 때 — 내 자리가 없어졌으면 다시 앉고, 있으면 신호만 */
+async function btRejoin(){
+  if(!BT.code||!ME) return;
+  const code=BT.code; let mine=null, room=null;
+  try{ room=await dbGet('battles/'+code,null); }catch(e){ return; }
+  if(!room||!room.host) return;
+  mine=(room.p||{})[ME.sid];
+  if(mine) btBeat();
+  else if(Object.keys(room.p||{}).length<BT_MAX) await dbSet(`battles/${code}/p/${ME.sid}`,Object.assign(btMe(),{rd:room.st==='run'?room.rd:0}));
+}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden) btRejoin(); });
+window.addEventListener('online',()=>btRejoin());
+/* 앱이 다시 열렸을 때 — 이 휴대폰에 적어 둔 방으로 돌아가기 */
+async function btResume(){
+  const sv=LS.get(BT_SAVE,null);
+  if(!sv||!ME||sv.sid!==ME.sid||BT.code||Date.now()-(sv.at||0)>3*3600e3) return;
+  let room=null; try{ room=await dbGet('battles/'+sv.code,null); }catch(e){}
+  if(!room||!room.host){ LS.del(BT_SAVE); return; }
+  if(!(room.p||{})[ME.sid]){ if(Object.keys(room.p||{}).length>=BT_MAX){ LS.del(BT_SAVE); return; }
+    await dbSet(`battles/${sv.code}/p/${ME.sid}`,btMe()); }
+  CUR.school=topicOf(room.t).school; BT.closed=false;
+  show('s-battle'); await btEnter(sv.code);
+  toast(`대전 방 ${sv.code}에 다시 들어왔어요`);
+}
 /* 실전 모드처럼 뒤로 갈수록 뒤 스테이지가 섞여 나오게, 방장이 문항 순서를 한 번 정해 둡니다 */
 function btKeys(t){
   const out=[], recent=[];
@@ -5824,7 +5857,7 @@ function btKeys(t){
 function btPlayers(room){
   const P=(room&&room.p)||{}, ci=((room&&room.cur)||{}).i||0;
   return Object.keys(P).map(sid=>{ const p=P[sid]||{};
-    return {sid, ch:cleanCh(p.ch), n:btScore(room,sid), w:btWins(room,sid), m:btMiss(room,sid), a:ci, done:true, host:sid===room.host, j:p.j||0}; });
+    return {sid, ch:cleanCh(p.ch), n:btScore(room,sid), w:btWins(room,sid), m:btMiss(room,sid), a:ci, done:true, host:sid===room.host, j:p.j||0, away:btAway(p)}; });
 }
 const btSort=P=>P.sort((a,b)=>b.n-a.n||a.a-b.a||a.sid.localeCompare(b.sid));
 
@@ -5917,16 +5950,19 @@ async function btEnter(code){
   btUnsub();
   Object.assign(BT,{code, view:'room', room:null, paid:{}, gain:{}, my:null, closed:false, playedRd:0});
   btPaint();
-  BT.offDc=await dbOnDisconnectRemove(`battles/${code}/p/${ME.sid}`);
+  LS.set(BT_SAVE,{code, sid:ME.sid, at:Date.now()});
+  clearInterval(BT.hbT); BT.hbT=setInterval(btBeat,15000); btBeat();
   BT.off=await dbOn('battles/'+code, btOnRoom);
 }
 function btUnsub(){
   if(BT.off){ try{ BT.off(); }catch(e){} BT.off=null; }
   if(BT.offDc){ try{ BT.offDc(); }catch(e){} BT.offDc=null; }
+  clearInterval(BT.hbT); BT.hbT=null;
 }
 async function btLeave(){
   const code=BT.code, room=BT.room;
   btUnsub(); Object.assign(BT,{code:null, room:null, view:'menu'});
+  LS.del(BT_SAVE);
   if(!code||!ME) return;
   try{
     const others=room?Object.keys(room.p||{}).filter(s=>s!==ME.sid):[];
@@ -5945,7 +5981,12 @@ async function btLeave(){
 function btOnRoom(room){
   if(!BT.code||!ME) return;
   const mine=room&&room.p&&room.p[ME.sid];
-  if(!room||!mine){                                   /* 방이 닫혔거나 내가 빠졌어요 */
+  if(room&&room.host&&!mine){                         /* 잠깐 끊긴 사이 자리가 빠졌으면 다시 앉아요 */
+    if(Date.now()-(BT.rejoinAt||0)>3000){ BT.rejoinAt=Date.now(); btRejoin(); }
+    return;
+  }
+  if(!room||!mine){                                   /* 방장이 방을 닫았어요 */
+    LS.del(BT_SAVE);
     const res=BT.view==='result';
     btUnsub(); BT.code=null; BT.room=null;
     if(G&&G.mode==='battle'&&!G.over){ G.over=true; stopTimer(); }
@@ -5976,7 +6017,7 @@ function btPaintRoom(){
   const tops=schoolOf(T.school).topics;
   el('btBody').innerHTML=`
     <div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>대전 대기실</h2>
-      <p class="sub">${host?'친구들에게 방 번호를 알려 주세요. 다 들어오면 <b>시작하기</b>를 눌러요.':'방장이 시작하면 3초 뒤에 바로 문제가 나와요.'}</p></div></div>
+      <p class="sub">${host?'친구들에게 방 번호를 알려 주세요(카톡에 다녀와도 방은 그대로예요). 다 들어오면 <b>시작하기</b>를 눌러요.':'방장이 시작하면 3초 뒤에 바로 문제가 나와요. 카톡으로 번호를 알려 주러 잠깐 나갔다 와도 자리는 그대로예요.'}</p></div></div>
     <div class="btcode"><span>방 번호</span><b>${room.code}</b></div>
     ${host?`<div class="btlab">주제</div>
       <div class="chips" id="btTopics">${tops.map(t=>modeOpen(t,'b')||t===room.t?`<button class="chip${t===room.t?' on':''}" data-t="${t}">${topicOf(t).n}</button>`:`<button class="chip chlock" data-t="${t}" disabled>${LOCKI}${topicOf(t).n}</button>`).join('')}</div>
@@ -5984,7 +6025,7 @@ function btPaintRoom(){
     :`<div class="btinfo"><span class="tsym sm">${symHTML(T)}</span><b>${T.n}</b><span>${btKind(room)==='n'?'개수제':'시간제'} ${btLenLabel(room)} · 먼저 맞히기</span></div>`}
     <div class="btlab">들어온 친구 ${P.length}명</div>
     <div class="btplayers">${P.map(p=>`<div class="btp${p.sid===ME.sid?' me':''}">
-      <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${esc(p.sid)}</b>${p.host?'<em>방장</em>':p.sid===ME.sid?'<em class="me">나</em>':''}</div>`).join('')}</div>
+      <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${esc(p.sid)}</b>${p.host?'<em>방장</em>':p.sid===ME.sid?'<em class="me">나</em>':''}${p.away&&p.sid!==ME.sid?'<small class="btaway">잠깐 자리 비움</small>':''}</div>`).join('')}</div>
     <div class="btrow">${host
       ?`<button class="btn" id="btLeave">방 닫기</button>
         <button class="btn primary" id="btGo" ${P.length<2?'disabled':''}>${P.length<2?'친구를 기다리는 중…':`${P.length}명으로 시작하기`}</button>`
@@ -6055,7 +6096,7 @@ function btTick(){
   el('tbar').querySelector('i').style.width=(left/BT_RT*100)+'%';
   el('tbar').classList.toggle('warn',left<=3);
   if(!win&&G.rev!==i){
-    const players=Object.keys(room.p||{});
+    const players=Object.keys(room.p||{}).filter(s=>!btAway(room.p[s])||X.includes(s));   /* 자리 비운 친구는 기다리지 않아요 */
     if(players.length&&players.every(s=>X.includes(s))){ G.rev=i; btReveal(null,'모두 틀렸어요'); btAdvance(i); return; }
     if(left<=0){ G.rev=i; btReveal(null,'시간이 끝났어요'); btAdvance(i); }
   }
@@ -6335,7 +6376,7 @@ async function tryLogin(){
     if(u.h!==hash4(sid,pw)) return gateErr('gErr','비밀번호가 맞지 않습니다.');
     ME=meFrom(sid,u);
     LS.set(MEKEY,{sid,h:u.h});
-    openSchool();
+    openSchool(); if(typeof btResume==='function') btResume();
     if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요'));
   }else{
     newCh=Object.assign({},DEF_CH);
@@ -7552,7 +7593,7 @@ async function boot(){
     try{
       let u=await dbGet('users/'+saved.sid,null), up=false;
       if(!(u&&u.h)&&online()){ const lu=lget('users/'+saved.sid,null); if(lu&&lu.h===saved.h){ u=lu; up=true; } }
-      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); openSchool(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
+      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); openSchool(); if(typeof btResume==='function') btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
     }catch(e){}
   }
   show('s-gate');
