@@ -1208,6 +1208,13 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .mxc{display:inline-block;margin-left:6px;padding:0 7px;border-radius:7px;background:#eef2fe;color:#2f5bea;font-size:.8em;font-weight:600;white-space:nowrap}
 
 .btp .btaway{display:block;font-size:11px;font-weight:600;color:#a1a1a6;margin-top:2px}
+
+/* 일차방정식 — 방정식을 문제 위에 크게, x/3 같은 작은 분수 */
+.eq .cond.cb{font-size:34px;font-weight:700;color:var(--ink);letter-spacing:-.5px;margin-bottom:4px}
+.eq.small .cond.cb{font-size:20px}
+@media(max-width:520px){.eq .cond.cb{font-size:27px}}
+.ifr{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1.05;font-size:.78em;margin:0 2px}
+.ifr i{font-style:normal;padding:0 .15em}.ifr i:first-child{border-bottom:2px solid currentColor}
 </style>
 </head>
 <body>
@@ -2757,7 +2764,7 @@ function eqHTML(f,typed,state){
     if(t==='…') return `<span class="opr rem">…</span>`;
     return fill(t);
   };
-  return (f.cond?`<span class="cond">${f.cond}</span>`:'')+f.eq.map(tok).join('');
+  return (f.cond?`<span class="cond${f.cb?' cb':''}">${f.cond}</span>`:'')+f.eq.map(tok).join('');
 }
 /* 글로 쓴 식 (해설·목록용) — 입력칸 자리에 답을 채웁니다 */
 function eqText(f,fill){
@@ -5440,6 +5447,163 @@ function elemNote(t,fromHint){
   extPreview=(t,n)=>ELEM.includes(t)?elemPreview(t,n):p0(t,n);
   extNote=(t,fh)=>ELEM.includes(t)?elemNote(t,fh):n0(t,fh); }
 
+/* ═══════════════════ 중등 주제 더하기 — 일차방정식 (암산으로 풀 만한 것만) ═══════════════════
+   열쇠 머리글자 LQ :  LQ1 한 번에 풀기 · LQ2 ax + b = c · LQ3 양변에 x · LQ4 괄호·분수
+   방정식은 위쪽(cond)에 크게 보여 주고, 아래에 'x = □' 를 묻습니다. 답은 정수(음수도 가끔).        */
+
+const LQT=['lineq'];
+Object.assign(SK_EXT,{
+  LQ1:{t:'lineq',n:'한 번에 풀기 (x + a = b · ax = b)'}, LQ2:{t:'lineq',n:'ax + b = c'},
+  LQ3:{t:'lineq',n:'양변에 x 가 있는 식'}, LQ4:{t:'lineq',n:'괄호·분수가 있는 식'}
+});
+/* x 를 a 로 나눈 꼴 — 작은 분수로 */
+const xOver=(a,v)=>`<span class="ifr"><i>${v||'x'}</i><i>${a}</i></span>`;
+const xOverT=(a,v)=>`${v||'x'}/${a}`;
+const sgnT=(v)=>v<0?` − ${-v}`:` + ${v}`;
+/* 한 번에 풀기 — form p: x + b = c · m: x − b = c · t: ax = c · d: x/a = c */
+function lq1(form,a,x){
+  let L, c, L0;
+  if(form==='p'){ c=x+a; L=`x + ${a}`; }
+  else if(form==='m'){ c=x-a; L=`x − ${a}`; }
+  else if(form==='t'){ c=a*x; L=`${a}x`; }
+  else { c=x/a; L=xOver(a); L0=xOverT(a); }
+  return F({key:'LQ1'+form+'_'+a+'_'+x, sk:'LQ1', t:'lineq', k:'lq1', form, a, x, c, lhs:L0||L,
+    cond:`${L} = ${MI(c)}`, cb:true, eq:['x','=','?'], ans:x});
+}
+/* ax + b = c (b 는 음수일 수 있어요) */
+function lq2(a,b,x){
+  const c=a*x+b;
+  return F({key:'LQ2'+a+'_'+b+'_'+x, sk:'LQ2', t:'lineq', k:'lq2', a, b, x, c,
+    cond:`${poly([[a,'x'],[b,'']])} = ${MI(c)}`, cb:true, eq:['x','=','?'], ans:x});
+}
+/* ax + b = cx + d (a > c) */
+function lq3(a,b,c,x){
+  const d=a*x+b-c*x;
+  return F({key:'LQ3'+a+'_'+b+'_'+c+'_'+x, sk:'LQ3', t:'lineq', k:'lq3', a, b, c, d, x,
+    cond:`${poly([[a,'x'],[b,'']])} = ${poly([[c,'x'],[d,'']])}`, cb:true, eq:['x','=','?'], ans:x});
+}
+/* 괄호 a(x + b) = c · 분수 x/a + b = c */
+function lq4(form,a,b,x){
+  let cond, c;
+  if(form==='b'){ c=a*(x+b); cond=`${a}(x${sgnT(b)}) = ${MI(c)}`; }
+  else { c=x/a+b; cond=`${xOver(a)}${sgnT(b)} = ${MI(c)}`; }
+  return F({key:'LQ4'+form+'_'+a+'_'+b+'_'+x, sk:'LQ4', t:'lineq', k:'lq4', form, a, b, x, c,
+    cond, cb:true, eq:['x','=','?'], ans:x});
+}
+function lineqFact(key){
+  let m; const N='(-?\\d+)', R=p=>key.match(new RegExp('^'+p+'$'));
+  if(m=R('LQ1([pmtd])_(\\d+)_'+N)) return lq1(m[1],+m[2],+m[3]);
+  if(m=R('LQ2(\\d+)_'+N+'_'+N)) return lq2(+m[1],+m[2],+m[3]);
+  if(m=R('LQ3(\\d+)_'+N+'_(\\d+)_'+N)) return lq3(+m[1],+m[2],+m[3],+m[4]);
+  if(m=R('LQ4([bf])_(\\d+)_'+N+'_'+N)) return lq4(m[1],+m[2],+m[3],+m[4]);
+  return null;
+}
+/* ── 만들기 — 답은 대부분 자연수, 뒤 단계에서 가끔 음수 ── */
+const xPick=(neg)=>neg&&Math.random()<.25?-ri(1,6):ri(1,12);
+function genLQ1(){
+  const form=pickOne(['p','m','t','d']);
+  if(form==='p') return lq1('p',ri(2,19),ri(1,20));
+  if(form==='m') return lq1('m',ri(2,19),ri(1,20));
+  if(form==='t') return lq1('t',ri(2,9),ri(2,12));
+  const a=ri(2,6), q=ri(2,9); return lq1('d',a,a*q);
+}
+function genLQ2(){
+  for(let g=0;g<40;g++){
+    const a=ri(2,9), x=xPick(Math.random()<.3), b=Math.random()<.5?ri(1,15):-ri(1,15);
+    const c=a*x+b; if(Math.abs(c)>60) continue;
+    return lq2(a,b,x);
+  }
+  return lq2(2,3,4);
+}
+function genLQ3(){
+  for(let g=0;g<40;g++){
+    const c=ri(1,6), a=c+ri(1,5), x=xPick(true), b=Math.random()<.5?ri(1,12):-ri(1,12);
+    const d=a*x+b-c*x; if(Math.abs(d)>40||d===0) continue;
+    return lq3(a,b,c,x);
+  }
+  return lq3(5,-3,2,4);
+}
+function genLQ4(){
+  for(let g=0;g<40;g++){
+    if(Math.random()<.5){ const a=ri(2,6), b=Math.random()<.6?ri(1,9):-ri(1,6), x=xPick(true);
+      const c=a*(x+b); if(Math.abs(c)>60||x+b===0) continue; return lq4('b',a,b,x); }
+    const a=ri(2,5), q=ri(1,8)*(Math.random()<.15?-1:1), b=Math.random()<.6?ri(1,9):-ri(1,6);
+    return lq4('f',a,b,a*q);
+  }
+  return lq4('b',2,3,4);
+}
+
+TOPICS.lineq={k:'lineq', n:'일차방정식', sym:'x=?', school:'m', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
+  desc:'이항과 등식의 성질로 x 구하기 — 암산으로',
+  stages:[
+    {n:1, name:'한 번에 풀기',      ex:'x + 7 = 15 · 3x = 21', gen:genLQ1, take:12},
+    {n:2, name:'ax + b = c',        ex:'2x + 3 = 11', gen:genLQ2, take:12},
+    {n:3, name:'양변에 x 가 있는 식', ex:'5x − 3 = 2x + 9', gen:genLQ3, take:10},
+    {n:4, name:'괄호·분수가 있는 식', ex:'2(x + 3) = 14', gen:genLQ4, take:10}
+  ],
+  cats:[['LQ1'],['LQ2'],['LQ3'],['LQ4']]};
+TOPIC_SYMH.lineq='<span style="font-size:.6em;font-style:italic;letter-spacing:-.5px">x=?</span>';
+{ const m=SCHOOLS.find(s=>s.k==='m'), i=m.topics.indexOf('subst');
+  m.topics.splice(i+1,0,'lineq'); m.sub=m.sub.replace('식의 값','식의 값 · 일차방정식');
+  TOPIC_ORDER.splice(TOPIC_ORDER.indexOf('subst')+1,0,'lineq'); }
+
+/* ═══ 풀이 — 이항해서 한 줄씩 ═══ */
+function lineqHint(f){
+  const B=v=>`<b>${MI(v)}</b>`, tip=s=>`<span class="tip">${s}</span>`;
+  const chk=s=>tip(`확인: ${s}`);
+  switch(f.k){
+    case 'lq1':{ const {form,a,x,c}=f;
+      if(form==='p') return {t:'+ 를 반대쪽으로 넘기면 −', lines:[`x + ${a} = ${MI(c)}`, `x = ${MI(c)} − ${a}`, `x = ${B(x)}`, chk(`${MI(x)} + ${a} = ${MI(c)}`)]};
+      if(form==='m') return {t:'− 를 반대쪽으로 넘기면 +', lines:[`x − ${a} = ${MI(c)}`, `x = ${MI(c)} + ${a}`, `x = ${B(x)}`, chk(`${MI(x)} − ${a} = ${MI(c)}`)]};
+      if(form==='t') return {t:'양변을 x 앞의 수로 나누기', lines:[`${a}x = ${MI(c)}`, `x = ${MI(c)} ÷ ${a}`, `x = ${B(x)}`, chk(`${a} × ${PV(x)} = ${MI(c)}`)]};
+      return {t:'양변에 분모를 곱하기', lines:[`${xOverT(a)} = ${MI(c)}`, `x = ${MI(c)} × ${a}`, `x = ${B(x)}`, chk(`${MI(x)} ÷ ${a} = ${MI(c)}`)]};
+    }
+    case 'lq2':{ const {a,b,x,c}=f;
+      return {t:'상수항 먼저 넘기고, 그다음 나누기', lines:[`${poly([[a,'x'],[b,'']])} = ${MI(c)}`,
+        `${a}x = ${MI(c)} ${b<0?'+ '+(-b):'− '+b} = ${MI(c-b)}`, `x = ${MI(c-b)} ÷ ${a} = ${B(x)}`, chk(`${a} × ${PV(x)}${sgnT(b)} = ${MI(c)}`)]};
+    }
+    case 'lq3':{ const {a,b,c,d,x}=f, k=a-c, r=d-b;
+      return {t:'x 는 왼쪽으로, 수는 오른쪽으로', lines:[`${poly([[a,'x'],[b,'']])} = ${poly([[c,'x'],[d,'']])}`,
+        `${a}x − ${c===1?'':c}x = ${MI(d)} ${b<0?'+ '+(-b):'− '+b}`, ...(k===1?[`x = ${B(x)}`]:[`${k}x = ${MI(r)}`, `x = ${MI(r)} ÷ ${k} = ${B(x)}`]),
+        tip('넘어간 항은 부호가 바뀌어요')]};
+    }
+    case 'lq4':{ const {form,a,b,x,c}=f;
+      if(form==='b') return {t:'양변을 괄호 앞의 수로 먼저 나누기', lines:[`${a}(x${sgnT(b)}) = ${MI(c)}`,
+        `x${sgnT(b)} = ${MI(c)} ÷ ${a} = ${MI(c/a)}`, `x = ${MI(c/a)} ${b<0?'+ '+(-b):'− '+b} = ${B(x)}`, tip('괄호를 풀어도 되지만, 나누어떨어지면 나누는 쪽이 빨라요')]};
+      return {t:'상수항 넘기고 분모 곱하기', lines:[`${xOverT(a)}${sgnT(b)} = ${MI(c)}`,
+        `${xOverT(a)} = ${MI(c)} ${b<0?'+ '+(-b):'− '+b} = ${MI(c-b)}`, `x = ${MI(c-b)} × ${a} = ${B(x)}`]};
+    }
+  }
+  return null;
+}
+function lineqPreview(t,n){
+  const H=(f,tip,extra)=>{ const h=hintOf(f); return Object.assign({tip, lines:h.lines, svg:''},extra||{}); };
+  const neg='<div class="hl" style="font-size:14px;margin-top:10px;color:var(--dim)">음수 답은 숫자판의 <b>−</b> 단추를 눌러요.</div>';
+  if(n===1) return H(lq1('p',7,8),'이항: 항을 등호 건너편으로 넘기면 부호가 바뀌어요. x 앞에 수가 있으면 나누고, 분모가 있으면 곱해요.',
+    {body:chipList(['+ a → − a','− a → + a','× a → ÷ a','÷ a → × a'])});
+  if(n===2) return H(lq2(2,3,4),'상수항을 먼저 넘기고, 그다음 x 앞의 수로 나눠요.',{body:neg});
+  if(n===3) return H(lq3(5,-3,2,4),'x 가 있는 항은 왼쪽, 수는 오른쪽으로 모아요.',{body:neg});
+  return H(lq4('b',2,3,4),'괄호 앞의 수로 양변을 나누거나, 분수면 양변에 분모를 곱해요.',{body:neg});
+}
+function lineqNote(t,fromHint){
+  return {
+    sub:'이항 · 등식의 성질 · 양변에 x · 괄호와 분수',
+    memo:[{h:'등식의 성질 = 이항', html:chipList(['양변에 같은 수를 더하고 빼도 등식은 성립','양변에 같은 수를 곱하고 (0이 아닌 수로) 나눠도 성립','넘어간 항은 부호가 바뀜'])},
+          {h:'푸는 순서', html:chipList(['① 괄호·분모 정리','② x 는 왼쪽, 수는 오른쪽','③ 정리 ax = b','④ 양변 ÷ a','⑤ 대입해서 확인'])}],
+    ways:[fromHint('이항','x + 7 = 15',lq1('p',7,8)), fromHint('나누기','3x = 21',lq1('t',3,7)),
+          fromHint('두 단계','2x + 3 = 11',lq2(2,3,4)), fromHint('양변에 x','5x − 3 = 2x + 9',lq3(5,-3,2,4)),
+          fromHint('괄호','2(x + 3) = 14',lq4('b',2,3,4))],
+    miss:[{w:'x + 7 = 15 → x = 22', r:'8', y:'+ 7 을 넘기면 − 7: 15 − 7 = 8.'},
+          {w:'2x + 3 = 11 → x = 11 ÷ 2 − 3', r:'4', y:'상수항 3 을 먼저 넘겨요: 2x = 8, x = 4.'},
+          {w:'5x − 3 = 2x + 9 → 7x = 6', r:'x = 4', y:'2x 를 넘기면 −2x, −3 을 넘기면 +3: 3x = 12.'}]};
+}
+{ const f0=extFact, v0=extVariant, h0=extHint, p0=extPreview, n0=extNote;
+  extFact=k=>f0(k)||lineqFact(k);
+  extVariant=f=>LQT.includes(f.t)?f:v0(f);
+  extHint=f=>{ if(!LQT.includes(f.t)) return h0(f); const h=lineqHint(f); if(h&&h.svg==null) h.svg=''; return h; };
+  extPreview=(t,n)=>LQT.includes(t)?lineqPreview(t,n):p0(t,n);
+  extNote=(t,fh)=>LQT.includes(t)?lineqNote(t,fh):n0(t,fh); }
+
 /* ═══════════════════ 선생님 모드 ═══════════════════
    학번 칸에 00000, 비밀번호 0815를 넣으면 들어옵니다.
    ① 랭킹  ② 계산별 정답률(학생 전체 기록을 모아서)  ③ 학생 정보          */
@@ -5605,7 +5769,7 @@ function paintTTl(){
 
 /* ── 고등 열쇠 — 고등학교를 여는 기준 ── */
 function paintTHs(){
-  const L=CFG.lock, mids=schoolOf('m').topics, sids=Object.keys(tUsers);
+  const L=CFG.lock, mids=schoolOf('m').topics.filter(t=>t in HS_GOAL_DEF), sids=Object.keys(tUsers);
   const best=(sid,t)=>((((tUsers[sid]||{}).R||{})[t]||{}).best)||0;
   const rows=mids.map(t=>{ const vals=sids.map(sid=>best(sid,t)).filter(v=>v>0).sort((a,b)=>b-a), g=hsGoal(t);
     return {t, goal:g, n:vals.length, top:vals[0]||0, p90:vals.length?vals[Math.max(0,Math.ceil(vals.length*.1)-1)]:0, pass:vals.filter(v=>v>=g).length}; });
@@ -6424,7 +6588,7 @@ const HS_GOAL_DEF={int:20, subst:14, expo:18, power:25, root:16, pyth:15, trig:1
    SSS : 아주 잘하는 친구도 문제 운이 따라야 나오는 개수 (마지막 단계 문제를 계속 빠르게)
    B   : 1개 이상 */
 const GRADE_CUT={addsub:[26,20,15,10], gugu:[30,24,18,12], power:[23,18,14,9], pyth:[15,12,9,6],
-  bond:[24,19,14,9], boxq:[20,16,12,8], mixc:[16,13,10,6], divm:[16,13,10,6], frac:[15,12,9,6]};   /* SSS · SS · S · A */
+  lineq:[18,14,10,6], bond:[24,19,14,9], boxq:[20,16,12,8], mixc:[16,13,10,6], divm:[16,13,10,6], frac:[15,12,9,6]};   /* SSS · SS · S · A */
 function gradeCuts(t){ const c=GRADE_CUT[t]; if(!c) return null;
   return [['SSS',c[0]],['SS',c[1]],['S',c[2]],['A',c[3]],['B',1]]; }
 function gradeOfRec(t,n){ const C=gradeCuts(t); if(!C||!(n>0)) return null; for(const [g,c] of C) if(n>=c) return g; return null; }
@@ -6453,7 +6617,7 @@ async function loadCfg(){
   return CFG;
 }
 const hsGoal=t=>{ const g=+((CFG.lock.goal||{})[t]); return g>0?g:(HS_GOAL_DEF[t]||25); };
-const hsKeys=()=>schoolOf('m').topics.map(t=>{ const best=rec(t).best||0, goal=hsGoal(t); return {t,best,goal,ok:best>=goal}; });
+const hsKeys=()=>schoolOf('m').topics.filter(t=>t in HS_GOAL_DEF).map(t=>{ const best=rec(t).best||0, goal=hsGoal(t); return {t,best,goal,ok:best>=goal}; });
 const hsOpen=()=>!CFG.lock.on||!!(ME&&ME.hu)||hsKeys().every(x=>x.ok);
 const shopOpenNow=()=>CFG.shop&&CFG.shop.open===true;   /* 상점은 처음에 잠겨 있고 선생님이 열어 줄 때까지 코인만 모입니다 */
 const modeOpen=(t,m)=>(CFG.tl[m]||[]).includes(t);
