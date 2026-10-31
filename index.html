@@ -7826,7 +7826,7 @@ function btReward(rank,n,score,my){
   else{ coin=rank<=3?BT_COIN[rank-1]:BT_COIN_ELSE; ME.bt.n++; ME.coin+=coin;
     msg=`${n}명 중 <b>${rank}위</b> — <b>+${coin}코인</b> (오늘 ${ME.bt.n} / ${BT_DAY_MAX}판)`; }
   /* 마이페이지 대전 기록 — 최근 30판 */
-  if(my){ H.push({d:Date.now(), t:my.t, len:my.len||'', n:score, r:rank, np:n, c:coin}); if(H.length>30) H.splice(0,H.length-30); }
+  if(my){ H.push({d:Date.now(), t:my.t||'', len:my.len||'', n:score, r:rank, np:n, c:coin}); if(H.length>30) H.splice(0,H.length-30); }
   saveMe(); paintMe(); if(coin) toast(`+${coin}코인!`);
   return {coin,msg};
 }
@@ -7911,25 +7911,67 @@ function logFact(f,ok,sec){
   a[2]=(a[2]||0)+Math.round(Math.min(30,Math.max(0,sec))*10);
   fs[f.sk]=a;
 }
-async function saveMe(){
-  if(!ME) return;
-  await dbUpdate('users/'+ME.sid,{ch:ME.ch,coin:ME.coin,own:ME.own||[],
-    ownS:ownShapes(),ownC:ownColors(),sc:ME.sc||'',R:ME.R||{},P:ME.P||{},
-    pc:ME.pc||null,W:ME.W||{},fs:ME.fs||{},boxN:ME.boxN||0,
-    hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,bh:(ME.bh||[]).slice(-30),cu:ME.cu||{},
-    h:ME.h||((LS.get(MEKEY,{})||{}).h)||''});
+/* ═══ 저장 — 같은 학번이 두 곳에서 열려 있어도 서로 지우지 않게 ═══
+   카카오톡 안 브라우저와 크롬처럼 같은 학번이 두 창에 열려 있으면, 예전에는 늦게 저장한 쪽이
+   먼저 저장된 물건(상자에서 나온 아이템 등)을 지워 버렸어요. 이제는 저장하기 직전에 서버 기록을 읽어
+   · 가진 물건·몸·색은 합치고  · 코인은 '이 창에서 늘거나 준 만큼'만 서버 값에 더하고
+   · 최고 기록·클리어·대전 전적은 더 좋은 쪽을 남긴 뒤 저장합니다. 저장은 한 번에 하나씩 차례로.   */
+const uniq=(...L)=>[...new Set(L.flatMap(arr))];
+function mergeFrom(u){
+  if(!ME||!u) return;
+  const c0=ME._c0==null?ME.coin:ME._c0, sc=+u.coin||0;
+  ME.coin=Math.max(0,sc+(ME.coin-c0)); ME._c0=sc;
+  ME.own=uniq(ME.own,u.own).filter(id=>ITEM(id));
+  ME.ownS=uniq(ownShapes(),u.ownS).filter(k=>CH_SHAPES.some(x=>x.k===k));
+  ME.ownC=uniq(ownColors(),u.ownC).filter(k=>CH_COLORS.some(x=>x.k===k));
+  ME.boxN=Math.max(ME.boxN||0,u.boxN||0); ME.bw=Math.max(ME.bw||0,u.bw||0); ME.bp=Math.max(ME.bp||0,u.bp||0);
+  if(u.cu){ const cu=ME.cu||(ME.cu={}); Object.keys(u.cu).forEach(k=>{ cu[k]=Math.max(cu[k]||0,+u.cu[k]||0); }); }
+  if(u.R&&typeof u.R==='object') Object.keys(u.R).forEach(t=>{ const b=u.R[t]; if(!b) return; const R=ME.R||(ME.R={}), a=R[t];
+    if(!a){ R[t]={best:b.best||0,hist:arr(b.hist)}; return; }
+    const key=h=>`${h.d}|${h.n}|${h.ts||''}`, seen=new Set(arr(a.hist).map(key));
+    a.hist=arr(a.hist).concat(arr(b.hist).filter(h=>h&&!seen.has(key(h)))).sort((x,y)=>(x.ts||0)-(y.ts||0)).slice(-120);
+    a.best=Math.max(a.best||0,b.best||0); });
+  if(u.P&&typeof u.P==='object') Object.keys(u.P).forEach(t=>{ const b=u.P[t]; if(!b) return; const P=ME.P||(ME.P={}), a=P[t];
+    if(!a){ P[t]=b; return; } if(a.v!==b.v) return;
+    a.c=uniq(a.c,b.c).sort((x,y)=>x-y); a.bt=a.bt||{};
+    Object.keys(b.bt||{}).forEach(k=>{ if(!(a.bt[k]<=b.bt[k])) a.bt[k]=b.bt[k]; }); });
+  if(u.bh){ const key=h=>`${h.d}|${h.r}`, seen=new Set(arr(ME.bh).map(key));
+    ME.bh=arr(ME.bh).concat(arr(u.bh).filter(h=>h&&!seen.has(key(h)))).sort((x,y)=>(x.d||0)-(y.d||0)).slice(-30); }
 }
-/* ═══ 서버 연결이 끊겼다가 다시 이어지면 — 이 휴대폰에만 있던 기록을 서버로 올립니다 ═══
-   서버에 이미 기록이 있으면 주제마다 더 높은 최고 기록·더 많은 코인을 남겨요. */
+let SAVEQ=Promise.resolve();
+function saveMe(){
+  if(!ME) return Promise.resolve();
+  const me=ME;
+  SAVEQ=SAVEQ.catch(()=>{}).then(async()=>{
+    if(ME!==me) return;
+    try{ const u=await dbGet('users/'+me.sid,null); if(u&&u.h) mergeFrom(u); }catch(e){}
+    if(ME!==me) return;
+    const coin=ME.coin; ME._c0=coin;
+    /* JSON 으로 한 번 걸러 undefined·NaN 이 섞여도 서버가 저장을 거절하지 않게 */
+    await dbUpdate('users/'+ME.sid,JSON.parse(JSON.stringify({ch:ME.ch,coin,own:ME.own||[],
+      ownS:ownShapes(),ownC:ownColors(),sc:ME.sc||'',R:ME.R||{},P:ME.P||{},
+      pc:ME.pc||null,W:ME.W||{},fs:ME.fs||{},boxN:ME.boxN||0,
+      hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,bh:(ME.bh||[]).slice(-30),cu:ME.cu||{},
+      h:ME.h||((LS.get(MEKEY,{})||{}).h)||''})));
+  });
+  return SAVEQ;
+}
+/* 상점·마이페이지를 열 때, 다른 창으로 갔다가 돌아왔을 때 — 서버 기록을 읽어 합쳐 보여 줘요 (저장은 안 함) */
+async function refreshMe(){
+  if(!ME) return false;
+  const me=ME;
+  try{ const u=await dbGet('users/'+me.sid,null); if(ME===me&&u&&u.h){ mergeFrom(u); return true; } }catch(e){}
+  return false;
+}
+document.addEventListener('visibilitychange',()=>{ if(document.hidden||!ME) return;
+  refreshMe().then(ok=>{ if(!ok) return; paintMe();
+    if(el('s-shop').classList.contains('on')) paintShop();
+    if(el('s-mine').classList.contains('on')) openMineRepaint(); }); });
+/* ═══ 서버 연결이 끊겼다가 다시 이어지면 — 이 휴대폰에만 있던 기록을 서버로 올립니다 (합치기는 saveMe 가 해요) ═══ */
 let wasOffline=false;
 async function syncUp(){
   if(!ME||!online()) return;
-  try{
-    const u=await dbGet('users/'+ME.sid,null);
-    if(u&&u.R) Object.keys(u.R).forEach(t=>{ const a=ME.R[t], b=u.R[t]; if(b&&(!a||(b.best||0)>(a.best||0))) ME.R[t]=b; });
-    if(u&&(u.coin||0)>ME.coin) ME.coin=u.coin;
-    await saveMe();
-  }catch(e){}
+  try{ await saveMe(); }catch(e){}
 }
 function paintNetWarn(){
   let n=el('netWarn'); if(!n){ n=document.createElement('div'); n.id='netWarn'; document.body.appendChild(n); }
@@ -7999,7 +8041,7 @@ async function tryLogin(){
   el('gGo').disabled=false; el('gGo').textContent='들어가기';
   if(u&&u.h){
     if(u.h!==hash4(sid,pw)) return gateErr('gErr','비밀번호가 맞지 않습니다.');
-    ME=meFrom(sid,u);
+    ME=meFrom(sid,u); ME._c0=up?null:ME.coin;
     LS.set(MEKEY,{sid,h:u.h});
     openSchool(); if(typeof btResume==='function') btResume();
     if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요'));
@@ -8022,7 +8064,7 @@ async function makeAccount(){
              own:[], ownS:s0, ownC:c0, at:Date.now()};
   await dbSet('users/'+sid,rec0);
   el('gMake').disabled=false; el('gMake').textContent='이 친구로 시작하기';
-  ME=meFrom(sid,rec0);
+  ME=meFrom(sid,rec0); ME._c0=0;
   LS.set(MEKEY,{sid,h:rec0.h});
   openSchool();
   toast('반가워요! 연습 모드부터 시작해 보세요');
@@ -8719,6 +8761,11 @@ function openMine(){
   if(!ME) return;
   stopTimer(); G=null;
   MP.topic=CUR.topic;
+  openMineRepaint();
+  show('s-mine');
+  refreshMe().then(ok=>{ if(ok&&el('s-mine').classList.contains('on')){ openMineRepaint(); paintMe(); } });
+}
+function openMineRepaint(){
   el('mpAv').innerHTML=avatarSVG(ME.ch);
   el('mpSid').textContent=ME.sid;
   el('mpChips').innerHTML=`
@@ -8727,7 +8774,6 @@ function openMine(){
     <span class="mpchip">가진 것 ${ownItems().length+ownShapes().length+ownColors().length}개</span>
     <span class="mpchip">친구 대전 ${ME.bw||0}승 ${Math.max(0,(ME.bp||0)-(ME.bw||0))}패</span>`;
   paintMine(); paintMineBattle(); paintMineOwn();
-  show('s-mine');
 }
 function paintMineOwn(){
   const ids=ownItems().filter(id=>ITEM(id)), w=ME.ch.items||[];
@@ -9086,6 +9132,7 @@ function openShop(){ if(!ME) return;
   if(!shopOpenNow()){ toast('상점은 아직 잠겨 있어요 · 코인은 계속 모이니까 열릴 때 쓰세요');
     loadCfg().then(()=>{ if(shopOpenNow()) openShop(); else if(typeof paintMe==='function') paintMe(); }); return; }
   stopTimer(); G=null; shopCat='new'; TRY=null; show('s-shop'); paintShop();
+  refreshMe().then(ok=>{ if(ok&&el('s-shop').classList.contains('on')){ paintShop(); paintMe(); } });
   loadClass().then(()=>{ if(el('s-shop').classList.contains('on')) paintShop(); }).catch(()=>{}); }
 function endTry(){ TRY=null; const b=el('tryBar'); if(b) b.classList.remove('on'); }
 function paintShop(){
@@ -9183,6 +9230,7 @@ async function tapGoods(kind,k){
 }
 async function buyTry(){
   if(!ME||!TRY) return;
+  await refreshMe(); if(!ME||!TRY) return;          /* 다른 창에서 쓴 코인·산 물건까지 보고 사요 */
   const g=goodsOf(TRY.kind,TRY.k);
   if(g.has){ endTry(); return paintShop(); }
   if(g.box) return toast('랜덤 상자에서만 나오는 아이템이에요');
@@ -9244,6 +9292,7 @@ function boxPanelHTML(){
 }
 async function openBox(k){
   const B=BOXES.find(x=>x.k===k); if(!B||!ME) return;
+  await refreshMe(); if(!ME) return;
   if(ME.coin<B.p) return toast(`코인이 ${B.p-ME.coin}개 모자라요`);
   ME.coin-=B.p;
   const it=rollBox(B), dup=ownItems().includes(it.id), back=dup?Math.min(Math.round(it.p*REFUND),Math.round(B.p*.5)):0;   /* 돌려받는 코인은 상자 값의 절반까지 */
@@ -9333,6 +9382,7 @@ function classPanelHTML(){
 }
 /* 모금 — 단계를 넘는 순간 그 단계의 표를 세어 아이템을 정해요(트랜잭션 안에서 한 번만) */
 async function giveClass(v){
+  if(!ME) return; await refreshMe();
   if(!ME||ME.coin<v) return toast('코인이 모자라요');
   if(!confirm(`우리 반 모금함에 ${v}코인을 낼까요?\n낸 코인은 돌려받을 수 없어요.`)) return;
   ME.coin-=v; spendLog('g',v); await saveMe();
@@ -9386,7 +9436,7 @@ async function boot(){
     try{
       let u=await dbGet('users/'+saved.sid,null), up=false;
       if(!(u&&u.h)&&online()){ const lu=lget('users/'+saved.sid,null); if(lu&&lu.h===saved.h){ u=lu; up=true; } }
-      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); openSchool(); if(typeof btResume==='function') btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
+      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); ME._c0=up?null:ME.coin; openSchool(); if(typeof btResume==='function') btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
     }catch(e){}
   }
   show('s-gate');
