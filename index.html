@@ -1319,6 +1319,26 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .rkpod .cbp b{font-variant-numeric:tabular-nums}
 .rkpod .cbp em{color:var(--ink);font-weight:700}
 .rkpod .cbp.me b{color:var(--blue)}
+/* ── 학급 대항 카드 · 단체 사진 ── */
+.cbcard{border:1px solid var(--line);border-radius:18px;background:#fff;padding:12px 12px 10px;margin-bottom:12px;box-shadow:var(--sh1)}
+.cbcard.me{border-color:var(--cc);box-shadow:0 0 0 1px var(--cc) inset}
+.cbtop{display:flex;align-items:center;gap:10px;padding:0 2px 8px}
+.cbtop .who{flex:1;min-width:0}
+.cbtop .who b{font-size:16.5px;font-weight:800}
+.cbtop .who span{display:block;font-size:12px;color:var(--dim);font-weight:600;margin-top:1px}
+.cbtop .sc{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
+.cbtop .sc small{font-size:12px;color:var(--dim);margin-left:2px;font-weight:700}
+.cbscene{border-radius:14px;overflow:hidden}
+.cbscene svg{display:block;width:100%;height:auto}
+.cbfoot{padding:8px 2px 0}
+.cbfoot .cbbar{margin:0 0 6px}.cbfoot .cbbar em{background:var(--cc)}
+.cbfoot span{font-size:12px;color:var(--dim);font-weight:600}
+.cbfoot span b{color:var(--ink)}
+/* 선생님 랭킹 종류 · 학생 정보 정렬 */
+.rkkinds{margin:0 0 12px;padding:2px 0}
+.tsort{padding:0 0 12px 0}
+.stuhead .who span .tno{font-style:normal;display:inline-block;min-width:18px;margin-right:4px;color:var(--blue);font-weight:800}
+.rkpod .cbp em small{font-size:11px;color:var(--dim);margin-left:1px;font-weight:600}
 </style>
 </head>
 <body>
@@ -1877,7 +1897,7 @@ async function dbTx(path,fn){
          gy 발 높이 · fdx 두 발 간격 반 · x0 x1 y0 y1 몸의 바깥 상자 }            */
 const FONT="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif";
 /* 그리기 도우미(P·C·R·G …)가 다른 파일의 이름과 부딪히지 않도록 한 덩어리로 감쌉니다 */
-const {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY}=(()=>{
+const {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,classSceneSVG}=(()=>{
 const INK='#1f2433';
 
 /* ── 그리기 도우미 ── */
@@ -2766,7 +2786,53 @@ function avatarSVG(ch,opt){
     bodySVG(k,fill,col.l)}${has('face')?'':faceSVG(b)}${L(['face','neck','foot','eye','hat','hand','pet','fx'])}${worn.filter(id=>ITEM(id).cat==='class'&&!ITEM(id).under).map(one).join('')}</svg>`;
 }
 const avatarWith=(ch,id)=>avatarSVG({s:ch.s,c:ch.c,cl:ch.cl,cc:ch.cc,items:[id]});
-return {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY};
+
+/* ═══ 학급 단체 사진 — 학급 랭킹에서 반 친구들이 한자리에 서고, 반이 연 학급 아이템이 사진을 꾸며요 ═══
+   o = {mem:[{ch, sid, sc}], picks:[열린 학급 아이템 id], cl:'2-5', cc:'#4f6bff'}   (mem 은 점수 높은 순) */
+function classSceneSVG(o){
+  const W=360, mem=o.mem.slice(0,32), n=mem.length, cc=o.cc||'#4f6bff', cl=String(o.cl||''), has=id=>o.picks.includes(id);
+  const per=n<=7?Math.max(n,1):n<=16?Math.ceil(n/2):Math.ceil(n/3), rows=[];
+  for(let i=0;i<n;i+=per) rows.push(mem.slice(i,i+per));
+  const ov=.74, s=Math.min(64,(W-24)/((per-1)*ov+1)), gap=s*.46;
+  const top=o.picks.length?58:22, H=Math.round(top+s+(rows.length-1)*gap+26);
+  const SPOT=has('clsSpot'), floorY=H-14;
+  let bg=R(0,0,W,H,18,'#fff')+R(0,0,W,H,18,cc,0,0,'.08');
+  if(has('clsAura')) [0,1,2].forEach(i=>{ bg+=E(W/2,H*.62,W*.52-i*26,H*.5-i*12,'none',[cc,'#ffd23f','#ff6b9a'][i],5,'.35'); });
+  if(has('clsStars')) for(let i=0;i<9;i++){ const x=22+i*39+(i%2)*8, y=14+(i%3)*12; bg+=STAR(x,y,i%2?5:7,i%2?'#ffe066':'#ffd23f'); }
+  if(has('clsHearts')) for(let i=0;i<8;i++){ const x=26+i*44, y=16+(i%2)*14, r=6, f=i%2?'#fff':cc;
+    bg+=P(`M${x},${y+r*.9} C${x-r*1.6},${y-r*.2} ${x-r*.7},${y-r*1.4} ${x},${y-r*.5} C${x+r*.7},${y-r*1.4} ${x+r*1.6},${y-r*.2} ${x},${y+r*.9} Z`,f,INK,1.4); }
+  if(SPOT) bg+=P(`M8,0 L${W*.32},${floorY} H${W*.06} Z`,'#fff6c8',0,0,' opacity=".7"')+P(`M${W-8},0 L${W*.68},${floorY} H${W*.94} Z`,'#fff6c8',0,0,' opacity=".7"');
+  if(has('clsStick')) for(let i=0;i<14;i++){ const x=14+i*25.5, y=top-4+(i%3)*8; bg+=C(x,y,i%2?3:4.5,i%3?'#fff6c8':cc,0,0,'.9'); }
+  bg+=E(W/2,floorY,W*.46,11,SPOT?cc:'#1f2433',0,0,SPOT?'.85':'.07');
+  if(SPOT) bg+=T(W/2,floorY+4,`${cl} 무대`,10,'#fff',900);
+  if(has('clsRing')){ for(let k=0;k<28;k++){ const t=k/28, x=t<.5?8+t*2*(W-16):W-8-(t-.5)*2*(W-16), y=t<.5?7:H-7; bg+=C(x,y,k%3?2.6:4,k%3?'#fff6c8':cc,INK,1); } }
+  /* 사진 속에서는 배경처럼 큰 학급 아이템(별빛·오라·무대 …)은 사진 전체에 한 번만 그리고,
+     사람마다는 몸에 붙는 학급 아이템(배지·리본·망토·날개·메달·왕관) 가운데 가장 높은 단계 것을 입혀요 */
+  const BODYCLS=['clsBadge','clsRosette','clsCape','clsWings','clsMedal','clsCrown'];
+  const bodyTop=o.picks.filter(id=>BODYCLS.includes(id)).pop();
+  const wearIn=ch=>{ const it=(ch.items||[]).filter(id=>CAT_OF(id)!=='class'); if(bodyTop) it.push(bodyTop); return Object.assign({},ch,{items:it}); };
+  /* 사람들 — 뒷줄부터 */
+  let ppl='';
+  for(let r=rows.length-1;r>=0;r--){ const L=rows[r], rw=(L.length-1)*s*ov+s, x0=(W-rw)/2, y=top+(rows.length-1-r)*gap;
+    L.forEach((m,i)=>{ const x=x0+i*s*ov, sv=avatarSVG(wearIn(m.ch),{tight:true}).replace('<svg ',`<svg x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}" `);
+      ppl+=m.sc>0?sv:`<g opacity=".42">${sv}</g>`; }); }
+  /* 앞 장식 */
+  let fx='';
+  if(has('clsCrown')&&n){ const L=rows[0], rw=(L.length-1)*s*ov+s, x=(W-rw)/2+s/2, y=top+(rows.length-1)*gap-2;
+    fx+=G(`translate(${x} ${y}) scale(${(s/64).toFixed(2)})`,P('M-20,0 L-23,-18 L-10,-8 L0,-23 L10,-8 L23,-18 L20,0 Z','#ffd23f',INK,2)+R(-19,-7,38,7,2,cc)+C(0,-23,3,cc,INK,1.4)); }
+  if(has('clsFlag')) [[16,1],[W-16,-1]].forEach(([x,d])=>{ fx+=P(`M${x},${floorY} V${top-30}`,'none',INK,3.5)+P(`M${x},${top-28} h${d*40} l${-d*7},11 l${d*7},11 h${-d*40} Z`,cc,INK,2)+T(x+d*18,top-13,cl,10,'#fff',900); });
+  if(has('clsBalloon')) [[20,22],[W-20,22]].forEach(([x,y],j)=>{ [[-9,4,'#ffd23f'],[9,0,'#fff'],[0,-6,cc]].forEach(([dx,dy,f])=>{
+      fx+=P(`M${x+dx},${y+dy+14} Q${x+dx+4},${y+40} ${x},${y+64}`,'none',INK,1)+E(x+dx,y+dy,9,11,f,INK,1.6); }); });
+  if(has('clsBadge')){ let g=P(`M6,6 Q${W/2},34 ${W-6},6`,'none',INK,1.4);    /* 삼각 깃발 줄 */
+    for(let i=0;i<13;i++){ const t=(i+.5)/13, x=6+t*(W-12), y=6+4*t*(1-t)*14; g+=P(`M${x-9},${y} L${x+9},${y} L${x},${y+15} Z`,i%2?'#fff':cc,INK,1.2); } fx+=g; }
+  if(has('clsRosette')){ const x=30,y=30; let g=''; for(let k=0;k<10;k++){ const a=k*36*Math.PI/180; g+=C(x+Math.cos(a)*11,y+Math.sin(a)*11,6,cc,INK,1.3); } fx+=g+C(x,y,10,'#fff',INK,1.6)+T(x,y+3.5,cl,8,cc,900); }
+  if(has('clsBanner')){ const y=8; fx+=P(`M${W/2-92},${y} H${W/2+92} L${W/2+84},${y+12} L${W/2+92},${y+24} H${W/2-92} L${W/2-84},${y+12} Z`,cc,INK,2)+T(W/2,y+17,`${cl} 최고!`,13,'#fff',900); }
+  if(has('clsMedal')){ const x=W-34, y=34; fx+=P(`M${x-12},0 L${x-4},${y-12} M${x+12},0 L${x+4},${y-12}`,'none',cc,5)+C(x,y,14,'#ffd23f',INK,2)+T(x,y+3.5,cl,8,'#a87400',900); }
+  if(has('clsTrophy')){ const x=W-30, y=floorY+2; fx+=R(x-12,y-8,24,8,2,cc,INK,1.6)+R(x-4,y-17,8,9,1,'#f0a400',INK,1.4)+
+      P(`M${x-13},${y-42} H${x+13} V${y-32} Q${x+13},${y-17} ${x},${y-17} Q${x-13},${y-17} ${x-13},${y-32} Z`,'#ffd23f',INK,1.8)+T(x,y-27,cl,7,'#a87400',900); }
+  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="clsscene">${bg}${ppl}${fx}</svg>`;
+}
+return {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,classSceneSVG};
 })();
 
 /* ═══════════════════ 계산 내용 ═══════════════════
@@ -6239,7 +6305,7 @@ const TEACHER_ID='00000', TEACHER_PW='0815';
 const isTestSid=sid=>/^000/.test(String(sid));
 let tTest=0;
 let tClasses={};
-let isTeacher=false, tTab='rank', tTopic='gugu', tOpen=null, tUsers={}, tClass='', tHm='g', tCb='m';
+let isTeacher=false, tTab='rank', tTopic='gugu', tOpen=null, tUsers={}, tClass='', tHm='g', tCb='m', tRk='best', tSort='best';
 
 async function enterTeacher(){
   isTeacher=true; ME=null; G=null;
@@ -6269,14 +6335,11 @@ function hscShow(root){ root.querySelectorAll('.hsc').forEach(h=>{ const on=h.qu
   if(on&&(on.offsetLeft+on.offsetWidth>h.clientWidth)) h.scrollLeft=on.offsetLeft-h.clientWidth/3; }); }
 const classShort=c=>c.length===3?`${c[0]}-${+c.slice(1)}`:c;
 const tSids=()=>Object.keys(tUsers).filter(sid=>!tClass||classOf(sid)===tClass);
+/* 학생 한 줄 — 학생 화면 랭킹과 같은 지표(userStat)에 이 주제의 그래프·스테이지를 더해요 */
 function teacherRows(t){
   return tSids().map(sid=>{
-    const u=tUsers[sid]||{}, r=(u.R&&u.R[t])||{}, hist=Array.isArray(r.hist)?r.hist:[];
-    const P=(u.P&&u.P[t])||{}, W=(u.W&&u.W[t])||[];
-    return {sid, u, ch:cleanCh(u.ch), best:r.best||0, cnt:hist.length, hist,
-            coin:u.coin||0, clear:Array.isArray(P.c)?P.c.length:0, wrong:Array.isArray(W)?W.length:0,
-            last:hist.length?hist[hist.length-1].n:0,
-            avg:hist.length?hist.reduce((a,b)=>a+(b.n||0),0)/hist.length:0};
+    const st=userStat(sid,tUsers[sid],t,tClasses), r=(st.u.R&&st.u.R[t])||{};
+    return Object.assign(st,{hist:Array.isArray(r.hist)?r.hist:Object.values(r.hist||{}), clear:(tPracOf(st.u,t).c||[]).length});
   });
 }
 function paintTeacher(){
@@ -6290,7 +6353,7 @@ function paintTeacher(){
   el('tTabs').innerHTML=seg('기록',[['rank','랭킹'],['cls','학급 대항'],['fact','정답률'],['stu','학생 정보']])
     +seg('설정',[['hs','고등 열쇠'],['tl','모드 잠금']]);
   el('tTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ tTab=b.dataset.k; tOpen=null; paintTeacher(); });
-  const showT=!(tTab==='hs'||tTab==='tl'||(tTab==='cls'&&tCb!=='t')), showC=!(tTab==='hs'||tTab==='tl'||tTab==='cls');
+  const showT=!(tTab==='hs'||tTab==='tl'||(tTab==='cls'&&tCb!=='t')||(tTab==='rank'&&!RKK[tRk].topic)), showC=!(tTab==='hs'||tTab==='tl'||tTab==='cls');
   el('tTopicBar').style.display=showT?'':'none';
   el('tClassBar').style.display=showC?'':'none';
   el('tTopicBar').parentNode.style.display=(showT||showC)?'':'none';
@@ -6315,19 +6378,14 @@ function paintTeacher(){
   else paintTStu(teacherRows(tTopic));
 }
 
-/* ── ① 랭킹 ── */
+/* ── ① 랭킹 — 학생 화면과 같은 랭킹판(오늘·누적·노력왕·연습왕·코인·대전) ── */
 function paintTRank(rows){
-  const list=rows.filter(r=>r.best>0).sort((a,b)=>b.best-a.best||a.sid.localeCompare(b.sid));
-  el('tBody').innerHTML=`<div class="chartlab" style="margin:0 0 10px">${topicOf(tTopic).n} · ${REAL_SEC/60}분 동안 틀리지 않고 맞힌 개수가 많은 순</div>`+
-    (list.length?podiumHTML(rankList(list,r=>r.best),r=>r.best,'개')+belowPod(rankList(list,r=>r.best)).map(({r,rank})=>`
-    <div class="rk rkgo${rank<=3?' top':''}" data-sid="${esc(r.sid)}" title="눌러서 학생 정보 보기">
-      <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
-      <div class="av2">${avatarSVG(r.ch,{tight:true})}</div>
-      <div class="who"><b>${esc(r.sid)}</b><span>도전 ${r.cnt}회 · 평균 ${r.avg.toFixed(1)} · 스테이지 ${r.clear}/${topicOf(tTopic).stages.length}</span></div>
-      <div class="sc">${r.best}<small>개</small>${gBadge(gradeOfRec(tTopic,r.best))}</div>
-    </div>`).join(''):`<div class="empty">아직 실전 기록이 없습니다.</div>`);
-  el('tBody').querySelectorAll('.rkgo').forEach(b=>b.onclick=()=>openTStudent(b.dataset.sid));
-  el('tBody').querySelectorAll('.rkpod .cbp').forEach((b,i)=>{ const sid=b.querySelector('b').textContent; b.style.cursor='pointer'; b.onclick=()=>openTStudent(sid); });
+  const kinds=[['best','누적'],['today','오늘'],['effort','노력'],['prac','연습'],['coin','코인'],['battle','대전']];
+  const badge=tRk==='best'||tRk==='today'?r=>gBadge(gradeOfRec(tTopic,tRk==='best'?r.best:r.today)):null;
+  el('tBody').innerHTML=`<div class="segs rkkinds">${kinds.map(([k,n])=>`<button class="sg${tRk===k?' on':''}" data-rk="${k}">${n}</button>`).join('')}</div>`+
+    rankBoard(tRk,rows,tTopic,{go:1,noMine:1,max:200,badge});
+  el('tBody').querySelectorAll('[data-rk]').forEach(b=>b.onclick=()=>{ tRk=b.dataset.rk; paintTeacher(); });
+  el('tBody').querySelectorAll('.rkgo,.rkpod .cbp').forEach(b=>{ b.style.cursor='pointer'; b.onclick=()=>openTStudent(b.dataset.sid); });
 }
 /* 랭킹에서 학생을 누르면 학생 정보 탭으로 바로 */
 function openTStudent(sid){ tTab='stu'; tOpen=sid; tClass=''; paintTeacher();
@@ -6349,7 +6407,7 @@ function tOverview(u){
 }
 
 /* ── 학급 대항 — 학생마다 주제별 실전 최고 기록을 더하고, 반끼리 다시 더합니다 ── */
-function classBattle(users,topics){
+function classBattle(users,topics,classes){
   const m={};
   Object.keys(users||{}).forEach(sid=>{
     if(isTestSid(sid)) return;
@@ -6357,34 +6415,34 @@ function classBattle(users,topics){
     const sc=topics.reduce((a,t)=>a+((R[t]&&R[t].best)||0),0);
     const c=classOf(sid), g=m[c]||(m[c]={c,sum:0,n:0,play:0,mem:[]});
     g.n++; g.sum+=sc; if(sc>0) g.play++;
-    g.mem.push({sid,sc,ch:cleanCh(u.ch)});
+    g.mem.push({sid,sc,ch:clsCh(sid,u.ch,classes)});
   });
   return Object.values(m).filter(g=>g.play>0)
     .map(g=>{ g.mem.sort((a,b)=>b.sc-a.sc||a.sid.localeCompare(b.sid)); g.avg=g.sum/Math.max(1,g.n); return g; })
     .sort((a,b)=>b.sum-a.sum||a.c.localeCompare(b.c));
 }
-function classBattleHTML(list,mine){
+/* 반마다 카드 한 장 — 순위·점수 + 반 친구 모두가 선 단체 사진(학급 아이템으로 꾸밈) */
+function classBattleHTML(list,mine,classes){
   if(!list.length) return `<div class="empty">아직 학급 기록이 없어요. 실전 모드에 도전하면 우리 반 점수가 올라가요!</div>`;
   const R=rankList(list,g=>g.sum), top=list[0].sum||1;
-  const pod=list.length>=2?`<div class="cbpod">${[1,0,2].filter(i=>R[i]).map(i=>{ const {r:g,rank}=R[i];
-      return `<div class="cbp p${rank}${mine===g.c?' me':''}"><div class="cbpav">${avatarSVG((g.mem[0]||{}).ch,{tight:true})}</div>
-        <span class="medal m${rank}">${rank}</span><b>${classLabel(g.c)}</b><em>${g.sum}점</em><i style="height:${[0,64,46,34][rank]||30}px"></i></div>`; }).join('')}</div>`:'';
-  return pod+R.map(({r:g,rank})=>{
-    const me=mine===g.c, mvp=g.mem[0]||{sid:'',sc:0};
-    return `<div class="rk cb${rank<=3?' top':''}${me?' me':''}">
-      <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
-      <div class="cbav">${g.mem.filter(x=>x.sc>0).slice(0,3).map(x=>`<span>${avatarSVG(x.ch,{tight:true})}</span>`).join('')}</div>
-      <div class="who"><b>${classLabel(g.c)}${me?' <em class="mytag">우리 반</em>':''}</b>
-        <span>참여 ${g.play} / ${g.n}명 · 1인 평균 ${g.avg.toFixed(1)}점 · 반 1등 ${esc(mvp.sid)} (${mvp.sc}점)</span>
-        <i class="cbbar"><em style="width:${Math.max(3,g.sum/top*100).toFixed(1)}%"></em></i></div>
-      <div class="sc">${g.sum}<small>점</small></div></div>`; }).join('');
+  return R.map(({r:g,rank})=>{
+    const me=mine===g.c, mvp=g.mem[0]||{sid:'',sc:0}, c=(classes||{})[g.c]||null, cc=clsColor(c,g.c), picks=clsPicks(c&&c.pick);
+    return `<div class="cbcard${me?' me':''}" style="--cc:${cc.c}">
+      <div class="cbtop"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span>
+        <div class="who"><b>${classLabel(g.c)}${me?' <em class="mytag">우리 반</em>':''}</b>
+          <span>참여 ${g.play} / ${g.n}명 · 1인 평균 ${g.avg.toFixed(1)}점</span></div>
+        <div class="sc">${g.sum}<small>점</small></div></div>
+      <div class="cbscene">${classSceneSVG({mem:g.mem,picks,cl:shortCls(g.c+'00'),cc:cc.c})}</div>
+      <div class="cbfoot"><i class="cbbar"><em style="width:${Math.max(3,g.sum/top*100).toFixed(1)}%"></em></i>
+        <span>반 1등 <b>${esc(mvp.sid)}</b> ${mvp.sc}점${picks.length?` · 학급 아이템 ${picks.length}개`:''}</span></div>
+    </div>`; }).join('');
 }
 function paintTClass(){
   const scopes=[['t','이 주제만'],['e','초등'],['m','중등'],['h','고등'],['all','전체']];
   const topics=tCb==='t'?[tTopic]:tCb==='all'?TOPIC_ORDER:schoolOf(tCb).topics;
   el('tBody').innerHTML=`<div class="segs cbscope">${scopes.map(([k,n])=>`<button class="sg${tCb===k?' on':''}" data-cb="${k}">${n}</button>`).join('')}</div>
     <div class="chartlab" style="margin:0 0 12px">학생마다 ${tCb==='t'?'이 주제의':'주제별'} 실전 최고 기록을 더하고, 반 학생들의 점수를 모두 더한 값 · 학생 화면 랭킹의 '학급 대항'과 같아요</div>`+
-    classBattleHTML(classBattle(tUsers,topics),'');
+    classBattleHTML(classBattle(tUsers,topics,tClasses),'',tClasses);
   el('tBody').querySelectorAll('[data-cb]').forEach(b=>b.onclick=()=>{ tCb=b.dataset.cb; paintTeacher(); });
 }
 
@@ -6515,10 +6573,17 @@ function paintTFact(){
 }
 
 /* ── ③ 학생 정보 ── */
+const T_SORTS=[['best','누적 기록',r=>r.best],['today','오늘 기록',r=>r.today],['effort','노력',r=>r.solved],['prac','연습',r=>r.prac],
+  ['coin','코인',r=>r.coin],['battle','대전',r=>r.bw*1000+r.rate],['wrong','오답노트',r=>r.wrong],['sid','학번',null]];
 function paintTStu(rows){
-  rows.sort((a,b)=>b.best-a.best||a.sid.localeCompare(b.sid));
+  const S=T_SORTS.find(x=>x[0]===tSort)||T_SORTS[0], f=S[2];
+  rows.sort((a,b)=>f?(f(b)-f(a)||a.sid.localeCompare(b.sid)):a.sid.localeCompare(b.sid));
   const T=topicOf(tTopic);
-  el('tBody').innerHTML=rows.length?rows.map(r=>{
+  const bar=`<div class="tpick tsort"><span class="tlab">정렬</span><div class="hsc">${T_SORTS.map(([k,n])=>`<button class="pk${tSort===k?' on':''}" data-so="${k}">${n}</button>`).join('')}</div></div>`;
+  const val=r=>tSort==='today'?`오늘 <em class="tsb">${r.today}개</em>`:tSort==='effort'?`푼 문제 <em class="tsb">${cn(r.solved)}개</em>`
+    :tSort==='prac'?`연습 <em class="tsb">${r.prac}단계</em>`:tSort==='coin'?`모은 코인 <em class="tsb">${cn(r.coin)}</em>`
+    :tSort==='battle'?`대전 <em class="tsb">${r.bw}승 ${r.bl}패</em>`:`${T.n} 최고 <em class="tsb">${r.best}개</em>`;
+  el('tBody').innerHTML=bar+(rows.length?rows.map((r,ri)=>{
     const open=tOpen===r.sid, u=r.u, fs=u.fs||{};
     const nRec=TOPIC_ORDER.filter(k=>(((u.R||{})[k]||{}).best||0)>0).length;
     const wk=open?weakList(fs,tTopic,8):[], cu=coinUse(u,r.sid,tClasses);
@@ -6526,8 +6591,8 @@ function paintTStu(rows){
       <button class="stuhead" data-sid="${esc(r.sid)}">
         <span class="av2">${avatarSVG(r.ch,{tight:true})}</span>
         <span class="who"><b>${esc(r.sid)}</b>
-          <span>${T.n} 최고 <em class="tsb">${r.best}개</em> · 기록 있는 주제 ${nRec}개</span>
-          <span>코인 ${cn(r.coin)} · 쓴 코인 ${cu.exact?'':'약 '}${cn(cu.spent)}${r.wrong?` · 오답노트 ${r.wrong}`:''}</span></span>
+          <span>${tSort==='sid'?'':`<i class="tno">${ri+1}</i>`}${val(r)} · 기록 있는 주제 ${nRec}개</span>
+          <span>코인 ${cn(r.have)} · 쓴 코인 ${cu.exact?'':'약 '}${cn(cu.spent)}${r.wrong?` · 오답노트 ${r.wrong}`:''}</span></span>
         <span class="arw">${open?'▲':'▼'}</span>
       </button>
       ${open?`<div class="studet">
@@ -6561,7 +6626,9 @@ function paintTStu(rows){
         </div>
       </div>`:''}
     </div>`;
-  }).join(''):`<div class="empty">아직 등록된 학생이 없습니다.</div>`;
+  }).join(''):`<div class="empty">아직 등록된 학생이 없습니다.</div>`);
+  el('tBody').querySelectorAll('[data-so]').forEach(b=>b.onclick=()=>{ tSort=b.dataset.so; tOpen=null; paintTStu(teacherRows(tTopic)); });
+  hscShow(el('tBody'));
   el('tBody').querySelectorAll('.stuhead').forEach(b=>b.onclick=()=>{
     tOpen=(tOpen===b.dataset.sid)?null:b.dataset.sid; paintTStu(teacherRows(tTopic)); });
   el('tBody').querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>resetPw(b.dataset.reset));
@@ -7422,7 +7489,7 @@ function openSchool(){
   paintSchools();
   loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')) paintSchools(); });
   /* 우리 반 색이 바뀌었으면 내 캐릭터에도 반영 (학급 아이템이 그 색으로 그려져요) */
-  const cc0=ME.ch.cc; loadClass().then(()=>{ if(ME&&ME.ch.cc!==cc0) saveMe(); }).catch(()=>{});
+  loadClass().catch(()=>{});
 }
 function paintSchools(){
   el('schoolList').innerHTML=SCHOOLS.map(s=>{
@@ -8142,83 +8209,104 @@ async function loadRank(){
   Object.keys(RK.users||{}).forEach(sid=>{ if(isTestSid(sid)) delete RK.users[sid]; });
   paintRank();
 }
-function rankRows(t){
-  const u=RK.users||{}, d=todayKey();
-  return Object.keys(u).map(sid=>{
-    const x=u[sid]||{}, r=(x.R&&x.R[t])||{}, hist=Array.isArray(r.hist)?r.hist:[];
-    const td=hist.filter(q=>q&&q.d===d);
-    return {sid, ch:cleanCh(x.ch), best:r.best||0, cnt:hist.length,
-            today:td.reduce((a,q)=>Math.max(a,q.n||0),0), tcnt:td.length};
-  });
+/* ═══ 랭킹 지표 — 학생 화면과 선생님 모드가 함께 써요 ═══
+   한 학생(u)의 기록을 한 줄로 : 주제 t 의 오늘·누적 기록 + 푼 문제 수 + 연습 단계 + 코인 + 대전   */
+function userStat(sid,u,t,classes){
+  const x=u||{}, R=(x.R&&x.R[t])||{}, hist=Array.isArray(R.hist)?R.hist:Object.values(R.hist||{}), d=todayKey();
+  const td=hist.filter(q=>q&&q.d===d);
+  let solved=0; Object.values(x.fs||{}).forEach(a=>{ solved+=(a&&+a[0])||0; });
+  let prac=0, real=0; TOPIC_ORDER.forEach(k=>{ prac+=(tPracOf(x,k).c||[]).length;
+    const h=((x.R||{})[k]||{}).hist; real+=Array.isArray(h)?h.length:Object.keys(h||{}).length; });
+  const c=coinUse(x,sid,classes), bp=x.bp||0, bw=Math.min(bp,x.bw||0);
+  return {sid, u:x, ch:clsCh(sid,x.ch,classes), best:R.best||0, cnt:hist.length,
+    today:td.reduce((a,q)=>Math.max(a,q.n||0),0), tcnt:td.length,
+    avg:hist.length?hist.reduce((a,q)=>a+((q&&q.n)||0),0)/hist.length:0, last:hist.length?((hist[hist.length-1]||{}).n||0):0,
+    solved, prac, real, coin:c.total, have:c.have, spent:c.spent, cu:c, bw, bp, bl:bp-bw, rate:bp?bw/bp:0,
+    wrong:arr(((x.W||{})[t])).length};
 }
+/* 랭킹 종류 — v 값, 단위, 아래 작은 글씨, 설명 */
+const RKK={
+  today :{n:'오늘',     unit:'개',  v:r=>r.today,  sub:r=>`오늘 ${r.tcnt}회 도전 · 최고 ${r.best}개`, topic:1,
+          desc:t=>`${todayKey()} · ${topicOf(t).n} · 오늘 세운 기록 가운데 가장 높은 것`, empty:'오늘은 아직 기록이 없어요. 첫 번째 주인공이 되어 보세요!'},
+  best  :{n:'누적',     unit:'개',  v:r=>r.best,   sub:r=>`도전 ${r.cnt}회 · 평균 ${r.avg.toFixed(1)}개`, topic:1,
+          desc:t=>`${topicOf(t).n} · 지금까지 세운 최고 기록`, empty:'아직 기록이 없어요.'},
+  effort:{n:'노력왕',   unit:'문제', v:r=>r.solved, sub:r=>`실전 도전 ${r.real}회 · 연습 ${r.prac}단계`,
+          desc:()=>'모든 주제의 연습·실전·오답노트에서 지금까지 푼 문제 수', empty:'아직 푼 문제가 없어요.'},
+  prac  :{n:'연습왕',   unit:'단계', v:r=>r.prac,   sub:r=>`푼 문제 ${cn(r.solved)}개`,
+          desc:()=>'모든 주제에서 클리어한 연습 스테이지 수', empty:'아직 클리어한 스테이지가 없어요.'},
+  coin  :{n:'코인',     unit:'코인', v:r=>r.coin,   sub:r=>`가진 코인 ${cn(r.have)} · 쓴 코인 ${cn(r.spent)}`, fmt:1,
+          desc:()=>'모은 코인 = 가진 코인 + 상점·상자·우리 반 모금에 쓴 코인', empty:'아직 코인 기록이 없어요.'},
+  battle:{n:'대전',     unit:'승',  v:r=>r.bw,     sub:r=>`${r.bp}판 · ${r.bl}패 · 우승률 ${Math.round(r.rate*100)}%`, key:r=>r.bw*1000+r.rate,
+          desc:()=>'친구 대전에서 우승한 횟수 · 같으면 우승률 순 (2명 이상이 끝까지 한 판만 세요)', empty:'아직 친구 대전 기록이 없어요.'}
+};
+/* 순위 매기기 — 값이 같으면 같은 등수 */
+function rankList(list,val){
+  let last=null, rank=0;
+  return list.map((r,i)=>{ const v=val(r); if(v!==last){ rank=i+1; last=v; } return {r,rank}; });
+}
+/* 1·2·3등 시상대 */
+function podiumHTML(R,val,unit,meSid){
+  if(R.length<2) return '';
+  return `<div class="cbpod rkpod">${[1,0,2].filter(i=>R[i]&&R[i].rank<=3).map(i=>{ const {r,rank}=R[i];
+    return `<div class="cbp p${rank}${meSid&&r.sid===meSid?' me':''}" data-sid="${esc(r.sid)}"><div class="cbpav">${avatarSVG(r.ch,{tight:true})}</div>
+      <span class="medal m${rank}">${rank}</span><b>${esc(r.sid)}</b><em>${val(r)}${unit?`<small>${unit}</small>`:''}</em><i style="height:${[0,58,42,30][rank]}px"></i></div>`; }).join('')}</div>`;
+}
+const belowPod=R=>R.length>=2?R.filter(o=>o.rank>3):R;
+function rkRow(o,val,sub,unit,opt){
+  const {r,rank}=o, me=ME&&r.sid===ME.sid; opt=opt||{};
+  return `<div class="rk${rank<=3?' top':''}${me?' me':''}${opt.go?' rkgo':''}" data-sid="${esc(r.sid)}">
+      <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
+      <div class="av2">${avatarSVG(r.ch,{tight:true})}</div>
+      <div class="who"><b>${esc(r.sid)}${me?' <em class="mytag">나</em>':''}</b><span>${sub(r)}</span></div>
+      <div class="sc">${val(r)}<small>${unit}</small>${opt.badge?opt.badge(r):''}</div>
+    </div>`;
+}
+/* 랭킹판 하나 — 시상대 + 4위부터 목록 + 내 자리 */
+function rankBoard(kind,stats,t,opt){
+  const K=RKK[kind], key=K.key||K.v, show=r=>K.fmt?cn(K.v(r)):K.v(r);
+  const rows=stats.filter(r=>K.v(r)>0).sort((a,b)=>key(b)-key(a)||a.sid.localeCompare(b.sid));
+  const R=rankList(rows,key), list=R.slice(0,(opt&&opt.max)||50), meSid=ME&&ME.sid;
+  const mi=meSid?R.findIndex(o=>o.r.sid===meSid):-1;
+  return `<div class="chartlab" style="margin:0 0 10px">${K.desc(t)}</div>`+
+    (list.length?podiumHTML(list,show,K.unit,meSid)+belowPod(list).map(o=>rkRow(o,show,K.sub,K.unit,opt)).join('')
+      :`<div class="empty">${K.empty}</div>`)+
+    (opt&&opt.noMine||!ME?'':`<div class="myplace">${mi<0?'아직 순위에 들어가지 않았어요. 도전해 보세요!'
+      :`${esc(ME.sid)} 님은 <b>${show(R[mi].r)}${K.unit}</b> · ${rows.length}명 중 <b>${R[mi].rank}위</b>예요.`}</div>`);
+}
+
+/* ═══ 학생 화면 랭킹 ═══
+   맨 위 : 실전 기록 · 노력왕 · 연습왕 · 대전 · 코인
+   실전 기록 아래 : 주제(학교별 한 줄) · 오늘 / 누적(암호) / 학급 대항                    */
 function paintRank(){
-  if(!rkTopicsOf(RK.school).length){ const k=SCHOOLS.map(x=>x.k).find(k=>rkTopicsOf(k).length); if(k) RK.school=k; }
-  const SN={e:'초등',m:'중등',h:'고등'};
-  el('rkSchools').innerHTML=SCHOOLS.map(x=>{ const n=rkTopicsOf(x.k).length;
-    return n?`<button class="sg${!RK.battle&&x.k===RK.school?' on':''}" data-k="${x.k}">${SN[x.k]||x.n}</button>`
-            :`<button class="sg off" disabled>${LOCKI}${SN[x.k]||x.n}</button>`; }).join('')+
-    `<button class="sg${RK.battle==='b'?' on':''}" data-b="b">대전</button>`+
-    `<button class="sg${RK.battle==='c'?' on':''}" data-b="c">코인</button>`;
-  el('rkSchools').querySelectorAll('.sg[data-k]').forEach(b=>b.onclick=()=>{ RK.battle=false; RK.school=b.dataset.k; RK.topic=null; RK.scope='school'; paintRank(); });
-  el('rkSchools').querySelectorAll('.sg[data-b]').forEach(b=>b.onclick=()=>{ RK.battle=b.dataset.b; paintRank(); });
-  el('rkTopics').style.display=RK.battle?'none':'';
-  if(RK.battle) return RK.battle==='c'?paintRkCoin():paintRkBattle();
-  const tops=rkTopicsOf(RK.school);
-  if(!tops.length){ el('rkSub').innerHTML='아직 열린 실전 모드가 없어요.'; el('rkTopics').innerHTML=''; el('rkTabs').innerHTML='';
+  RK.kind=RK.kind||'rec';
+  const kinds=[['rec','실전 기록'],['effort','노력왕'],['prac','연습왕'],['battle','대전'],['coin','코인']];
+  el('rkSchools').innerHTML=kinds.map(([k,n])=>`<button class="sg${RK.kind===k?' on':''}" data-k="${k}">${n}</button>`).join('');
+  el('rkSchools').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ RK.kind=b.dataset.k; paintRank(); });
+  const live=online()?'반 전체가 함께 보는 기록':'이 기기에 저장된 기록';
+  const users=RK.users||{}, statsOf=t=>Object.keys(users).map(sid=>userStat(sid,users[sid],t,RK.classes));
+  if(RK.kind!=='rec'){
+    el('rkTopics').style.display='none'; el('rkTopics').innerHTML='';
+    el('rkTabs').style.display='none'; el('rkTabs').innerHTML='';
+    el('rkSub').innerHTML=`${live} · <b>${kinds.find(x=>x[0]===RK.kind)[1]}</b>`;
+    el('rkBody').innerHTML=rankBoard(RK.kind,statsOf(RK.topic),RK.topic);
+    return;
+  }
+  el('rkTopics').style.display=''; el('rkTabs').style.display='';
+  const SN={e:'초등',m:'중등',h:'고등'}, open=SCHOOLS.filter(x=>rkTopicsOf(x.k).length), all=open.flatMap(x=>rkTopicsOf(x.k));
+  if(!all.length){ el('rkSub').innerHTML='아직 열린 실전 모드가 없어요.'; el('rkTopics').innerHTML=''; el('rkTabs').innerHTML='';
     el('rkBody').innerHTML='<div class="empty">선생님이 실전 모드를 열면 랭킹이 보여요.</div>'; return; }
-  if(!tops.includes(RK.topic)) RK.topic=tops[0];
-  const t=RK.topic, rows=rankRows(t);
-  el('rkSub').innerHTML=`${online()?'반 전체가 함께 보는 기록':'이 기기에 저장된 기록'} ·
-    <b>실전 모드</b>(${REAL_SEC/60}분 무실수)에서 맞힌 개수로 매깁니다`;
-  el('rkTopics').innerHTML=`<div class="tpick"><div class="hsc">${tops.map(k=>
-    `<button class="pk${k===t?' on':''}" data-t="${k}">${topicOf(k).n}</button>`).join('')}</div></div>`;
+  if(!all.includes(RK.topic)) RK.topic=all[0];
+  const t=RK.topic; RK.school=(SCHOOLS.find(x=>x.topics.includes(t))||SCHOOLS[0]).k;
+  el('rkSub').innerHTML=`${live} · <b>실전 모드</b>(${REAL_SEC/60}분 무실수)에서 맞힌 개수로 매겨요`;
+  el('rkTopics').innerHTML=open.map(x=>`<div class="tpick">${open.length>1?`<span class="tlab">${SN[x.k]||x.n}</span>`:''}<div class="hsc">${rkTopicsOf(x.k).map(k=>
+    `<button class="pk${k===t?' on':''}" data-t="${k}">${topicOf(k).n}</button>`).join('')}</div></div>`).join('');
   el('rkTopics').querySelectorAll('.pk').forEach(b=>b.onclick=()=>{ RK.topic=b.dataset.t; if(RK.tab==='class') RK.scope='topic'; paintRank(); });
   hscShow(el('rkTopics'));
   const tabs=[['today','오늘'],['all',`누적${RK.open?'':' '+LOCKI}`],['class','학급 대항']];
   el('rkTabs').innerHTML=tabs.map(([k,n])=>`<button class="sg${RK.tab===k?' on':''}" data-k="${k}">${n}</button>`).join('');
   el('rkTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>pickRankTab(b.dataset.k));
-  if(RK.tab==='class')    paintRkClass();
-  else if(RK.tab==='all') paintRkAll(rows);
-  else                    paintRkToday(rows);
-}
-/* 친구 대전 랭킹 — 몇 승 몇 패 (패 = 우승하지 못한 판) */
-function paintRkBattle(){
-  el('rkTopics').innerHTML=''; el('rkTabs').innerHTML='';
-  el('rkSub').innerHTML=`${online()?'반 전체가 함께 보는 기록':'이 기기에 저장된 기록'} · <b>친구 대전</b>에서 우승한 횟수로 매깁니다`;
-  const u=RK.users||{};
-  const rows=Object.keys(u).map(sid=>{ const x=u[sid]||{}, p=x.bp||0, w=Math.min(p,x.bw||0);
-      return {sid, ch:cleanCh(x.ch), w, l:p-w, p, rate:p?w/p:0}; }).filter(r=>r.p>0)
-    .sort((a,b)=>b.w-a.w||b.rate-a.rate||a.l-b.l||a.sid.localeCompare(b.sid));
-  const list=rows.slice(0,50), mi=ME?rows.findIndex(r=>r.sid===ME.sid):-1;
-  el('rkBody').innerHTML=`<div class="chartlab" style="margin:0 0 10px">우승한 횟수가 많은 순 · 같으면 우승률이 높은 순 · 2명 이상이 끝까지 한 판만 세요</div>`+
-    (list.length?(R=>podiumHTML(R,r=>r.w,'승',ME&&ME.sid))(rankList(list,r=>r.w+'/'+r.rate))+belowPod(rankList(list,r=>r.w+'/'+r.rate)).map(({r,rank})=>{ const me=ME&&r.sid===ME.sid;
-      return `<div class="rk${rank<=3?' top':''}${me?' me':''}">
-        <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
-        <div class="av2">${avatarSVG(r.ch,{tight:true})}</div>
-        <div class="who"><b>${esc(r.sid)}${me?' <em class="mytag">나</em>':''}</b><span>대전 ${r.p}판 · 우승률 ${Math.round(r.rate*100)}%</span></div>
-        <div class="sc wl">${r.w}<small>승</small> ${r.l}<small>패</small></div></div>`; }).join('')
-      :`<div class="empty">아직 친구 대전 기록이 없어요.</div>`)+
-    (ME?`<div class="myplace">${mi<0?'아직 친구 대전 기록이 없어요. 학교 고르기 화면의 친구와 대전에서 시작해 보세요!'
-      :`${esc(ME.sid)} 님은 <b>${rows[mi].w}승 ${rows[mi].l}패</b> · ${rows.length}명 중 ${rankList(rows,r=>r.w+'/'+r.rate)[mi].rank}위예요.`}</div>`:'');
-}
-/* 코인 랭킹 — 지금까지 모은 코인(가진 코인 + 쓴 코인) · 지금 가진 코인 */
-function paintRkCoin(){
-  el('rkTopics').innerHTML=''; const by=RK.coinBy||'total';
-  el('rkTabs').innerHTML=[['total','모은 코인'],['have','가진 코인']].map(([k,n])=>`<button class="sg${by===k?' on':''}" data-k="${k}">${n}</button>`).join('');
-  el('rkTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ RK.coinBy=b.dataset.k; paintRkCoin(); });
-  el('rkSub').innerHTML=`${online()?'반 전체가 함께 보는 기록':'이 기기에 저장된 기록'} · ${by==='total'?'<b>모은 코인</b> = 가진 코인 + 상점·상자·우리 반 모금에 쓴 코인':'<b>지금 가진 코인</b>'}`;
-  const u=RK.users||{};
-  const rows=Object.keys(u).map(sid=>{ const x=u[sid]||{}, c=coinUse(x,sid,RK.classes); return {sid, ch:cleanCh(x.ch), c, v:by==='total'?c.total:c.have}; })
-    .filter(r=>r.v>0).sort((a,b)=>b.v-a.v||a.sid.localeCompare(b.sid));
-  const list=rows.slice(0,50), mi=ME?rows.findIndex(r=>r.sid===ME.sid):-1, R=rankList(rows,r=>r.v);
-  el('rkBody').innerHTML=(list.length?podiumHTML(R,r=>cn(r.v),'',ME&&ME.sid)+belowPod(R.slice(0,50)).map(({r,rank})=>{ const me=ME&&r.sid===ME.sid;
-      return `<div class="rk${rank<=3?' top':''}${me?' me':''}">
-        <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
-        <div class="av2">${avatarSVG(r.ch,{tight:true})}</div>
-        <div class="who"><b>${esc(r.sid)}${me?' <em class="mytag">나</em>':''}</b><span>${by==='total'?`가진 코인 ${cn(r.c.have)} · 쓴 코인 ${cn(r.c.spent)}`:`모은 코인 ${cn(r.c.total)}`}</span></div>
-        <div class="sc">${cn(r.v)}<small>코인</small></div></div>`; }).join('')
-      :`<div class="empty">아직 코인 기록이 없어요.</div>`)+
-    (ME&&mi>=0?`<div class="myplace">${esc(ME.sid)} 님은 <b>${cn(rows[mi].v)}코인</b> · ${rows.length}명 중 ${R[mi].rank}위예요.</div>`:'');
+  if(RK.tab==='class') paintRkClass();
+  else el('rkBody').innerHTML=rankBoard(RK.tab==='all'?'best':'today',statsOf(t),t);
 }
 function pickRankTab(k){ if(k==='all'&&!RK.open) return askRankPw(); RK.tab=k; paintRank(); }
 function askRankPw(){
@@ -8233,59 +8321,18 @@ function askRankPw(){
   openM('ovPw');
   setTimeout(()=>{ try{ el('rkPw').focus(); }catch(e){} },120);
 }
-function rankList(list,val){
-  let last=null, rank=0;
-  return list.map((r,i)=>{ const v=val(r); if(v!==last){ rank=i+1; last=v; } return {r,rank}; });
-}
-/* 1·2·3등 시상대 — R 은 rankList 결과, val 은 숫자, unit 은 단위 */
-function podiumHTML(R,val,unit,meSid){
-  if(R.length<2) return '';
-  return `<div class="cbpod rkpod">${[1,0,2].filter(i=>R[i]&&R[i].rank<=3).map(i=>{ const {r,rank}=R[i];
-    return `<div class="cbp p${rank}${meSid&&r.sid===meSid?' me':''}"><div class="cbpav">${avatarSVG(r.ch,{tight:true})}</div>
-      <span class="medal m${rank}">${rank}</span><b>${esc(r.sid)}</b><em>${val(r)}${unit}</em><i style="height:${[0,58,42,30][rank]}px"></i></div>`; }).join('')}</div>`;
-}
-/* 시상대에 오른 사람(3위까지)은 아래 목록에서 빼요 — 2명 이상일 때만 */
-const belowPod=R=>R.length>=2?R.filter(o=>o.rank>3):R;
-function rkRow(o,val,sub){
-  const {r,rank}=o, me=ME&&r.sid===ME.sid;
-  return `<div class="rk${rank<=3?' top':''}${me?' me':''}">
-      <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
-      <div class="av2">${avatarSVG(r.ch,{tight:true})}</div>
-      <div class="who"><b>${esc(r.sid)}${me?' <em class="mytag">나</em>':''}</b><span>${sub(r)}</span></div>
-      <div class="sc">${val(r)}<small>개</small></div>
-    </div>`;
-}
-function paintRkToday(rows){
-  const list=rows.filter(r=>r.today>0).sort((a,b)=>b.today-a.today||a.sid.localeCompare(b.sid));
-  el('rkBody').innerHTML=`<div class="chartlab" style="margin:0 0 10px">${todayKey()} · ${topicOf(RK.topic).n} · 오늘 세운 기록 중 가장 높은 것</div>`+
-    (list.length? (R=>podiumHTML(R,r=>r.today,'개',ME&&ME.sid)+belowPod(R).map(o=>rkRow(o,r=>r.today,r=>`오늘 ${r.tcnt}회 도전 · 내 최고 ${r.best}개`)).join(''))(rankList(list,r=>r.today))
-      : `<div class="empty">오늘은 아직 기록이 없어요. 첫 번째 주인공이 되어 보세요!</div>`)+myPlace(rows,'today');
-}
-function paintRkAll(rows){
-  const all=rows.filter(r=>r.best>0).sort((a,b)=>b.best-a.best||a.sid.localeCompare(b.sid)), list=all.slice(0,50);
-  el('rkBody').innerHTML=`<div class="chartlab" style="margin:0 0 10px">${topicOf(RK.topic).n} · 개인 최고 기록 1위 ~ ${Math.min(50,all.length)}위</div>`+
-    (list.length? (R=>podiumHTML(R,r=>r.best,'개',ME&&ME.sid)+belowPod(R).map(o=>rkRow(o,r=>r.best,r=>`도전 ${r.cnt}회`)).join(''))(rankList(list,r=>r.best))
-      : `<div class="empty">아직 기록이 없어요.</div>`)+myPlace(rows,'best');
-}
-function myPlace(rows,key){
-  if(!ME) return '';
-  const list=rows.filter(r=>r[key]>0).sort((a,b)=>b[key]-a[key]||a.sid.localeCompare(b.sid));
-  const i=list.findIndex(r=>r.sid===ME.sid);
-  if(i<0) return `<div class="myplace">아직 순위에 들어가지 않았어요. 실전 모드에 도전해 보세요!</div>`;
-  return `<div class="myplace">${esc(ME.sid)} 님은 <b>${list.length}명 중 ${i+1}위</b>예요.</div>`;
-}
 /* 학급 대항 — 학생마다 (이 학교 주제들의) 실전 최고 기록을 더하고 반끼리 다시 더합니다 */
 function paintRkClass(){
   const sc=schoolOf(RK.school), one=RK.scope==='topic', topics=one?[RK.topic]:rkTopicsOf(RK.school);
-  const list=classBattle(RK.users,topics), mine=ME?classOf(ME.sid):'';
+  const list=classBattle(RK.users,topics,RK.classes), mine=ME?classOf(ME.sid):'';
   const i=list.findIndex(g=>g.c===mine), me=list[i];
   const gap=i>0?list[i-1].sum-me.sum:0;
   el('rkBody').innerHTML=`<div class="segs cbscope">
       <button class="sg${one?'':' on'}" data-s="school">${sc.n} 전체 (${topics.length}개 주제)</button>
       <button class="sg${one?' on':''}" data-s="topic">${topicOf(RK.topic).n}만</button></div>
     <div class="chartlab" style="margin:0 0 12px">학생마다 ${one?'이 주제의':'주제별'} 실전 최고 기록을 더하고, 반 학생들의 점수를 모두 더한 값이에요.
-      친구가 참여할수록, 기록을 깰수록 우리 반 점수가 올라가요.</div>`+
-    classBattleHTML(list,mine)+
+      흐린 친구는 아직 기록이 없는 친구 · 단체 사진은 우리 반이 연 학급 아이템으로 꾸며져요.</div>`+
+    classBattleHTML(list,mine,RK.classes)+
     (ME?`<div class="myplace">${me?`${classLabel(mine)}는 <b>${list.length}개 반 중 ${i+1}위</b>${i>0?` · 바로 위 반까지 <b>${gap}점</b>`:' — 1등이에요!'}`
       :`${classLabel(mine)}는 아직 기록이 없어요. 실전 모드에 도전해 우리 반 점수를 올려 보세요!`}</div>`:'');
   el('rkBody').querySelectorAll('.cbscope .sg').forEach(b=>b.onclick=()=>{ RK.scope=b.dataset.s; paintRank(); });
@@ -8601,15 +8648,33 @@ const clsKey=()=>classOf(ME.sid);
 const clsShort=()=>shortCls(ME.sid);
 const tally=o=>{ const n={}; Object.values(o||{}).forEach(v=>{ n[v]=(n[v]||0)+1; }); return n; };
 /* 우리 반 색 — 표가 가장 많은 색, 같으면 목록 앞쪽 */
-function clsColor(c){
+function clsColor(c,key){
   const n=tally((c||{}).col), best=CLASS_COLS.slice().sort((a,b)=>(n[b.k]||0)-(n[a.k]||0))[0];
   if(best&&n[best.k]) return best;
-  const num=parseInt(String(clsKey()).slice(1),10)||0; return CLASS_COLS[num%CLASS_COLS.length];
+  const num=parseInt(String(key||clsKey()).slice(1),10)||0; return CLASS_COLS[num%CLASS_COLS.length];
+}
+/* 학급 아이템은 반 모두에게 자동으로 — 열린 단계 가운데 가장 높은 단계의 아이템을 반 친구 모두가 입어요 */
+function clsTop(pick){ let top=null; CLASS_TIERS.forEach(T=>{ if(pick&&pick[T.t]) top=pick[T.t]; }); return top&&ITEM(top)?top:null; }
+const clsPicks=pick=>CLASS_TIERS.map(T=>pick&&pick[T.t]).filter(id=>id&&ITEM(id));
+/* 다른 학생 캐릭터를 그릴 때 — 그 학생 반의 색·이름·학급 아이템을 입혀서 */
+function clsCh(sid,ch,classes){
+  const k=classOf(sid), c=(classes||{})[k]||null, o=cleanCh(ch), top=c&&clsTop(c.pick);
+  o.cl=shortCls(sid); o.cc=clsColor(c,k).c;
+  o.items=o.items.filter(id=>CAT_OF(id)!=='class'); if(top) o.items.push(top);
+  return o;
+}
+/* 내 캐릭터에 우리 반 학급 아이템 입히기 — 바뀌었으면 true */
+function clsApplyMe(){
+  if(!ME||!CLS) return false;
+  const top=clsTop(CLS.pick), w=(ME.ch.items||[]).filter(id=>CAT_OF(id)!=='class'); if(top) w.push(top);
+  if(JSON.stringify(w)===JSON.stringify(ME.ch.items||[])) return false;
+  ME.ch.items=w; return true;
 }
 async function loadClass(){
   const d=(await dbGet('classes/'+clsKey(),null))||{};
   CLS={fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, vt:d.vt||{}, pick:d.pick||{}};
-  ME.ch.cl=clsShort(); ME.ch.cc=clsColor(CLS).c;
+  const cc0=ME.ch.cc; ME.ch.cl=clsShort(); ME.ch.cc=clsColor(CLS).c;
+  if(clsApplyMe()||cc0!==ME.ch.cc){ paintMe(); saveMe(); }
   return CLS;
 }
 const clsPick=t=>CLS&&CLS.pick&&CLS.pick[t];
@@ -8627,7 +8692,7 @@ function classPanelHTML(){
   const mine=CLS.gv[ME.sid]||0, cc=clsColor(CLS), cn=tally(CLS.col), myCol=CLS.col[ME.sid];
   return `<div class="clspanel" style="--cc:${cc.c}">
     <div class="clshead"><div><h3>${classLabel(clsKey())} 모금함</h3>
-      <div class="sub">반 친구들과 코인을 모아 <b>우리 반만의 아이템</b>을 열어요. 단계마다 <b>두 가지 중 하나</b>를 투표로 고르고, 아이템은 <b>우리 반 색</b>으로 칠해져요 — 그래서 반마다 달라요.</div></div>
+      <div class="sub">반 친구들과 코인을 모아 <b>우리 반만의 아이템</b>을 열어요. 단계마다 <b>두 가지 중 하나</b>를 투표로 고르고, 아이템은 <b>우리 반 색</b>으로 칠해져요. 열린 아이템은 <b>반 친구 모두의 캐릭터</b>에 자동으로 입혀지고(가장 높은 단계 것), <b>학급 랭킹 단체 사진</b>도 꾸며 줘요.</div></div>
       <div class="fundbox"><span>모은 코인</span><b>${CLS.fund}</b></div></div>
     <h4 class="boxh">우리 반 색 <small>한 사람에 한 표 · 바꿀 수 있어요</small></h4>
     <div class="cccols">${CLASS_COLS.map(c=>`<button class="ccvote${c.k===cc.k?' on':''}${myCol===c.k?' mine':''}" data-c="${c.k}" style="--c:${c.c}">
@@ -8662,6 +8727,7 @@ async function giveClass(v){
     return cur; });
   if(r&&r.val){ const d=r.val; CLS={fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, vt:d.vt||{}, pick:d.pick||{}}; }
   const opened=CLASS_TIERS.filter(T=>CLS.pick[T.t]&&!before[T.t]).map(T=>ITEM(CLS.pick[T.t]).n);
+  if(clsApplyMe()) await saveMe();
   paintShop(); paintMe();
   toast(opened.length?`🎉 ${opened.join(', ')}이(가) 우리 반에 열렸어요!`:`${v}코인을 냈어요. 고마워요!`);
 }
@@ -8680,9 +8746,7 @@ async function voteClassOpt(t,id){
 async function tapClassItem(id){
   const it=ITEM(id); if(!it) return;
   if(!clsOpen(it)) return toast(`우리 반이 ${it.goal}코인을 모으고 이 아이템이 뽑히면 열려요`);
-  const w=ME.ch.items||[];
-  ME.ch.items=w.includes(id)?w.filter(x=>x!==id):w.filter(x=>CAT_OF(x)!=='class').concat([id]);
-  await saveMe(); paintShop(); paintMe();
+  toast('학급 아이템은 우리 반 모두에게 자동으로 입혀져요 · 학급 랭킹 단체 사진도 꾸며져요');
 }
 
 /* ═══════════════════ 시작 ═══════════════════ */
