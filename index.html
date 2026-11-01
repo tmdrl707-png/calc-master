@@ -1681,22 +1681,6 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
   </div>
 </div>
 
-<div class="overlay" id="ovPw" onclick="if(event.target===this)close_('ovPw')">
-  <div class="modal">
-    <h3>누적 랭킹</h3>
-    <div class="sub">누적 랭킹은 암호를 넣어야 볼 수 있습니다.</div>
-    <div class="fld">
-      <label for="rkPw">암호 (4자리)</label>
-      <input type="password" id="rkPw" maxlength="4" inputmode="numeric" autocomplete="new-password" placeholder="숫자 4자리">
-    </div>
-    <div class="err" id="rkErr"></div>
-    <div class="row">
-      <button class="btn" onclick="close_('ovPw')">취소</button>
-      <button class="btn primary" id="rkPwGo">들어가기</button>
-    </div>
-  </div>
-</div>
-
 <div class="overlay" id="ovBox" onclick="if(event.target===this)close_('ovBox')">
   <div class="modal boxmodal">
     <h3 id="boxTitle">랜덤 상자</h3>
@@ -6455,6 +6439,9 @@ function paintTTl(){
     <div class="tbox"><h3>상점 <span>잠가 두어도 코인은 계속 모여요</span></h3>
       <div class="tlrow shoprow"><span class="cn">상점 (꾸미기·랜덤 상자·학급 아이템)</span>${sw(shopOpenNow(),'data-shop="1"')}</div>
       <div class="hint">잠겨 있으면 학생의 상점 버튼에 자물쇠가 보이고, 눌러도 들어갈 수 없어요. 문제를 풀어 얻는 코인은 그대로 쌓이고, 열리는 순간부터 쓸 수 있어요.</div></div>
+    <div class="tbox"><h3>학생 화면 랭킹 <span>잠긴 랭킹은 학생에게 자물쇠로 보여요</span></h3>
+      ${RK_TABS.map(([k,n])=>`<div class="tlrow shoprow"><span class="cn">${n} 랭킹</span>${sw(rkTabOpen(k),`data-rk="${k}"`)}</div>`).join('')}
+      <div class="hint">선생님 모드 랭킹은 잠금과 상관없이 모두 볼 수 있어요. 노력왕·연습왕·대전 랭킹은 선생님 모드에서만 보여요.</div></div>
     ${SCHOOLS.map(sc=>`<div class="tbox"><h3>${sc.n}</h3>
       <div class="tlrow hd"><span>주제</span>${MODES.map(([m,n])=>`<span>${n}</span>`).join('')}</div>
       <div class="tlrow all"><span class="cn">전체</span>${MODES.map(([m])=>{ const all=sc.topics.every(t=>has(t,m));
@@ -6464,6 +6451,9 @@ function paintTTl(){
   const save=async()=>{ await dbSet('config/tl',CFG.tl); paintTTl(); toast('저장했어요 · 학생 화면에 바로 반영돼요'); };
   el('tBody').querySelectorAll('.tsw[data-shop]').forEach(b=>b.onclick=async()=>{ CFG.shop={open:!shopOpenNow()}; await dbSet('config/shop',CFG.shop); paintTTl();
     toast(CFG.shop.open?'상점을 열었어요':'상점을 잠갔어요 · 코인은 계속 모여요'); });
+  el('tBody').querySelectorAll('.tsw[data-rk]').forEach(b=>b.onclick=async()=>{ const k=b.dataset.rk, n=(RK_TABS.find(x=>x[0]===k)||[])[1];
+    CFG.rk=Object.assign({},CFG.rk,{[k]:!rkTabOpen(k)}); await dbSet('config/rk',CFG.rk); paintTTl();
+    toast(`${n} 랭킹을 ${CFG.rk[k]?'열었어요':'잠갔어요'}`); });
   const setM=(t,m,on)=>{ const a=new Set(CFG.tl[m]||[]); on?a.add(t):a.delete(t); CFG.tl[m]=[...a]; };
   el('tBody').querySelectorAll('.tsw[data-t]').forEach(b=>b.onclick=()=>{ setM(b.dataset.t,b.dataset.m,!has(b.dataset.t,b.dataset.m)); save(); });
   el('tBody').querySelectorAll('.tsw[data-all]').forEach(b=>b.onclick=()=>{ const [k,m,on]=b.dataset.all.split(':');
@@ -7446,10 +7436,11 @@ function stageGradeP(p,t,n){ const c=GRADE_CUT[t], bt=p&&p.bt&&p.bt['s'+n]; if(!
 const gBadge=g=>g?`<span class="gbadge g-${g}">${g}</span>`:'';
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
-let CFG={shop:{open:false},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
+let CFG={shop:{open:false},rk:{today:true,all:false,class:true,coin:true},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
 async function loadCfg(){
   try{ const c=await dbGet('config',null);
     if(c&&c.shop) CFG.shop={open:c.shop.open===true};
+    if(c&&c.rk) CFG.rk=Object.assign({today:true,all:false,class:true,coin:true},c.rk);
     if(c&&c.lock) CFG.lock={on:c.lock.on!==false, goal:Object.assign({},c.lock.goal||{})};
     if(c&&c.tl){ const vs=x=>Object.values(x||{}).filter(v=>typeof v==='string');
       CFG.tl=c.tl.open!=null&&c.tl.v==null?{v:2,p:vs(c.tl.open),r:vs(c.tl.open),b:vs(c.tl.open)}:{v:2,p:vs(c.tl.p),r:vs(c.tl.r),b:vs(c.tl.b)}; }
@@ -8191,9 +8182,8 @@ function coinUse(u,sid,classes){
 const cn=v=>Number(v||0).toLocaleString('ko-KR');
 
 /* ═══════════════════ 랭킹 ═══════════════════
-   주제마다 ① 오늘의 랭킹 ② 누적 랭킹(암호) ③ 학급 랭킹             */
-const RANK_PW='0815';
-let RK={school:'e',topic:'addsub',tab:'today',users:null,open:false,scope:'school'};
+   학생 화면 : 오늘 · 누적 · 학급 대항 · 코인 — 선생님 모드에서 하나씩 잠그고 열어요             */
+let RK={school:'e',topic:'addsub',tab:'today',users:null,scope:'school'};
 /* 랭킹은 실전 모드가 열린 주제만 보여 줍니다 */
 const rkTopicsOf=k=>schoolOf(k).topics.filter(t=>modeOpen(t,'r'));
 async function openRank(){
@@ -8277,23 +8267,26 @@ function rankBoard(kind,stats,t,opt){
 /* ═══ 학생 화면 랭킹 ═══
    맨 위 : 실전 기록 · 노력왕 · 연습왕 · 대전 · 코인
    실전 기록 아래 : 주제(학교별 한 줄) · 오늘 / 누적(암호) / 학급 대항                    */
+/* 학생 화면 — 오늘 · 누적 · 학급 대항 · 코인 (선생님 모드 '모드 잠금'에서 하나씩 잠그고 열어요) */
+const RK_TABS=[['today','오늘'],['all','누적'],['class','학급 대항'],['coin','코인']];
+const rkTabOpen=k=>!!(CFG.rk&&CFG.rk[k]);
 function paintRank(){
-  RK.kind=RK.kind||'rec';
-  const kinds=[['rec','실전 기록'],['effort','노력왕'],['prac','연습왕'],['battle','대전'],['coin','코인']];
-  el('rkSchools').innerHTML=kinds.map(([k,n])=>`<button class="sg${RK.kind===k?' on':''}" data-k="${k}">${n}</button>`).join('');
-  el('rkSchools').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ RK.kind=b.dataset.k; paintRank(); });
   const live=online()?'반 전체가 함께 보는 기록':'이 기기에 저장된 기록';
+  if(!rkTabOpen(RK.tab)){ const f=RK_TABS.find(([k])=>rkTabOpen(k)); if(f) RK.tab=f[0]; }
+  el('rkSchools').innerHTML=RK_TABS.map(([k,n])=>`<button class="sg${RK.tab===k&&rkTabOpen(k)?' on':''}${rkTabOpen(k)?'':' off'}" data-k="${k}">${rkTabOpen(k)?'':LOCKI}${n}</button>`).join('');
+  el('rkSchools').querySelectorAll('.sg').forEach(b=>b.onclick=()=>pickRankTab(b.dataset.k));
+  el('rkTabs').style.display='none'; el('rkTabs').innerHTML='';
+  if(!RK_TABS.some(([k])=>rkTabOpen(k))){ el('rkTopics').style.display='none'; el('rkSub').innerHTML=live;
+    el('rkBody').innerHTML='<div class="empty">랭킹은 아직 잠겨 있어요. 선생님이 열어 주면 볼 수 있어요.</div>'; return; }
   const users=RK.users||{}, statsOf=t=>Object.keys(users).map(sid=>userStat(sid,users[sid],t,RK.classes));
-  if(RK.kind!=='rec'){
+  if(RK.tab==='coin'){
     el('rkTopics').style.display='none'; el('rkTopics').innerHTML='';
-    el('rkTabs').style.display='none'; el('rkTabs').innerHTML='';
-    el('rkSub').innerHTML=`${live} · <b>${kinds.find(x=>x[0]===RK.kind)[1]}</b>`;
-    el('rkBody').innerHTML=rankBoard(RK.kind,statsOf(RK.topic),RK.topic);
-    return;
+    el('rkSub').innerHTML=`${live} · <b>코인</b>`;
+    el('rkBody').innerHTML=rankBoard('coin',statsOf(RK.topic),RK.topic); return;
   }
-  el('rkTopics').style.display=''; el('rkTabs').style.display='';
+  el('rkTopics').style.display='';
   const SN={e:'초등',m:'중등',h:'고등'}, open=SCHOOLS.filter(x=>rkTopicsOf(x.k).length), all=open.flatMap(x=>rkTopicsOf(x.k));
-  if(!all.length){ el('rkSub').innerHTML='아직 열린 실전 모드가 없어요.'; el('rkTopics').innerHTML=''; el('rkTabs').innerHTML='';
+  if(!all.length){ el('rkSub').innerHTML='아직 열린 실전 모드가 없어요.'; el('rkTopics').innerHTML='';
     el('rkBody').innerHTML='<div class="empty">선생님이 실전 모드를 열면 랭킹이 보여요.</div>'; return; }
   if(!all.includes(RK.topic)) RK.topic=all[0];
   const t=RK.topic; RK.school=(SCHOOLS.find(x=>x.topics.includes(t))||SCHOOLS[0]).k;
@@ -8302,25 +8295,10 @@ function paintRank(){
     `<button class="pk${k===t?' on':''}" data-t="${k}">${topicOf(k).n}</button>`).join('')}</div></div>`).join('');
   el('rkTopics').querySelectorAll('.pk').forEach(b=>b.onclick=()=>{ RK.topic=b.dataset.t; if(RK.tab==='class') RK.scope='topic'; paintRank(); });
   hscShow(el('rkTopics'));
-  const tabs=[['today','오늘'],['all',`누적${RK.open?'':' '+LOCKI}`],['class','학급 대항']];
-  el('rkTabs').innerHTML=tabs.map(([k,n])=>`<button class="sg${RK.tab===k?' on':''}" data-k="${k}">${n}</button>`).join('');
-  el('rkTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>pickRankTab(b.dataset.k));
   if(RK.tab==='class') paintRkClass();
   else el('rkBody').innerHTML=rankBoard(RK.tab==='all'?'best':'today',statsOf(t),t);
 }
-function pickRankTab(k){ if(k==='all'&&!RK.open) return askRankPw(); RK.tab=k; paintRank(); }
-function askRankPw(){
-  el('rkPw').value=''; el('rkErr').textContent='';
-  const go=()=>{
-    const v=(el('rkPw').value||'').replace(/\D/g,'');
-    if(v!==RANK_PW){ el('rkErr').textContent='암호가 맞지 않습니다.'; el('rkPw').value=''; return; }
-    close_('ovPw'); RK.open=true; RK.tab='all'; paintRank();
-  };
-  el('rkPwGo').onclick=go;
-  el('rkPw').onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); go(); } };
-  openM('ovPw');
-  setTimeout(()=>{ try{ el('rkPw').focus(); }catch(e){} },120);
-}
+function pickRankTab(k){ if(!rkTabOpen(k)) return toast('아직 잠겨 있어요 — 선생님이 열어 주면 볼 수 있어요'); RK.tab=k; paintRank(); }
 /* 학급 대항 — 학생마다 (이 학교 주제들의) 실전 최고 기록을 더하고 반끼리 다시 더합니다 */
 function paintRkClass(){
   const sc=schoolOf(RK.school), one=RK.scope==='topic', topics=one?[RK.topic]:rkTopicsOf(RK.school);
