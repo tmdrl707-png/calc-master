@@ -1328,12 +1328,6 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .cbtop .who span{display:block;font-size:12px;color:var(--dim);font-weight:600;margin-top:1px}
 .cbtop .sc{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums}
 .cbtop .sc small{font-size:12px;color:var(--dim);margin-left:2px;font-weight:700}
-.cbscene{border-radius:14px;overflow:hidden}
-.cbscene svg{display:block;width:100%;height:auto}
-.cbfoot{padding:8px 2px 0}
-.cbfoot .cbbar{margin:0 0 6px}.cbfoot .cbbar em{background:var(--cc)}
-.cbfoot span{font-size:12px;color:var(--dim);font-weight:600}
-.cbfoot span b{color:var(--ink)}
 /* 선생님 랭킹 종류 · 학생 정보 정렬 */
 .rkkinds{margin:0 0 12px;padding:2px 0}
 .tsort{padding:0 0 12px 0}
@@ -1402,6 +1396,113 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .qfig .vis.kcq2{height:150px}
 @media(max-width:520px){.qfig .vis.kcq2{height:140px}}
 .dotk{display:inline-block;width:11px;height:11px;border-radius:50%;background:currentColor;vertical-align:-14px}
+/* 학급 대항 카드 (2026-11-03) — 랭킹 한 줄 모양 + 반 친구들을 겹치지 않게 한 칸씩 */
+.cbcard>.cbbar{margin:0 2px 10px}.cbcard>.cbbar em{background:var(--cc)}
+.cbitem{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim);font-weight:600;padding:7px 10px;border-radius:12px;background:var(--soft);margin-bottom:10px}
+.cbitem i{flex:none;width:12px;height:12px;border-radius:50%}
+.cbitem b{color:var(--ink);font-weight:800}
+.cbgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px 4px}
+@media(min-width:560px){.cbgrid{grid-template-columns:repeat(8,minmax(0,1fr))}}
+.cbm{display:flex;flex-direction:column;align-items:center;min-width:0;padding:4px 0 5px;border-radius:12px}
+.cbm .cbav{width:100%;aspect-ratio:1/1}
+.cbm .cbav svg{width:100%;height:100%;display:block}
+.cbm b{font-size:10.5px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.2px;line-height:1.2}
+.cbm em{font-style:normal;font-size:11px;font-weight:800;color:var(--cc);font-variant-numeric:tabular-nums;line-height:1.2}
+.cbm.dim .cbav{opacity:.38}.cbm.dim em{color:var(--dim);font-weight:600}
+.cbm.me{background:var(--soft);box-shadow:0 0 0 1.5px var(--blue) inset}.cbm.me b{color:var(--blue)}
+.cbm.mvp em::before{content:'★ ';color:#e8a800}
+.cbmore{display:block;width:100%;margin-top:8px;padding:8px;border:none;border-radius:10px;background:var(--soft);font:inherit;font-size:13px;font-weight:700;color:var(--ink);cursor:pointer}
+.cbmore small{color:var(--dim);font-weight:600}
+.cbadm{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:end;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.cbadm label{display:flex;flex-direction:column;gap:3px;min-width:0}
+.cbadm label span{font-size:11px;color:var(--dim);font-weight:700}
+.cbadm input{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font:inherit;font-size:14px;min-width:0}
+.cbadm .btn{padding:8px 12px;font-size:13px}
+.myplace.top{margin:0 0 12px}
+/* 모금함 — 받침 세 단계 · 글자 투표 */
+.ctiers.c3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 4px}
+.ctiers.c3 .ctier{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;text-align:center}
+.ctiers.c3 .ctier .ic{width:100%;max-width:110px;aspect-ratio:1/1}.ctiers.c3 .ctier .ic svg{width:100%;height:100%}
+.ctiers.c3 .ctier .nm2{font-size:12.5px;font-weight:800}
+.ctiers.c3 .ctier:not(.done) .ic{opacity:.45;filter:grayscale(.5)}
+.ctier.wear{box-shadow:0 0 0 2px var(--cc) inset}
+.ctiers.c3 .cth{width:100%;display:flex;flex-direction:column;align-items:center;gap:0;font-size:12px;line-height:1.3}
+.ctiers.c3 .cth span{color:var(--dim)}
+.txvotes{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px;margin:6px 0 4px}
+.txvote{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 6px;border:1px solid var(--line);border-radius:12px;background:#fff;font:inherit;cursor:pointer}
+.txvote b{font-size:13.5px;font-weight:800}.txvote small{font-size:11px;color:var(--dim)}
+.txvote.on{box-shadow:0 0 0 2px var(--cc) inset;border-color:var(--cc)}.txvote.mine small{color:var(--cc);font-weight:700}
+/* ═══ 성장 (2026-11-03) — 오늘의 미션 · 출석 · 마이페이지 진단 ═══ */
+.msbox{margin:6px 0 14px}
+.mscard{border:1px solid var(--line);border-radius:18px;background:#fff;padding:12px 12px 8px}
+.mscard.flat{border:none;padding:4px 0 0;background:none}
+.msh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:0 2px 8px;flex-wrap:wrap}
+.msh b{font-size:16px;font-weight:800}
+.msh span{font-size:12px;color:var(--dim);font-weight:600}
+.msrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 6px;border:none;border-top:1px solid var(--hair);background:none;font:inherit;color:inherit;cursor:pointer}
+.msrow:first-of-type{border-top:none}
+.msk{flex:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:13px;font-weight:800;background:var(--soft2);color:var(--ink2)}
+.msk.k-pre{background:#fff1d6;color:#a86400}.msk.k-weak{background:#ffe3ea;color:#c2255c}.msk.k-real{background:#e6edff;color:var(--blue)}.msk.k-new,.msk.k-again{background:#e6f6ec;color:#1f7a45}
+.mst{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.mst em{font-style:normal;font-size:11px;font-weight:700;color:var(--dim)}
+.mst b{font-size:14.5px;font-weight:800;word-break:keep-all}
+.mst small{font-size:12px;color:var(--dim);line-height:1.45;word-break:keep-all}
+.msgo{flex:none;font-size:12.5px;font-weight:800;color:var(--blue)}
+.msrow.done{cursor:default}.msrow.done .msk{background:var(--o);color:#fff}.msrow.done b{color:var(--dim);text-decoration:line-through}.msrow.done .msgo{color:var(--o)}
+.msgain{margin-bottom:10px}
+/* 출석 */
+.attm{text-align:center}
+.attstamp{display:inline-block;font-size:12px;font-weight:800;letter-spacing:1px;color:var(--blue);background:#e6edff;border-radius:99px;padding:4px 12px;margin-bottom:8px}
+.attweek{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:14px 0 10px}
+.attweek span{display:flex;flex-direction:column;align-items:center;gap:3px}
+.attweek i{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:13px;font-weight:800;background:var(--soft2);color:var(--dim)}
+.attweek em{font-style:normal;font-size:10.5px;color:var(--dim);font-weight:700}
+.attweek .got i{background:#cfe0ff;color:var(--blue)}
+.attweek .now i{background:var(--blue);color:#fff;box-shadow:0 0 0 4px #e6edff}
+.attweek .now em{color:var(--blue)}
+.attgain{font-size:15px;margin-bottom:6px}.attgain b{font-size:22px;font-weight:800;color:#b8860b}.attgain small{display:block;font-size:12px;color:var(--dim);margin-top:2px}
+/* 마이페이지 진단 */
+.mpdiag h3{margin-bottom:8px}
+.dgl{font-size:14px;color:var(--dim);line-height:1.6;margin-bottom:6px}
+.dgrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+@media(max-width:420px){.dgrow{grid-template-columns:1fr}}
+.dg{border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.dg span{font-size:11.5px;font-weight:800}
+.dg b{font-size:15px;font-weight:800;word-break:keep-all}
+.dg small{font-size:12px;color:var(--ink2);line-height:1.45}
+.dg.good{background:#eaf7ef}.dg.good span{color:#1f7a45}
+.dg.grow{background:#fff4e2}.dg.grow span{color:#a86400}
+.wkgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:6px}
+@media(max-width:520px){.wkgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.wkc{background:var(--soft);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.wkc span{font-size:11.5px;color:var(--dim);font-weight:700}
+.wkc b{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.wkc em{font-style:normal;font-size:11.5px;color:var(--dim);font-weight:600}
+.wkc em.up{color:var(--o)}.wkc em.dn{color:var(--x)}
+.smrow{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.smrow .tlab{flex:none;width:26px;font-size:11.5px;font-weight:800;color:var(--dim);padding-top:8px}
+.smgrid{flex:1;display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:5px}
+.smt{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:2px;text-align:left;padding:7px 8px;min-height:50px;border-radius:12px;border:1px solid transparent;font:inherit;color:inherit;cursor:pointer;min-width:0}
+.smt b{font-size:12px;font-weight:800;line-height:1.25;word-break:keep-all}
+.smt small{font-size:10.5px;color:var(--ink2);opacity:.8}
+.smt em{font-style:normal;font-size:10.5px;font-weight:800}
+.smt.on{box-shadow:0 0 0 2px var(--ink) inset}
+.lv0{background:var(--soft)}.lv0 b{color:var(--dim);font-weight:700}
+.lv1{background:#ffe3ea}.lv1 em{color:#c2255c}
+.lv2{background:#fff4e2}.lv2 em{color:#a86400}
+.lv3{background:#e3f5ea}.lv3 em{color:#1f7a45}
+.lv4{background:linear-gradient(135deg,#fff3c4,#ffe08a)}.lv4 em{color:#8a6100}
+.smleg{display:flex;flex-wrap:wrap;gap:10px;margin-top:4px;font-size:11px;color:var(--dim);font-weight:700}
+.smleg span{display:flex;align-items:center;gap:4px;background:none}
+.smleg i{width:11px;height:11px;border-radius:4px;display:inline-block}
+.smleg .lv0 i{background:var(--soft2)}.smleg .lv1 i{background:#ffc9d6}.smleg .lv2 i{background:#ffe0a8}.smleg .lv3 i{background:#bfe8cf}.smleg .lv4 i{background:#ffd54a}
+.mpsec{font-size:16px;font-weight:900;margin:24px 0 2px;padding-top:14px;border-top:1px solid var(--line)}
+.wkc,.mpsec,.smt{scroll-margin-top:12px}
+/* 선생님 — 학생의 오늘 미션 */
+.tmsl{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.tms{display:flex;gap:8px;font-size:12.5px;align-items:flex-start;background:var(--soft);border-radius:10px;padding:7px 9px}
+.tms i{font-style:normal;font-weight:800;color:var(--dim)}.tms.done i{color:var(--o)}
+.tms em{font-style:normal;color:var(--dim);font-weight:700}.tms small{display:block;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -1464,6 +1565,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 <section id="s-school" class="screen">
   <div class="mebar" id="meBar5"></div>
   <div class="title"><h1>계산 마스터</h1><p class="lead" id="schoolHi">어디서부터 시작할까요?</p></div>
+  <div class="msbox" id="msBox"></div>
   <div class="schools" id="schoolList"></div>
   <div class="btwrap"><button class="btbar" onclick="openBattle()"><span class="bti" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M2.8 19c.6-3.4 3.1-5.4 6.2-5.4s5.6 2 6.2 5.4z" fill="currentColor"/><circle cx="16.6" cy="9" r="2.6" fill="currentColor" opacity=".55"/><path d="M14.6 14.2c.6-.2 1.3-.3 2-.3 2.6 0 4.4 1.7 4.9 4.6h-4.6c-.3-1.7-1.1-3.2-2.3-4.3z" fill="currentColor" opacity=".55"/></svg></span>
         <span class="btt"><b>친구와 대전</b><small>초등·중등·고등 어느 주제든 · 방 번호로 친구들과 빨리 맞히기</small></span><span class="go" aria-hidden="true">→</span></button></div>
@@ -1598,16 +1700,18 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
         </div>
       </div>
     </div>
+    <div class="mpbox mpdiag" id="mpDiag"></div>
     <div class="mpbox">
-      <h3>내가 가진 꾸미기 <span class="mpown-n" id="mpOwnN"></span></h3>
-      <div class="chartlab" style="margin:-2px 0 8px">누르면 입고, 한 번 더 누르면 벗어요 · 랜덤 상자에서 얻은 것도 여기 있어요</div>
-      <div class="items" id="mpOwn"></div>
+      <div class="mphd"><h3>이번 주의 나 <small>vs 지난주의 나</small></h3></div>
+      <div id="mpWeek"></div>
     </div>
     <div class="mpbox">
-      <h3>친구 대전 기록</h3>
-      <div id="mpBattle"></div>
+      <div class="mphd"><h3>실력 지도</h3></div>
+      <div class="chartlab" style="margin:-2px 0 8px;text-align:left">주제마다 색으로 — 누르면 아래에서 그 주제를 자세히 봐요</div>
+      <div id="mpMap"></div>
     </div>
-    <div class="tabs" id="mpTopics" style="margin-top:18px"></div>
+    <h3 class="mpsec" id="mpTopicH">주제 자세히 보기</h3>
+    <div class="tabs" id="mpTopics" style="margin-top:8px"></div>
     <div class="mpgrid" id="mpStats"></div>
     <div class="mpbox">
       <div class="mphd"><h3>실전 기록의 변화</h3><div class="chtoggle" id="mineToggle"></div></div>
@@ -1621,6 +1725,15 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
     <div class="mpbox">
       <h3>연습 스테이지</h3>
       <div class="mpstage" id="mpStage"></div>
+    </div>
+    <div class="mpbox">
+      <h3>내가 가진 꾸미기 <span class="mpown-n" id="mpOwnN"></span></h3>
+      <div class="chartlab" style="margin:-2px 0 8px">누르면 입고, 한 번 더 누르면 벗어요 · 랜덤 상자에서 얻은 것도 여기 있어요</div>
+      <div class="items" id="mpOwn"></div>
+    </div>
+    <div class="mpbox">
+      <h3>친구 대전 기록</h3>
+      <div id="mpBattle"></div>
     </div>
     <div style="margin-top:18px;display:flex;gap:9px;justify-content:center">
       <button class="btn" onclick="goHome()">← 처음으로</button>
@@ -1723,6 +1836,16 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
   </div>
 </div>
 
+<div class="overlay" id="ovAtt" onclick="if(event.target===this)close_('ovAtt')">
+  <div class="modal attm">
+    <div class="attstamp" id="attStamp">출석</div>
+    <h3 id="attTitle">오늘도 왔어요!</h3>
+    <div class="sub" id="attSub"></div>
+    <div class="attweek" id="attWeek"></div>
+    <div class="attgain" id="attGain"></div>
+    <div class="row"><button class="btn primary" onclick="close_('ovAtt')">좋아요</button></div>
+  </div>
+</div>
 <div class="overlay" id="ovHs" onclick="if(event.target===this)close_('ovHs')">
   <div class="modal">
     <h3 id="hsTitle">고등학교는 아직 잠겨 있어요</h3>
@@ -1944,7 +2067,7 @@ async function dbTx(path,fn){
          gy 발 높이 · fdx 두 발 간격 반 · x0 x1 y0 y1 몸의 바깥 상자 }            */
 const FONT="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif";
 /* 그리기 도우미(P·C·R·G …)가 다른 파일의 이름과 부딪히지 않도록 한 덩어리로 감쌉니다 */
-const {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,classSceneSVG}=(()=>{
+const {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,CLASS_TXT,CLS_PERSONAL}=(()=>{
 const INK='#1f2433';
 
 /* ── 그리기 도우미 ── */
@@ -2620,75 +2743,98 @@ const BOX_ITEMS=[
   [[-20,-30],[40,-20],[200,-36],[236,60],[-26,150],[240,190],[60,226],[180,216]].forEach(([x,y],i)=>g+=C(x,y,i%3?1.4:2.2,'#fff',0,0,'.8'));
   return df+CLIPBG(g);}}
 ];
-/* ═══ 학급 아이템 — 반마다 다르게 ═══
-   ① 우리 반 색 : 반 친구들의 투표로 정하고, 학급 아이템이 모두 그 색(b.cc)으로 칠해져요.
-   ② 단계마다 두 가지 가운데 하나 : 모금액이 그 단계에 닿는 순간, 표가 많은 쪽이 우리 반에 열려요.
-   그래서 반마다 열리는 아이템 조합과 색이 달라집니다.   b.cl : '2-3' 처럼 반 이름 · b.cc : 반 색  */
+/* ═══ 학급 아이템 (2026-11-03 바꿈) ═══
+   예전 학급 아이템 16가지(배지·깃발·망토·왕관 …)는 이제 상점에서 사는 '개인 아이템'이에요(CLS_PERSONAL).
+   그 반 이름(b.cl)과 반 색(b.cc)으로 그려져서, 같은 물건이라도 반마다 다르게 보여요.
+   반 모두가 함께 입는 '공통 아이템'은 발밑 받침 세 가지뿐 — 받침 자리는 개인 아이템이 쓰지 않는 자리라
+   어떤 꾸미기와도 겹치지 않아요. 받침의 색(반 색)과 글자(b.ct)는 반마다 바꿀 수 있어요.          */
 const CLASS_COLS=[{k:'blue',n:'파랑',c:'#4f6bff'},{k:'red',n:'빨강',c:'#ff4f6d'},{k:'green',n:'초록',c:'#18b07a'},
                   {k:'purple',n:'보라',c:'#7b61ff'},{k:'orange',n:'주황',c:'#ff8a1f'},{k:'sky',n:'하늘',c:'#22a7e0'}];
 const CC=b=>b.cc||'#4f6bff';
-const CLASS_ITEMS=[
+const CLS_PERSONAL=[
 /* 1단계 600 */
-{id:'clsBadge',cat:'class',tier:0,goal:600,n:'우리 반 배지',d:b=>{const x=Math.max(b.fx-b.ew-b.gr-12,b.x0+16), y=b.ny+2;
+{id:'clsBadge',cat:'neck',p:300,cls:1,n:'우리 반 배지',d:b=>{const x=Math.max(b.fx-b.ew-b.gr-12,b.x0+16), y=b.ny+2;
   return G(`translate(${x} ${y}) scale(1.3) translate(${-x} ${-y})`,P(`M${x-7},${y+8} l-5,16 l7,-4 l4,6 l2,-16 Z M${x+7},${y+8} l5,16 l-7,-4 l-4,6 l-2,-16 Z`,CC(b),INK,1.6)+
     C(x,y,14,'#ffd23f',INK,2.2)+C(x,y,10,'#fff6c8',0)+T(x,y+4,b.cl,b.cl.length>3?8.5:10.5,INK,900));}},
-{id:'clsRosette',cat:'class',tier:0,goal:600,n:'우리 반 꽃 리본',d:b=>{const x=b.fx, y=b.ny+6; let g='';
+{id:'clsRosette',cat:'neck',p:320,cls:1,n:'우리 반 꽃 리본',d:b=>{const x=b.fx, y=b.ny+6; let g='';
   g+=P(`M${x-9},${y+10} l-7,22 l9,-5 l5,8 l3,-22 Z M${x+9},${y+10} l7,22 l-9,-5 l-5,8 l-3,-22 Z`,CC(b),INK,1.6);
   for(let k=0;k<10;k++){ const a=k*36*Math.PI/180; g+=C(x+Math.cos(a)*13,y+Math.sin(a)*13,7,CC(b),INK,1.6); }
   return g+C(x,y,12,'#fff',INK,2)+T(x,y+4,b.cl,b.cl.length>3?8:10,CC(b),900);}},
 /* 2단계 1500 */
-{id:'clsFlag',cat:'class',tier:1,goal:1500,n:'우리 반 깃발',d:b=>{const x=Math.max(b.x0-14,-30), y0=b.gy+4, y1=Math.min(b.y0,40)-18;
+{id:'clsFlag',cat:'hand',p:520,cls:1,n:'우리 반 깃발',d:b=>{const x=Math.max(b.x0-14,-30), y0=b.gy+4, y1=Math.min(b.y0,40)-18;
   return P(`M${x},${y0} V${y1}`,'none',INK,5)+P(`M${x},${y0} V${y1}`,'none','#c9ced8',2.5)+C(x,y1-3,4,'#ffd23f',INK,1.6)+
     P(`M${x+2},${y1+2} H${x+46} L${x+38},${y1+15} L${x+46},${y1+28} H${x+2} Z`,CC(b),INK,2.2)+T(x+21,y1+20,b.cl,12,'#fff',900);}},
-{id:'clsStick',cat:'class',tier:1,goal:1500,n:'우리 반 응원봉',d:b=>{const x=Math.min(b.x1+22,232), y0=b.y1-4, y1=b.y0-6;
+{id:'clsStick',cat:'hand',p:560,cls:1,n:'우리 반 응원봉',d:b=>{const x=Math.min(b.x1+22,232), y0=b.y1-4, y1=b.y0-6;
   return E(x+8,y1-14,26,30,CC(b),0,0,'.18')+P(`M${x},${y0} L${x+8},${y1+14}`,'none',INK,7)+P(`M${x},${y0} L${x+8},${y1+14}`,'none','#e6e9f0',4)+
     E(x+8,y1-6,15,21,'#fff',INK,2.4)+E(x+8,y1-6,11,17,CC(b),0,0,'.85')+T(x+8,y1-2,b.cl,b.cl.length>3?8:9.5,'#fff',900)+SPARK(x+28,y1-24,6,'#fff6c8');}},
 /* 3단계 3000 */
-{id:'clsCape',cat:'class',tier:2,under:1,goal:3000,n:'우리 반 망토',d:b=>{const cy=(b.y0+b.y1)/2;
+{id:'clsCape',cat:'back',p:900,cls:1,under:1,n:'우리 반 망토',d:b=>{const cy=(b.y0+b.y1)/2;
   return P(`M${110-48},${cy-30} Q${b.x0-28},${cy+40} ${b.x0-20},${b.y1+14} L${b.x1+20},${b.y1+14} Q${b.x1+28},${cy+40} ${110+48},${cy-30} Z`,CC(b),INK,2.6)+
     P(`M${b.x0-10},${b.y1+6} L${b.x1+10},${b.y1+6}`,'none','#ffd23f',3.4)+T(b.x1+4,b.y1-2,b.cl,13,'#fff',900);}},
-{id:'clsWings',cat:'class',tier:2,under:1,goal:3000,n:'우리 반 날개',d:b=>{const cy=(b.y0+b.y1)/2-10; let g='';
+{id:'clsWings',cat:'back',p:1100,cls:1,under:1,n:'우리 반 날개',d:b=>{const cy=(b.y0+b.y1)/2-10; let g='';
   [[b.x0+14,-1],[b.x1-14,1]].forEach(([x,s])=>{ g+=P(`M${x},${cy} C${x+s*30},${cy-58} ${x+s*92},${cy-50} ${x+s*96},${cy-18} C${x+s*80},${cy-12} ${x+s*84},${cy+6} ${x+s*70},${cy+12} C${x+s*60},${cy+30} ${x+s*30},${cy+30} ${x},${cy+14} Z`,CC(b),INK,2.4);
     g+=P(`M${x+s*16},${cy-6} Q${x+s*48},${cy-30} ${x+s*80},${cy-20} M${x+s*16},${cy+6} Q${x+s*44},${cy-6} ${x+s*66},${cy+6}`,'none','#fff',2,' opacity=".7"'); });
   return g+T(110,Math.max(b.y0-14,-38),b.cl,12,CC(b),900,` stroke="#fff" stroke-width="3" paint-order="stroke"`);}},
 /* 4단계 6000 */
-{id:'clsTrophy',cat:'class',tier:3,goal:6000,n:'우리 반 트로피',d:b=>{const x=Math.min(b.x1+18,234), y=b.gy+4;
+{id:'clsTrophy',cat:'pet',p:1200,cls:1,n:'우리 반 트로피',d:b=>{const x=Math.min(b.x1+18,234), y=b.gy+4;
   return G(`translate(${x} ${y}) scale(1.55) translate(${-x} ${-y})`,R(x-13,y-8,26,8,2,CC(b),INK,1.8)+R(x-4,y-18,8,10,1,'#f0a400',INK,1.6)+
     P(`M${x-14},${y-44} H${x+14} V${y-34} Q${x+14},${y-18} ${x},${y-18} Q${x-14},${y-18} ${x-14},${y-34} Z`,'#ffd23f',INK,2)+
     P(`M${x-14},${y-40} q-9,0 -9,7 q0,7 9,7 M${x+14},${y-40} q9,0 9,7 q0,7 -9,7`,'none',INK,2.2)+T(x,y-28,b.cl,b.cl.length>3?7:8.5,'#a87400',900));}},
-{id:'clsMedal',cat:'class',tier:3,goal:6000,n:'우리 반 큰 메달',d:b=>{const x=b.fx, y=b.ny+20;
+{id:'clsMedal',cat:'neck',p:1000,cls:1,n:'우리 반 큰 메달',d:b=>{const x=b.fx, y=b.ny+20;
   return P(`M${x-26},${b.ny-18} L${x-8},${y-14} M${x+26},${b.ny-18} L${x+8},${y-14}`,'none',INK,9)+P(`M${x-26},${b.ny-18} L${x-8},${y-14} M${x+26},${b.ny-18} L${x+8},${y-14}`,'none',CC(b),5.5)+
     C(x,y,20,'#ffd23f',INK,2.4)+C(x,y,14,'none','#f0a400',2)+T(x,y+5,b.cl,b.cl.length>3?9:11.5,'#a87400',900)+SPARK(x+20,y-16,5,'#fff');}},
 /* 5단계 10000 */
-{id:'clsStars',cat:'class',tier:4,under:1,goal:10000,n:'우리 반 별빛',d:b=>{let g=E(110,(b.y0+b.y1)/2,128,110,'#fff6c8',0,0,'.35');
+{id:'clsStars',cat:'fx',p:1500,cls:1,under:1,n:'우리 반 별빛',d:b=>{let g=E(110,(b.y0+b.y1)/2,128,110,'#fff6c8',0,0,'.35');
   for(let i=0;i<10;i++){const a=i*36*Math.PI/180; g+=STAR(110+Math.cos(a)*122,(b.y0+b.y1)/2+Math.sin(a)*104,i%2?7:10,i%2?'#ffe066':'#ffd23f');}
   return g+R(110-30,-46,60,20,10,CC(b),INK,2)+T(110,-31,'★ '+b.cl,12,'#fff',900);}},
-{id:'clsHearts',cat:'class',tier:4,under:1,goal:10000,n:'우리 반 하트비',d:b=>{const H=(x,y,r,f)=>P(`M${x},${y+r*.9} C${x-r*1.6},${y-r*.2} ${x-r*.7},${y-r*1.4} ${x},${y-r*.5} C${x+r*.7},${y-r*1.4} ${x+r*1.6},${y-r*.2} ${x},${y+r*.9} Z`,f,INK,1.6);
+{id:'clsHearts',cat:'fx',p:1400,cls:1,under:1,n:'우리 반 하트비',d:b=>{const H=(x,y,r,f)=>P(`M${x},${y+r*.9} C${x-r*1.6},${y-r*.2} ${x-r*.7},${y-r*1.4} ${x},${y-r*.5} C${x+r*.7},${y-r*1.4} ${x+r*1.6},${y-r*.2} ${x},${y+r*.9} Z`,f,INK,1.6);
   let g=''; [[-14,-20,9],[30,-36,7],[200,-30,9],[236,40,7],[-24,90,8],[244,130,9],[-10,190,7],[226,210,8],[60,220,6],[170,226,7]].forEach(([x,y,r],i)=>{ g+=H(x,y,r,i%2?'#fff':CC(b)); });
   return g+R(110-30,-46,60,20,10,CC(b),INK,2)+T(110,-31,'♥ '+b.cl,12,'#fff',900);}},
 /* 6단계 15000 */
-{id:'clsBanner',cat:'class',tier:5,under:1,goal:15000,n:'우리 반 현수막',d:b=>{const y=Math.max(b.y0-46,-46);
+{id:'clsBanner',cat:'fx',p:1700,cls:1,under:1,n:'우리 반 현수막',d:b=>{const y=Math.max(b.y0-46,-46);
   return P(`M-30,${y} H250 L242,${y+14} L250,${y+28} H-30 L-22,${y+14} Z`,CC(b),INK,2.4)+T(110,y+19.5,`${b.cl} 최고!`,14,'#fff',900)+C(-30,y,3,INK)+C(250,y,3,INK);}},
-{id:'clsBalloon',cat:'class',tier:5,goal:15000,n:'우리 반 풍선',d:b=>{const x=Math.max(b.x0-18,0), y=Math.min(b.y0,40)-20; let g='';
+{id:'clsBalloon',cat:'hand',p:1300,cls:1,n:'우리 반 풍선',d:b=>{const x=Math.max(b.x0-18,0), y=Math.min(b.y0,40)-20; let g='';
   [[x-14,y+8,'#ffd23f'],[x+16,y+4,'#fff']].forEach(([bx,by,f])=>{ g+=P(`M${bx},${by+16} Q${bx+4},${by+44} ${x+2},${b.y1+6}`,'none',INK,1.4)+E(bx,by,12,15,f,INK,2); });
   return g+P(`M${x},${y+22} Q${x-4},${y+50} ${x+2},${b.y1+6}`,'none',INK,1.4)+E(x,y,17,21,CC(b),INK,2.4)+E(x-6,y-8,4,6,'#fff',0,0,'.6')+T(x,y+4,b.cl,b.cl.length>3?9:11,'#fff',900);}},
 /* 7단계 22000 */
-{id:'clsAura',cat:'class',tier:6,under:1,goal:22000,n:'우리 반 오라',d:b=>{const cy=(b.y0+b.y1)/2;
+{id:'clsAura',cat:'frame',p:2200,cls:1,under:1,n:'우리 반 오라',d:b=>{const cy=(b.y0+b.y1)/2;
   return [CC(b),'#ffd23f','#ff6b9a'].map((c,i)=>E(110,cy,140-i*14,120-i*12,'none',c,4,'.55')).join('')+T(110,Math.min(b.y1+40,236),b.cl,13,CC(b),900);}},
-{id:'clsRing',cat:'class',tier:6,under:1,goal:22000,n:'우리 반 빛 고리',d:b=>{const cy=(b.y0+b.y1)/2; let g='';
+{id:'clsRing',cat:'frame',p:2400,cls:1,under:1,n:'우리 반 빛 고리',d:b=>{const cy=(b.y0+b.y1)/2; let g='';
   for(let k=0;k<24;k++){ const a=k*15*Math.PI/180; g+=C(110+Math.cos(a)*120,cy+Math.sin(a)*104,k%3?3.5:6,k%3?'#fff6c8':CC(b),INK,1.4); }
   return C(110,cy,112,'none',CC(b),2,'.35').replace('<circle','<ellipse').replace(/r="112"/,'rx="120" ry="104"')+g+T(110,Math.min(b.y1+40,236),b.cl,13,CC(b),900);}},
 /* 8단계 30000 */
-{id:'clsCrown',cat:'class',tier:7,goal:30000,n:'우리 반 왕관',d:b=>{const x=b.hx,y=b.top+5;
+{id:'clsCrown',cat:'hat',p:3000,cls:1,n:'우리 반 왕관',d:b=>{const x=b.hx,y=b.top+5;
   return G(`translate(${x} ${y}) scale(1.4) translate(${-x} ${-y})`,P(`M${x-27},${y} L${x-30},${y-24} L${x-14},${y-11} L${x},${y-30} L${x+14},${y-11} L${x+30},${y-24} L${x+27},${y} Z`,'#ffd23f',INK)+
     R(x-25,y-9,50,9,2,CC(b))+T(x,y-1.5,b.cl,7.5,'#fff',900)+C(x,y-30,4,CC(b),INK,1.6));}},
-{id:'clsSpot',cat:'class',tier:7,under:1,goal:30000,n:'우리 반 무대',d:b=>{const y=b.gy+8;
+{id:'clsSpot',cat:'stage',p:2800,cls:1,under:1,n:'우리 반 무대',d:b=>{const y=b.gy+8;
   return P(`M-20,-48 L60,${y} H-40 Z`,'#fff6c8',0,0,' opacity=".55"')+P(`M240,-48 L160,${y} H260 Z`,'#fff6c8',0,0,' opacity=".55"')+
     E(110,y+8,130,16,CC(b),INK,2.4)+E(110,y+4,118,10,'#fff',0,0,'.35')+T(110,y+14,`${b.cl} 무대`,12,'#fff',900)+
     SPARK(-14,-30,7,'#ffd23f')+SPARK(234,-30,7,'#ffd23f');}}
 ];
-/* 단계 — 두 가지 가운데 하나 */
-const CLASS_TIERS=[...new Set(CLASS_ITEMS.map(i=>i.tier))].map(t=>{ const L=CLASS_ITEMS.filter(i=>i.tier===t); return {t, goal:L[0].goal, opts:L.map(i=>i.id)}; });
+/* 받침 — 발밑(b.gy 아래)에 놓이는 반 공통 아이템. 너비는 몸 크기에 맞추고, 글자는 길이에 맞춰 줄여요 */
+const PLATE=b=>{ const w=Math.max(124,Math.min(178,(b.x1-b.x0)*.8)), x=Math.max(-12+w/2,Math.min(232-w/2,b.ftx!=null?b.ftx:b.fx)), y=b.gy+2;
+  const t=String(b.ct||b.cl||''), fs=Math.min(13.5,(w-30)/Math.max(2,[...t].length)*1.05);
+  return {x,y,w,t,fs}; };
+const CLASS_ITEMS=[
+{id:'clsPlate',cat:'class',under:1,tier:0,goal:800,n:'학급 명패',d:b=>{const {x,y,w,t,fs}=PLATE(b);
+  return E(x,y+21,w/2+4,4,'#1f2433',0,0,'.12')+R(x-w/2,y,w,19,9.5,CC(b),INK,2.2)+R(x-w/2+5,y+3,w-10,4,2,'#fff',0,0,'.35')+
+    T(x,y+14,t,fs,'#fff',900);}},
+{id:'clsRibbon',cat:'class',under:1,tier:1,goal:4000,n:'학급 리본 받침',d:b=>{const {x,y,w,t,fs}=PLATE(b), h=19, L=x-w/2, Rr=x+w/2;
+  return E(x,y+22,w/2+8,4,'#1f2433',0,0,'.12')+
+    P(`M${L-16},${y+5} H${L+4} V${y+h+5} H${L-16} L${L-9},${y+12+2.5} Z M${Rr+16},${y+5} H${Rr-4} V${y+h+5} H${Rr+16} L${Rr+9},${y+12+2.5} Z`,CC(b),INK,1.8)+
+    P(`M${L+4},${y+h+5} L${L+4},${y+h} M${Rr-4},${y+h+5} L${Rr-4},${y+h}`,'none',INK,1.4)+
+    R(L,y,w,h,4,CC(b),INK,2.2)+P(`M${L+6},${y+3.5} H${Rr-6}`,'none','#fff',1.6,' opacity=".55"')+
+    STAR(L+11,y+h/2,5,'#ffd23f')+STAR(Rr-11,y+h/2,5,'#ffd23f')+T(x,y+14,t,Math.min(fs,(w-40)/Math.max(2,[...t].length)*1.05),'#fff',900);}},
+{id:'clsPodium',cat:'class',under:1,tier:2,goal:12000,n:'학급 시상대',d:b=>{const {x,y,w,t,fs}=PLATE(b), h=21;
+  return E(x,y+h+2,w/2+10,4.5,'#1f2433',0,0,'.14')+
+    P(`M${x-w/2+6},${y} H${x+w/2-6} L${x+w/2},${y+h} H${x-w/2} Z`,CC(b),INK,2.2)+
+    P(`M${x-w/2+6},${y} H${x+w/2-6} L${x+w/2-4.5},${y+5} H${x-w/2+4.5} Z`,'#ffd23f',INK,1.6)+
+    T(x,y+17.5,t,Math.min(fs,12.5),'#fff',900)+SPARK(x-w/2-6,y-6,5,'#ffd23f')+SPARK(x+w/2+6,y-9,6,'#fff6c8');}}
+];
+/* 모금액이 단계 기준을 넘으면 그 받침이 열리고, 반 모두가 가장 높은 단계의 받침에 서요 */
+const CLASS_TIERS=CLASS_ITEMS.map(i=>({t:i.tier, goal:i.goal, opts:[i.id]}));
+/* 반 글자 — 반 친구들이 고르는 문구(투표) · 선생님이 정한 글자가 있으면 그 글자가 먼저 */
+const CLASS_TXT=[{k:'cl',f:c=>c},{k:'best',f:c=>c+' 최고!'},{k:'go',f:c=>c+' 화이팅'},{k:'king',f:c=>'계산왕 '+c},{k:'star',f:c=>'★ '+c+' ★'}];
 /* ═══ 새 꾸미기 (2026-10-31) — 사각형 게임에서 인기가 많았던 갈래(동물 친구 · 빛나는 검 · 불사조 날개)를 중심으로 ═══
    그 전에 NEW 였던 물건은 NEW 표시를 떼고, 이번 묶음만 NEW 칸에 보여요. 값은 아래 REPRICE 에서 정해요.          */
 ITEMS.forEach(i=>{ delete i.nw; }); BOX_ITEMS.forEach(i=>{ delete i.nw; }); CH_COLORS.forEach(c=>{ delete c.nw; }); CH_SHAPES.forEach(c=>{ c.nw=false; });
@@ -2795,6 +2941,14 @@ ITEMS.forEach(i=>{ if(REPRICE[i.id]) i.p=REPRICE[i.id]; else if(i.p<300) i.p=R10
   CH_COLORS.forEach(c=>{ if(CP[c.k]) c.p=CP[c.k]; else if(c.p>0&&c.p<300) c.p=R10(c.p*1.5); else if(c.p>=300&&c.p<1000) c.p=R10(c.p*1.25); });
   const SP={sigma:3600, inf:3200, pi:2400, equal:600, pct:1200};
   CH_SHAPES.forEach(c=>{ if(SP[c.k]){ c.p=SP[c.k]; if(BODY[c.k]) BODY[c.k].p=SP[c.k]; } }); }
+/* 예전 학급 아이템 16가지는 개인 아이템으로 상점에 — '새로 나옴' 칸에 보여요 */
+CLS_PERSONAL.forEach(i=>{ i.nw=1; }); ITEMS.push(...CLS_PERSONAL);
+/* 값의 폭 넓히기 (2026-11-03) — 평균값은 그대로 두고 평균에서 멀어지게 :
+   평균보다 비싼 것은 평균과의 차이를 1.25배로, 싼 것은 (값 ÷ 평균)을 1.25제곱해서 더 싸게.
+   그다음 전체를 살짝 늘이거나 줄여 평균을 예전과 똑같이 맞추고, 끝자리는 10 단위로 (가장 싼 것도 40 이상) */
+{ const L=ITEMS, m=L.reduce((a,i)=>a+i.p,0)/L.length, K=1.25;
+  const f=p=>p>=m?m+K*(p-m):m*Math.pow(p/m,K), sc=m*L.length/L.reduce((a,i)=>a+f(i.p),0);
+  L.forEach(i=>{ i.p=Math.max(40,R10(f(i.p)*sc)); }); }
 ITEMS.push(...BOX_ITEMS,...CLASS_ITEMS);
 const ITEM=id=>ITEMS.find(i=>i.id===id);
 const CATS=[{k:'hat',n:'머리'},{k:'face',n:'표정'},{k:'eye',n:'얼굴'},{k:'neck',n:'목·몸'},{k:'hand',n:'손'},
@@ -2820,7 +2974,7 @@ function avatarSVG(ch,opt){
   }
   b.px=Math.max(-10,Math.min(b.x0,30)-18);
   b.ftx=b.ftx!=null?b.ftx:b.fx;                        /* 발 자리 (몸 아래 가운데) */
-  b.cl=String(ch.cl||'우리 반'); b.cc=ch.cc||'#4f6bff';
+  b.cl=String(ch.cl||'우리 반'); b.cc=ch.cc||'#4f6bff'; b.ct=String(ch.ct||b.cl);
   b.ny=Math.min(b.mouthY+16*KS(b), b.y1-8);           /* 목걸이·넥타이 자리 (입 아래) */
   /* 작게 붙는 자리는 조금 키워서 얹습니다 — 기준점을 중심으로 */
   const SC={hat:[1.35,()=>[b.hx,b.top+4]], hand:[1.3,()=>b.hand], pet:[1.4,()=>[b.px,b.gy]], foot:[1.15,()=>[b.ftx,b.gy]], neck:[1.35,()=>[b.fx,b.ny]]};
@@ -2832,54 +2986,9 @@ function avatarSVG(ch,opt){
   return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg"${opt.cls?` class="${opt.cls}"`:''}>${defs}${L(['stage'])}${worn.filter(id=>ITEM(id).under).map(one).join('')}${L(['back'])}${L(['frame'])}${
     bodySVG(k,fill,col.l)}${has('face')?'':faceSVG(b)}${L(['face','neck','foot','eye','hat','hand','pet','fx'])}${worn.filter(id=>ITEM(id).cat==='class'&&!ITEM(id).under).map(one).join('')}</svg>`;
 }
-const avatarWith=(ch,id)=>avatarSVG({s:ch.s,c:ch.c,cl:ch.cl,cc:ch.cc,items:[id]});
+const avatarWith=(ch,id)=>avatarSVG({s:ch.s,c:ch.c,cl:ch.cl,cc:ch.cc,ct:ch.ct,items:[id]});
 
-/* ═══ 학급 단체 사진 — 학급 랭킹에서 반 친구들이 한자리에 서고, 반이 연 학급 아이템이 사진을 꾸며요 ═══
-   o = {mem:[{ch, sid, sc}], picks:[열린 학급 아이템 id], cl:'2-5', cc:'#4f6bff'}   (mem 은 점수 높은 순) */
-function classSceneSVG(o){
-  const W=360, mem=o.mem.slice(0,32), n=mem.length, cc=o.cc||'#4f6bff', cl=String(o.cl||''), has=id=>o.picks.includes(id);
-  const per=n<=7?Math.max(n,1):n<=16?Math.ceil(n/2):Math.ceil(n/3), rows=[];
-  for(let i=0;i<n;i+=per) rows.push(mem.slice(i,i+per));
-  const ov=.74, s=Math.min(64,(W-24)/((per-1)*ov+1)), gap=s*.46;
-  const top=o.picks.length?58:22, H=Math.round(top+s+(rows.length-1)*gap+26);
-  const SPOT=has('clsSpot'), floorY=H-14;
-  let bg=R(0,0,W,H,18,'#fff')+R(0,0,W,H,18,cc,0,0,'.08');
-  if(has('clsAura')) [0,1,2].forEach(i=>{ bg+=E(W/2,H*.62,W*.52-i*26,H*.5-i*12,'none',[cc,'#ffd23f','#ff6b9a'][i],5,'.35'); });
-  if(has('clsStars')) for(let i=0;i<9;i++){ const x=22+i*39+(i%2)*8, y=14+(i%3)*12; bg+=STAR(x,y,i%2?5:7,i%2?'#ffe066':'#ffd23f'); }
-  if(has('clsHearts')) for(let i=0;i<8;i++){ const x=26+i*44, y=16+(i%2)*14, r=6, f=i%2?'#fff':cc;
-    bg+=P(`M${x},${y+r*.9} C${x-r*1.6},${y-r*.2} ${x-r*.7},${y-r*1.4} ${x},${y-r*.5} C${x+r*.7},${y-r*1.4} ${x+r*1.6},${y-r*.2} ${x},${y+r*.9} Z`,f,INK,1.4); }
-  if(SPOT) bg+=P(`M8,0 L${W*.32},${floorY} H${W*.06} Z`,'#fff6c8',0,0,' opacity=".7"')+P(`M${W-8},0 L${W*.68},${floorY} H${W*.94} Z`,'#fff6c8',0,0,' opacity=".7"');
-  if(has('clsStick')) for(let i=0;i<14;i++){ const x=14+i*25.5, y=top-4+(i%3)*8; bg+=C(x,y,i%2?3:4.5,i%3?'#fff6c8':cc,0,0,'.9'); }
-  bg+=E(W/2,floorY,W*.46,11,SPOT?cc:'#1f2433',0,0,SPOT?'.85':'.07');
-  if(SPOT) bg+=T(W/2,floorY+4,`${cl} 무대`,10,'#fff',900);
-  if(has('clsRing')){ for(let k=0;k<28;k++){ const t=k/28, x=t<.5?8+t*2*(W-16):W-8-(t-.5)*2*(W-16), y=t<.5?7:H-7; bg+=C(x,y,k%3?2.6:4,k%3?'#fff6c8':cc,INK,1); } }
-  /* 사진 속에서는 배경처럼 큰 학급 아이템(별빛·오라·무대 …)은 사진 전체에 한 번만 그리고,
-     사람마다는 몸에 붙는 학급 아이템(배지·리본·망토·날개·메달·왕관) 가운데 가장 높은 단계 것을 입혀요 */
-  const BODYCLS=['clsBadge','clsRosette','clsCape','clsWings','clsMedal','clsCrown'];
-  const bodyTop=o.picks.filter(id=>BODYCLS.includes(id)).pop();
-  const wearIn=ch=>{ const it=(ch.items||[]).filter(id=>CAT_OF(id)!=='class'); if(bodyTop) it.push(bodyTop); return Object.assign({},ch,{items:it}); };
-  /* 사람들 — 뒷줄부터 */
-  let ppl='';
-  for(let r=rows.length-1;r>=0;r--){ const L=rows[r], rw=(L.length-1)*s*ov+s, x0=(W-rw)/2, y=top+(rows.length-1-r)*gap;
-    L.forEach((m,i)=>{ const x=x0+i*s*ov, sv=avatarSVG(wearIn(m.ch),{tight:true}).replace('<svg ',`<svg x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}" `);
-      ppl+=m.sc>0?sv:`<g opacity=".42">${sv}</g>`; }); }
-  /* 앞 장식 */
-  let fx='';
-  if(has('clsCrown')&&n){ const L=rows[0], rw=(L.length-1)*s*ov+s, x=(W-rw)/2+s/2, y=top+(rows.length-1)*gap-2;
-    fx+=G(`translate(${x} ${y}) scale(${(s/64).toFixed(2)})`,P('M-20,0 L-23,-18 L-10,-8 L0,-23 L10,-8 L23,-18 L20,0 Z','#ffd23f',INK,2)+R(-19,-7,38,7,2,cc)+C(0,-23,3,cc,INK,1.4)); }
-  if(has('clsFlag')) [[16,1],[W-16,-1]].forEach(([x,d])=>{ fx+=P(`M${x},${floorY} V${top-30}`,'none',INK,3.5)+P(`M${x},${top-28} h${d*40} l${-d*7},11 l${d*7},11 h${-d*40} Z`,cc,INK,2)+T(x+d*18,top-13,cl,10,'#fff',900); });
-  if(has('clsBalloon')) [[20,22],[W-20,22]].forEach(([x,y],j)=>{ [[-9,4,'#ffd23f'],[9,0,'#fff'],[0,-6,cc]].forEach(([dx,dy,f])=>{
-      fx+=P(`M${x+dx},${y+dy+14} Q${x+dx+4},${y+40} ${x},${y+64}`,'none',INK,1)+E(x+dx,y+dy,9,11,f,INK,1.6); }); });
-  if(has('clsBadge')){ let g=P(`M6,6 Q${W/2},34 ${W-6},6`,'none',INK,1.4);    /* 삼각 깃발 줄 */
-    for(let i=0;i<13;i++){ const t=(i+.5)/13, x=6+t*(W-12), y=6+4*t*(1-t)*14; g+=P(`M${x-9},${y} L${x+9},${y} L${x},${y+15} Z`,i%2?'#fff':cc,INK,1.2); } fx+=g; }
-  if(has('clsRosette')){ const x=30,y=30; let g=''; for(let k=0;k<10;k++){ const a=k*36*Math.PI/180; g+=C(x+Math.cos(a)*11,y+Math.sin(a)*11,6,cc,INK,1.3); } fx+=g+C(x,y,10,'#fff',INK,1.6)+T(x,y+3.5,cl,8,cc,900); }
-  if(has('clsBanner')){ const y=8; fx+=P(`M${W/2-92},${y} H${W/2+92} L${W/2+84},${y+12} L${W/2+92},${y+24} H${W/2-92} L${W/2-84},${y+12} Z`,cc,INK,2)+T(W/2,y+17,`${cl} 최고!`,13,'#fff',900); }
-  if(has('clsMedal')){ const x=W-34, y=34; fx+=P(`M${x-12},0 L${x-4},${y-12} M${x+12},0 L${x+4},${y-12}`,'none',cc,5)+C(x,y,14,'#ffd23f',INK,2)+T(x,y+3.5,cl,8,'#a87400',900); }
-  if(has('clsTrophy')){ const x=W-30, y=floorY+2; fx+=R(x-12,y-8,24,8,2,cc,INK,1.6)+R(x-4,y-17,8,9,1,'#f0a400',INK,1.4)+
-      P(`M${x-13},${y-42} H${x+13} V${y-32} Q${x+13},${y-17} ${x},${y-17} Q${x-13},${y-17} ${x-13},${y-32} Z`,'#ffd23f',INK,1.8)+T(x,y-27,cl,7,'#a87400',900); }
-  return `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" class="clsscene">${bg}${ppl}${fx}</svg>`;
-}
-return {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,classSceneSVG};
+return {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,CLASS_TXT,CLS_PERSONAL};
 })();
 
 /* ═══════════════════ 계산 내용 ═══════════════════
@@ -2925,6 +3034,10 @@ const sq   =n      =>F({key:'s'+n,  t:'power', k:'sq',  n, eq:[{b:n,e:2},'=','?'
 const sqr  =n      =>F({key:'rs'+n, t:'power', k:'sqr', n, cond:'□ 는 자연수', eq:[{b:'?',e:2},'=',n*n], ans:n});
 const cu   =n      =>F({key:'c'+n,  t:'power', k:'cu',  n, eq:[{b:n,e:3},'=','?'], ans:n*n*n});
 const cur  =n      =>F({key:'rc'+n, t:'power', k:'cur', n, eq:[{b:'?',e:3},'=',n*n*n], ans:n});
+/* 문항 수 — 제곱수 1~25 와 몇십(30~90), 세제곱수 1~12 와 20 (답은 네 자리까지라 30³ 부터는 거꾸로 찾기에만) */
+const SQ_N=()=>range(1,25).concat([30,40,50,60,70,80,90]);
+const CU_N=()=>range(1,12).concat([20]);
+const CUR_N=()=>range(2,12).concat([20,30,40,50]);
 
 function factFromKey(key){
   let m;
@@ -3021,14 +3134,16 @@ const TOPICS={
       {n:3, name:'거꾸로 찾기', ex:'7 × □ = 56', facts:DANR, take:15, old:[6]}
     ]},
   power:{k:'power', n:'제곱수 · 세제곱수', sym:'x²', school:'m', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'1²~20², 1³~10³ 과 거꾸로 찾기',
+    desc:'1²~25², 1³~12³ 과 거꾸로 찾기',
     stages:[
-      {n:1, name:'제곱수',     ex:'13²',  facts:()=>range(1,20).map(sq), take:14, old:[1,2],
-       pick:l=>sampleN(l.filter(f=>f.n>10),9).concat(sampleN(l.filter(f=>f.n<=10),5))},
-      {n:2, name:'세제곱수',   ex:'6³',        facts:()=>range(1,10).map(cu), take:10, old:[4]},
+      {n:1, name:'제곱수',     ex:'13²',  facts:()=>SQ_N().map(sq), take:14, old:[1,2],
+       pick:l=>sampleN(l.filter(f=>f.n>10&&f.n<=20),8).concat(sampleN(l.filter(f=>f.n<=10),3),sampleN(l.filter(f=>f.n>20),3))},
+      {n:2, name:'세제곱수',   ex:'6³',        facts:()=>CU_N().map(cu), take:10, old:[4],
+       pick:l=>sampleN(l.filter(f=>f.n<=10),7).concat(sampleN(l.filter(f=>f.n>10),3))},
       {n:3, name:'거꾸로 찾기', ex:'□² = 169', take:14, old:[3,5],
-       facts:()=>range(2,20).map(sqr).concat(range(2,10).map(cur)),
-       pick:l=>sampleN(l.filter(f=>f.k==='sqr'),9).concat(sampleN(l.filter(f=>f.k!=='sqr'),5))}
+       facts:()=>SQ_N().filter(n=>n>=2).map(sqr).concat(CUR_N().map(cur)),
+       pick:l=>sampleN(l.filter(f=>f.k==='sqr'&&f.n<=20),7).concat(sampleN(l.filter(f=>f.k==='sqr'&&f.n>20),2),
+         sampleN(l.filter(f=>f.k!=='sqr'&&f.n<=10),4),sampleN(l.filter(f=>f.k!=='sqr'&&f.n>10),1))}
     ]}
 };
 const TOPIC_ORDER=[];
@@ -3401,18 +3516,21 @@ function hintOf(f){
     case 'sq':{
       const n=f.n, p=n*n;
       if(n<=10) return {t:'같은 수를 두 번 곱하기', lines:[`${n}² = ${n} × ${n} = ${B(p)}`], svg:''};
-      if(n===20) return {t:'20 × 20', lines:[`20² = 20 × 20 = ${B(400)}`], svg:''};
-      const k=n-10, L=[`${n}² = ${n} × ${n}`, `= ${n} × 10 + ${n} × ${k} = ${n*10} + ${n*k}`, `= ${B(p)}`];
+      if(n%10===0){ const m=n/10; return {t:'몇십의 제곱', lines:[`${n}² = ${n} × ${n}`, `${m} × ${m} = ${m*m} 뒤에 0 두 개`, `= ${B(p)}`], svg:''}; }
+      if(n%10===5){ const m=(n-5)/10; return {t:'일의 자리가 5인 수의 제곱', lines:[`${m} × ${m+1} = ${m*(m+1)} 뒤에 25를 붙여요`, `${n}² = ${B(p)}`,
+        `<span class="tip">${n} × ${n} 으로 확인해도 같아요</span>`], svg:''}; }
+      const t10=Math.floor(n/10)*10, k=n-t10, L=[`${n}² = ${n} × ${n}`, `= ${n} × ${t10} + ${n} × ${k} = ${n*t10} + ${n*k}`, `= ${B(p)}`];
       return {t:'같은 수를 두 번 곱하기', lines:L, svg:''};
     }
     case 'sqr':{
       const n=f.n, p=n*n;
       if(n<=10) return {t:'제곱해서 '+jG(p)+' 되는 수', lines:[`${n} × ${n} = ${p}`, `그래서 □ = ${B(n)}`], svg:''};
-      const d=p%10, c=SQ_END[d]||[];
+      if(n%10===0){ const m=n/10; return {t:'0 두 개를 떼고 보기', lines:[`${p} = ${m*m} × 100`, `${m*m} = ${m}², 100 = 10²`, `그래서 □ = ${m} × 10 = ${B(n)}`], svg:''}; }
+      const d=p%10, c=SQ_END[d]||[], lo=Math.floor(n/10)*10, hi=lo+10;
       return {t:'범위와 끝자리로 찾기', lines:[
-        n<20?`10² = 100 < ${p} < 400 = 20² → □는 11 ~ 19`:`20² = 400`,
-        n<20?`끝자리가 ${d} → □의 끝자리는 ${c.join(' 또는 ')}`:`그래서 □ = ${B(20)}`,
-        n<20?`${n} × ${n} = ${p} 이므로 □ = ${B(n)}`:''].filter(Boolean), svg:''};
+        `${lo}² = ${lo*lo} < ${p} < ${hi*hi} = ${hi}² → □는 ${lo+1} ~ ${hi-1}`,
+        `끝자리가 ${d} → □의 끝자리는 ${c.join(' 또는 ')}`,
+        `${n} × ${n} = ${p} 이므로 □ = ${B(n)}`], svg:''};
     }
     case 'cu':{
       const n=f.n, p=n*n*n;
@@ -3421,9 +3539,11 @@ function hintOf(f){
     case 'cur':{
       const n=f.n, p=n*n*n;
       if(n===10) return {t:'0이 세 개', lines:[`10³ = 10 × 10 × 10 = 1000`, `□ = ${B(10)}`], svg:cubeSVG(10)};
-      return {t:'끝자리로 찾기', lines:[`세제곱수는 끝자리만 보면 원래 수의 끝자리를 알 수 있어요`,
-        `${p}의 끝자리 ${p%10} → □의 끝자리 ${CU_END[p%10]}`, `${n} × ${n} × ${n} = ${p} 이므로 □ = ${B(n)}`],
-        svg:cubeSVG(n)};
+      if(n%10===0){ const m=n/10; return {t:'0 세 개를 떼고 보기', lines:[`${p} = ${m*m*m} × 1000`, `${m*m*m} = ${m}³, 1000 = 10³`, `그래서 □ = ${m} × 10 = ${B(n)}`], svg:''}; }
+      return {t:'끝자리로 찾기', lines:[`세제곱수는 끝자리만 보면 원래 수의 끝자리를 알 수 있어요`].concat(
+        n>10?[`10³ = 1000 < ${p} < 8000 = 20³ → □는 11 ~ 19`]:[],
+        [`${p}의 끝자리 ${p%10} → □의 끝자리 ${CU_END[p%10]}`, `${n} × ${n} × ${n} = ${p} 이므로 □ = ${B(n)}`]),
+        svg:n<=10?cubeSVG(n):''};
     }
   }
   return (typeof extHint==='function'&&extHint(f))||{t:'풀이', lines:[eqText(f,true)], svg:''};
@@ -3442,13 +3562,15 @@ function stagePreview(t,n){
     return {tip:`${a}단은 ${a}씩 커져요.`,
       body:noteSheet(`${a}단`, range(1,9).map(b=>`${a} × ${b} = <b>${a*b}</b>`), 3, 'gugu')}; }
   if(t==='power'){
-    if(n===1) return {tip:'1² ~ 20² — 왼쪽부터 차례로 외워요.',
-      body:noteSheet('제곱수', range(1,20).map(k=>`${k}² = <b>${k*k}</b>`), 4, 'sq')};
-    if(n===2) return {tip:'1³ ~ 10³ — 같은 수를 세 번 곱한 수예요.',
-      body:noteSheet('세제곱수', range(1,10).map(k=>`${k}³ = <b>${k*k*k}</b>`), 2, 'cu')};
-    if(n===3) return {tip:'수를 보고 무엇의 제곱·세제곱인지 바로 떠올려요.',
-      body:noteSheet('이 수는 □의 제곱', range(2,20).map(k=>`${k*k} = <b>${k}</b>²`), 4, 'sq')+
-           noteSheet('이 수는 □의 세제곱', range(2,10).map(k=>`${k*k*k} = <b>${k}</b>³`), 3, 'cu')};
+    if(n===1) return {tip:'1² ~ 20² 를 먼저 외우고, 21² ~ 25² 와 몇십의 제곱(30² = 900 …)까지 넓혀요.',
+      body:noteSheet('제곱수', range(1,25).map(k=>`${k}² = <b>${k*k}</b>`), 4, 'sq')+
+           noteSheet('몇십의 제곱 — 0 두 개', [30,40,50,60,70,80,90].map(k=>`${k}² = <b>${k*k}</b>`), 4, 'sq')};
+    if(n===2) return {tip:'1³ ~ 12³ — 같은 수를 세 번 곱한 수예요. 몇십의 세제곱은 0 세 개를 붙여요.',
+      body:noteSheet('세제곱수', range(1,12).map(k=>`${k}³ = <b>${k*k*k}</b>`), 2, 'cu')+
+           noteSheet('몇십의 세제곱 — 0 세 개', [20,30,40,50].map(k=>`${k}³ = <b>${k*k*k}</b>`), 2, 'cu')};
+    if(n===3) return {tip:'수를 보고 무엇의 제곱·세제곱인지 바로 떠올려요. 0 이 붙었으면 떼고 생각해요.',
+      body:noteSheet('이 수는 □의 제곱', range(2,25).map(k=>`${k*k} = <b>${k}</b>²`), 4, 'sq')+
+           noteSheet('이 수는 □의 세제곱', range(2,12).map(k=>`${k*k*k} = <b>${k}</b>³`), 3, 'cu')};
   }
   if(st&&st.pv&&typeof st.pv==='string') return previewOf(t,st.pv);
   const ids=(st&&st.old)||[n];
@@ -3592,7 +3714,7 @@ function noteOf(t){
   if(t!=='power'&&typeof extNote==='function') return extNote(t,fromHint);
   /* power */
   return {
-    sub:'거듭제곱(밑과 지수) · 제곱수 1² ~ 20² · 세제곱수 1³ ~ 10³ · 거꾸로 찾기',
+    sub:'거듭제곱(밑과 지수) · 제곱수 1² ~ 25² · 세제곱수 1³ ~ 12³ · 거꾸로 찾기',
     memo:[
       {h:'거듭제곱 — 밑과 지수', html:`<div class="kcp">같은 수를 여러 번 곱한 것을 간단히 나타낸 것을 <b>거듭제곱</b>이라고 해요. 이때 곱한 수를 <b>밑</b>, 곱한 개수를 <b>지수</b>라고 해요.</div>
         <table class="kct"><thead><tr><th>곱셈</th><th>거듭제곱 · 읽기</th><th>값</th></tr></thead><tbody>
@@ -3600,8 +3722,10 @@ function noteOf(t){
         <tr><td>3 × 3 × 3</td><td>3³ · 3의 세제곱</td><td><b>27</b></td></tr>
         <tr><td>2 × 2 × 2 × 2</td><td>2⁴ · 2의 네제곱 (밑 2, 지수 4)</td><td><b>16</b></td></tr></tbody></table>
         <div class="kcp" style="margin-top:8px">자연수를 제곱한 수 1, 4, 9, 16, … 을 <b>제곱수</b>라고 해요.</div>`},
-      {h:'제곱수 1² ~ 20²', html:chipList(range(1,20).map(k=>`${k}² = <b>${k*k}</b>`))},
-      {h:'세제곱수 1³ ~ 10³', html:chipList(range(1,10).map(k=>`${k}³ = <b>${k*k*k}</b>`))},
+      {h:'제곱수 1² ~ 25²', html:chipList(range(1,25).map(k=>`${k}² = <b>${k*k}</b>`))+
+        `<div class="kcp" style="margin-top:6px">몇십의 제곱은 0 두 개: 30² = 900, 70² = 4900</div>`},
+      {h:'세제곱수 1³ ~ 12³', html:chipList(range(1,12).map(k=>`${k}³ = <b>${k*k*k}</b>`))+
+        `<div class="kcp" style="margin-top:6px">몇십의 세제곱은 0 세 개: 20³ = 8000, 30³ = 27000</div>`},
       {h:'끝자리 표 — 거꾸로 찾을 때', html:`<div class="ftabs">
         <div class="ftab"><h4>□² 의 끝자리 → □ 의 끝자리</h4><div>1 → 1, 9 &nbsp;·&nbsp; 4 → 2, 8<br>9 → 3, 7 &nbsp;·&nbsp; 6 → 4, 6<br>5 → 5 &nbsp;·&nbsp; 0 → 0</div></div>
         <div class="ftab"><h4>□³ 의 끝자리 → □ 의 끝자리</h4><div>1→1 &nbsp;8→2 &nbsp;7→3<br>4→4 &nbsp;5→5 &nbsp;6→6<br>3→7 &nbsp;2→8 &nbsp;9→9</div></div></div>
@@ -3631,7 +3755,7 @@ function noteOf(t){
 
 const MI=v=>String(v).replace(/^-/,'−');                    /* −3 */
 const PN=v=>v<0?`(−${-v})`:`(+${v})`;                       /* (−3) (+5) */
-const SUPN=n=>n===2?'²':'³';
+const SUPN=n=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[n]||String(n);
 const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
 
 /* 통계 열쇠 가운데 '갈래'로 묶어 세는 것 (문항이 끝없이 많은 단계) */
@@ -3671,8 +3795,8 @@ function extFact(key){
   if(m=R('iT'+N+'_'+N+'_'+N)) return iT(+m[1],+m[2],+m[3]);
   if(m=R('iM'+N+'_'+N)) return iM(+m[1],+m[2]);
   if(m=R('iD'+N+'_'+N)) return iD(+m[1],+m[2]);
-  if(m=R('iP'+N+'_([23])')) return iP(+m[1],+m[2]);
-  if(m=R('iN(\\d+)_([23])')) return iN(+m[1],+m[2]);
+  if(m=R('iP'+N+'_([2-5])')) return iP(+m[1],+m[2]);
+  if(m=R('iN(\\d+)_([2-5])')) return iN(+m[1],+m[2]);
   if(m=R('yC(\\d+)_(\\d+)_(\\d+)_([012])')) return yC(+m[1],+m[2],+m[3],+m[4]);
   if(m=R('yS(\\d+)_(\\d+)')) return yS(+m[1],+m[2]);
   if(m=R('yD(\\d+)_(\\d+)')) return yD(+m[1],+m[2]);
@@ -3691,10 +3815,21 @@ function genIS(){ const a=nz(-12,12), b=nz(-12,12); return iS(a,b); }
 function genIT(){ for(let g=0;g<20;g++){ const a=nz(-15,15), b=sgn(ri(1,12)), c=sgn(ri(1,12)); if(a<0||b<0||c<0) return iT(a,b,c); } return iT(-3,8,-6); }   /* 음수 항이 하나는 있게 */
 function genIM(){ let a=sgn(ri(1,9)), b=sgn(ri(2,9)); if(a>0&&b>0) (Math.random()<.5?a=-a:b=-b); return iM(a,b); }
 function genID(){ let b=sgn(ri(2,9)), q=sgn(ri(2,9)); if(b>0&&q>0) b=-b; return iD(b*q,b); }
-const IPOW=()=>[iP(-1,2),iP(-1,3),iP(-2,2),iP(-2,3),iP(-3,2),iP(-3,3),iP(-4,2),iP(-5,2),iP(-4,3),iP(-6,2),
-                iN(2,2),iN(3,2),iN(4,2),iN(5,2),iN(2,3),iN(3,3),iN(1,2)];
+/* 음수의 거듭제곱 — (−a)ⁿ 과 −aⁿ 을 짝으로. 제곱은 −1 ~ −10, 세제곱은 −1 ~ −5, 네제곱·다섯제곱은 작은 수만 */
+const IPOW_N=[[2,[1,2,3,4,5,6,7,8,9,10]],[3,[1,2,3,4,5]],[4,[1,2,3]],[5,[1,2]]];
+const IPOW=()=>IPOW_N.flatMap(([n,as])=>as.flatMap(a=>[iP(-a,n),iN(a,n)]));
 
 const PY_BASE=[[3,4,5],[5,12,13],[8,15,17],[7,24,25]];
+/* 빗변·다른 한 변 단계의 피타고라스 수 — 1 기본 넷 · 2 기본의 배수 · 3 조금 큰 피타고라스 수 (빗변 65 이하) */
+const PY_L2=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[30,40,50],[10,24,26],[16,30,34],[14,48,50]];
+const PY_L3=[[20,21,29],[9,40,41],[12,35,37],[11,60,61]];
+const PY_LV=t=>PY_BASE.some(x=>x[2]===t[2]&&x[0]===t[0])?1:PY_L2.some(x=>x[2]===t[2]&&x[0]===t[0])?2:3;
+const pyLv=f=>{ const t=[f.a,f.b,f.c].sort((x,y)=>x-y); return PY_LV(t); };
+const PY_HS=T=>T.flatMap(([a,b])=>[yH(a,b),yH(b,a)]);
+const PY_LS=T=>T.flatMap(([a,b,c])=>[yL(c,a),yL(c,b)]);
+const PY_ALL=PY_BASE.concat(PY_L2,PY_L3);
+/* 연습 한 판 8문항 : 기본 4 · 배수 3 · 큰 수 1 */
+const pyPick=l=>sampleN(l.filter(f=>pyLv(f)===1),4).concat(sampleN(l.filter(f=>pyLv(f)===2),3),sampleN(l.filter(f=>pyLv(f)===3),1));
 const PY_MULT=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[30,40,50],[10,24,26],[15,36,39],[16,30,34],[14,48,50]];
 /* 연습용 배수: (3,4,5)는 2~5배, 나머지는 2배까지 */
 const PY_MULT_P=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[10,24,26],[16,30,34],[14,48,50]];
@@ -3766,9 +3901,9 @@ Object.assign(TOPICS,{
     desc:'빗변 · 다른 한 변 · 닮은 직각삼각형 · 삼각형의 분류(예각·직각·둔각)',
     stages:[
       {n:1, name:'빗변 구하기',       ex:'3² + 4² = □²',  take:8,
-       facts:()=>PY_BASE.flatMap(([a,b])=>[yH(a,b),yH(b,a)])},
+       facts:()=>PY_HS(PY_ALL), pick:pyPick},
       {n:2, name:'다른 한 변 구하기', ex:'□² + 12² = 13²', take:8,
-       facts:()=>PY_BASE.flatMap(([a,b,c])=>[yL(c,a),yL(c,b)])},
+       facts:()=>PY_LS(PY_ALL), pick:pyPick},
       {n:3, name:'닮은 직각삼각형 (늘리기·줄이기)', ex:'0.6² + 0.8² = □²', take:12,
        facts:()=>pyFacts(PY_MULT_P,true).concat(pyFacts(PY_BIG,true),PY_FD_P.map(yX)),
        pick:l=>sampleN(l.filter(f=>f.k!=='yX'&&f.c!==29),6).concat(sampleN(l.filter(f=>f.c===29),2),sampleN(l.filter(f=>f.k==='yX'),4))},
@@ -3776,9 +3911,9 @@ Object.assign(TOPICS,{
     ],
     /* 실전은 마지막 단계에서 배수·분수·소수가 더 다양하게 */
     realStages:[
-      {n:1, name:'빗변 구하기', facts:()=>PY_BASE.flatMap(([a,b])=>[yH(a,b),yH(b,a)])},
-      {n:2, name:'다른 한 변 구하기', facts:()=>PY_BASE.flatMap(([a,b,c])=>[yL(c,a),yL(c,b)])},
-      {n:3, name:'닮은 직각삼각형', facts:()=>pyFacts(PY_MULT,true).concat(pyFacts(PY_BIG,true),PY_FD.map((_,i)=>yX(i)))},
+      {n:1, name:'빗변 구하기', facts:()=>PY_HS(PY_BASE.concat(PY_L2))},
+      {n:2, name:'다른 한 변 구하기', facts:()=>PY_LS(PY_BASE.concat(PY_L2))},
+      {n:3, name:'닮은 직각삼각형', facts:()=>pyFacts(PY_MULT,true).concat(pyFacts(PY_BIG,true),pyFacts(PY_L3.filter(t=>t[2]!==29),true),PY_FD.map((_,i)=>yX(i)))},
       {n:4, name:'삼각형의 분류', gen:()=>genYC(2)}
     ],
     cats:[['빗변 구하기',sk=>/^yH/.test(sk)],['다른 한 변 구하기',sk=>/^yL/.test(sk)],['분수·소수',sk=>/^yX/.test(sk)],
@@ -3959,10 +4094,11 @@ function extPreview(t,n){
       lines:hintOf(iN(3,2)).lines};
   }
   /* pyth */
-  if(n===1) return Object.assign(H(yH(3,4),'직각삼각형에서 (빗변)² = (직각변)² + (직각변)². 먼저 이 네 가지를 외워 두세요.'),
-      {body:chipList(PY_BASE.map(([a,b,c])=>`(${a}, ${b}, <b>${c}</b>)`))});
+  const pyMore='<div class="hl" style="font-size:14px;margin-top:8px;color:var(--dim)">기본 넷을 먼저 외우고, 배수와 조금 큰 피타고라스 수로 넓혀요.</div>';
+  if(n===1) return Object.assign(H(yH(3,4),'직각삼각형에서 (빗변)² = (직각변)² + (직각변)². 먼저 기본 네 가지를 외워 두세요.'),
+      {body:chipList(PY_BASE.map(([a,b,c])=>`(${a}, ${b}, <b>${c}</b>)`))+pyMore+chipList(PY_L2.concat(PY_L3).map(([a,b,c])=>`(${a}, ${b}, <b>${c}</b>)`))});
   if(n===2) return Object.assign(H(yL(13,12),'빗변이 주어졌으면, 빗변의 제곱에서 아는 변의 제곱을 빼요.'),
-      {body:chipList(PY_BASE.map(([a,b,c])=>`(<b>${a}</b>, <b>${b}</b>, ${c})`))});
+      {body:chipList(PY_BASE.map(([a,b,c])=>`(<b>${a}</b>, <b>${b}</b>, ${c})`))+pyMore+chipList(PY_L2.concat(PY_L3).map(([a,b,c])=>`(<b>${a}</b>, <b>${b}</b>, ${c})`))});
   if(n===4) return Object.assign(H(yC(5,12,14),'가장 긴 변을 찾아 그 제곱을 나머지 두 변의 제곱의 합과 비교해요.'),
       {body:chipList(['c² &lt; a² + b² → <b>예각삼각형</b>','c² = a² + b² → <b>직각삼각형</b>','c² &gt; a² + b² → <b>둔각삼각형</b>'])});
   return Object.assign(H(yX(0),'피타고라스 수에 같은 수를 곱해도(나눠도) 피타고라스 수예요. 분수·소수로 줄여도 마찬가지!'),
@@ -4045,6 +4181,8 @@ function extNote(t,fromHint){
         <tr><td>5, 12, 13</td><td>25 + 144 = 169 = 13²</td><td><b>○</b></td></tr>
         <tr><td>2, 3, 4</td><td>4 + 9 = 13, 4² = 16</td><td><b>×</b></td></tr></tbody></table>`},
       {h:'자주 나오는 피타고라스 수', html:`${chipList(PY_BASE.map(t=>`(${t.join(', ')})`))}
+        <div class="kcp" style="margin-top:8px">조금 큰 피타고라스 수 (20, 21, 29) · (12, 35, 37) · (9, 40, 41) · (11, 60, 61)<br>
+        <small>(3, 4, 5) · (5, 12, 13) · (7, 24, 25) · (9, 40, 41) · (11, 60, 61) — 홀수 a 에서 나머지 두 수는 a² 을 반으로 나눈 이웃한 두 수예요.</small></div>
         <div class="kcp" style="margin-top:8px">세 수에 같은 수를 곱하거나 나누어도 직각삼각형의 세 변이 돼요(닮은 직각삼각형).<br>(6, 8, 10) · (9, 12, 15) · (10, 24, 26) · (0.6, 0.8, 1)</div>`},
       {h:'삼각형의 변의 길이와 각의 크기 사이의 관계', html:`<div class="kcp">세 변의 길이가 a, b, c 이고 <b>c 가 가장 긴 변</b>인 삼각형에서 (∠C 는 c 의 대각)</div>
         <table class="kct"><thead><tr><th>비교</th><th>∠C</th><th style="width:96px">삼각형</th></tr></thead><tbody>
@@ -4151,8 +4289,11 @@ function genEC(){ const n=Math.random()<.6?2:3, c=n===2?sgn(ri(2,5)):ri(2,4); re
 const QP=()=>[2,3,5,6,7,10,11,13].map(qP).concat([3,4,5,6,7,8,9,12].map(qN));
 const QO=()=>{ const o=[]; [2,3,5,6,7].forEach(b=>range(2,6).forEach(a=>{ if(a*a*b<=300) o.push(qO(a,b)); })); return o; };
 const QI=()=>{ const o=[]; [2,3,5,6,7].forEach(b=>range(2,5).forEach(a=>{ if(a*a*b<=200) o.push(qI(a,b)); })); return o; };
-const QM=()=>[[2,8],[3,12],[2,18],[5,20],[3,27],[2,32],[6,24],[7,28],[5,45],[2,50],[8,18],[12,27]].map(([x,y])=>qM(x,y))
-  .concat([[12,3],[18,2],[50,2],[45,5],[48,3],[75,3],[72,2],[98,2],[80,5]].map(([x,y])=>qD(x,y)));
+/* 곱셈 — 같은 √ 꼴(√2 · √8 = 2√2 · …)끼리 곱해 제곱수가 되는 짝 · 나눗셈 — 몫이 제곱수가 되는 짝 */
+const QM=()=>[[2,8],[3,12],[2,18],[5,20],[3,27],[2,32],[6,24],[7,28],[5,45],[2,50],[8,18],[12,27],
+  [2,72],[8,32],[8,50],[18,32],[18,50],[3,48],[3,75],[12,48],[12,75],[5,80],[20,45],[6,54],[24,54],[7,63],[10,40],[10,90]].map(([x,y])=>qM(x,y))
+  .concat([[12,3],[18,2],[50,2],[45,5],[48,3],[75,3],[72,2],[98,2],[80,5],
+  [8,2],[32,2],[27,3],[20,5],[24,6],[54,6],[96,6],[28,7],[63,7],[108,3],[125,5],[112,7]].map(([x,y])=>qD(x,y)));
 
 Object.assign(TOPICS,{
   expo:{k:'expo', n:'지수법칙', sym:'aⁿ', school:'m', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
@@ -4173,7 +4314,8 @@ Object.assign(TOPICS,{
        facts:()=>range(2,20).map(qS).concat(QP()), pick:l=>sampleN(l.filter(f=>f.k==='qS'&&f.n>10),6).concat(sampleN(l.filter(f=>f.k==='qS'&&f.n<=10),2),sampleN(l.filter(f=>f.k!=='qS'),4))},
       {n:2, name:'근호 밖으로·안으로',   ex:'√12 = □√3', facts:()=>QO().concat(QI()), take:12, old:[3,4],
        pick:l=>byPre(l,[[/^qO/,6],[/^qI/,6]])},
-      {n:3, name:'곱셈과 나눗셈',        ex:'√2 × √8 = □',    facts:QM, take:12, old:[5]}
+      {n:3, name:'곱셈과 나눗셈',        ex:'√2 × √8 = □',    facts:QM, take:12, old:[5],
+       pick:l=>byPre(l,[[/^qM/,7],[/^qD/,5]])}
     ],
     cats:[['제곱근 구하기',sk=>/^qS/.test(sk)],['(√a)² · √(−a)²',sk=>/^q[PN]/.test(sk)],['근호 밖으로',sk=>/^qO/.test(sk)],
           ['근호 안으로',sk=>/^qI/.test(sk)],['√ 의 곱셈·나눗셈',sk=>/^q[MD]/.test(sk)]]}
@@ -4398,6 +4540,10 @@ const tV=(fn,d)=>{ const v=TVAL[fn+d], [tok,ans]=TFORM[v];
   return F({key:'tV'+fn+d, t:'trig', k:'tV', fn, d, v, eq:[`${FN[fn]} ${d}°`,'=',tok], ans}); };
 const tA=(fn,d)=>F({key:'tA'+fn+d, t:'trig', k:'tA', fn, d, v:TVAL[fn+d],
   cond:`${FN[fn]} A = ${TVAL[fn+d]} 일 때 (0° < A < 90°)`, eq:['A','=','?','°'], ans:d});
+/* 한 삼각비의 값 → 각을 찾고 → 다른 삼각비의 값 (sin A = 1/2 이면 cos A = √□/2) */
+const tB=(f1,d,f2)=>{ const v=TVAL[f2+d], [tok,ans]=TFORM[v];
+  return F({key:'tB'+f1+d+f2, t:'trig', k:'tB', f1, fn:f2, d, v, v1:TVAL[f1+d],
+    cond:`${FN[f1]} A = ${TVAL[f1+d]} 일 때 (0° < A < 90°)`, eq:[`${FN[f2]} A`,'=',tok], ans}); };
 /* 직각삼각형 ABC (C = 90°) : BC = a (A의 맞은편), AC = b, AB = c */
 const tR=(a,b,fn)=>{ const c=Math.round(Math.hypot(a,b));
   const tok= fn==='t'?{fr:['?',String(b)]}:{fr:['?',String(c)]};
@@ -4422,7 +4568,32 @@ const TCALC=[
   ['6 sin 30° − tan 45°',2,0,['6 × 1/2 − 1 = 3 − 1','= 2']],
   ['√3 tan 60°',3,0,['√3 × √3 = 3']],
   ['√2 sin 45°',1,0,['√2 × √2/2 = 2/2','= 1']],
-  ['2 cos 60° + tan 45°',2,0,['2 × 1/2 + 1 = 1 + 1','= 2']]
+  ['2 cos 60° + tan 45°',2,0,['2 × 1/2 + 1 = 1 + 1','= 2']],
+  ['6 sin 30°',3,0,['6 × 1/2','= 3']],
+  ['8 cos 60°',4,0,['8 × 1/2','= 4']],
+  ['10 sin 30° − 2 tan 45°',3,0,['10 × 1/2 − 2 × 1 = 5 − 2','= 3']],
+  ['sin 30° + cos 60° + tan 45°',2,0,['1/2 + 1/2 + 1','= 2']],
+  ['4 sin 30° − tan 45°',1,0,['4 × 1/2 − 1 = 2 − 1','= 1']],
+  ['sin² 60° + cos² 60°',1,0,['(√3/2)² + (1/2)² = 3/4 + 1/4','= 1']],
+  ['4 sin² 60°',3,0,['4 × (√3/2)² = 4 × 3/4','= 3']],
+  ['8 sin² 30°',2,0,['8 × (1/2)² = 8 × 1/4','= 2']],
+  ['2 cos² 45°',1,0,['2 × (√2/2)² = 2 × 1/2','= 1']],
+  ['3 tan² 30°',1,0,['3 × (√3/3)² = 3 × 3/9','= 1']],
+  ['4 cos² 30°',3,0,['4 × (√3/2)² = 4 × 3/4','= 3']],
+  ['sin² 45°',1,2,['(√2/2)² = 2/4','= 1/2']],
+  ['cos² 30°',3,4,['(√3/2)² = 3/4']],
+  ['tan² 30°',1,3,['(√3/3)² = 3/9','= 1/3']],
+  ['√3 tan 30°',1,0,['√3 × √3/3 = 3/3','= 1']],
+  ['2√3 sin 60°',3,0,['2√3 × √3/2 = 2 × 3/2','= 3']],
+  ['√3 sin 60°',3,2,['√3 × √3/2 = 3/2']],
+  ['tan 60° × sin 60°',3,2,['√3 × √3/2 = 3/2']],
+  ['sin 30° ÷ cos 60°',1,0,['(1/2) ÷ (1/2)','= 1']],
+  ['sin 45° ÷ cos 45°',1,0,['(√2/2) ÷ (√2/2)','= 1']],
+  ['(sin 30° + cos 60°)²',1,0,['(1/2 + 1/2)² = 1²','= 1']],
+  ['2 sin 60° × cos 30°',3,2,['2 × √3/2 × √3/2 = 2 × 3/4','= 3/2']],
+  ['4 sin 30° × cos 60°',1,0,['4 × 1/2 × 1/2','= 1']],
+  ['(2 sin 60°)²',3,0,['(2 × √3/2)² = (√3)²','= 3']],
+  ['tan 45° − sin 30°',1,2,['1 − 1/2','= 1/2']]
 ];
 const tC=i=>{ const [x,ans,den]=TCALC[i]; return F({key:'tC'+i, t:'trig', k:'tC', i, eq:[x,'=',den?{fr:['?',String(den)]}:'?'], ans}); };
 
@@ -4447,7 +4618,36 @@ const LPROP=[
   ['2 log₃ 6 − log₃ 4',2,['2 log₃ 6 = log₃ 36','log₃ (36 ÷ 4) = log₃ 9 = 2']],
   ['log₂ 5 × log₅ 16',4,['밑변환으로 log₅ 이 지워져 log₂ 16','2⁴ = 16 이므로 4']],
   ['log₄ 2 + log₄ 8',2,['log₄ (2 × 8) = log₄ 16','4² = 16 이므로 2']],
-  ['log₉ 3 + log₉ 27',2,['log₉ (3 × 27) = log₉ 81','9² = 81 이므로 2']]
+  ['log₉ 3 + log₉ 27',2,['log₉ (3 × 27) = log₉ 81','9² = 81 이므로 2']],
+  ['log₆ 2 + log₆ 18',2,['log₆ (2 × 18) = log₆ 36','6² = 36 이므로 2']],
+  ['log 20 + log 5',2,['log (20 × 5) = log 100','10² = 100 이므로 2']],
+  ['log 8 + log 125',3,['log (8 × 125) = log 1000','10³ = 1000 이므로 3']],
+  ['log₃ 18 − log₃ 2',2,['log₃ (18 ÷ 2) = log₃ 9','3² = 9 이므로 2']],
+  ['log₂ 40 − log₂ 5',3,['log₂ (40 ÷ 5) = log₂ 8','2³ = 8 이므로 3']],
+  ['log₅ 75 − log₅ 3',2,['log₅ (75 ÷ 3) = log₅ 25','5² = 25 이므로 2']],
+  ['log₂ 48 − log₂ 3',4,['log₂ (48 ÷ 3) = log₂ 16','2⁴ = 16 이므로 4']],
+  ['log 500 − log 5',2,['log (500 ÷ 5) = log 100','10² = 100 이므로 2']],
+  ['log₃ 162 − log₃ 2',4,['log₃ (162 ÷ 2) = log₃ 81','3⁴ = 81 이므로 4']],
+  ['log₇ 98 − log₇ 2',2,['log₇ (98 ÷ 2) = log₇ 49','7² = 49 이므로 2']],
+  ['log₃ 9⁴',8,['지수는 앞으로: 4 log₃ 9','4 × 2 = 8']],
+  ['log₂ 4⁵',10,['지수는 앞으로: 5 log₂ 4','5 × 2 = 10']],
+  ['log₅ 25³',6,['지수는 앞으로: 3 log₅ 25','3 × 2 = 6']],
+  ['log₃ 5 × log₅ 9',2,['밑변환으로 log₅ 가 지워져 log₃ 9','3² = 9 이므로 2']],
+  ['log₂ 7 × log₇ 32',5,['밑변환으로 log₇ 이 지워져 log₂ 32','2⁵ = 32 이므로 5']],
+  ['log₃ 2 × log₂ 27',3,['밑변환으로 log₂ 가 지워져 log₃ 27','3³ = 27 이므로 3']],
+  ['log₅ 3 × log₃ 125',3,['밑변환으로 log₃ 이 지워져 log₅ 125','5³ = 125 이므로 3']],
+  ['log₄ 2 + log₄ 32',3,['log₄ (2 × 32) = log₄ 64','4³ = 64 이므로 3']],
+  ['log₈ 2 + log₈ 32',2,['log₈ (2 × 32) = log₈ 64','8² = 64 이므로 2']],
+  ['2 log₂ 6 − log₂ 9',2,['2 log₂ 6 = log₂ 36','log₂ (36 ÷ 9) = log₂ 4 = 2']],
+  ['2 log₅ 10 − log₅ 4',2,['2 log₅ 10 = log₅ 100','log₅ (100 ÷ 4) = log₅ 25 = 2']],
+  ['2 log 5 + log 4',2,['2 log 5 = log 25','log (25 × 4) = log 100 = 2']],
+  ['3 log 2 + 3 log 5',3,['3 (log 2 + log 5) = 3 log 10','3 × 1 = 3']],
+  ['log₃ √81',2,['√81 = 9 = 3²','log₃ 3² = 2']],
+  ['log₂ ∛64',2,['∛64 = 4 = 2²','log₂ 2² = 2']],
+  ['log₂ 3 + log₂ 4 − log₂ 6',1,['log₂ (3 × 4 ÷ 6) = log₂ 2','2¹ = 2 이므로 1']],
+  ['log₂ 6 + log₂ 12 − log₂ 9',3,['log₂ (6 × 12 ÷ 9) = log₂ 8','2³ = 8 이므로 3']],
+  ['log₂ 3 × log₃ 4 × log₄ 8',3,['밑변환으로 이어져 log₂ 8','2³ = 8 이므로 3']],
+  ['log₂₇ 3 + log₂₇ 9',1,['log₂₇ (3 × 9) = log₂₇ 27','27¹ = 27 이므로 1']]
 ];
 const lP=i=>F({key:'lP'+i, t:'logx', k:'lP', i, eq:[LPROP[i][0],'=','?'], ans:LPROP[i][1]});
 const LEQ=[
@@ -4464,7 +4664,37 @@ const LEQ=[
   ['log x = 3',1000,['밑이 10 인 로그: x = 10³','x = 1000']],
   ['logₓ 49 = 2',7,['x² = 49 이고 밑은 양수','x = 7']],
   ['logₓ 125 = 3',5,['x³ = 125','x = 5']],
-  ['log₂ (x − 1) = 3',9,['x − 1 = 2³ = 8','x = 9']]
+  ['log₂ (x − 1) = 3',9,['x − 1 = 2³ = 8','x = 9']],
+  ['2ˣ = 64',6,['64 = 2⁶','x = 6']],
+  ['3ˣ = 243',5,['243 = 3⁵','x = 5']],
+  ['5ˣ = 125',3,['125 = 5³','x = 3']],
+  ['7ˣ = 49',2,['49 = 7²','x = 2']],
+  ['2ˣ = 1/8',-3,['1/8 = 2⁻³','x = −3']],
+  ['3ˣ = 1/9',-2,['1/9 = 3⁻²','x = −2']],
+  ['10ˣ = 1000',3,['1000 = 10³','x = 3']],
+  ['4ˣ = 1/16',-2,['1/16 = 4⁻²','x = −2']],
+  ['2ˣ⁺² = 32',3,['32 = 2⁵ 이므로 x + 2 = 5','x = 3']],
+  ['3ˣ⁻² = 9',4,['9 = 3² 이므로 x − 2 = 2','x = 4']],
+  ['5ˣ⁺¹ = 25',1,['25 = 5² 이므로 x + 1 = 2','x = 1']],
+  ['2³ˣ = 64',2,['64 = 2⁶ 이므로 3x = 6','x = 2']],
+  ['3²ˣ = 81',2,['81 = 3⁴ 이므로 2x = 4','x = 2']],
+  ['4ˣ = 2ˣ⁺³',3,['4ˣ = 2²ˣ 이므로 2x = x + 3','x = 3']],
+  ['9ˣ = 3ˣ⁺²',2,['9ˣ = 3²ˣ 이므로 2x = x + 2','x = 2']],
+  ['8ˣ = 4ˣ⁺¹',2,['8ˣ = 2³ˣ, 4ˣ⁺¹ = 2²ˣ⁺² 이므로 3x = 2x + 2','x = 2']],
+  ['(1/2)ˣ = 8',-3,['(1/2)ˣ = 2⁻ˣ, 8 = 2³ 이므로 −x = 3','x = −3']],
+  ['log₅ x = 2',25,['x = 5²','x = 25']],
+  ['log₄ x = 3',64,['x = 4³','x = 64']],
+  ['log₆ x = 2',36,['x = 6²','x = 36']],
+  ['log x = 2',100,['밑이 10 인 로그: x = 10²','x = 100']],
+  ['logₓ 64 = 3',4,['x³ = 64','x = 4']],
+  ['logₓ 16 = 4',2,['x⁴ = 16 이고 밑은 양수','x = 2']],
+  ['logₓ 81 = 4',3,['x⁴ = 81 이고 밑은 양수','x = 3']],
+  ['logₓ 1000 = 3',10,['x³ = 1000','x = 10']],
+  ['log₃ (x + 1) = 2',8,['x + 1 = 3² = 9','x = 8']],
+  ['log₂ (x + 3) = 4',13,['x + 3 = 2⁴ = 16','x = 13']],
+  ['log₅ (2x − 1) = 2',13,['2x − 1 = 5² = 25 → 2x = 26','x = 13']],
+  ['log₂ x + log₂ 4 = 5',8,['log₂ 4x = 5 → 4x = 2⁵ = 32','x = 8']],
+  ['log₃ x − log₃ 2 = 2',18,['log₃ (x ÷ 2) = 2 → x ÷ 2 = 3² = 9','x = 18']]
 ];
 const lE=i=>F({key:'lE'+i, t:'logx', k:'lE', i, cond:`${LEQ[i][0]} 일 때`, eq:['x','=','?'], ans:LEQ[i][1]});
 
@@ -4502,7 +4732,31 @@ const CWORD=[
   ['1, 2, 3, 4, 5 를 한 번씩만 써서 만드는 세 자리 짝수의 개수',24,['일의 자리: 2 또는 4 → 2가지','나머지 두 자리: ₄P₂ = 12','2 × 12 = 24']],
   ['APPLE 의 다섯 글자를 한 줄로 늘어놓는 방법',60,['P 가 두 개 → 같은 것이 있는 순열','5! ÷ 2! = 120 ÷ 2 = 60']],
   ['정육각형의 대각선의 개수',9,['꼭짓점 두 개를 잇는 선분: ₆C₂ = 15','그 가운데 변 6개를 빼요: 15 − 6 = 9']],
-  ['부모 2명과 자녀 3명이 한 줄로 설 때 부모가 양 끝에 서는 방법',12,['양 끝의 부모: 2! = 2','가운데 자녀: 3! = 6','2 × 6 = 12']]
+  ['부모 2명과 자녀 3명이 한 줄로 설 때 부모가 양 끝에 서는 방법',12,['양 끝의 부모: 2! = 2','가운데 자녀: 3! = 6','2 × 6 = 12']],
+  ['6명을 한 줄로 세우는 방법',720,['6! = 6 × 5 × 4 × 3 × 2 × 1','= 720']],
+  ['7명 중 대표 3명을 뽑는 방법',35,['순서가 없으니 조합: ₇C₃','= 7 × 6 × 5 ÷ 6 = 35']],
+  ['7명 중 회장·부회장·총무를 뽑는 방법',210,['자리가 다르니 순열: ₇P₃','= 7 × 6 × 5 = 210']],
+  ['6명이 원탁에 둘러앉는 방법',120,['한 명을 고정하고 나머지 5명을 세워요','5! = 120']],
+  ['9팀이 서로 한 번씩 경기하는 횟수',36,['두 팀을 고르면 경기 하나: ₉C₂','= 9 × 8 ÷ 2 = 36']],
+  ['정팔각형의 대각선의 개수',20,['꼭짓점 두 개를 잇는 선분: ₈C₂ = 28','변 8개를 빼요: 28 − 8 = 20']],
+  ['원 위의 점 8개로 만드는 삼각형의 개수',56,['세 점을 고르면 삼각형 하나: ₈C₃','= 8 × 7 × 6 ÷ 6 = 56']],
+  ['BANANA 를 한 줄로 늘어놓는 방법',60,['A 3개, N 2개 → 같은 것이 있는 순열','6! ÷ (3! × 2!) = 720 ÷ 12 = 60']],
+  ['SCHOOL 을 한 줄로 늘어놓는 방법',360,['O 가 2개 → 같은 것이 있는 순열','6! ÷ 2! = 720 ÷ 2 = 360']],
+  ['1, 2, 3, 4 를 한 번씩 써서 만드는 네 자리 홀수',12,['일의 자리: 1 또는 3 → 2가지','나머지 세 자리: 3! = 6','2 × 6 = 12']],
+  ['0, 1, 2, 3 을 한 번씩 써서 만드는 세 자리 수',18,['백의 자리에 0 은 못 와요: 3가지','나머지 두 자리: ₃P₂ = 6','3 × 6 = 18']],
+  ['1 ~ 6 을 한 번씩 써서 만드는 세 자리 수',120,['순서가 있으니 순열: ₆P₃','= 6 × 5 × 4 = 120']],
+  ['남 3명, 여 3명이 번갈아 한 줄로 서는 방법',72,['남여남여남여 · 여남여남여남 → 2가지','남끼리 3! × 여끼리 3! = 36','2 × 36 = 72']],
+  ['5명 중 A 를 꼭 넣어 3명을 뽑는 방법',6,['A 를 먼저 넣고 나머지 4명 중 2명: ₄C₂','= 6']],
+  ['5명 중 A 를 빼고 3명을 뽑는 방법',4,['A 를 뺀 4명 중 3명: ₄C₃','= 4']],
+  ['남 5명, 여 4명 중 남 2명, 여 2명을 뽑는 방법',60,['₅C₂ × ₄C₂ = 10 × 6','= 60 (곱의 법칙)']],
+  ['책 5권 중 3권을 골라 한 줄로 꽂는 방법',60,['순서가 있으니 순열: ₅P₃','= 5 × 4 × 3 = 60']],
+  ['6명이 한 줄로 설 때 A, B 가 이웃하는 방법',240,['A·B 를 한 묶음 → 5개를 세우기: 5! = 120','묶음 안에서 AB, BA: 120 × 2 = 240']],
+  ['AABBC 를 한 줄로 늘어놓는 방법',30,['A 2개, B 2개 → 같은 것이 있는 순열','5! ÷ (2! × 2!) = 120 ÷ 4 = 30']],
+  ['남 3명, 여 4명 중 3명을 뽑을 때 남녀가 모두 있는 방법',30,['전체 ₇C₃ = 35','남자만 ₃C₃ = 1, 여자만 ₄C₃ = 4','35 − 1 − 4 = 30']],
+  ['동전 4개를 던져 앞면이 2개 나오는 경우',6,['앞면이 나올 동전 2개를 고르기: ₄C₂','= 6']],
+  ['가로 평행선 4개, 세로 평행선 3개로 생기는 평행사변형',18,['가로에서 2개, 세로에서 2개: ₄C₂ × ₃C₂','= 6 × 3 = 18']],
+  ['A, B, C, D, E 를 늘어놓을 때 A 가 맨 앞인 방법',24,['A 를 맨 앞에 두고 나머지 4개: 4!','= 24']],
+  ['1 ~ 10 에서 두 수를 골라 합이 짝수인 경우',20,['짝수끼리 ₅C₂ = 10, 홀수끼리 ₅C₂ = 10','10 + 10 = 20 (합의 법칙)']]
 ];
 /* 중학교 경우의 수와 겹치는 쉬운 상황(대표 2명·회장 부회장·동전·주사위·옷 입기)은 고등 연습에서 빼요 */
 const CW_EASY=[1,2,4,5,13];
@@ -4512,6 +4766,7 @@ function hsFact(key){
   let m; const R=p=>key.match(new RegExp('^'+p+'$'));
   if(m=R('tV([sct])(\\d+)')) return tV(m[1],+m[2]);
   if(m=R('tA([sct])(\\d+)')) return tA(m[1],+m[2]);
+  if((m=R('tB([sct])(\\d+)([sct])'))&&m[1]!==m[3]&&TVAL[m[1]+m[2]]) return tB(m[1],+m[2],m[3]);
   if(m=R('tR(\\d+)_(\\d+)_([sct])')) return tR(+m[1],+m[2],m[3]);
   if(m=R('tS(\\d+)_(\\d+)_([oj])')) return tS(+m[1],+m[2],m[3]);
   if(m=R('tC(\\d+)')) return TCALC[+m[1]]?tC(+m[1]):null;
@@ -4534,13 +4789,16 @@ function hsFact(key){
 const ANG=[30,45,60], FNS=['s','c','t'];
 const TV_ALL=()=>FNS.flatMap(fn=>ANG.map(d=>tV(fn,d)));
 const TA_ALL=()=>FNS.flatMap(fn=>ANG.map(d=>tA(fn,d)));
-const TR_ALL=()=>[[3,4],[4,3],[5,12],[12,5],[8,15],[15,8],[6,8],[8,6]].flatMap(([a,b])=>FNS.map(fn=>tR(a,b,fn)));
+const TB_ALL=()=>FNS.flatMap(f1=>ANG.flatMap(d=>FNS.filter(f2=>f2!==f1).map(f2=>tB(f1,d,f2))));
+const TR_ALL=()=>[[3,4],[4,3],[5,12],[12,5],[8,15],[15,8],[6,8],[8,6],[7,24],[24,7],[9,12],[12,9]].flatMap(([a,b])=>FNS.map(fn=>tR(a,b,fn)));
 const TS_ALL=()=>ANG.flatMap(d=>[2,4,6,8,10,12].flatMap(c=>[tS(d,c,'o'),tS(d,c,'j')]));
 const TC_ALL=()=>TCALC.map((_,i)=>tC(i));
 const LR_ALL=()=>[lR(3,2),lR(3,3),lR(3,4),lR(3,5),lR(3,-2),lR(3,-3),lR(4,2),lR(4,3),lR(5,2),lR(5,3),lR(5,-2),lR(2,12)];
 const LQ_ALL=()=>[[8,2,3],[27,2,3],[16,3,4],[4,3,2],[9,3,2],[32,2,5],[25,3,2],[64,2,3],[81,3,4],[100,3,2],[8,1,3],
                   [8,-2,3],[27,-1,3],[4,-3,2],[9,-1,2],[16,-1,4]].map(([a,p,q])=>lQ(a,p,q));
-const LL_ALL=()=>[[2,3],[2,5],[2,6],[2,-3],[2,0],[3,2],[3,4],[3,-2],[5,3],[5,-1],[10,3],[10,-2],[2,1],[3,5]].map(([b,e])=>lL(b,e));
+const LL_ALL=()=>[[2,3],[2,5],[2,6],[2,-3],[2,0],[3,2],[3,4],[3,-2],[5,3],[5,-1],[10,3],[10,-2],[2,1],[3,5],
+                  [2,2],[2,4],[2,7],[2,8],[2,10],[2,-1],[2,-2],[2,-4],[3,1],[3,3],[3,0],[3,-1],[3,-3],[4,2],[4,3],[4,-1],
+                  [5,2],[5,4],[5,0],[5,-2],[6,2],[7,2],[8,2],[9,2],[10,1],[10,4],[10,0],[10,-1],[10,-3]].map(([b,e])=>lL(b,e));
 const CF_ALL=()=>[0,1,3,4,5,6,7].map(cF).concat([[6,4],[7,5],[8,6],[10,8],[5,3],[9,7],[10,7]].map(([n,k])=>cG(n,k)));
 const CP_ALL=()=>{ const o=[]; range(3,10).forEach(n=>range(1,4).forEach(r=>{ if(r<=n&&r>=2&&nPr(n,r)<=9999) o.push(cP(n,r)); })); return o; };
 const CC_ALL=()=>{ const o=[]; range(4,12).forEach(n=>range(2,4).forEach(r=>{ if(r<n) o.push(cC(n,r)); })); return o; };
@@ -4552,13 +4810,13 @@ Object.assign(TOPICS,{
   trig:{k:'trig', n:'삼각비', sym:'sin', school:'m', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'특수각의 값 · 직각삼각형 · 변의 길이',
     stages:[
-      {n:1, name:'특수각의 삼각비',      ex:'sin 30° = □/2', facts:()=>TV_ALL().concat(TA_ALL()), take:12, old:[1,2],
-       pick:l=>byPre(l,[[/^tV/,7],[/^tA/,5]])},
+      {n:1, name:'특수각의 삼각비',      ex:'sin 30° = □/2', facts:()=>TV_ALL().concat(TA_ALL(),TB_ALL()), take:12, old:[1,2],
+       pick:l=>byPre(l,[[/^tV/,6],[/^tA/,3],[/^tB/,3]])},
       {n:2, name:'직각삼각형에서 삼각비', ex:'sin A = □/5',       facts:TR_ALL, take:10, old:[3]},
       {n:3, name:'변의 길이 구하기',     ex:'AB = 10, ∠A = 30°', facts:TS_ALL, take:10, old:[4]},
       {n:4, name:'특수각의 계산',        ex:'sin 30° + cos 60°', facts:TC_ALL, take:10, old:[5]}
     ],
-    cats:[['특수각의 값',sk=>/^tV/.test(sk)],['각도 찾기',sk=>/^tA/.test(sk)],['직각삼각형에서 삼각비',sk=>/^tR/.test(sk)],
+    cats:[['특수각의 값',sk=>/^tV/.test(sk)],['각도 찾기',sk=>/^tA/.test(sk)],['다른 삼각비 구하기',sk=>/^tB/.test(sk)],['직각삼각형에서 삼각비',sk=>/^tR/.test(sk)],
           ['변의 길이',sk=>/^tS/.test(sk)],['특수각의 계산',sk=>/^tC/.test(sk)]]},
   logx:{k:'logx', n:'지수와 로그', sym:'log', school:'h', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'거듭제곱근 · 유리수 지수 · 로그의 값과 성질',
@@ -4618,6 +4876,7 @@ function hsVariant(f){
   switch(f.k){
     case 'tV': return tA(f.fn,f.d);
     case 'tA': return tV(f.fn,f.d);
+    case 'tB': return tB(f.fn,f.d,f.f1);
     case 'tR': return tR(f.a,f.b,{s:'c',c:'t',t:'s'}[f.fn]);
     case 'tS': return tS(f.d,f.c,f.side==='o'?'j':'o');
     case 'cG': return cP(f.n,f.n-f.kk);
@@ -4639,6 +4898,8 @@ function hsHint(f){
       return {t:`${d}° 의 직각삼각형으로`, lines:[`${FN[fn]} A = ${ratio}`, `∠A = ${d}° 인 삼각형: 세 변 ${l.a}, ${l.b}, ${l.c}`,
         (`${num}/${den}`===String(v)?`${FN[fn]} ${d}° = <b>${v}</b>`:`${FN[fn]} ${d}° = ${num}/${den} = <b>${v}</b>`), `□ = ${B(f.ans)}`], svg:specialSVG(d)};
     }
+    case 'tB': return {t:'각을 먼저 찾고 다른 삼각비로', lines:[`${FN[f.f1]} A = ${f.v1} 이므로 A = ${f.d}°`,
+        `${FN[f.fn]} ${f.d}° = <b>${f.v}</b>`, `□ = ${B(f.ans)}`, tip('0° &lt; A &lt; 90° 에서 특수각의 값은 각마다 하나뿐이에요')], svg:specialSVG(f.d)};
     case 'tA': return {t:'삼각비 표에서 거꾸로', lines:[`${FN[f.fn]} ${f.d}° = ${f.v}`, `그래서 A = ${B(f.d)}°`,
         tip('sin 은 30° → 60° 로 갈수록 커지고, cos 은 작아져요')], svg:specialSVG(f.d)};
     case 'tR':{
@@ -4906,7 +5167,31 @@ const RELF=[
   ['sin θ − cos θ = 1/2 일 때',['sin θ cos θ','=',{fr:['?','8']}],3,['양변을 제곱: 1 − 2 sin θ cos θ = 1/4','2 sin θ cos θ = 3/4','sin θ cos θ = 3/8']],
   ['sin θ + cos θ = 1/3 일 때',['sin θ cos θ','=',{fr:['?','9']}],-4,['양변을 제곱: 1 + 2 sin θ cos θ = 1/9','2 sin θ cos θ = −8/9','sin θ cos θ = −4/9']],
   ['sin θ cos θ = 1/4 일 때',['tan θ + '+'1/tan θ','=','?'],4,['tan θ + 1/tan θ = sin/cos + cos/sin','= (sin²θ + cos²θ) ÷ (sin θ cos θ) = 1 ÷ 1/4','= 4']],
-  ['(sin θ + cos θ)² + (sin θ − cos θ)² 의 값은 θ에 관계없이',['?'],2,['전개: (1 + 2 sin θ cos θ) + (1 − 2 sin θ cos θ)','sin²θ + cos²θ = 1 을 두 번','= 2']]
+  ['(sin θ + cos θ)² + (sin θ − cos θ)² 의 값은 θ에 관계없이',['?'],2,['전개: (1 + 2 sin θ cos θ) + (1 − 2 sin θ cos θ)','sin²θ + cos²θ = 1 을 두 번','= 2']],
+  ['sin θ = 5/13, θ가 제2사분면의 각일 때',['cos θ','=',{fr:['?','13']}],-12,['cos²θ = 1 − 25/169 = 144/169','제2사분면에서 cos θ < 0','cos θ = −12/13']],
+  ['sin θ = 5/13, θ가 제2사분면의 각일 때',['tan θ','=',{fr:['?','12']}],-5,['cos θ = −12/13 (제2사분면)','tan θ = (5/13) ÷ (−12/13)','= −5/12']],
+  ['cos θ = 4/5, θ가 제4사분면의 각일 때',['sin θ','=',{fr:['?','5']}],-3,['sin²θ = 1 − 16/25 = 9/25','제4사분면에서 sin θ < 0','sin θ = −3/5']],
+  ['cos θ = 4/5, θ가 제4사분면의 각일 때',['tan θ','=',{fr:['?','4']}],-3,['sin θ = −3/5 (제4사분면)','tan θ = (−3/5) ÷ (4/5)','= −3/4']],
+  ['sin θ = −12/13, θ가 제3사분면의 각일 때',['cos θ','=',{fr:['?','13']}],-5,['cos²θ = 1 − 144/169 = 25/169','제3사분면에서 cos θ < 0','cos θ = −5/13']],
+  ['sin θ = −12/13, θ가 제3사분면의 각일 때',['tan θ','=',{fr:['?','5']}],12,['cos θ = −5/13 (제3사분면)','tan θ = (−12/13) ÷ (−5/13)','= 12/5']],
+  ['cos θ = −8/17, θ가 제2사분면의 각일 때',['sin θ','=',{fr:['?','17']}],15,['sin²θ = 1 − 64/289 = 225/289','제2사분면에서 sin θ > 0','sin θ = 15/17']],
+  ['cos θ = −8/17, θ가 제2사분면의 각일 때',['tan θ','=',{fr:['?','8']}],-15,['sin θ = 15/17 (제2사분면)','tan θ = (15/17) ÷ (−8/17)','= −15/8']],
+  ['tan θ = −3/4, θ가 제2사분면의 각일 때',['sin θ','=',{fr:['?','5']}],3,['빗변이 5 인 3 : 4 : 5 직각삼각형','제2사분면에서 sin θ > 0','sin θ = 3/5']],
+  ['tan θ = −3/4, θ가 제4사분면의 각일 때',['cos θ','=',{fr:['?','5']}],4,['빗변이 5 인 3 : 4 : 5 직각삼각형','제4사분면에서 cos θ > 0','cos θ = 4/5']],
+  ['tan θ = 5/12, θ가 제3사분면의 각일 때',['sin θ','=',{fr:['?','13']}],-5,['빗변이 13 인 5 : 12 : 13 직각삼각형','제3사분면에서 sin θ < 0','sin θ = −5/13']],
+  ['tan θ = 3 일 때',[{fr:['1','cos²θ']},'=','?'],10,['tan²θ + 1 = 1/cos²θ','3² + 1','= 10']],
+  ['tan θ = √3 일 때',[{fr:['1','cos²θ']},'=','?'],4,['tan²θ + 1 = 1/cos²θ','(√3)² + 1 = 3 + 1','= 4']],
+  ['cos θ = 1/3 일 때',['tan²θ','=','?'],8,['tan²θ + 1 = 1/cos²θ = 9','tan²θ = 9 − 1','= 8']],
+  ['sin θ = 1/3 일 때',['cos²θ','=',{fr:['?','9']}],8,['cos²θ = 1 − sin²θ','= 1 − 1/9','= 8/9']],
+  ['sin θ cos θ = 1/3 일 때',['tan θ + '+'1/tan θ','=','?'],3,['tan θ + 1/tan θ = (sin²θ + cos²θ) ÷ (sin θ cos θ)','= 1 ÷ 1/3','= 3']],
+  ['sin θ + cos θ = 1/5 일 때',['sin θ cos θ','=',{fr:['?','25']}],-12,['양변을 제곱: 1 + 2 sin θ cos θ = 1/25','2 sin θ cos θ = −24/25','sin θ cos θ = −12/25']],
+  ['sin θ − cos θ = 1/5 일 때',['sin θ cos θ','=',{fr:['?','25']}],12,['양변을 제곱: 1 − 2 sin θ cos θ = 1/25','2 sin θ cos θ = 24/25','sin θ cos θ = 12/25']],
+  ['sin θ + cos θ = 2/3 일 때',['sin θ cos θ','=',{fr:['?','18']}],-5,['양변을 제곱: 1 + 2 sin θ cos θ = 4/9','2 sin θ cos θ = −5/9','sin θ cos θ = −5/18']],
+  ['sin θ + cos θ = √2 일 때',['sin θ cos θ','=',{fr:['?','2']}],1,['양변을 제곱: 1 + 2 sin θ cos θ = 2','2 sin θ cos θ = 1','sin θ cos θ = 1/2']],
+  ['sin θ + cos θ = 1/2 일 때',['sin³θ + cos³θ','=',{fr:['?','16']}],11,['양변을 제곱하면 sin θ cos θ = −3/8','sin³θ + cos³θ = (sin θ + cos θ)(1 − sin θ cos θ)','= 1/2 × 11/8 = 11/16']],
+  ['sin θ = 3/5 일 때',['(1 + sin θ)(1 − sin θ)','=',{fr:['?','25']}],16,['(1 + sin θ)(1 − sin θ) = 1 − sin²θ = cos²θ','= 1 − 9/25','= 16/25']],
+  ['sin θ = 4/5 일 때',['sin⁴θ − cos⁴θ','=',{fr:['?','25']}],7,['(sin²θ − cos²θ)(sin²θ + cos²θ) = sin²θ − cos²θ','= 16/25 − 9/25','= 7/25']],
+  ['(1 + tan²θ) cos²θ 의 값은 θ에 관계없이',['?'],1,['1 + tan²θ = 1/cos²θ','(1/cos²θ) × cos²θ','= 1']]
 ];
 const fR=i=>F({key:'fR'+i, t:'tfn', k:'fR', i, cond:RELF[i][0]+(/일 때$|없이$/.test(RELF[i][0])?'':' 일 때'), eq:RELF[i][1], ans:RELF[i][2]});
 
@@ -4927,9 +5212,31 @@ const GRF=[
   ['y = cos (π/3)x','주기','?',6,['주기 = 2π ÷ (π/3)','= 2π × 3/π','= 6']],
   ['y = a sin x + 2 의 최댓값이 7 (a > 0)','a','?',5,['최댓값 = a + 2','a + 2 = 7','a = 5']],
   ['y = 2 cos x + k 의 최솟값이 1','k','?',3,['최솟값 = −2 + k','−2 + k = 1','k = 3']],
-  ['y = 3 sin (x − π/4) − 2','최솟값','?',-5,['평행이동은 최댓값·최솟값을 바꾸지 않아요 (x 쪽)','−3 − 2','= −5']]
+  ['y = 3 sin (x − π/4) − 2','최솟값','?',-5,['평행이동은 최댓값·최솟값을 바꾸지 않아요 (x 쪽)','−3 − 2','= −5']],
+  ['y = 2 sin x + 3','최댓값','?',5,['−2 ≤ 2 sin x ≤ 2','1 ≤ y ≤ 5','최댓값 = 5']],
+  ['y = 2 sin x + 3','최솟값','?',1,['−2 ≤ 2 sin x ≤ 2','1 ≤ y ≤ 5','최솟값 = 1']],
+  ['y = −3 cos x + 2','최솟값','?',-1,['−3 ≤ −3 cos x ≤ 3','−1 ≤ y ≤ 5','최솟값 = −1']],
+  ['y = −3 cos x + 2','최댓값','?',5,['−3 ≤ −3 cos x ≤ 3','−1 ≤ y ≤ 5','최댓값 = 5']],
+  ['y = 4 sin 3x − 1','최솟값','?',-5,['진폭 4, 아래로 1 만큼','−1 − 4 ≤ y ≤ −1 + 4','최솟값 = −5']],
+  ['y = 4 sin 3x − 1','주기',{fr:['2π','?']},3,['앞의 4 와 − 1 은 주기와 상관없어요','2π ÷ 3','= 2π/3']],
+  ['y = cos 4x','주기',{fr:['π','?']},2,['cos bx 의 주기는 2π ÷ |b|','2π ÷ 4','= π/2']],
+  ['y = 3 cos (1/3)x','주기','?π',6,['앞의 3 은 주기와 상관없어요','2π ÷ 1/3','= 6π']],
+  ['y = sin (1/2)x','주기','?π',4,['주기 = 2π ÷ |b|','2π ÷ 1/2','= 4π']],
+  ['y = 2 tan 3x','주기',{fr:['π','?']},3,['tan bx 의 주기는 π ÷ |b|','π ÷ 3','= π/3']],
+  ['y = tan (1/2)x','주기','?π',2,['tan 의 주기는 π ÷ |b|','π ÷ 1/2','= 2π']],
+  ['y = 5 sin x − 2','최댓값 − 최솟값','?',10,['최댓값 5 − 2 = 3, 최솟값 −5 − 2 = −7','3 − (−7)','= 10']],
+  ['y = 2 sin (x + π/3) + 4','최솟값','?',2,['평행이동은 최댓값·최솟값을 바꾸지 않아요 (x 쪽)','−2 + 4','= 2']],
+  ['y = −2 cos 3x + 1','최댓값','?',3,['−2 ≤ −2 cos 3x ≤ 2','−1 ≤ y ≤ 3','최댓값 = 3']],
+  ['y = sin 2πx','주기','?',1,['sin bx 의 주기 = 2π ÷ |b|','2π ÷ 2π','= 1']],
+  ['y = cos (π/2)x','주기','?',4,['주기 = 2π ÷ (π/2)','= 2π × 2/π','= 4']],
+  ['y = −sin x + 3','최댓값','?',4,['−1 ≤ −sin x ≤ 1','2 ≤ y ≤ 4','최댓값 = 4']],
+  ['y = a cos x − 1 의 최솟값이 −4 (a > 0)','a','?',3,['최솟값 = −a − 1','−a − 1 = −4','a = 3']],
+  ['y = 3 sin x + k 의 최댓값이 5','k','?',2,['최댓값 = 3 + k','3 + k = 5','k = 2']],
+  ['y = a sin bx 의 최댓값이 4, 주기가 π (a > 0, b > 0)','a + b','?',6,['최댓값 = a 이므로 a = 4','주기 2π ÷ b = π 이므로 b = 2','a + b = 6']],
+  ['y = 2 sin x + 1 (0 ≤ x ≤ π)','최솟값','?',1,['0 ≤ x ≤ π 에서 0 ≤ sin x ≤ 1','1 ≤ y ≤ 3','최솟값 = 1']],
+  ['y = 4 cos x + 2 (0 ≤ x ≤ π/2)','최솟값','?',2,['0 ≤ x ≤ π/2 에서 0 ≤ cos x ≤ 1','2 ≤ y ≤ 6','최솟값 = 2']]
 ];
-const fG=i=>F({key:'fG'+i, t:'tfn', k:'fG', i, cond:GRF[i][0]+(/[이가] \d|이 \d/.test(GRF[i][0])?' 일 때':' 에서'), eq:[GRF[i][1],'=',GRF[i][2]], ans:GRF[i][3]});
+const fG=i=>F({key:'fG'+i, t:'tfn', k:'fG', i, cond:GRF[i][0]+(/[이가] −?\d/.test(GRF[i][0])?' 일 때':' 에서'), eq:[GRF[i][1],'=',GRF[i][2]], ans:GRF[i][3]});
 
 /* ── 사인법칙 · 코사인법칙 · 넓이 : [조건, 식, 답, 풀이] ── */
 const LAWF=[
@@ -4950,7 +5257,31 @@ const LAWF=[
   ['b = 4, c = 6, A = 30° 인 △ABC',['넓이','=','?'],6,['넓이 = ½ bc sin A','= ½ × 4 × 6 × 1/2','= 6']],
   ['b = 6, c = 8, A = 150° 인 △ABC',['넓이','=','?'],12,['넓이 = ½ × 6 × 8 × sin 150°','sin 150° = 1/2','= 12']],
   ['b = 6, c = 4, A = 60° 인 △ABC',['넓이','=','?√3'],6,['넓이 = ½ × 6 × 4 × sin 60°','= 12 × √3/2','= 6√3']],
-  ['b = 10, c = 4, A = 120° 인 △ABC',['넓이','=','?√3'],10,['넓이 = ½ × 10 × 4 × sin 120°','= 20 × √3/2','= 10√3']]
+  ['b = 10, c = 4, A = 120° 인 △ABC',['넓이','=','?√3'],10,['넓이 = ½ × 10 × 4 × sin 120°','= 20 × √3/2','= 10√3']],
+  ['b = 5, c = 3, A = 120°',['a','=','?'],7,['a² = 25 + 9 − 2·5·3·(−1/2)','= 34 + 15 = 49','a = 7']],
+  ['b = 7, c = 15, A = 60°',['a','=','?'],13,['a² = 49 + 225 − 2·7·15·(1/2)','= 274 − 105 = 169','a = 13']],
+  ['b = 5, c = 21, A = 60°',['a','=','?'],19,['a² = 25 + 441 − 2·5·21·(1/2)','= 466 − 105 = 361','a = 19']],
+  ['b = 16, c = 21, A = 60°',['a','=','?'],19,['a² = 256 + 441 − 2·16·21·(1/2)','= 697 − 336 = 361','a = 19']],
+  ['b = 6, c = 16, A = 60°',['a','=','?'],14,['a² = 36 + 256 − 2·6·16·(1/2)','= 292 − 96 = 196','a = 14']],
+  ['b = 5, c = 16, A = 120°',['a','=','?'],19,['a² = 25 + 256 − 2·5·16·(−1/2)','= 281 + 80 = 361','a = 19']],
+  ['b = 9, c = 15, A = 120°',['a','=','?'],21,['a² = 81 + 225 − 2·9·15·(−1/2)','= 306 + 135 = 441','a = 21']],
+  ['a = 13, b = 8, c = 15',['A','=','?','°'],60,['cos A = (b² + c² − a²) ÷ 2bc','= (64 + 225 − 169) ÷ 240 = 1/2','A = 60°']],
+  ['a = 13, b = 7, c = 8',['A','=','?','°'],120,['cos A = (49 + 64 − 169) ÷ 112','= −56/112 = −1/2','A = 120°']],
+  ['a = 19, b = 5, c = 16',['A','=','?','°'],120,['cos A = (25 + 256 − 361) ÷ 160','= −80/160 = −1/2','A = 120°']],
+  ['a = 7, b = 3, c = 8',['A','=','?','°'],60,['cos A = (9 + 64 − 49) ÷ 48','= 24/48 = 1/2','A = 60°']],
+  ['a = 10, A = 30° 일 때 외접원의 반지름',['R','=','?'],10,['사인법칙: a ÷ sin A = 2R','10 ÷ (1/2) = 20 = 2R','R = 10']],
+  ['a = 5√2, A = 45° 일 때 외접원의 반지름',['R','=','?'],5,['2R = 5√2 ÷ (√2/2)','= 10','R = 5']],
+  ['a = 6√3, A = 60° 일 때 외접원의 반지름',['R','=','?'],6,['2R = 6√3 ÷ (√3/2)','= 12','R = 6']],
+  ['a = 8, A = 150° 일 때 외접원의 반지름',['R','=','?'],8,['sin 150° = 1/2 이므로 2R = 8 ÷ (1/2)','= 16','R = 8']],
+  ['외접원의 반지름 R = 6, A = 150°',['a','=','?'],6,['a = 2R sin A','= 12 × sin 150° = 12 × 1/2','= 6']],
+  ['a = 8, A = 30°, B = 45°',['b','=','?√2'],8,['b = a × sin B ÷ sin A','= 8 × (√2/2) ÷ (1/2)','b = 8√2']],
+  ['a = 2, A = 30°, B = 60°',['b','=','?√3'],2,['b = a × sin B ÷ sin A','= 2 × (√3/2) ÷ (1/2)','b = 2√3']],
+  ['a = 6, A = 45°, B = 30°',['b','=','?√2'],3,['b = a × sin B ÷ sin A','= 6 × (1/2) ÷ (√2/2) = 6/√2','b = 3√2']],
+  ['b = 8, c = 5, A = 30° 인 △ABC',['넓이','=','?'],10,['넓이 = ½ bc sin A','= ½ × 8 × 5 × 1/2','= 10']],
+  ['b = 6, c = 10, A = 150° 인 △ABC',['넓이','=','?'],15,['넓이 = ½ × 6 × 10 × sin 150°','sin 150° = 1/2','= 15']],
+  ['b = 8, c = 6, A = 120° 인 △ABC',['넓이','=','?√3'],12,['넓이 = ½ × 8 × 6 × sin 120°','= 24 × √3/2','= 12√3']],
+  ['b = 4, c = 10, A = 45° 인 △ABC',['넓이','=','?√2'],10,['넓이 = ½ × 4 × 10 × sin 45°','= 20 × √2/2','= 10√2']],
+  ['b = 6, c = 6, A = 30° 인 △ABC',['넓이','=','?'],9,['넓이 = ½ × 6 × 6 × sin 30°','= 18 × 1/2','= 9']]
 ];
 const fL=i=>F({key:'fL'+i, t:'tfn', k:'fL', i, cond:LAWF[i][0]+(/일 때|인 △/.test(LAWF[i][0])?'':' 일 때'), eq:LAWF[i][1], ans:LAWF[i][2]});
 
@@ -5108,7 +5439,7 @@ function tfnHint(f){
     case 'fR': return {t:'sin²θ + cos²θ = 1', lines:boldEnd(RELF[f.i][3],f.ans), svg:''};
     case 'fG': return {t:GRF[f.i][1].includes('주기')?'주기 = 2π ÷ |b| (tan 은 π ÷ |b|)':'−1 ≤ sin, cos ≤ 1 에서',
       lines:boldEnd(GRF[f.i][4],f.ans), svg:''};
-    case 'fL': return {t:/외접원|sin B|÷ sin/.test(LAWF[f.i][3].join(' '))?'사인법칙: a ÷ sin A = 2R':/넓이/.test(LAWF[f.i][0]+LAWF[f.i][1][0])?'넓이 = ½ bc sin A':'코사인법칙',
+    case 'fL': return {t:/외접원|sin B|÷ sin|2R/.test(LAWF[f.i][0]+' '+LAWF[f.i][3].join(' '))?'사인법칙: a ÷ sin A = 2R':/넓이/.test(LAWF[f.i][0]+LAWF[f.i][1][0])?'넓이 = ½ bc sin A':'코사인법칙',
       lines:boldEnd(LAWF[f.i][3],f.ans), svg:triABC()};
   }
   return null;
@@ -7240,7 +7571,7 @@ const TEACHER_ID='00000', TEACHER_PW='0815';
 const isTestSid=sid=>/^000/.test(String(sid));
 let tTest=0;
 let tClasses={};
-let isTeacher=false, tTab='rank', tTopic='gugu', tOpen=null, tUsers={}, tClass='', tHm='g', tCb='m', tRk='best', tSort='best';
+let isTeacher=false, tTab='rank', tTopic='gugu', tOpen=null, tUsers={}, tClass='', tHm='g', tCb='all', tRk='best', tSort='best';
 
 async function enterTeacher(){
   isTeacher=true; ME=null; G=null;
@@ -7281,14 +7612,15 @@ function paintTeacher(){
   const all=Object.keys(tUsers), played=all.filter(sid=>{ const R=tUsers[sid].R||{};
     return Object.values(R).some(r=>r&&r.hist&&r.hist.length); });
   el('tSub').innerHTML=`${online()?'모든 기기에서 함께 보는 자료':'이 기기에 저장된 자료'} ·
-    학생 <b>${all.length}명</b> · 실전 경험 <b>${played.length}명</b>${tTest?` · 시험용 계정 ${tTest}개는 빼고 봐요`:''}`;
+    학생 <b>${all.length}명</b> · 실전 경험 <b>${played.length}명</b>${tTest?` · 시험용 계정 ${tTest}개는 빼고 봐요`:''}
+    · 오늘 출석 <b>${all.filter(sid=>(tUsers[sid].att||{}).d===todayKey()).length}명</b> · 오늘 미션 다 끝낸 학생 <b>${all.filter(sid=>{ const M=tMsToday(tUsers[sid]); return M&&M.L.every(m=>m.done); }).length}명</b>`;
   /* 보는 것(기록)과 바꾸는 것(설정)을 두 줄로 나눠요 */
   const seg=(lab,arr)=>`<div class="tseg"><span class="tlab">${lab}</span><div class="segs">${arr.map(([k,n])=>
     `<button class="sg${tTab===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div></div>`;
   el('tTabs').innerHTML=seg('기록',[['rank','랭킹'],['cls','학급 대항'],['fact','정답률'],['stu','학생 정보']])
     +seg('설정',[['hs','고등 열쇠'],['tl','모드 잠금']]);
   el('tTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ tTab=b.dataset.k; tOpen=null; paintTeacher(); });
-  const showT=!(tTab==='hs'||tTab==='tl'||(tTab==='cls'&&tCb!=='t')||(tTab==='rank'&&!RKK[tRk].topic)), showC=!(tTab==='hs'||tTab==='tl'||tTab==='cls');
+  const showT=!(tTab==='hs'||tTab==='tl'||tTab==='cls'||(tTab==='rank'&&!RKK[tRk].topic)), showC=!(tTab==='hs'||tTab==='tl'||tTab==='cls');
   el('tTopicBar').style.display=showT?'':'none';
   el('tClassBar').style.display=showC?'':'none';
   el('tTopicBar').parentNode.style.display=(showT||showC)?'':'none';
@@ -7341,7 +7673,9 @@ function tOverview(u){
         <span class="ovr2"><b>${R.best||0}<small>개</small></b>${gBadge(gradeOfRec(t,R.best||0))}<em>도전 ${hist.length}회${W?` · 오답 ${W}`:''}</em></span></div>`; }).join('')}</div>`;
 }
 
-/* ── 학급 대항 — 학생마다 주제별 실전 최고 기록을 더하고, 반끼리 다시 더합니다 ── */
+/* ── 학급 대항 — 학생마다 (고른 학교의 열린 주제들) 실전 최고 기록을 모두 더하고, 반끼리 다시 더합니다 ── */
+const CB_SCOPES=[['all','전체'],['e','초등'],['m','중등'],['h','고등']];
+const cbTopics=k=>(k==='all'?SCHOOLS:SCHOOLS.filter(s=>s.k===k)).flatMap(s=>s.topics).filter(t=>modeOpen(t,'r'));
 function classBattle(users,topics,classes){
   const m={};
   Object.keys(users||{}).forEach(sid=>{
@@ -7350,35 +7684,74 @@ function classBattle(users,topics,classes){
     const sc=topics.reduce((a,t)=>a+((R[t]&&R[t].best)||0),0);
     const c=classOf(sid), g=m[c]||(m[c]={c,sum:0,n:0,play:0,mem:[]});
     g.n++; g.sum+=sc; if(sc>0) g.play++;
-    g.mem.push({sid,sc,ch:clsCh(sid,u.ch,classes)});
+    g.mem.push({sid,sc,ch:clsCh(sid,u.ch,classes,u.own)});
   });
   return Object.values(m).filter(g=>g.play>0)
     .map(g=>{ g.mem.sort((a,b)=>b.sc-a.sc||a.sid.localeCompare(b.sid)); g.avg=g.sum/Math.max(1,g.n); return g; })
     .sort((a,b)=>b.sum-a.sum||a.c.localeCompare(b.c));
 }
-/* 반마다 카드 한 장 — 순위·점수 + 반 친구 모두가 선 단체 사진(학급 아이템으로 꾸밈) */
-function classBattleHTML(list,mine,classes){
+/* 반마다 카드 한 장 — 위 : 순위·반·점수 (랭킹 한 줄과 같은 모양)
+   가운데 : 우리 반 받침(학급 아이템) 이름·글자 · 아래 : 반 친구들이 겹치지 않게 한 칸씩 (점수 높은 순, 기록 없는 친구는 흐리게)
+   반 친구가 많으면 12명까지만 보이고 [모두 보기] — 내 반은 처음부터 모두                                    */
+const CB_OPEN={}, CB_FOLD=12;
+function classBattleHTML(list,mine,classes,opt){
+  opt=opt||{};
   if(!list.length) return `<div class="empty">아직 학급 기록이 없어요. 실전 모드에 도전하면 우리 반 점수가 올라가요!</div>`;
-  const R=rankList(list,g=>g.sum), top=list[0].sum||1;
+  const R=rankList(list,g=>g.sum), top=list[0].sum||1, meSid=ME&&ME.sid;
   return R.map(({r:g,rank})=>{
-    const me=mine===g.c, mvp=g.mem[0]||{sid:'',sc:0}, c=(classes||{})[g.c]||null, cc=clsColor(c,g.c), picks=clsPicks(c&&c.pick);
+    const me=mine===g.c, c=(classes||{})[g.c]||null, cc=clsColor(c,g.c), it=clsTopOf(c), ct=clsText(c,g.c);
+    const open=CB_OPEN[g.c]!=null?CB_OPEN[g.c]:me, more=g.mem.length-CB_FOLD, show=open||more<=0?g.mem:g.mem.slice(0,CB_FOLD);
+    const nx=CLASS_TIERS.find(T=>((c&&c.fund)||0)<T.goal);
     return `<div class="cbcard${me?' me':''}" style="--cc:${cc.c}">
       <div class="cbtop"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span>
         <div class="who"><b>${classLabel(g.c)}${me?' <em class="mytag">우리 반</em>':''}</b>
           <span>참여 ${g.play} / ${g.n}명 · 1인 평균 ${g.avg.toFixed(1)}점</span></div>
-        <div class="sc">${g.sum}<small>점</small></div></div>
-      <div class="cbscene">${classSceneSVG({mem:g.mem,picks,cl:shortCls(g.c+'00'),cc:cc.c})}</div>
-      <div class="cbfoot"><i class="cbbar"><em style="width:${Math.max(3,g.sum/top*100).toFixed(1)}%"></em></i>
-        <span>반 1등 <b>${esc(mvp.sid)}</b> ${mvp.sc}점${picks.length?` · 학급 아이템 ${picks.length}개`:''}</span></div>
+        <div class="sc">${cn(g.sum)}<small>점</small></div></div>
+      <i class="cbbar"><em style="width:${Math.max(3,g.sum/top*100).toFixed(1)}%"></em></i>
+      <div class="cbitem"><i style="background:${cc.c}"></i>${it?`<span>학급 아이템 <b>${ITEM(it).n}</b> · 글자 <b>${esc(ct)}</b></span>`
+        :`<span>아직 학급 아이템이 없어요${nx?` · 모금 ${nx.goal}코인이면 <b>${ITEM(nx.opts[0]).n}</b>`:''}</span>`}</div>
+      <div class="cbgrid">${show.map((m,i)=>`<div class="cbm${m.sc>0?'':' dim'}${meSid===m.sid?' me':''}${i===0&&m.sc>0?' mvp':''}" data-sid="${esc(m.sid)}">
+          <div class="cbav">${avatarSVG(m.ch,{tight:true})}</div><b>${esc(m.sid)}</b><em>${m.sc}</em></div>`).join('')}</div>
+      ${more>0?`<button class="cbmore" data-c="${g.c}">${open?'접기 ▴':`모두 보기 ▾ <small>+${more}명</small>`}</button>`:''}
+      ${opt.teacher?`<div class="cbadm">
+        <label><span>받침 글자</span><input class="cbtx" data-c="${g.c}" maxlength="10" placeholder="${esc(clsTxtLead(c).f(shortCls(g.c+'00')))} (반 투표)" value="${esc((c&&c.ttx)||'')}"></label>
+        <button class="btn" data-txsave="${g.c}">저장</button>
+        <label><span>반 모두에게</span><input class="cbcoin" data-c="${g.c}" type="tel" inputmode="numeric" maxlength="4" placeholder="코인"></label>
+        <button class="btn" data-cgive="${g.c}">주기</button></div>`:''}
     </div>`; }).join('');
 }
+/* 카드 안 단추 — 모두 보기 / (선생님) 글자 저장 · 반 코인 주기 */
+function cbBind(root,repaint){
+  root.querySelectorAll('.cbmore').forEach(b=>b.onclick=()=>{ const c=b.dataset.c, card=b.closest('.cbcard');
+    CB_OPEN[c]=!(CB_OPEN[c]!=null?CB_OPEN[c]:card.classList.contains('me')); repaint(); });
+  root.querySelectorAll('[data-txsave]').forEach(b=>b.onclick=async()=>{ const c=b.dataset.txsave, v=(root.querySelector(`.cbtx[data-c="${c}"]`).value||'').trim().slice(0,10);
+    await dbSet(`classes/${c}/ttx`,v||null); tClasses[c]=Object.assign({},tClasses[c]||{}); if(v) tClasses[c].ttx=v; else delete tClasses[c].ttx;
+    toast(v?`${classLabel(c)} 받침 글자를 '${v}'(으)로 정했어요`:`${classLabel(c)} 받침 글자는 반 투표로 정해져요`); repaint(); });
+  root.querySelectorAll('[data-cgive]').forEach(b=>b.onclick=()=>{ const c=b.dataset.cgive, v=+(root.querySelector(`.cbcoin[data-c="${c}"]`).value||'').replace(/\D/g,'');
+    tGiveCoins(Object.keys(tUsers).filter(sid=>classOf(sid)===c),v,`${classLabel(c)} 모두에게`); });
+}
 function paintTClass(){
-  const scopes=[['t','이 주제만'],['e','초등'],['m','중등'],['h','고등'],['all','전체']];
-  const topics=tCb==='t'?[tTopic]:tCb==='all'?TOPIC_ORDER:schoolOf(tCb).topics;
-  el('tBody').innerHTML=`<div class="segs cbscope">${scopes.map(([k,n])=>`<button class="sg${tCb===k?' on':''}" data-cb="${k}">${n}</button>`).join('')}</div>
-    <div class="chartlab" style="margin:0 0 12px">학생마다 ${tCb==='t'?'이 주제의':'주제별'} 실전 최고 기록을 더하고, 반 학생들의 점수를 모두 더한 값 · 학생 화면 랭킹의 '학급 대항'과 같아요</div>`+
-    classBattleHTML(classBattle(tUsers,topics,tClasses),'',tClasses);
+  if(!CB_SCOPES.some(([k])=>k===tCb)) tCb='all';
+  const topics=cbTopics(tCb);
+  el('tBody').innerHTML=`<div class="segs cbscope">${CB_SCOPES.map(([k,n])=>`<button class="sg${tCb===k?' on':''}" data-cb="${k}">${n}</button>`).join('')}</div>
+    <div class="chartlab" style="margin:0 0 12px">학생마다 ${tCb==='all'?'모든':(CB_SCOPES.find(x=>x[0]===tCb)[1]+' ')} 주제(실전이 열린 ${topics.length}개)의 실전 최고 기록을 더하고, 반 학생들의 점수를 모두 더한 값 · 학생 화면 '학급 대항'과 같아요.
+      받침 글자를 비워 두면 반 친구들의 투표로 정해져요.</div>`+
+    classBattleHTML(classBattle(tUsers,topics,tClasses),'',tClasses,{teacher:1});
   el('tBody').querySelectorAll('[data-cb]').forEach(b=>b.onclick=()=>{ tCb=b.dataset.cb; paintTeacher(); });
+  cbBind(el('tBody'),paintTeacher);
+  el('tBody').querySelectorAll('.cbm').forEach(b=>{ b.style.cursor='pointer'; b.onclick=()=>openTStudent(b.dataset.sid); });
+}
+/* 선생님이 코인 주기 — 학생 기록의 coin 을 트랜잭션으로 더하고, 학생이 다음에 들어올 때 알림(gf)으로 보여 줘요 */
+async function tGiveCoins(sids,v,who){
+  if(!(v>0)||v>5000) return toast('코인은 1 ~ 5000 사이로 넣어 주세요');
+  if(!sids.length) return toast('줄 학생이 없어요');
+  if(!confirm(`${who} ${sids.length}명에게 ${v}코인씩 줄까요?`)) return;
+  const ts=Date.now();
+  for(const sid of sids){
+    try{ await dbTx(`users/${sid}/coin`,cur=>(+cur||0)+v); await dbSet(`users/${sid}/gf/${ts}`,{v,m:'선생님이 주신 코인'});
+      if(tUsers[sid]) tUsers[sid].coin=(+tUsers[sid].coin||0)+v; }catch(e){}
+  }
+  toast(`${sids.length}명에게 ${v}코인씩 주었어요`); paintTeacher();
 }
 
 /* ── 주제 열기 — 주제마다 연습·실전·친구 대전을 선생님이 바로 열고 잠급니다 (누르는 즉시 저장) ── */
@@ -7533,7 +7906,7 @@ function paintTStu(rows){
         <span class="av2">${avatarSVG(r.ch,{tight:true})}</span>
         <span class="who"><b>${esc(r.sid)}</b>
           <span>${tSort==='sid'?'':`<i class="tno">${ri+1}</i>`}${val(r)} · 기록 있는 주제 ${nRec}개</span>
-          <span>코인 ${cn(r.have)} · 쓴 코인 ${cu.exact?'':'약 '}${cn(cu.spent)}${r.wrong?` · 오답노트 ${r.wrong}`:''}</span></span>
+          <span>코인 ${cn(r.have)} · 쓴 코인 ${cu.exact?'':'약 '}${cn(cu.spent)}${r.wrong?` · 오답노트 ${r.wrong}`:''}${tMsLine(u)}</span></span>
         <span class="arw">${open?'▲':'▼'}</span>
       </button>
       ${open?`<div class="studet">
@@ -7545,6 +7918,7 @@ function paintTStu(rows){
           <div><b>${cn(cu.box)}</b><span>랜덤 상자 ${cu.boxN}번</span></div>
           <div><b>${cn(cu.gift)}</b><span>우리 반 모금</span></div>
         </div>
+        ${tMsHTML(u)}
         <div class="chartlab" style="margin:10px 0 6px;text-align:left">주제별 한눈에 — 연습 등급은 스테이지 최고 시간, 실전 등급은 1분 최고 기록</div>
         ${tOverview(u)}
         <div class="chartlab" style="margin:16px 0 6px;text-align:left">${T.n} 자세히 (위 주제 버튼으로 바꿀 수 있어요)</div>
@@ -7565,6 +7939,11 @@ function paintTStu(rows){
           <button class="btn" data-reset="${esc(r.sid)}">비밀번호 초기화</button>
           <button class="btn danger" data-del="${esc(r.sid)}">계정 삭제</button>
         </div>
+        <div class="admin">
+          <input type="tel" maxlength="4" inputmode="numeric" class="pwin" id="gcn_${esc(r.sid)}" placeholder="코인 (1~5000)">
+          <button class="btn" data-give="${esc(r.sid)}">코인 주기</button>
+          <span class="hint" style="margin:0">학생이 다음에 들어오면 '선생님이 주신 코인' 알림이 떠요</span>
+        </div>
       </div>`:''}
     </div>`;
   }).join(''):`<div class="empty">아직 등록된 학생이 없습니다.</div>`);
@@ -7574,7 +7953,16 @@ function paintTStu(rows){
     tOpen=(tOpen===b.dataset.sid)?null:b.dataset.sid; paintTStu(teacherRows(tTopic)); });
   el('tBody').querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>resetPw(b.dataset.reset));
   el('tBody').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteStudent(b.dataset.del));
+  el('tBody').querySelectorAll('[data-give]').forEach(b=>b.onclick=()=>{ const sid=b.dataset.give, v=+((el('gcn_'+sid)||{}).value||'').replace(/\D/g,'');
+    tGiveCoins([sid],v,sid); });
 }
+/* 학생의 오늘의 미션 — 목록 한 줄 · 펼친 곳 자세히 */
+const tMsToday=u=>u&&u.ms&&u.ms.d===todayKey()&&Array.isArray(u.ms.L)?u.ms:null;
+function tMsLine(u){ const M=tMsToday(u); const a=u&&u.att;
+  return (M?` · 미션 ${M.L.filter(m=>m.done).length}/${M.L.length}`:'')+(a&&a.s>1&&a.d>=prevSchoolDay(todayKey())?` · 연속 출석 ${a.s}일`:''); }
+function tMsHTML(u){ const M=tMsToday(u); if(!M) return '<div class="chartlab" style="margin:10px 0 0;text-align:left">오늘의 미션 — 아직 오늘 들어오지 않았어요</div>';
+  return `<div class="chartlab" style="margin:10px 0 6px;text-align:left">오늘의 미션 — 학생 기록으로 자동으로 골라요 (약한 곳 → 그 바탕이 되는 곳)</div>
+    <div class="tmsl">${M.L.map(m=>{ const x=missionText(m); return `<div class="tms${m.done?' done':''}"><i>${m.done?'✓':'·'}</i><span><em>${MS_TAG[m.k]}</em> <b>${esc(x.h)}</b><small>${esc(x.w)}</small></span></div>`; }).join('')}</div>`; }
 async function resetPw(sid){
   const box=el('pwn_'+sid);
   let pw=((box&&box.value)||'').replace(/\D/g,'');
@@ -7624,7 +8012,7 @@ async function teacherWipe(){
    가장 짧은 rt 의 주인을 w/{i} 에 적어요(누가 적어도 한 번만). 통신이 느린 친구도 손해 보지 않게.
    코인 : 2명 이상이 한 판을 끝내면 1위 20 · 2위 12 · 3위 8 · 그 밖 4 (1개 이상 맞혔을 때), 하루 5판까지.
    팀전은 팀 순위대로 팀 전원이 받아요(맞힌 개수와 상관없이). */
-const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[20,12,8], BT_COIN_ELSE=4, BT_DAY_MAX=5;
+const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[30,20,14], BT_COIN_ELSE=8, BT_DAY_MAX=5;
 const BT_KINDS=[['t','시간제'],['n','개수제'],['s','서바이벌']];
 const BT_VALS={t:range(1,10).map(k=>k*30), n:range(5,30), s:range(2,10)};
 const BT_DEF={t:60, n:10, s:5};
@@ -8175,6 +8563,275 @@ function btReward(rank,n,score,my){
   return {coin,msg};
 }
 
+/* ═══════════════════ 성장 — 출석 · 오늘의 미션 · 지난주보다 성장 · 선생님 코인 · 마이페이지 진단 ═══════════════════
+   코인을 '많이 풀고 잘 푸는 것'에만 주지 않고, 꾸준함(출석)과 약점 보완(미션)과 성장(지난주의 나)에도 줍니다.
+   학생 기록에 더하는 것 : att 출석 {d 마지막 날, s 연속 날수, n 모두}, ms 오늘의 미션 {d, L:[…], b 다 끝낸 보너스},
+                       gw 주간 성장 {w 주, t:[받은 주제]}, wk 주별 풀이 {월요일 날짜:[푼 수, 맞힌 수, 걸린 시간 합(0.1초)]}
+   선생님이 준 코인은 users/학번/gf 에 알림으로 남고, 학생이 다음에 들어오면 보여 준 뒤 지워요.                       */
+
+/* ── 날짜 ── */
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const dOf=k=>{ const [y,m,d]=String(k).split('-').map(Number); return new Date(y,(m||1)-1,d||1); };
+const addDay=(k,n)=>{ const d=dOf(k); d.setDate(d.getDate()+n); return ymd(d); };
+/* 그 주의 월요일 */
+const weekOf=k=>{ const d=dOf(k), w=(d.getDay()+6)%7; d.setDate(d.getDate()-w); return ymd(d); };
+/* 앞 등교일 — 토·일은 건너뛰어요 (금요일에 오고 월요일에 와도 연속) */
+function prevSchoolDay(k){ let p=addDay(k,-1); while([0,6].includes(dOf(p).getDay())) p=addDay(p,-1); return p; }
+
+/* ═══ ① 출석 — 하루 처음 들어오면 20코인, 연속 3일째 +30 · 5일째 +50 · 7일째 +100 (7일마다 다시) ═══ */
+const ATT_COIN=20, ATT_BONUS={3:30,5:50,7:100};
+const attPos=s=>((s-1)%7)+1;
+function checkAttendance(){
+  if(!ME) return;
+  const d=todayKey(), a=ME.att||{};
+  if(a.d===d) return;
+  const keep=a.d&&(a.d===prevSchoolDay(d)||(a.d>prevSchoolDay(d)&&a.d<d));   /* 주말에 들어왔어도 이어지게 */
+  const s=keep?(a.s||0)+1:1, bonus=ATT_BONUS[attPos(s)]||0, coin=ATT_COIN+bonus;
+  ME.att={d,s,n:(a.n||0)+1}; ME.coin+=coin; saveMe(); paintMe();
+  el('attStamp').textContent=`출석 ${s}일째`;
+  el('attTitle').textContent=s>1?`${s}일 연속으로 왔어요!`:'오늘도 왔어요!';
+  el('attSub').innerHTML=s>1?'하루도 빠지지 않고 오고 있어요. 주말은 쉬어도 이어져요.':(a.d?'다시 시작이에요. 내일도 오면 연속 출석이 이어져요.':'처음 출석이에요. 매일 오면 연속 출석 보너스가 있어요.');
+  const p=attPos(s);
+  el('attWeek').innerHTML=[1,2,3,4,5,6,7].map(i=>`<span class="${i<p?'got':i===p?'now':''}"><i>${i<=p?'✓':i}</i><em>${ATT_BONUS[i]?'+'+(ATT_COIN+ATT_BONUS[i]):'+'+ATT_COIN}</em></span>`).join('');
+  el('attGain').innerHTML=`<b>+${coin}코인</b>${bonus?` <small>출석 ${ATT_COIN} + 연속 보너스 ${bonus}</small>`:''}`;
+  openM('ovAtt');
+}
+
+/* ═══ ② 지난주보다 성장 — 실전 기록이 지난주 그 주제 최고보다 높으면 주제마다 한 주에 한 번 30코인 ═══ */
+const GROW_COIN=30;
+function weeklyGrowth(t,score){
+  if(!ME||!(score>0)) return null;
+  const d=todayKey(), w=weekOf(d), pw=addDay(w,-7), r=rec(t);
+  const last=(r.hist||[]).filter(h=>h&&h.d>=pw&&h.d<w).reduce((a,h)=>Math.max(a,h.n||0),0);
+  if(!(last>0)||score<=last) return null;
+  if(!ME.gw||ME.gw.w!==w) ME.gw={w,t:[]};
+  if(!Array.isArray(ME.gw.t)) ME.gw.t=[];
+  if(ME.gw.t.includes(t)) return null;
+  ME.gw.t.push(t); ME.coin+=GROW_COIN;
+  return {coin:GROW_COIN,last};
+}
+
+/* ═══ ③ 선생님이 준 코인 알림 ═══ */
+function giftNote(u){
+  if(!ME||!u||!u.gf||typeof u.gf!=='object') return;
+  const L=Object.values(u.gf).filter(x=>x&&x.v>0), v=L.reduce((a,x)=>a+(+x.v||0),0);
+  dbSet(`users/${ME.sid}/gf`,null).catch(()=>{});
+  if(v>0) setTimeout(()=>toast(`🎁 선생님이 ${v}코인을 주셨어요!`),400);
+}
+
+/* ═══ ④ 주별 풀이 기록 — 마이페이지 '이번 주의 나 vs 지난주의 나' ═══ */
+function logWeek(ok,sec){
+  if(!ME) return;
+  const w=weekOf(todayKey()), W=ME.wk||(ME.wk={});
+  const a=Array.isArray(W[w])?W[w].slice(0,3):[0,0,0];
+  a[0]=(a[0]||0)+1; if(ok) a[1]=(a[1]||0)+1; a[2]=(a[2]||0)+Math.round(Math.min(30,Math.max(0,sec))*10);
+  W[w]=a;
+  const ks=Object.keys(W).sort(); if(ks.length>8) ks.slice(0,ks.length-8).forEach(k=>delete W[k]);
+}
+
+/* ═══ ⑤ 스테이지별 실력 — 계산 기록(fs)을 스테이지마다 모아요 ═══
+   스테이지마다 나올 수 있는 계산의 열쇠(sk)를 한 번 모아 두고(SKST), 학생의 fs 를 그 열쇠로 더합니다.           */
+const SKST={};
+function stageSks(t){
+  if(SKST[t]) return SKST[t];
+  const T=TOPICS[t], out={};
+  (T?T.stages:[]).forEach(s=>{ const S=new Set();
+    try{ if(s.facts) s.facts().forEach(f=>f&&S.add(f.sk));
+      else for(let i=0;i<160;i++){ const f=s.gen(); if(f) S.add(f.sk); } }catch(e){}
+    out[s.n]=S; });
+  return SKST[t]=out;
+}
+function stageStat(fs,t,n){
+  const S=stageSks(t)[n]; let c=0, ok=0, sec=0;
+  if(S) S.forEach(k=>{ const a=fs&&fs[k]; if(a){ c+=+a[0]||0; ok+=+a[1]||0; sec+=+a[2]||0; } });
+  return {c, ok, acc:(ok+1)/(c+2), raw:c?ok/c:0, sec:c?sec/10/c:0};
+}
+/* 약한 스테이지 — 6문제 이상 풀었고 (맞힌 수+1)/(푼 수+2) 가 0.88 아래인 곳, 약한 순 */
+function weakStages(fs,only){
+  const L=[];
+  TOPIC_ORDER.forEach(t=>{ if(only&&!only(t)) return; (TOPICS[t].stages||[]).forEach(s=>{ const st=stageStat(fs,t,s.n);
+    if(st.c>=6&&st.acc<.88) L.push(Object.assign({t,n:s.n},st)); }); });
+  return L.sort((a,b)=>a.acc-b.acc||b.sec-a.sec);
+}
+/* 강한 스테이지 — 8문제 이상, 정답률 높고 빠른 순 */
+function strongStages(fs){
+  const L=[];
+  TOPIC_ORDER.forEach(t=>(TOPICS[t].stages||[]).forEach(s=>{ const st=stageStat(fs,t,s.n);
+    if(st.c>=8&&st.acc>=.85) L.push(Object.assign({t,n:s.n},st)); }));
+  return L.sort((a,b)=>b.acc-a.acc||a.sec-b.sec);
+}
+
+/* ═══ ⑥ 먼저 다져야 할 것 (선수 학습) — '주제:스테이지' → 먼저 연습하면 좋은 스테이지들 ═══
+   예) 피타고라스 수에서 막히면 제곱수부터 · 일차방정식의 분수 계수에서 막히면 분수의 통분·곱셈부터          */
+const PREQ={
+  'addsub:3':[['addsub',1]], 'addsub:4':[['addsub',2]], 'addsub:5':[['addsub',3],['addsub',4]],
+  'gugu:9':[['gugu',8],['gugu',6],['gugu',7]],
+  'boxq:1':[['addsub',3],['addsub',4]], 'boxq:2':[['gugu',9]], 'boxq:3':[['boxq',1],['boxq',2]],
+  'fadd:1':[['addsub',1]], 'fadd:2':[['gugu',9]], 'fadd:3':[['fadd',2]],
+  'fmul:1':[['gugu',9]], 'fmul:2':[['gugu',9]], 'fmul:3':[['fadd',2]], 'fmul:4':[['fmul',3]], 'fmul:5':[['fmul',3],['fmul',4]],
+  'dadd:1':[['addsub',1],['addsub',2]], 'dadd:2':[['dadd',1]], 'dadd:3':[['addsub',3],['addsub',4]], 'dadd:4':[['boxq',1]],
+  'dmul:1':[['gugu',9]], 'dmul:2':[['dmul',1]], 'dmul:3':[['gugu',9]], 'dmul:4':[['dmul',3]],
+  'ratio:1':[['gugu',9],['fadd',2]], 'ratio:2':[['gugu',9],['boxq',2]], 'ratio:3':[['ratio',1],['fmul',1]],
+  'int:1':[['addsub',3],['addsub',4]], 'int:2':[['int',1]], 'int:3':[['gugu',9]], 'int:4':[['int',3],['power',1]],
+  'power:1':[['gugu',9]], 'power:2':[['power',1]], 'power:3':[['power',1]],
+  'lineq:1':[['int',1],['boxq',1]], 'lineq:2':[['boxq',3],['int',3]], 'lineq:3':[['int',2],['lineq',2]], 'lineq:4':[['fadd',2],['fmul',3],['int',3]],
+  'expo:1':[['power',1],['power',2]], 'expo:2':[['expo',1]], 'expo:3':[['expo',2],['gugu',9]], 'expo:4':[['expo',3]],
+  'pyth:1':[['power',1]], 'pyth:2':[['power',1],['power',3]], 'pyth:3':[['pyth',1],['gugu',9]], 'pyth:4':[['power',1],['pyth',1]],
+  'cnt:2':[['cnt',1]], 'cnt:3':[['cnt',1],['gugu',9]], 'cnt:4':[['cnt',2],['cnt',3]], 'cnt:5':[['cnt',3]],
+  'root:1':[['power',1],['power',3]], 'root:2':[['power',1],['root',1]], 'root:3':[['root',2],['gugu',9]],
+  'factor:1':[['gugu',9]], 'factor:2':[['power',1]], 'factor:3':[['power',1]], 'factor:4':[['int',3],['gugu',9]], 'factor:5':[['factor',4]],
+  'trig:1':[['root',1]], 'trig:2':[['pyth',1],['fadd',2]], 'trig:3':[['trig',1]], 'trig:4':[['trig',1],['root',3]],
+  'logx:1':[['expo',1],['root',1]], 'logx:2':[['expo',1],['power',2]], 'logx:3':[['logx',2]], 'logx:4':[['logx',2],['expo',2]],
+  'tfn:1':[['fmul',3]], 'tfn:2':[['trig',1]], 'tfn:3':[['tfn',2],['trig',2]], 'tfn:4':[['tfn',2]], 'tfn:5':[['trig',4],['root',2]],
+  'comb:1':[['cnt',5]], 'comb:2':[['comb',1]], 'comb:3':[['cnt',5],['comb',2]]
+};
+const stName=(t,n)=>{ const s=(TOPICS[t]&&TOPICS[t].stages||[]).find(x=>x.n===n); return s?s.name:''; };
+const hasStage=(t,n)=>!!(TOPICS[t]&&TOPICS[t].stages.some(s=>s.n===n));
+
+/* ═══ ⑦ 오늘의 미션 — 하루 세 개 · 하나에 15코인, 셋 다 하면 +25 ═══
+   ① 기초 다지기 : 가장 약한 스테이지의 선수 학습 (그것도 충분히 잘하면 건너뛰어요)
+   ② 약점 다시 잡기 : 가장 약한 스테이지를 연습으로 한 번 클리어
+   ③ 실전 도전 : 요즘 하는 주제에서 실전 한 번 (1개 이상 맞히기)
+   기록이 아직 적으면 '다음 단계 도전'으로 채워요. 연습·실전이 잠긴 주제는 미션에 넣지 않아요.            */
+const MS_COIN=15, MS_ALL=25;
+/* 요즘 하는 주제 — 최근 14일 실전 횟수 + 계산 기록 수가 많은 순 */
+function busyTopics(){
+  const fs=ME.fs||{}, from=addDay(todayKey(),-14), sc={};
+  TOPIC_ORDER.forEach(t=>{ const h=((ME.R||{})[t]||{}).hist||[]; sc[t]=arr(h).filter(x=>x&&x.d>=from).length*20; });
+  Object.keys(fs).forEach(k=>{ const t=skTopic(k); if(t&&sc[t]!=null) sc[t]+=Math.min(200,+(fs[k]||[])[0]||0); });
+  return TOPIC_ORDER.slice().sort((a,b)=>sc[b]-sc[a]).filter(t=>sc[t]>0);
+}
+function makeMissions(){
+  const fs=ME.fs||{}, L=[], seen=new Set(), key=(t,n)=>t+':'+n;
+  const canP=(t,n)=>hasStage(t,n)&&modeOpen(t,'p')&&!seen.has(key(t,n));
+  const add=m=>{ if(m.k!=='real') seen.add(key(m.t,m.n)); L.push(Object.assign({done:0},m)); };
+  const W=weakStages(fs,t=>modeOpen(t,'p'));
+  if(W.length){ const w=W[0];
+    const pre=(PREQ[key(w.t,w.n)]||[]).filter(([t,n])=>canP(t,n)).map(([t,n])=>Object.assign({t,n},stageStat(fs,t,n)))
+      .filter(x=>x.c<8||x.acc<.95).sort((a,b)=>a.acc-b.acc)[0];
+    if(pre) add({k:'pre',t:pre.t,n:pre.n,ft:w.t,fn:w.n,acc:Math.round(w.raw*100)});
+    if(canP(w.t,w.n)) add({k:'weak',t:w.t,n:w.n,acc:Math.round(w.raw*100)});
+    const w2=W.slice(1).find(x=>canP(x.t,x.n));
+    if(L.length<2&&w2) add({k:'weak',t:w2.t,n:w2.n,acc:Math.round(w2.raw*100)});
+  }
+  /* 다음 단계 도전 — 요즘 하는 주제 → 지금 고른 학교의 열린 주제 차례로, 아직 클리어 못 한 첫 스테이지 */
+  const pool=[...new Set(busyTopics().concat([CUR.topic],schoolOf(ME.sc||CUR.school).topics,TOPIC_ORDER))].filter(t=>TOPICS[t]&&modeOpen(t,'p'));
+  for(const t of pool){ if(L.length>=2) break;
+    const p=prog(t), s=TOPICS[t].stages.find(x=>!p.c.includes(x.n)&&canP(t,x.n));
+    if(s) add({k:'new',t,n:s.n}); }
+  /* 실전 도전 */
+  const rt=busyTopics().concat([CUR.topic],pool).find(t=>TOPICS[t]&&modeOpen(t,'r'));
+  if(rt) add({k:'real',t:rt});
+  /* 그래도 셋이 안 되면 클리어한 스테이지 가운데 등급이 낮은 것 다시 */
+  for(const t of pool){ if(L.length>=3) break;
+    const G=['B','A','S','SS','SSS'], gi=n=>G.indexOf(stageGrade(t,n)||'B');
+    const s=TOPICS[t].stages.filter(x=>canP(t,x.n)).sort((a,b)=>gi(a.n)-gi(b.n))[0];
+    if(s) add({k:'again',t,n:s.n}); }
+  return L.slice(0,3);
+}
+function ensureMissions(){
+  if(!ME||!CFG_OK) return (ME&&ME.ms&&ME.ms.d===todayKey())?ME.ms:null;
+  const d=todayKey();
+  if(!ME.ms||ME.ms.d!==d||!Array.isArray(ME.ms.L)){
+    const L=makeMissions(); if(!L.length) return null;
+    ME.ms={d,L,b:0}; saveMe();
+  }
+  return ME.ms;
+}
+/* 미션 확인 — 연습 클리어(stage) · 실전 끝(real) 때 불러요. 받은 코인과 알림 문구를 돌려줘요 (저장은 부른 쪽에서) */
+function markMission(kind,t,n,score){
+  const M=ME&&ME.ms; if(!M||M.d!==todayKey()) return null;
+  let coin=0; const got=[];
+  M.L.forEach(m=>{ if(m.done) return;
+    const hit=kind==='stage'?(m.k!=='real'&&m.t===t&&m.n===n):(m.k==='real'&&m.t===t&&score>0);
+    if(hit){ m.done=1; coin+=MS_COIN; got.push(m); } });
+  if(got.length&&!M.b&&M.L.every(m=>m.done)){ M.b=1; coin+=MS_ALL; }
+  if(!coin) return null;
+  ME.coin+=coin;
+  return {coin,all:!!M.b&&M.L.every(m=>m.done),msg:`오늘의 미션 완료 +${coin}코인${M.b&&M.L.every(m=>m.done)?' · 세 개 모두 끝!':''}`};
+}
+const MS_TAG={pre:'기초 다지기',weak:'약점 다시 잡기',new:'다음 단계 도전',again:'등급 올리기',real:'실전 도전'};
+function missionText(m){
+  const T=topicOf(m.t);
+  if(m.k==='pre') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:`${topicOf(m.ft).n} '${stName(m.ft,m.fn)}' 정답률이 ${m.acc}%예요. 그 바탕이 되는 이것부터 다져요 — 연습 한 번 클리어`};
+  if(m.k==='weak') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:`정답률 ${m.acc}% — 자주 막히는 곳이에요. 연습으로 한 번 클리어`};
+  if(m.k==='new') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:'아직 클리어하지 않은 단계예요. 연습 한 번 클리어'};
+  if(m.k==='again') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:'한 번 더 빠르게 — 연습 한 번 클리어'};
+  return {h:`${T.n} 실전`, w:'1분 무실수 실전에 한 번 도전 (1개 이상 맞히기)'};
+}
+function missionGo(i){ const m=ME&&ME.ms&&ME.ms.L[i]; if(!m) return;
+  if(m.k==='real') tryReal(m.t); else { CUR.topic=m.t; startStage(m.t,m.n); } }
+function missionHTML(opt){
+  const M=ensureMissions(); if(!M) return '';
+  const done=M.L.filter(m=>m.done).length;
+  return `<div class="mscard${opt&&opt.flat?' flat':''}">
+    <div class="msh"><b>오늘의 미션</b><span>${done} / ${M.L.length}${M.b?' · 모두 끝!':` · 하나에 ${MS_COIN}코인, 다 하면 +${MS_ALL}`}</span></div>
+    ${M.L.map((m,i)=>{ const x=missionText(m);
+      return `<button class="msrow${m.done?' done':''}" ${m.done?'disabled':`onclick="missionGo(${i})"`}>
+        <i class="msk k-${m.k}">${m.done?'✓':i+1}</i>
+        <span class="mst"><em>${MS_TAG[m.k]}</em><b>${esc(x.h)}</b><small>${esc(x.w)}</small></span>
+        <span class="msgo">${m.done?'완료':'하기 →'}</span></button>`; }).join('')}
+  </div>`;
+}
+function paintMissionBox(){ const b=el('msBox'); if(!b) return; b.innerHTML=ME?missionHTML():''; }
+
+/* ═══ ⑧ 마이페이지 진단 ═══ */
+/* 주제마다 실력 단계 — 0 기록 없음 · 1 다지는 중(정답률 70% 아래) · 2 연습 중 · 3 익숙함 · 4 마스터 */
+const LV_NAME=['기록 없음','다지는 중','연습 중','익숙해요','마스터'];
+function topicLevel(t){
+  const fs=ME.fs||{}, T=TOPICS[t], p=prog(t), r=rec(t);
+  let c=0, ok=0; T.stages.forEach(s=>{ const st=stageStat(fs,t,s.n); c+=st.c; ok+=st.ok; });
+  const acc=c?ok/c:0, cl=p.c.length, all=cl>=T.stages.length, g=gradeOfRec(t,r.best||0);
+  if(!c&&!cl&&!(r.best>0)) return {lv:0,acc,c,cl};
+  let lv=c>=10&&acc<.7?1:2;
+  if((all||cl>=Math.ceil(T.stages.length*.6))&&(c<10||acc>=.85)) lv=3;
+  const top=gradeCuts(t)?['S','SS','SSS'].includes(g):(t in HS_GOAL_DEF?(r.best||0)>=hsGoal(t):(r.best||0)>=12);
+  if(lv===3&&all&&top) lv=4;
+  return {lv,acc,c,cl,g};
+}
+function skillMapHTML(){
+  const sch=SCHOOLS.filter(s=>s.k!=='h'||hsOpen());
+  return sch.map(s=>{ const L=s.topics.filter(t=>topicOpen(t)||topicLevel(t).lv);
+    if(!L.length) return '';
+    return `<div class="smrow"><span class="tlab">${({e:'초등',m:'중등',h:'고등'})[s.k]||s.n}</span><div class="smgrid">${L.map(t=>{ const x=topicLevel(t), T=TOPICS[t];
+      return `<button class="smt lv${x.lv}${MP.topic===t?' on':''}" data-t="${t}" title="${LV_NAME[x.lv]}"><b>${T.n}</b>
+        <small>${x.lv?`${x.cl}/${T.stages.length}단계${x.c?` · ${Math.round(x.acc*100)}%`:''}`:'—'}</small></button>`; }).join('')}</div></div>`; }).join('')+
+    `<div class="smleg">${LV_NAME.map((n,i)=>`<span class="lv${i}"><i></i>${n}</span>`).join('')}</div>`;
+}
+function weekCmpHTML(){
+  const w=weekOf(todayKey()), pw=addDay(w,-7), W=ME.wk||{}, a=W[w]||[0,0,0], b=W[pw]||[0,0,0];
+  const acc=x=>x[0]?Math.round(x[1]/x[0]*100):null, sec=x=>x[0]?x[2]/10/x[0]:null;
+  const real=(from,to)=>TOPIC_ORDER.reduce((s,t)=>s+arr(((ME.R||{})[t]||{}).hist).filter(h=>h&&h.d>=from&&h.d<to).length,0);
+  const ra=real(w,addDay(w,7)), rb=real(pw,w);
+  const cell=(lab,va,vb,fmt,better)=>{ const has=va!=null&&vb!=null&&(b[0]||lab==='실전 도전');
+    const up=has&&(better==='low'?va<vb:va>vb), same=has&&va===vb;
+    return `<div class="wkc"><span>${lab}</span><b>${va==null?'—':fmt(va)}</b>
+      <em class="${!has||same?'':up?'up':'dn'}">${vb==null||(!b[0]&&lab!=='실전 도전')?'지난주 기록 없음':`지난주 ${fmt(vb)}${has&&!same?(va>vb?' ▲':' ▼'):''}`}</em></div>`; };
+  return `<div class="wkgrid">${cell('푼 문제',a[0],b[0],v=>cn(v)+'개')}${cell('정답률',acc(a),acc(b),v=>v+'%')}
+    ${cell('한 문제 평균',sec(a),sec(b),v=>v.toFixed(1)+'초','low')}${cell('실전 도전',ra,rb,v=>v+'회')}</div>
+    <div class="chartlab" style="text-align:left;margin-top:8px">주는 월요일에 새로 시작해요 · 정답률이 같으면 빨라진 것도 성장이에요${ME.gw&&ME.gw.w===w&&ME.gw.t&&ME.gw.t.length?` · 이번 주 '지난주보다 성장' 코인 ${ME.gw.t.length}번 받음`:''}</div>`;
+}
+function diagHTML(){
+  const fs=ME.fs||{}, S=strongStages(fs)[0], Wk=weakStages(fs)[0];
+  let line;
+  if(!S&&!Wk) line=`<p class="dgl">아직 진단할 기록이 모자라요. 연습을 몇 번 하면 <b>잘하는 것</b>과 <b>키울 것</b>을 알려 줄게요.</p>`;
+  else{
+    const pre=Wk&&(PREQ[Wk.t+':'+Wk.n]||[]).filter(([t,n])=>hasStage(t,n)).map(([t,n])=>Object.assign({t,n},stageStat(fs,t,n))).filter(x=>x.c<8||x.acc<.95).sort((a,b)=>a.acc-b.acc)[0];
+    line=`<div class="dgrow">${S?`<div class="dg good"><span>가장 강한 것</span><b>${topicOf(S.t).n} · ${stName(S.t,S.n)}</b><small>정답률 ${Math.round(S.raw*100)}% · 한 문제 ${S.sec.toFixed(1)}초</small></div>`:''}
+      ${Wk?`<div class="dg grow"><span>이번 주 키울 것</span><b>${topicOf(Wk.t).n} · ${stName(Wk.t,Wk.n)}</b><small>정답률 ${Math.round(Wk.raw*100)}%${pre?` · 먼저 <u>${topicOf(pre.t).n} ${stName(pre.t,pre.n)}</u>부터`:''}</small></div>`
+        :'<div class="dg grow"><span>이번 주 키울 것</span><b>눈에 띄는 약점이 없어요</b><small>새 단계나 실전 등급에 도전해 보세요</small></div>'}</div>`;
+  }
+  return `<h3>오늘의 한 줄 진단</h3>${line}${missionHTML({flat:1})}`;
+}
+function paintMineGrowth(){
+  if(!ME) return;
+  el('mpDiag').innerHTML=diagHTML();
+  el('mpWeek').innerHTML=weekCmpHTML();
+  el('mpMap').innerHTML=skillMapHTML();
+  el('mpMap').querySelectorAll('.smt').forEach(b=>b.onclick=()=>{ MP.topic=b.dataset.t; paintMine(); paintMineGrowth();
+    const h=el('mpTopicH'); if(h) h.scrollIntoView({behavior:'smooth',block:'start'}); });
+}
+
 /* ═══════════════════ 공통 도우미 ═══════════════════ */
 const el=id=>document.getElementById(id);
 const show=id=>{ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
@@ -8236,7 +8893,8 @@ function meFrom(sid,u){
   return {sid, ch:Object.assign(cleanCh(u.ch),{cl:shortCls(sid)}), coin:u.coin||0, own:arr(u.own).filter(id=>ITEM(id)),
           ownS:ownS.length?ownS:null, ownC:ownC.length?ownC:null,
           sc:u.sc||'', boxN:u.boxN||0, R:u.R||{}, P:u.P||{}, pc:u.pc||null, W:u.W||{}, fs:u.fs||{},
-          hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, bh:arr(u.bh), h:u.h||'', cu:Object.assign({},u.cu||{})};
+          hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, bh:arr(u.bh), h:u.h||'', cu:Object.assign({},u.cu||{}),
+          att:u.att||null, ms:u.ms||null, gw:u.gw||null, wk:u.wk||{}};
 }
 function rec(t){ const R=ME.R||(ME.R={}); const r=R[t]||(R[t]={best:0,hist:[]});
   if(!Array.isArray(r.hist)) r.hist=[]; return r; }
@@ -8254,6 +8912,7 @@ function logFact(f,ok,sec){
   a[0]=(a[0]||0)+1; if(ok) a[1]=(a[1]||0)+1;
   a[2]=(a[2]||0)+Math.round(Math.min(30,Math.max(0,sec))*10);
   fs[f.sk]=a;
+  logWeek(ok,sec);
 }
 /* ═══ 저장 — 같은 학번이 두 곳에서 열려 있어도 서로 지우지 않게 ═══
    카카오톡 안 브라우저와 크롬처럼 같은 학번이 두 창에 열려 있으면, 예전에는 늦게 저장한 쪽이
@@ -8281,6 +8940,14 @@ function mergeFrom(u){
     Object.keys(b.bt||{}).forEach(k=>{ if(!(a.bt[k]<=b.bt[k])) a.bt[k]=b.bt[k]; }); });
   if(u.bh){ const key=h=>`${h.d}|${h.r}`, seen=new Set(arr(ME.bh).map(key));
     ME.bh=arr(ME.bh).concat(arr(u.bh).filter(h=>h&&!seen.has(key(h)))).sort((x,y)=>(x.d||0)-(y.d||0)).slice(-30); }
+  /* 출석 · 미션 · 주간 성장 · 주별 풀이 — 늦은 날짜가 이기고, 같은 날이면 더 많이 한 쪽으로 */
+  if(u.att&&u.att.d&&(!ME.att||u.att.d>ME.att.d||(u.att.d===ME.att.d&&(u.att.s||0)>(ME.att.s||0)))) ME.att=u.att;
+  if(u.ms&&u.ms.d){ if(!ME.ms||u.ms.d>ME.ms.d) ME.ms=u.ms;
+    else if(u.ms.d===ME.ms.d){ const L=arr(u.ms.L); arr(ME.ms.L).forEach((m,i)=>{ if(L[i]&&L[i].done&&L[i].t===m.t) m.done=1; }); ME.ms.b=ME.ms.b||u.ms.b; } }
+  if(u.gw&&u.gw.w){ if(!ME.gw||u.gw.w>ME.gw.w) ME.gw=u.gw; else if(u.gw.w===ME.gw.w) ME.gw.t=uniq(ME.gw.t,u.gw.t); }
+  if(u.wk&&typeof u.wk==='object'){ const W=ME.wk||(ME.wk={}); Object.keys(u.wk).forEach(k=>{ const b=arr(u.wk[k]), a=arr(W[k]);
+    W[k]=[0,1,2].map(i=>Math.max(+a[i]||0,+b[i]||0)); }); }
+  giftNote(u);
 }
 let SAVEQ=Promise.resolve();
 function saveMe(){
@@ -8296,6 +8963,7 @@ function saveMe(){
       ownS:ownShapes(),ownC:ownColors(),sc:ME.sc||'',R:ME.R||{},P:ME.P||{},
       pc:ME.pc||null,W:ME.W||{},fs:ME.fs||{},boxN:ME.boxN||0,
       hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,bh:(ME.bh||[]).slice(-30),cu:ME.cu||{},
+      att:ME.att||null,ms:ME.ms||null,gw:ME.gw||null,wk:ME.wk||{},
       h:ME.h||((LS.get(MEKEY,{})||{}).h)||''})));
   });
   return SAVEQ;
@@ -8385,7 +9053,7 @@ async function tryLogin(){
   el('gGo').disabled=false; el('gGo').textContent='들어가기';
   if(u&&u.h){
     if(u.h!==hash4(sid,pw)) return gateErr('gErr','비밀번호가 맞지 않습니다.');
-    ME=meFrom(sid,u); ME._c0=up?null:ME.coin;
+    ME=meFrom(sid,u); ME._c0=up?null:ME.coin; giftNote(u);
     LS.set(MEKEY,{sid,h:u.h});
     openSchool(); if(typeof btResume==='function') btResume();
     if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요'));
@@ -8454,8 +9122,9 @@ const gBadge=g=>g?`<span class="gbadge g-${g}">${g}</span>`:'';
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
 let CFG={shop:{open:false},rk:{today:true,all:true,class:true,coin:true},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
+let CFG_OK=false;   /* 설정을 서버에서 한 번이라도 읽었는지 — 미션은 열린 주제를 알아야 고를 수 있어요 */
 async function loadCfg(){
-  try{ const c=await dbGet('config',null);
+  try{ const c=await dbGet('config',null); CFG_OK=true;
     if(c&&c.shop) CFG.shop={open:c.shop.open===true};
     if(c&&c.rk) CFG.rk=Object.assign({today:true,all:true,class:true,coin:true},c.rk);
     if(c&&c.lock) CFG.lock={on:c.lock.on!==false, goal:Object.assign({},c.lock.goal||{})};
@@ -8494,8 +9163,8 @@ function openSchool(){
   stopTimer(); G=null;
   show('s-school');
   el('schoolHi').innerHTML=`<b>${esc(ME.sid)}</b> 님, 오늘은 어디서 시작할까요?`;
-  paintSchools();
-  loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')) paintSchools(); });
+  paintSchools(); paintMissionBox();
+  loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')){ paintSchools(); paintMissionBox(); checkAttendance(); } });
   /* 우리 반 색이 바뀌었으면 내 캐릭터에도 반영 (학급 아이템이 그 색으로 그려져요) */
   loadClass().catch(()=>{});
 }
@@ -8908,6 +9577,7 @@ async function stageClear(){
   const prevBt=p.bt['s'+n], newBt=!prevBt||sec<prevBt;
   if(newBt) p.bt['s'+n]=+sec.toFixed(1);
   ME.coin+=coin;
+  const ms=markMission('stage',t,n);
   const retry=G.wrongOnce.size, need=G.need, wrongs=[...G.wrongOnce.values()];
   G.over=true;
   saveMe();
@@ -8932,8 +9602,9 @@ async function stageClear(){
   btns.push(`<button class="btn" onclick="startStage('${t}',${n})">다시 풀기</button>`);
   btns.push(`<button class="btn" onclick="openStages('${t}')">스테이지 고르기</button>`);
   el('clBtns').innerHTML=btns.join('');
+  if(ms) el('clMiss').insertAdjacentHTML('afterbegin',`<div class="gainbox good msgain">${ms.msg}</div>`);
   show('s-clear');
-  if(coin) toast(`+${coin}코인!`);
+  if(coin||ms) toast(`+${coin+(ms?ms.coin:0)}코인!${ms?' · 미션 완료':''}`);
 }
 
 /* ═══ 실전 끝 ═══ */
@@ -8955,6 +9626,7 @@ async function finish(timeUp){
   r.hist=(r.hist||[]).concat([{d:day,n:score,ts:Date.now()}]).slice(-120);
   if(miss){ const w=wrongOf(t); if(!w.includes(miss.key)) w.push(miss.key); }
   ME.coin+=coin;
+  const grow=weeklyGrowth(t,score), ms=markMission('real',t,null,score);
   RK.users=null;
 
   el('endTitle').textContent = G.quit?`${T.n} · 중간에 그만두었어요 · 맞힌 문항`
@@ -8966,10 +9638,12 @@ async function finish(timeUp){
     <div class="stat"><b>${score}</b><span>맞힌 문항</span></div>
     <div class="stat"><b>${prevBest}</b><span>이전 최고</span></div>
     <div class="stat"><b>${clock(used)}</b><span>걸린 시간</span></div>
-    <div class="stat"><b>+${coin}</b><span>받은 코인</span></div>`;
+    <div class="stat"><b>+${coin+(grow?grow.coin:0)+(ms?ms.coin:0)}</b><span>받은 코인</span></div>`;
   el('byLv').innerHTML = beat
     ? `<div class="gainbox good">최고 기록 갱신! 넘어선 ${over}문항은 코인 <b>2배</b> — <b>+${coin}코인</b></div>`
     : '';
+  if(grow) el('byLv').innerHTML+=`<div class="gainbox good">지난주 최고 ${grow.last}개보다 성장했어요! <b>+${grow.coin}코인</b> <small>(주제마다 한 주에 한 번)</small></div>`;
+  if(ms) el('byLv').innerHTML+=`<div class="gainbox good msgain">${ms.msg}</div>`;
   if(hsNow) el('byLv').innerHTML+=`<div class="gainbox hsopen"><b>고등학교가 열렸어요!</b> 중학교 열쇠 ${hsKeys().length}개를 모두 모았어요. 처음 화면에서 고등학교를 골라 보세요.</div>`;
   else if(keyNew){ const K=hsKeys(); el('byLv').innerHTML+=`<div class="gainbox hskeybox">${LOCKI}<span><b>고등학교 열쇠</b>를 얻었어요 — ${K.filter(x=>x.ok).length} / ${K.length}</span></div>`; }
   el('endMiss').innerHTML = miss
@@ -8993,7 +9667,8 @@ async function finish(timeUp){
     : score===prev?'지난번과 같은 기록이에요.'
     : `지난번보다 ${prev-score}개 적어요. 다시 도전해 보세요.`;
   el('endDelta').className='delta '+(prev!=null&&score>prev?'up':'dn');
-  if(coin) toast(`+${coin}코인!`);
+  const extra=(grow?grow.coin:0)+(ms?ms.coin:0);
+  if(coin||extra) toast(`+${coin+extra}코인!`);
 }
 
 /* ═══════════════════ 오답노트 ═══════════════════
@@ -9121,7 +9796,7 @@ function openMineRepaint(){
     <span class="mpchip">${classLabel(classOf(ME.sid))}</span>
     <span class="mpchip">가진 것 ${ownItems().length+ownShapes().length+ownColors().length}개</span>
     <span class="mpchip">친구 대전 ${ME.bw||0}승 ${Math.max(0,(ME.bp||0)-(ME.bw||0))}패</span>`;
-  paintMine(); paintMineBattle(); paintMineOwn();
+  paintMine(); paintMineBattle(); paintMineOwn(); paintMineGrowth();
 }
 function paintMineOwn(){
   const ids=ownItems().filter(id=>ITEM(id)), w=ME.ch.items||[];
@@ -9135,9 +9810,10 @@ function paintMineOwn(){
 }
 function paintMine(){
   const t=MP.topic, T=topicOf(t), r=rec(t), p=prog(t), h=r.hist, day=todayKey();
-  el('mpTopics').innerHTML=schoolOf(CUR.school).topics.map(k=>
+  const msc=(SCHOOLS.find(x=>x.topics.includes(t))||schoolOf(CUR.school));
+  el('mpTopics').innerHTML=msc.topics.map(k=>
     `<button class="tab${k===t?' on':''}" data-k="${k}">${topicOf(k).n}</button>`).join('');
-  el('mpTopics').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ MP.topic=b.dataset.k; paintMine(); });
+  el('mpTopics').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ MP.topic=b.dataset.k; paintMine(); paintMineGrowth(); });
   const td=h.filter(x=>x&&x.d===day);
   const fsT=Object.keys(ME.fs||{}).filter(sk=>skTopic(sk)===t).map(sk=>ME.fs[sk]);
   const n=fsT.reduce((a,x)=>a+(x[0]||0),0), ok=fsT.reduce((a,x)=>a+(x[1]||0),0);
@@ -9215,7 +9891,7 @@ const cn=v=>Number(v||0).toLocaleString('ko-KR');
 
 /* ═══════════════════ 랭킹 ═══════════════════
    학생 화면 : 오늘 · 누적 · 학급 대항 · 코인 — 선생님 모드에서 하나씩 잠그고 열어요             */
-let RK={school:'e',topic:'addsub',tab:'today',users:null,scope:'school'};
+let RK={school:'e',topic:'addsub',tab:'today',users:null,cs:'all'};
 /* 랭킹은 실전 모드가 열린 주제만 보여 줍니다 */
 const rkTopicsOf=k=>schoolOf(k).topics.filter(t=>modeOpen(t,'r'));
 async function openRank(){
@@ -9240,7 +9916,7 @@ function userStat(sid,u,t,classes){
   let prac=0, real=0; TOPIC_ORDER.forEach(k=>{ prac+=(tPracOf(x,k).c||[]).length;
     const h=((x.R||{})[k]||{}).hist; real+=Array.isArray(h)?h.length:Object.keys(h||{}).length; });
   const c=coinUse(x,sid,classes), bp=x.bp||0, bw=Math.min(bp,x.bw||0);
-  return {sid, u:x, ch:clsCh(sid,x.ch,classes), best:R.best||0, cnt:hist.length,
+  return {sid, u:x, ch:clsCh(sid,x.ch,classes,x.own), best:R.best||0, cnt:hist.length,
     today:td.reduce((a,q)=>Math.max(a,q.n||0),0), tcnt:td.length,
     avg:hist.length?hist.reduce((a,q)=>a+((q&&q.n)||0),0)/hist.length:0, last:hist.length?((hist[hist.length-1]||{}).n||0):0,
     solved, prac, real, coin:c.total, have:c.have, spent:c.spent, cu:c, bw, bp, bl:bp-bw, rate:bp?bw/bp:0,
@@ -9316,6 +9992,7 @@ function paintRank(){
     el('rkSub').innerHTML=`${live} · <b>코인</b>`;
     el('rkBody').innerHTML=rankBoard('coin',statsOf(RK.topic),RK.topic); return;
   }
+  if(RK.tab==='class'){ el('rkTopics').style.display='none'; el('rkTopics').innerHTML=''; paintRkClass(); return; }
   el('rkTopics').style.display='';
   const SN={e:'초등',m:'중등',h:'고등'}, open=SCHOOLS.filter(x=>rkTopicsOf(x.k).length), all=open.flatMap(x=>rkTopicsOf(x.k));
   if(!all.length){ el('rkSub').innerHTML='아직 열린 실전 모드가 없어요.'; el('rkTopics').innerHTML='';
@@ -9330,27 +10007,26 @@ function paintRank(){
   el('rkSub').innerHTML=`${live} · <b>실전 모드</b>(${REAL_SEC/60}분 무실수)에서 맞힌 개수로 매겨요`;
   el('rkTopics').innerHTML=open.map(x=>`<div class="tpick">${open.length>1?`<span class="tlab">${SN[x.k]||x.n}</span>`:''}<div class="hsc">${rkTopicsOf(x.k).map(k=>
     `<button class="pk${k===t?' on':''}" data-t="${k}">${topicOf(k).n}</button>`).join('')}</div></div>`).join('');
-  el('rkTopics').querySelectorAll('.pk').forEach(b=>b.onclick=()=>{ RK.topic=b.dataset.t; if(RK.tab==='class') RK.scope='topic'; paintRank(); });
+  el('rkTopics').querySelectorAll('.pk').forEach(b=>b.onclick=()=>{ RK.topic=b.dataset.t; paintRank(); });
   hscShow(el('rkTopics'));
-  if(RK.tab==='class') paintRkClass();
-  else el('rkBody').innerHTML=rankBoard(RK.tab==='all'?'best':'today',statsOf(t),t);
+  el('rkBody').innerHTML=rankBoard(RK.tab==='all'?'best':'today',statsOf(t),t);
 }
 function pickRankTab(k){ if(!rkTabOpen(k)) return toast('아직 잠겨 있어요 — 선생님이 열어 주면 볼 수 있어요'); RK.tab=k; paintRank(); }
-/* 학급 대항 — 학생마다 (이 학교 주제들의) 실전 최고 기록을 더하고 반끼리 다시 더합니다 */
+/* 학급 대항 — 학생마다 (전체 · 초등 · 중등 · 고등) 열린 주제의 실전 최고 기록을 모두 더하고, 반끼리 다시 더합니다 */
 function paintRkClass(){
-  const sc=schoolOf(RK.school), one=RK.scope==='topic', topics=one?[RK.topic]:rkTopicsOf(RK.school);
-  const list=classBattle(RK.users,topics,RK.classes), mine=ME?classOf(ME.sid):'';
-  const i=list.findIndex(g=>g.c===mine), me=list[i];
-  const gap=i>0?list[i-1].sum-me.sum:0;
-  el('rkBody').innerHTML=`<div class="segs cbscope">
-      <button class="sg${one?'':' on'}" data-s="school">${sc.n} 전체 (${topics.length}개 주제)</button>
-      <button class="sg${one?' on':''}" data-s="topic">${topicOf(RK.topic).n}만</button></div>
-    <div class="chartlab" style="margin:0 0 12px">학생마다 ${one?'이 주제의':'주제별'} 실전 최고 기록을 더하고, 반 학생들의 점수를 모두 더한 값이에요.
-      흐린 친구는 아직 기록이 없는 친구 · 단체 사진은 우리 반이 연 학급 아이템으로 꾸며져요.</div>`+
-    classBattleHTML(list,mine,RK.classes)+
-    (ME?`<div class="myplace">${me?`${classLabel(mine)}는 <b>${list.length}개 반 중 ${i+1}위</b>${i>0?` · 바로 위 반까지 <b>${gap}점</b>`:' — 1등이에요!'}`
-      :`${classLabel(mine)}는 아직 기록이 없어요. 실전 모드에 도전해 우리 반 점수를 올려 보세요!`}</div>`:'');
-  el('rkBody').querySelectorAll('.cbscope .sg').forEach(b=>b.onclick=()=>{ RK.scope=b.dataset.s; paintRank(); });
+  const live=online()?'반 전체가 함께 보는 기록':'이 기기에 저장된 기록';
+  const sc=CB_SCOPES.filter(([k])=>cbTopics(k).length); if(!sc.some(([k])=>k===RK.cs)) RK.cs='all';
+  const topics=cbTopics(RK.cs), list=classBattle(RK.users,topics,RK.classes), mine=ME?classOf(ME.sid):'';
+  const i=list.findIndex(g=>g.c===mine), me=list[i], gap=i>0?list[i-1].sum-me.sum:0;
+  el('rkSub').innerHTML=`${live} · <b>실전 누적</b> — 주제마다 세운 최고 기록을 모두 더해요`;
+  el('rkBody').innerHTML=`<div class="segs cbscope">${sc.map(([k,n])=>`<button class="sg${RK.cs===k?' on':''}" data-s="${k}">${n}</button>`).join('')}</div>
+    <div class="chartlab" style="margin:0 0 12px">${RK.cs==='all'?'모든':(CB_SCOPES.find(x=>x[0]===RK.cs)[1])} 주제 ${topics.length}개의 실전 최고 기록을 학생마다 더하고, 반 친구들 점수를 모두 더한 값이에요.
+      흐린 친구는 아직 기록이 없는 친구 · 발밑 받침은 우리 반이 모금으로 연 학급 아이템이에요.</div>`+
+    (ME?`<div class="myplace top">${me?`${classLabel(mine)}는 <b>${list.length}개 반 중 ${i+1}위</b>${i>0?` · 바로 위 반까지 <b>${gap}점</b>`:' — 1등이에요!'}`
+      :`${classLabel(mine)}는 아직 기록이 없어요. 실전 모드에 도전해 우리 반 점수를 올려 보세요!`}</div>`:'')+
+    classBattleHTML(list,mine,RK.classes);
+  el('rkBody').querySelectorAll('.cbscope .sg').forEach(b=>b.onclick=()=>{ RK.cs=b.dataset.s; paintRank(); });
+  cbBind(el('rkBody'),paintRank);
 }
 
 /* ═══════════════════ 정리 노트 ═══════════════════
@@ -9476,7 +10152,7 @@ function paintShop(){
   const mine=ownItems().length+ownShapes().length+ownColors().length;
   el('shopSub').innerHTML=`모은 것 <b>${mine}</b> / ${total} · 입은 꾸미기 ${(ME.ch.items||[]).length}개`;
   const cnt=k=>{ if(k==='box') return [ownItems().filter(id=>BOX_ITEMS.some(i=>i.id===id)).length,BOX_ITEMS.length];
-    if(k==='class') return [CLS?CLASS_TIERS.filter(T=>clsPick(T.t)).length:0,CLASS_TIERS.length];
+    if(k==='class') return [CLS?CLASS_TIERS.filter(clsTierOpen).length:0,CLASS_TIERS.length];
     const L=goodsList(k); return [L.filter(g=>g.has).length,L.length]; };
   const tab=c=>{ const [a,b]=cnt(c.k);
     return `<button class="tab${shopCat===c.k?' on':''}${c.k==='new'?' tnew':c.k==='hs'?' ths':''}" data-k="${c.k}">${c.n} <small>${a}/${b}</small></button>`; };
@@ -9490,16 +10166,15 @@ function paintShop(){
     box.querySelectorAll('.boxbuy').forEach(b=>b.onclick=()=>openBox(b.dataset.b));
     box.querySelectorAll('.givebtn').forEach(b=>b.onclick=()=>giveClass(+b.dataset.v));
     box.querySelectorAll('.item[data-kind="item"]').forEach(b=>b.onclick=()=>tapGoods('item',b.dataset.k));
-    box.querySelectorAll('.item[data-kind="class"]').forEach(b=>b.onclick=()=>tapClassItem(b.dataset.k));
     box.querySelectorAll('.ccvote').forEach(b=>b.onclick=()=>voteClassColor(b.dataset.c));
-    box.querySelectorAll('.optvote').forEach(b=>b.onclick=()=>voteClassOpt(+b.dataset.t,b.dataset.k));
+    box.querySelectorAll('.txvote').forEach(b=>b.onclick=()=>voteClassText(b.dataset.x));
     el('shopStrip').onclick=async()=>{ endTry(); ME.ch.items=[]; await saveMe(); paintShop(); paintMe(); toast('꾸미기를 모두 벗었어요'); };
     paintTry(); return;
   }
   box.className='items';
   const list=goodsList(shopCat), grouped=shopCat==='new'||shopCat==='hs';
   let lastGrp='';
-  const intro= shopCat==='new'?`<div class="shopnote"><span>새로 들어온 꾸미기 <b>${list.length}가지</b> — 동물 친구(아기 티라노·고양이·강아지·펭귄·햄스터), 빛의 검, 불사조 날개, 고양이·토끼 귀, 벚꽃 비, 별똥별, 바닷속 무대까지. 랜덤 상자에서도 나와요.</span></div>`
+  const intro= shopCat==='new'?`<div class="shopnote"><span>새로 들어온 꾸미기 <b>${list.length}가지</b> — <b>우리 반 시리즈</b>(배지·깃발·망토·날개·왕관·무대 … 내 반 이름과 반 색으로 그려져요), 동물 친구, 빛의 검, 불사조 날개, 벚꽃 비까지. 랜덤 상자에서도 나와요.</span></div>`
     : shopCat==='hs'?`<div class="shopnote">${hsOpen()?'고등학교가 열려 있어요. 고등 전용 물건을 모두 살 수 있어요.'
         :`${LOCKI}<span><b>고등학교가 열리면</b> 살 수 있어요 — 중학교 주제마다 실전 모드 목표를 넘어 열쇠 ${hsKeys().length}개를 모으면 열려요. 지금 ${hsKeys().filter(x=>x.ok).length}개. 입어 보기는 지금도 할 수 있어요.</span>`}</div>`:'';
   el('shopItems').innerHTML=intro+list.map(g=>{
@@ -9653,11 +10328,11 @@ async function openBox(k){
 }
 
 /* ═══════════════════ 학급 아이템 ═══════════════════
-   우리 반 학생들이 코인을 모아(모금) 누적 금액이 단계 기준을 넘으면 그 단계의 아이템이 반 모두에게 열립니다.
-   반마다 다르게 :
-   ① 우리 반 색 — 반 친구들이 한 표씩 투표 (아무도 안 하면 반 번호에 따라 정해져요). 학급 아이템이 모두 그 색.
-   ② 단계마다 두 가지 가운데 하나 — 미리 투표해 두고, 모금액이 그 단계에 닿는 순간 표가 많은 쪽이 열려요(한 번 정해지면 그대로).
-   자료 : classes/203 = {fund:누적, gv:{학번:낸 코인}, col:{학번:색}, vt:{단계:{학번:아이템}}, pick:{단계:아이템}}  */
+   반 친구들이 코인을 모아(모금) 누적 금액이 단계 기준을 넘으면 그 단계의 '받침'이 반 모두에게 열려요.
+   받침은 발밑에 놓여서 다른 꾸미기와 겹치지 않고, 반 모두가 가장 높은 단계의 받침에 서요.
+   반마다 다르게 : ① 반 색 — 한 사람에 한 표(아무도 안 하면 반 번호로)  ② 반 글자 — 문구 투표(선생님이 정한 글자가 먼저)
+   예전 학급 아이템(배지·깃발·망토 …)은 상점의 개인 아이템이 되었고, 우리 반이 예전에 열었던 것은 반 친구 모두가 가진 것으로 넘겨받아요.
+   자료 : classes/203 = {fund:누적, gv:{학번:낸 코인}, col:{학번:색}, tx:{학번:문구}, ttx:선생님 글자, pick:(예전에 연 아이템)}  */
 let CLS=null;
 const clsKey=()=>classOf(ME.sid);
 const clsShort=()=>shortCls(ME.sid);
@@ -9668,80 +10343,86 @@ function clsColor(c,key){
   if(best&&n[best.k]) return best;
   const num=parseInt(String(key||clsKey()).slice(1),10)||0; return CLASS_COLS[num%CLASS_COLS.length];
 }
-/* 학급 아이템은 반 모두에게 자동으로 — 열린 단계 가운데 가장 높은 단계의 아이템을 반 친구 모두가 입어요 */
-function clsTop(pick){ let top=null; CLASS_TIERS.forEach(T=>{ if(pick&&pick[T.t]) top=pick[T.t]; }); return top&&ITEM(top)?top:null; }
-const clsPicks=pick=>CLASS_TIERS.map(T=>pick&&pick[T.t]).filter(id=>id&&ITEM(id));
-/* 다른 학생 캐릭터를 그릴 때 — 그 학생 반의 색·이름·학급 아이템을 입혀서 */
-function clsCh(sid,ch,classes){
-  const k=classOf(sid), c=(classes||{})[k]||null, o=cleanCh(ch), top=c&&clsTop(c.pick);
-  o.cl=shortCls(sid); o.cc=clsColor(c,k).c;
-  o.items=o.items.filter(id=>CAT_OF(id)!=='class'); if(top) o.items.push(top);
+/* 반 글자 — 선생님이 정한 글자 → 표가 가장 많은 문구 → 반 이름('2-5') */
+const clsTxtLead=c=>{ const n=tally((c||{}).tx); const b=CLASS_TXT.slice().sort((x,y)=>(n[y.k]||0)-(n[x.k]||0))[0]; return b&&n[b.k]?b:CLASS_TXT[0]; };
+function clsText(c,key){ const cl=shortCls(String(key)+'00');
+  if(c&&c.ttx) return String(c.ttx).slice(0,10); return clsTxtLead(c).f(cl); }
+/* 열린 받침 가운데 가장 높은 단계 */
+const clsTopOf=c=>{ const f=(c&&c.fund)||0; let top=null; CLASS_TIERS.forEach(T=>{ if(f>=T.goal) top=T.opts[0]; }); return top; };
+const clsOld=c=>Object.values((c&&c.pick)||{}).filter(id=>ITEM(id)&&ITEM(id).cls);
+/* 다른 학생 캐릭터를 그릴 때 — 그 반의 색·이름·글자와 받침을 입혀서 (own : 그 학생이 가진 물건, 있으면 안 가진 반 아이템은 벗겨요) */
+function clsCh(sid,ch,classes,own){
+  const k=classOf(sid), c=(classes||{})[k]||null, o=cleanCh(ch), top=clsTopOf(c), old=clsOld(c);
+  o.cl=shortCls(sid); o.cc=clsColor(c,k).c; o.ct=clsText(c,k);
+  o.items=o.items.filter(id=>CAT_OF(id)!=='class'&&!(own&&ITEM(id).cls&&!arr(own).includes(id)&&!old.includes(id)));
+  if(top) o.items.push(top);
   return o;
 }
-/* 내 캐릭터에 우리 반 학급 아이템 입히기 — 바뀌었으면 true */
+/* 내 캐릭터에 우리 반 받침·색·글자 입히기 — 바뀌었으면 true */
 function clsApplyMe(){
   if(!ME||!CLS) return false;
-  const top=clsTop(CLS.pick), w=(ME.ch.items||[]).filter(id=>CAT_OF(id)!=='class'); if(top) w.push(top);
-  if(JSON.stringify(w)===JSON.stringify(ME.ch.items||[])) return false;
-  ME.ch.items=w; return true;
+  const k=clsKey(), o=clsCh(ME.sid,ME.ch,{[k]:CLS},ownItems());
+  const same=JSON.stringify([o.items,o.cc,o.ct,o.cl])===JSON.stringify([ME.ch.items||[],ME.ch.cc,ME.ch.ct,ME.ch.cl]);
+  ME.ch.items=o.items; ME.ch.cc=o.cc; ME.ch.ct=o.ct; ME.ch.cl=o.cl;
+  return !same;
 }
+const clsFrom=d=>({fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, tx:d.tx||{}, ttx:d.ttx||'', pick:d.pick||{}});
 async function loadClass(){
   const d=(await dbGet('classes/'+clsKey(),null))||{};
-  CLS={fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, vt:d.vt||{}, pick:d.pick||{}};
-  const cc0=ME.ch.cc; ME.ch.cl=clsShort(); ME.ch.cc=clsColor(CLS).c;
-  if(clsApplyMe()||cc0!==ME.ch.cc){ paintMe(); saveMe(); }
+  CLS=clsFrom(d);
+  /* 예전에 우리 반이 연 학급 아이템은 내 물건으로 (한 번만 늘어나요) */
+  const got=clsOld(CLS).filter(id=>!ownItems().includes(id));
+  if(got.length){ ownItems().push(...got); toast(`예전 학급 아이템 ${got.length}개가 내 물건이 되었어요 · 상점·마이페이지에서 입을 수 있어요`); }
+  if(clsApplyMe()||got.length){ paintMe(); saveMe(); }
   return CLS;
 }
-const clsPick=t=>CLS&&CLS.pick&&CLS.pick[t];
-const clsOpen=it=>!!(CLS&&it&&clsPick(it.tier)===it.id);
-/* 단계에서 지금 표가 많은 쪽 (같으면 앞쪽) */
-function clsLead(c,T){ const n=tally(((c||{}).vt||{})[T.t]); return T.opts.slice().sort((a,b)=>(n[b]||0)-(n[a]||0))[0]; }
-/* 모금 막대 — 단계 사이를 같은 간격으로 (앞 단계 눈금이 겹치지 않게) */
+const clsTierOpen=T=>!!(CLS&&CLS.fund>=T.goal);
+/* 모금 막대 — 단계 사이를 같은 간격으로 */
 function clsBarPct(f){ const G=[0].concat(CLASS_TIERS.map(T=>T.goal)), n=G.length-1;
   for(let i=1;i<=n;i++) if(f<G[i]) return ((i-1)+(f-G[i-1])/(G[i]-G[i-1]))/n*100;
   return 100; }
 function classPanelHTML(){
   if(!CLS) return `<div class="empty">우리 반 모금함을 불러오는 중…</div>`;
-  const nextT=CLASS_TIERS.find(T=>!clsPick(T.t));
+  const nextT=CLASS_TIERS.find(T=>!clsTierOpen(T)), top=clsTopOf(CLS);
   const givers=Object.keys(CLS.gv).map(s=>({s,n:CLS.gv[s]})).sort((a,b)=>b.n-a.n);
   const mine=CLS.gv[ME.sid]||0, cc=clsColor(CLS), cn=tally(CLS.col), myCol=CLS.col[ME.sid];
+  const tn=tally(CLS.tx), myTx=CLS.tx[ME.sid], lead=clsTxtLead(CLS), cl=clsShort();
+  const look=Object.assign({},ME.ch,{items:(ME.ch.items||[]).filter(id=>CAT_OF(id)!=='class')});
   return `<div class="clspanel" style="--cc:${cc.c}">
     <div class="clshead"><div><h3>${classLabel(clsKey())} 모금함</h3>
-      <div class="sub">반 친구들과 코인을 모아 <b>우리 반만의 아이템</b>을 열어요. 단계마다 <b>두 가지 중 하나</b>를 투표로 고르고, 아이템은 <b>우리 반 색</b>으로 칠해져요. 열린 아이템은 <b>반 친구 모두의 캐릭터</b>에 자동으로 입혀지고(가장 높은 단계 것), <b>학급 랭킹 단체 사진</b>도 꾸며 줘요.</div></div>
+      <div class="sub">반 친구들과 코인을 모으면 <b>반 모두가 함께 서는 받침</b>이 열려요. 받침은 발밑에 놓여서 다른 꾸미기와 겹치지 않고,
+        <b>우리 반 색과 글자</b>로 꾸며져요. 학급 대항 랭킹에서도 반 친구 모두가 이 받침 위에 서 있어요.</div></div>
       <div class="fundbox"><span>모은 코인</span><b>${CLS.fund}</b></div></div>
-    <h4 class="boxh">우리 반 색 <small>한 사람에 한 표 · 바꿀 수 있어요</small></h4>
-    <div class="cccols">${CLASS_COLS.map(c=>`<button class="ccvote${c.k===cc.k?' on':''}${myCol===c.k?' mine':''}" data-c="${c.k}" style="--c:${c.c}">
-      <i></i><b>${c.n}</b><small>${cn[c.k]||0}표${myCol===c.k?' · 내 표':''}</small></button>`).join('')}</div>
+    <div class="ctiers c3">${CLASS_TIERS.map((T,ti)=>{ const id=T.opts[0], it=ITEM(id), op=clsTierOpen(T), on=top===id;
+      return `<div class="ctier${op?' done':''}${on?' wear':''}"><div class="cth"><b>${ti+1}단계</b><span>${T.goal>=10000?(T.goal/10000)+'만':T.goal}코인</span></div>
+        <div class="ic">${avatarSVG(Object.assign({},look,{items:look.items.concat([id])}),{tight:true})}</div>
+        <div class="nm2">${it.n}</div><span class="state${on?' wear':op?' own':''}">${on?'지금 사용 중':op?'열림':'잠김'}</span></div>`; }).join('')}</div>
     <div class="fundbar"><i style="width:${clsBarPct(CLS.fund)}%"></i>${CLASS_TIERS.map((T,i)=>
-      `<span class="tick${clsPick(T.t)?' on':''}" style="left:${(i+1)/CLASS_TIERS.length*100}%"><em>${T.goal>=10000?T.goal/10000+'만':T.goal}</em></span>`).join('')}</div>
-    <div class="fundnext">${nextT?`다음 단계까지 <b>${nextT.goal-CLS.fund}코인</b> 남았어요 — 지금 표가 많은 <b>${ITEM(clsLead(CLS,nextT)).n}</b>이(가) 열릴 차례예요`:'모든 단계를 열었어요! 🎉'}</div>
+      `<span class="tick${clsTierOpen(T)?' on':''}" style="left:${(i+1)/CLASS_TIERS.length*100}%"><em>${T.goal>=10000?T.goal/10000+'만':T.goal}</em></span>`).join('')}</div>
+    <div class="fundnext">${nextT?`<b>${ITEM(nextT.opts[0]).n}</b>까지 <b>${nextT.goal-CLS.fund}코인</b> 남았어요`:'모든 받침을 열었어요! 🎉'}</div>
     <div class="give">${[10,50,100,300].map(v=>`<button class="btn givebtn" data-v="${v}" ${ME.coin<v?'disabled':''}>${v}코인 내기</button>`).join('')}</div>
     <div class="sub" style="margin-top:6px">내가 낸 코인 <b>${mine}</b> · 함께한 친구 <b>${givers.length}명</b></div>
     ${givers.length?`<div class="givers">${givers.slice(0,8).map((g,i)=>`<span class="gv${g.s===ME.sid?' me':''}">${i+1}. ${esc(g.s)} <b>${g.n}</b></span>`).join('')}</div>`:''}
-    <h4 class="boxh">단계별 학급 아이템 <small>열리기 전까지 어느 쪽이든 투표할 수 있어요</small></h4>
-    <div class="ctiers">${CLASS_TIERS.map((T,ti)=>{ const pk=clsPick(T.t), n=tally(CLS.vt[T.t]), my=(CLS.vt[T.t]||{})[ME.sid], lead=clsLead(CLS,T);
-      return `<div class="ctier${pk?' done':''}"><div class="cth"><b>${ti+1}단계</b><span>${T.goal}코인${pk?' · 열림':''}</span></div>
-        <div class="ctopts">${T.opts.map(id=>{ const it=ITEM(id), op=pk===id, on=(ME.ch.items||[]).includes(id), lost=pk&&!op;
-          return `<button class="item ctopt${on?' wear':''}${op?'':pk?' lost':' locked'}" ${op?`data-kind="class" data-k="${id}"`:pk?'disabled':`data-t="${T.t}" data-k="${id}"`}>
-            ${!pk&&lead===id&&n[id]?'<span class="tagw">1위</span>':''}
-            <div class="ic">${avatarWith(ME.ch,id)}</div><div class="nm2">${it.n}</div>
-            ${on?'<span class="state wear">입는 중</span>':op?'<span class="state own">우리 반 것</span>':lost?'<span class="state">다른 쪽이 열림</span>'
-              :`<span class="state vote${my===id?' mine':''}">${n[id]||0}표${my===id?' · 내 표':' · 투표'}</span>`}</button>`; }).join('').replace(/class="item ctopt([^"]*)" data-t=/g,'class="item ctopt optvote$1" data-t=')}</div></div>`; }).join('')}</div>
+    <h4 class="boxh">우리 반 색 <small>한 사람에 한 표 · 바꿀 수 있어요</small></h4>
+    <div class="cccols">${CLASS_COLS.map(c=>`<button class="ccvote${c.k===cc.k?' on':''}${myCol===c.k?' mine':''}" data-c="${c.k}" style="--c:${c.c}">
+      <i></i><b>${c.n}</b><small>${cn[c.k]||0}표${myCol===c.k?' · 내 표':''}</small></button>`).join('')}</div>
+    <h4 class="boxh">받침 글자 <small>${CLS.ttx?`지금은 선생님이 정한 <b>${esc(CLS.ttx)}</b>`:'한 사람에 한 표 · 표가 가장 많은 문구'}</small></h4>
+    <div class="txvotes">${CLASS_TXT.map(x=>`<button class="txvote${!CLS.ttx&&x.k===lead.k?' on':''}${myTx===x.k?' mine':''}" data-x="${x.k}">
+      <b>${esc(x.f(cl))}</b><small>${tn[x.k]||0}표${myTx===x.k?' · 내 표':''}</small></button>`).join('')}</div>
+    <div class="shopnote" style="margin-top:12px"><span>예전 학급 아이템(배지·깃발·망토·날개·왕관 …)은 이제 <b>상점의 개인 아이템</b>이에요. 우리 반 이름과 색으로 그려지고, '새로 나옴' 칸에서 살 수 있어요.</span></div>
   </div>`;
 }
-/* 모금 — 단계를 넘는 순간 그 단계의 표를 세어 아이템을 정해요(트랜잭션 안에서 한 번만) */
+/* 모금 — 트랜잭션으로 더하고, 새로 넘은 단계가 있으면 알려 줘요 */
 async function giveClass(v){
   if(!ME) return; await refreshMe();
   if(!ME||ME.coin<v) return toast('코인이 모자라요');
   if(!confirm(`우리 반 모금함에 ${v}코인을 낼까요?\n낸 코인은 돌려받을 수 없어요.`)) return;
   ME.coin-=v; spendLog('g',v); await saveMe();
-  const before=Object.assign({},(CLS&&CLS.pick)||{});
+  const f0=(CLS&&CLS.fund)||0;
   const r=await dbTx('classes/'+clsKey(),cur=>{ cur=cur||{fund:0,gv:{}}; cur.fund=(cur.fund||0)+v;
-    cur.gv=cur.gv||{}; cur.gv[ME.sid]=(cur.gv[ME.sid]||0)+v; cur.pick=cur.pick||{};
-    CLASS_TIERS.forEach(T=>{ if(cur.fund>=T.goal&&!cur.pick[T.t]) cur.pick[T.t]=clsLead(cur,T); });
-    return cur; });
-  if(r&&r.val){ const d=r.val; CLS={fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, vt:d.vt||{}, pick:d.pick||{}}; }
-  const opened=CLASS_TIERS.filter(T=>CLS.pick[T.t]&&!before[T.t]).map(T=>ITEM(CLS.pick[T.t]).n);
+    cur.gv=cur.gv||{}; cur.gv[ME.sid]=(cur.gv[ME.sid]||0)+v; return cur; });
+  if(r&&r.val) CLS=clsFrom(r.val);
+  const opened=CLASS_TIERS.filter(T=>CLS.fund>=T.goal&&f0<T.goal).map(T=>ITEM(T.opts[0]).n);
   if(clsApplyMe()) await saveMe();
   paintShop(); paintMe();
   toast(opened.length?`🎉 ${opened.join(', ')}이(가) 우리 반에 열렸어요!`:`${v}코인을 냈어요. 고마워요!`);
@@ -9752,16 +10433,11 @@ async function voteClassColor(k){
   await loadClass(); await saveMe(); paintShop(); paintMe();
   toast(`우리 반 색으로 ${CLASS_COLS.find(c=>c.k===k).n}에 투표했어요`);
 }
-async function voteClassOpt(t,id){
-  if(!ME||clsPick(t)) return toast('이미 정해진 단계예요');
-  await dbSet(`classes/${clsKey()}/vt/${t}/${ME.sid}`,id);
-  await loadClass(); paintShop();
-  toast(`${ITEM(id).n}에 투표했어요`);
-}
-async function tapClassItem(id){
-  const it=ITEM(id); if(!it) return;
-  if(!clsOpen(it)) return toast(`우리 반이 ${it.goal}코인을 모으고 이 아이템이 뽑히면 열려요`);
-  toast('학급 아이템은 우리 반 모두에게 자동으로 입혀져요 · 학급 랭킹 단체 사진도 꾸며져요');
+async function voteClassText(k){
+  const x=CLASS_TXT.find(o=>o.k===k); if(!ME||!x) return;
+  await dbSet(`classes/${clsKey()}/tx/${ME.sid}`,k);
+  await loadClass(); await saveMe(); paintShop(); paintMe();
+  toast(`받침 글자로 '${x.f(clsShort())}'에 투표했어요`);
 }
 
 /* ═══ 뒤로 가기 — 사이트를 나가지 않고 메인(학교 고르기)으로 ═══
@@ -9806,7 +10482,7 @@ async function boot(){
     try{
       let u=await dbGet('users/'+saved.sid,null), up=false;
       if(!(u&&u.h)&&online()){ const lu=lget('users/'+saved.sid,null); if(lu&&lu.h===saved.h){ u=lu; up=true; } }
-      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); ME._c0=up?null:ME.coin; openSchool(); if(typeof btResume==='function') btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
+      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); ME._c0=up?null:ME.coin; giftNote(u); openSchool(); if(typeof btResume==='function') btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
     }catch(e){}
   }
   show('s-gate');
