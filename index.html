@@ -3457,83 +3457,105 @@ function noteOf(t){
   const fromHint=(t2,ex,f,tip)=>{ const h=hintOf(f);
     return {t:t2, ex, svg:h.svg, lines:h.lines.concat(tip?[`<span class="tip">${tip}</span>`]:[])}; };
   if(t==='addsub') return {
-    sub:'한 자리 수 · 두 자리 수 · 받아올림과 받아내림 · 빈칸 채우기 · 세 자리 수',
+    sub:'받아올림이 있는 덧셈 · 받아내림이 있는 뺄셈 · 덧셈과 뺄셈의 관계 · □가 있는 식 · 세 자리 수의 덧셈과 뺄셈',
     memo:[
-      {h:'10이 되는 짝 — 모든 받아올림의 출발점', html:chipList(range(1,9).map(a=>`${a} + <b>${10-a}</b>`))},
-      {h:'덧셈과 뺄셈은 한 가족', html:`${tapeSVG(13,8,5,'')}
-        ${chipList(['8 + 5 = <b>13</b>','5 + 8 = <b>13</b>','13 − 5 = <b>8</b>','13 − 8 = <b>5</b>'])}
-        <div class="hl" style="font-size:14.5px;margin-top:6px">전체 13 = 부분 8 + 부분 5 — 세 수 가운데 두 개를 알면 나머지 하나를 구할 수 있어요.</div>`}
+      {h:'받아올림과 받아내림', html:`<div class="kcvs">
+        <div class="kcv add"><em>덧셈</em><b>받아올림</b><span>같은 자리의 수끼리 더한 값이 <u>10이거나 10보다 크면</u> 10을 바로 윗자리로 1 올려 써요</span><strong>7 + 6 = 13</strong><small>일의 자리 3, 십의 자리로 1</small></div>
+        <div class="kcv mul"><em>뺄셈</em><b>받아내림</b><span>같은 자리의 수끼리 <u>뺄 수 없으면</u> 바로 윗자리에서 10을 받아내려 계산해요</span><strong>13 − 7 = 6</strong><small>십의 자리는 1 작아져요</small></div></div>
+        <div class="kcp" style="margin-top:8px">세로로 계산할 때는 <b>같은 자리끼리 줄을 맞추고, 일의 자리부터</b> 계산해요.</div>`},
+      {h:'10이 되는 두 수 — 받아올림의 출발점', html:chipList(range(1,9).map(a=>`${a} + <b>${10-a}</b>`))},
+      {h:'덧셈과 뺄셈의 관계', html:`${tapeSVG(13,8,5,'')}
+        <table class="kct"><thead><tr><th>덧셈식 하나로</th><th style="width:auto;text-align:left">뺄셈식 두 개</th></tr></thead><tbody>
+        <tr><td>8 + 5 = 13</td><td style="width:auto;text-align:left">13 − 5 = <b style="font-size:15px">8</b> · 13 − 8 = <b style="font-size:15px">5</b></td></tr></tbody></table>
+        <div class="kcp" style="margin-top:8px">전체 13 = 부분 8 + 부분 5 — 세 수 가운데 두 수를 알면 나머지 한 수를 구할 수 있어요.</div>`}
     ],
     ways:[
-      fromHint('10 먼저 만들기','8 + 5',add1(8,5)),
+      fromHint('10을 만들어 더하기','8 + 5',add1(8,5)),
       fromHint('10을 거쳐 빼기','13 − 5',sub1(13,5)),
-      fromHint('다음 몇십까지 먼저','47 + 8',asN('P',47,'+',8)),
-      fromHint('십씩 먼저, 그다음 일','47 + 36',asN('Q',47,'+',36)),
-      fromHint('넉넉히 빼고 돌려주기','83 − 29',asN('Q',83,'-',29),'빼는 수의 일의 자리가 7, 8, 9이면 이 방법이 빨라요'),
-      fromHint('거꾸로 계산하기','□ + 26 = 61',blankF(1,26,61)),
-      fromHint('세 자리 덧셈 — 일의 자리부터','358 + 267',r3F(358,'+',267)),
-      fromHint('0 이 있는 수에서 빼기','503 − 278',r3F(503,'-',278))
+      fromHint('받아올림이 있는 두 자리 수의 덧셈','47 + 36',asN('Q',47,'+',36)),
+      fromHint('받아내림이 있는 두 자리 수의 뺄셈','83 − 29',asN('Q',83,'-',29),'빼는 수의 일의 자리가 7, 8, 9이면 30을 빼고 1을 더하는 방법도 빨라요'),
+      fromHint('□가 있는 덧셈식은 뺄셈으로','□ + 26 = 61',blankF(1,26,61),'구한 수를 □에 넣어 맞는지 확인해요: 35 + 26 = 61'),
+      fromHint('세 자리 수의 덧셈 — 일의 자리부터','358 + 267',r3F(358,'+',267)),
+      fromHint('0이 있는 수에서 빼기 — 두 번 받아내림','503 − 278',r3F(503,'-',278))
     ],
     miss:[
-      {w:'53 − 27 = 34', r:'53 − 27 = 26', y:'일의 자리 3 − 7 이 안 된다고 7 − 3 을 하면 안 돼요. 십의 자리에서 10을 빌려 와 13 − 7 = 6, 십의 자리는 4 − 2 = 2.'},
-      {w:'47 + 36 = 713', r:'47 + 36 = 83', y:'일의 자리 7 + 6 = 13 을 그대로 붙여 쓰면 안 돼요. 13 가운데 10은 십의 자리로 올려 보내요.'},
+      {w:'53 − 27 = 34', r:'53 − 27 = 26', y:'일의 자리 3에서 7을 뺄 수 없다고 7 − 3을 하면 안 돼요. 십의 자리에서 10을 받아내려 13 − 7 = 6, 십의 자리는 4 − 2 = 2.'},
+      {w:'47 + 36 = 713', r:'47 + 36 = 83', y:'일의 자리 7 + 6 = 13을 그대로 붙여 쓰면 안 돼요. 13 가운데 10은 십의 자리로 받아올려요.'},
       {w:'38 + 45 = 73', r:'38 + 45 = 83', y:'받아올린 1을 잊으면 꼭 10이 모자라요. 십의 자리는 3 + 4 + 1 = 8.'},
-      {w:'73 − □ = 45 → □ = 118', r:'73 − □ = 45 → □ = 28', y:'빼는 수를 찾을 때는 더하지 않고, 전체에서 남은 것을 빼요: 73 − 45 = 28. 확인: 73 − 28 = 45.'}
+      {w:'245 + 32 = 565', r:'245 + 32 = 277', y:'세로로 쓸 때 32를 왼쪽으로 붙여 쓰면 320을 더한 셈이 돼요. 일의 자리끼리 줄을 맞춰요.'},
+      {w:'503 − 278 = 335', r:'503 − 278 = 225', y:'십의 자리가 0이면 백의 자리에서 먼저 받아내려요. 백의 자리 5 → 4, 십의 자리 10 → 일의 자리에 1을 주고 9. 일 13 − 8 = 5, 십 9 − 7 = 2, 백 4 − 2 = 2.'},
+      {w:'73 − □ = 45 → □ = 118', r:'73 − □ = 45 → □ = 28', y:'빼는 수를 구할 때는 더하지 않고 전체에서 남은 수를 빼요: 73 − 45 = 28. 확인: 73 − 28 = 45.'}
     ]};
   if(t==='gugu'){
     const hard=new Set(['6x7','7x6','6x8','8x6','7x8','8x7','9x6','6x9']);
     const grid=`<div class="ggrid nb"><span class="gh">×</span>${range(1,9).map(b=>`<span class="gh">${b}</span>`).join('')}${
       range(1,9).map(a=>`<span class="gh">${a}</span>${range(1,9).map(b=>
         `<span class="${hard.has(a+'x'+b)?'gx':a===b?'gd':''}">${a*b}</span>`).join('')}`).join('')}</div>
-      <div class="hl" style="font-size:13.5px;margin-top:7px"><span class="gkey gd"></span>같은 수끼리 곱한 칸(제곱수) · <span class="gkey gx"></span>가장 많이 헷갈리는 칸</div>`;
+      <div class="hl" style="font-size:13.5px;margin-top:7px"><span class="gkey gd"></span>같은 수끼리 곱한 칸 · <span class="gkey gx"></span>가장 많이 헷갈리는 칸</div>`;
     return {
-      sub:'2단부터 9단 · 거꾸로 찾기',
+      sub:'곱셈의 뜻 · 2단 ~ 9단 곱셈구구 · 1단과 0의 곱 · 곱셈표의 규칙 · □ 찾기',
       memo:[
-        {h:'구구단 표', html:grid},
-        {h:'외울 것은 생각보다 적어요', html:`<div class="hl" style="font-size:15px">2단~9단은 64칸이지만 <b>3 × 8</b>과 <b>8 × 3</b>처럼 순서만 다른 것을 한 번씩만 세면 <b>36개</b>예요.</div>`}
+        {h:'곱셈의 뜻 — 몇의 몇 배', html:`${arraySVG(4,3,0)}<div class="kcp" style="margin-top:6px"><b>3 × 4</b>는 3씩 4묶음, 3의 4배예요. 3 + 3 + 3 + 3 = <b>12</b>처럼 같은 수를 여러 번 더한 것을 곱셈으로 간단히 나타내요.</div>`},
+        {h:'곱셈표', html:grid},
+        {h:'곱셈표에서 찾은 규칙', html:`<table class="kct"><thead><tr><th>규칙</th><th style="width:auto;text-align:left">예</th></tr></thead><tbody>
+          <tr><td>■단은 곱이 ■씩 커져요</td><td style="width:auto;text-align:left">7 × 5 = 35 → 7 × 6 = 42</td></tr>
+          <tr><td>곱하는 두 수의 순서를 바꾸어도 곱은 같아요</td><td style="width:auto;text-align:left">3 × 8 = 8 × 3 = 24</td></tr>
+          <tr><td>1과 어떤 수의 곱은 항상 어떤 수</td><td style="width:auto;text-align:left">1 × 6 = 6</td></tr>
+          <tr><td>0과 어떤 수의 곱은 항상 0</td><td style="width:auto;text-align:left">0 × 6 = 0</td></tr></tbody></table>
+          <div class="kcp" style="margin-top:8px">2단~9단 64칸 가운데 순서만 다른 것을 한 번씩만 세면 꼭 외울 것은 <b>36개</b>예요.</div>`}
       ],
       ways:[
-        fromHint('5묶음으로 나눠 생각하기','7 × 8',mul(7,8)),
-        {t:'순서를 바꿔도 같아요', ex:'8 × 3 = 3 × 8', svg:arraySVG(3,8,0),
-         lines:['곱하는 순서를 바꿔도 값은 같아요','모르는 8 × 3 은 아는 3 × 8 로: <b>24</b>']},
+        {t:'■단은 ■씩 커져요', ex:'7 × 6', svg:'',
+         lines:['7 × 5 = 35를 알면','7을 한 번 더: 35 + 7 = <b>42</b>','<span class="tip">5단은 시계를 볼 때처럼 5, 10, 15, … 로 세면 쉬워요</span>']},
+        fromHint('5묶음과 나머지로 나눠 생각하기','7 × 8',mul(7,8)),
+        {t:'순서를 바꾸어 곱하기', ex:'8 × 3 = 3 × 8', svg:arraySVG(3,8,0),
+         lines:['3줄 8칸이든 8줄 3칸이든 모두 24칸이에요','모르는 8 × 3은 아는 3 × 8로: <b>24</b>']},
         {t:'9단은 10단에서 빼기', ex:'9 × 6', svg:'',
-         lines:['9 × 6 = 10 × 6 − 6','= 60 − 6 = <b>54</b>','<span class="tip">9단의 답은 두 숫자를 더하면 9: 5 + 4 = 9</span>']},
+         lines:['9 × 6 = 10 × 6 − 6','= 60 − 6 = <b>54</b>','<span class="tip">9단의 곱은 두 숫자를 더하면 9예요: 5 + 4 = 9</span>']},
         {t:'두 배로 생각하기', ex:'4 × 7 · 8 × 7', svg:'',
          lines:['4단은 2단의 두 배: 2 × 7 = 14 → <b>28</b>','8단은 4단의 두 배: 4 × 7 = 28 → <b>56</b>']},
-        fromHint('거꾸로 찾기 = 나눗셈','7 × □ = 56',mulr(7,8))
+        fromHint('□ 찾기는 곱셈구구를 거꾸로','7 × □ = 56',mulr(7,8))
       ],
       miss:[
-        {w:'6 × 8 = 42', r:'6 × 8 = 48', y:'6 × 7 = 42, 6 × 8 = 48, 7 × 8 = 56 이 자주 섞여요. 56 = 7 × 8 은 "5, 6, 7, 8" 순서로 기억해요.'},
-        {w:'7 × 6 = 36', r:'7 × 6 = 42', y:'36은 6 × 6 이에요. 7 × 6 은 7 × 5 = 35 에 7을 더해 42.'},
-        {w:'9 × 6 = 56', r:'9 × 6 = 54', y:'9단의 답은 두 숫자의 합이 9예요. 56은 5 + 6 = 11 이라 9단의 답이 될 수 없어요.'},
-        {w:'3 × 4 = 7', r:'3 × 4 = 12', y:'곱하기와 더하기가 섞였어요. 3 × 4 는 3을 4번 더한 것: 3 + 3 + 3 + 3 = 12.'}
+        {w:'6 × 8 = 42', r:'6 × 8 = 48', y:'6 × 7 = 42, 6 × 8 = 48, 7 × 8 = 56이 자주 섞여요. 56 = 7 × 8은 "5, 6, 7, 8" 순서로 기억해요.'},
+        {w:'7 × 6 = 36', r:'7 × 6 = 42', y:'36은 6 × 6이에요. 7 × 6은 7 × 5 = 35에 7을 더해 42.'},
+        {w:'9 × 6 = 56', r:'9 × 6 = 54', y:'9단의 곱은 두 숫자의 합이 9예요. 56은 5 + 6 = 11이라 9단의 곱이 될 수 없어요.'},
+        {w:'3 × 4 = 7', r:'3 × 4 = 12', y:'곱셈과 덧셈이 섞였어요. 3 × 4는 3을 4번 더한 것: 3 + 3 + 3 + 3 = 12.'},
+        {w:'0 × 5 = 5', r:'0 × 5 = 0', y:'0을 5번 더해도 0이에요. 0과 어떤 수의 곱은 항상 0.'}
       ]};
   }
   if(t!=='power'&&typeof extNote==='function') return extNote(t,fromHint);
   /* power */
   return {
-    sub:'1² ~ 20² · 1³ ~ 10³ · 거꾸로 찾기',
+    sub:'거듭제곱(밑과 지수) · 제곱수 1² ~ 20² · 세제곱수 1³ ~ 10³ · 거꾸로 찾기',
     memo:[
+      {h:'거듭제곱 — 밑과 지수', html:`<div class="kcp">같은 수를 여러 번 곱한 것을 간단히 나타낸 것을 <b>거듭제곱</b>이라고 해요. 이때 곱한 수를 <b>밑</b>, 곱한 개수를 <b>지수</b>라고 해요.</div>
+        <table class="kct"><thead><tr><th>곱셈</th><th>거듭제곱 · 읽기</th><th>값</th></tr></thead><tbody>
+        <tr><td>3 × 3</td><td>3² · 3의 제곱</td><td><b>9</b></td></tr>
+        <tr><td>3 × 3 × 3</td><td>3³ · 3의 세제곱</td><td><b>27</b></td></tr>
+        <tr><td>2 × 2 × 2 × 2</td><td>2⁴ · 2의 네제곱 (밑 2, 지수 4)</td><td><b>16</b></td></tr></tbody></table>
+        <div class="kcp" style="margin-top:8px">자연수를 제곱한 수 1, 4, 9, 16, … 을 <b>제곱수</b>라고 해요.</div>`},
       {h:'제곱수 1² ~ 20²', html:chipList(range(1,20).map(k=>`${k}² = <b>${k*k}</b>`))},
       {h:'세제곱수 1³ ~ 10³', html:chipList(range(1,10).map(k=>`${k}³ = <b>${k*k*k}</b>`))},
       {h:'끝자리 표 — 거꾸로 찾을 때', html:`<div class="ftabs">
         <div class="ftab"><h4>□² 의 끝자리 → □ 의 끝자리</h4><div>1 → 1, 9 &nbsp;·&nbsp; 4 → 2, 8<br>9 → 3, 7 &nbsp;·&nbsp; 6 → 4, 6<br>5 → 5 &nbsp;·&nbsp; 0 → 0</div></div>
         <div class="ftab"><h4>□³ 의 끝자리 → □ 의 끝자리</h4><div>1→1 &nbsp;8→2 &nbsp;7→3<br>4→4 &nbsp;5→5 &nbsp;6→6<br>3→7 &nbsp;2→8 &nbsp;9→9</div></div></div>
-        <div class="hl" style="font-size:14px;margin-top:6px">제곱수의 끝자리는 0, 1, 4, 5, 6, 9 뿐이에요. 세제곱수는 끝자리가 모두 달라서 끝자리 하나로 답이 정해져요.</div>`}
+        <div class="hl" style="font-size:14px;margin-top:6px">제곱수의 끝자리는 0, 1, 4, 5, 6, 9뿐이에요. 세제곱수는 끝자리가 모두 달라서 끝자리 하나로 답이 정해져요.</div>`}
     ],
     ways:[
       fromHint('같은 수를 두 번 곱하기','7²',sq(7)),
       fromHint('11² ~ 19² 는 나눠 곱하기','13²',sq(13)),
-      {t:'끝이 5인 수', ex:'15² = 225', svg:'',
-       lines:['십의 자리 1과 그다음 수 2를 곱해요: 1 × 2 = 2','그 뒤에 25를 붙여요 → <b>225</b>','<span class="tip">같은 방법으로 25² = 625 (2 × 3 = 6)</span>']},
-      fromHint('범위와 끝자리로 거꾸로','□² = 289',sqr(17)),
+      {t:'일의 자리가 5인 수의 제곱', ex:'15² = 225', svg:'',
+       lines:['십의 자리 1과 그다음 수 2를 곱해요: 1 × 2 = 2','그 뒤에 25를 붙여요 → <b>225</b>','<span class="tip">같은 방법으로 25² = 625 (2 × 3 = 6), 35² = 1225 (3 × 4 = 12)</span>']},
+      fromHint('범위와 끝자리로 거꾸로 찾기','□² = 289',sqr(17)),
       fromHint('같은 수를 세 번 곱하기','4³',cu(4)),
       fromHint('세제곱 거꾸로 찾기','□³ = 343',cur(7))
     ],
     miss:[
-      {w:'13² = 26', r:'13² = 169', y:'제곱은 2를 곱하는 것이 아니라 같은 수를 두 번 곱하는 것: 13 × 13.'},
+      {w:'13² = 26', r:'13² = 169', y:'지수 2는 2를 곱하라는 뜻이 아니라 밑 13을 두 번 곱하라는 뜻이에요: 13 × 13.'},
       {w:'5³ = 15', r:'5³ = 125', y:'세제곱은 3을 곱하는 것이 아니에요: 5 × 5 × 5 = 25 × 5 = 125.'},
-      {w:'13² = 10² + 3² = 109', r:'13² = 169', y:'13² 은 13 × 13 이에요. 10² 과 3² 만 더하면 안 돼요: 13 × 13 = 130 + 39 = 169.'},
+      {w:'13² = 10² + 3² = 109', r:'13² = 169', y:'13² 은 13 × 13이에요. 10²과 3²만 더하면 10 × 3 이 두 번 빠져요: 100 + 60 + 9 = 169.'},
+      {w:'3² + 4² = (3 + 4)² = 49', r:'3² + 4² = 9 + 16 = 25', y:'제곱을 먼저 계산한 뒤 더해요. 거듭제곱은 덧셈보다 먼저 계산해요.'},
       {w:'□² = 196 → □ = 98', r:'□² = 196 → □ = 14', y:'196을 2로 나누면 안 돼요. 100과 400 사이이니 11~19, 끝자리 6이니 14 또는 16 → 14 × 14 = 196.'}
     ]};
 }
@@ -3833,53 +3855,103 @@ function extPreview(t,n){
 }
 
 /* ═══ 정리 노트 ═══ */
+/* ── 정리 노트용 그림 ── */
+/* 수직선 — 0 에서 −a 와 +a 까지의 거리(절댓값)가 같아요 */
+function intLineSVG(a){
+  const L=20, W=300, u=(W-2*L)/10, X=v=>L+(v+5)*u, y=46; let g=`<line x1="${L-8}" y1="${y}" x2="${W-L+8}" y2="${y}" stroke="#333" stroke-width="1.6"/>`;
+  for(let v=-5;v<=5;v++){ g+=`<line x1="${X(v)}" y1="${y-5}" x2="${X(v)}" y2="${y+5}" stroke="#333" stroke-width="1.4"/>`;
+    g+=`<text x="${X(v)}" y="${y+22}" text-anchor="middle" font-size="12" font-weight="${v===0||Math.abs(v)===a?800:500}" fill="${v===0?'#111':Math.abs(v)===a?'#2f5bea':'#888'}">${v<0?'−'+(-v):v>0?'+'+v:0}</text>`; }
+  [[-a,0],[0,a]].forEach(([p,q])=>{ g+=`<path d="M${X(p)},${y-10} Q${(X(p)+X(q))/2},${y-34} ${X(q)},${y-10}" fill="none" stroke="#2f5bea" stroke-width="2"/>`;
+    g+=`<text x="${(X(p)+X(q))/2}" y="${y-28}" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">${a}</text>`; });
+  g+=`<circle cx="${X(-a)}" cy="${y}" r="4.5" fill="#2f5bea"/><circle cx="${X(a)}" cy="${y}" r="4.5" fill="#2f5bea"/>`;
+  return `<svg class="vis" viewBox="0 0 ${W} 78" font-family="${FONT}" data-keep="1" aria-label="수직선과 절댓값">${g}</svg>`;
+}
+/* 직각삼각형의 세 변 위에 그린 정사각형 — 넓이 a² + b² = c² */
+function pySqSVG(a,b){
+  const c=Math.round(Math.hypot(a,b)), k=Math.min(15,64/Math.max(a,b)), A=a*k, B=b*k, x0=8+B, y0=10+A+B;
+  const C0=[x0,y0], P=[x0+A,y0], Q=[x0,y0-B], pt=v=>v.map(n=>n.toFixed(1)).join(',');
+  const sq=(pts,f)=>`<polygon points="${pts.map(pt).join(' ')}" fill="${f}" stroke="#333" stroke-width="1.6" stroke-linejoin="round"/>`;
+  const sa=[C0,P,[x0+A,y0+A],[x0,y0+A]], sb=[C0,Q,[x0-B,y0-B],[x0-B,y0]], sc=[Q,P,[P[0]+B,P[1]-A],[Q[0]+B,Q[1]-A]];
+  const cen=L=>[L.reduce((s,v)=>s+v[0],0)/4,L.reduce((s,v)=>s+v[1],0)/4];
+  const lab=(L,t,v,col)=>{ const [x,y]=cen(L); return `<text x="${x.toFixed(1)}" y="${(y-2).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="${col}">${t}</text><text x="${x.toFixed(1)}" y="${(y+15).toFixed(1)}" text-anchor="middle" font-size="15" font-weight="800" fill="${col}">${v}</text>`; };
+  const W=x0+A+B+8, H=y0+A+8;
+  return `<svg class="vis" viewBox="0 0 ${W.toFixed(0)} ${H.toFixed(0)}" font-family="${FONT}" data-keep="1" style="max-width:260px" aria-label="세 변 위의 정사각형">
+    ${sq(sa,'#fff4e6')}${sq(sb,'#eef9f2')}${sq(sc,'#eef2fe')}
+    <polygon points="${[C0,P,Q].map(pt).join(' ')}" fill="#fff" stroke="#111" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M${x0+9},${y0} V${y0-9} H${x0}" fill="none" stroke="#111" stroke-width="1.3"/>
+    ${lab(sa,'a²',a*a,'#e8590c')}${lab(sb,'b²',b*b,'#127a45')}${lab(sc,'c²',c*c,'#2f5bea')}</svg>`;
+}
 function extNote(t,fromHint){
-  
-  
   if(t==='int') return {
-    sub:'덧셈 · 뺄셈 · 곱셈 · 나눗셈 · 거듭제곱의 부호',
+    sub:'정수와 절댓값 · 부호가 같은/다른 두 수의 덧셈 · 뺄셈은 부호를 바꾸어 덧셈으로 · 곱셈과 나눗셈의 부호 · 거듭제곱',
     memo:[
-      {h:'덧셈의 부호', html:`<div class="ftabs">
-        <div class="ftab"><h4>부호가 같을 때</h4><div>절댓값끼리 <b>더하고</b><br>같은 부호를 붙여요<br>(−3) + (−5) = −8</div></div>
-        <div class="ftab"><h4>부호가 다를 때</h4><div>큰 것에서 작은 것을 <b>빼고</b><br>절댓값이 큰 쪽 부호<br>(−7) + (+4) = −3</div></div></div>`},
-      {h:'곱셈·나눗셈의 부호', html:`${chipList(['(+)(+) → <b>+</b>','(−)(−) → <b>+</b>','(+)(−) → <b>−</b>','(−)(+) → <b>−</b>'])}
-        <div class="hl" style="font-size:14.5px;margin-top:6px">여러 수를 곱할 때는 <b>음수의 개수</b>를 세요. 짝수 개면 +, 홀수 개면 −.</div>`}
+      {h:'정수와 절댓값', html:`<div class="kcp">양의 정수(+1, +2, +3, …), 0, 음의 정수(−1, −2, −3, …)를 통틀어 <b>정수</b>라고 해요.
+        수직선 위에서 0을 나타내는 점과 어떤 수를 나타내는 점 사이의 거리를 그 수의 <b>절댓값</b>이라고 해요.</div>${intLineSVG(3)}
+        <div class="kcp" style="text-align:center">|+3| = 3, |−3| = 3 — 절댓값은 0 또는 양수예요.</div>`},
+      {h:'정수의 덧셈', html:`<div class="kcvs">
+        <div class="kcv add"><em>부호가 같은 두 수</em><b>절댓값의 합</b><span>에 <u>공통인 부호</u>를 붙여요</span><strong style="font-size:15px">(−3) + (−5) = −8</strong></div>
+        <div class="kcv mul"><em>부호가 다른 두 수</em><b>절댓값의 차</b><span>에 <u>절댓값이 큰 수의 부호</u>를 붙여요</span><strong style="font-size:15px">(−7) + (+4) = −3</strong></div></div>`},
+      {h:'뺄셈과 덧셈의 계산 법칙', html:`<div class="kcp">정수의 뺄셈은 <b>빼는 수의 부호를 바꾸어</b> 덧셈으로 고쳐서 계산해요.</div>
+        ${chipList(['(+3) − (−8) = (+3) + (+8) = <b>+11</b>','(−2) − (+5) = (−2) + (−5) = <b>−7</b>'])}
+        <div class="kcp" style="margin-top:8px">덧셈의 <b>교환법칙</b> a + b = b + a, <b>결합법칙</b> (a + b) + c = a + (b + c) 를 써서 양수끼리, 음수끼리 모아 계산하면 편해요.</div>`},
+      {h:'곱셈과 나눗셈의 부호', html:`<table class="kct"><thead><tr><th>두 수의 부호</th><th>예</th><th>부호</th></tr></thead><tbody>
+        <tr><td>같을 때</td><td>(−6) × (−7) = +42</td><td><b>+</b></td></tr>
+        <tr><td>다를 때</td><td>(+42) ÷ (−6) = −7</td><td><b>−</b></td></tr></tbody></table>
+        <div class="kcp" style="margin-top:8px">셋 이상의 수를 곱할 때는 <b>음수의 개수</b>를 세요. 짝수 개이면 +, 홀수 개이면 −.</div>
+        ${chipList(['(−3)² = (−3) × (−3) = <b>9</b>','−3² = −(3 × 3) = <b>−9</b>'])}
+        <div class="kcp" style="margin-top:6px">괄호가 있는지 꼭 보세요. 괄호가 없으면 거듭제곱은 수에만 붙어요.</div>`}
     ],
     ways:[
-      fromHint('부호가 다르면 빼고 큰 쪽 부호','(−7) + (+4)',iA(-7,4)),
-      fromHint('빼기는 부호를 바꿔 더하기','(+3) − (−8)',iS(3,-8)),
-      fromHint('양수끼리, 음수끼리','−3 + 8 − 6',iT(-3,8,-6)),
-      fromHint('부호 먼저, 그다음 곱','(−6) × (+7)',iM(-6,7)),
-      fromHint('괄호 안 전체를 거듭','(−2)³',iP(-2,3)),
-      fromHint('괄호가 없으면 수에만','−3²',iN(3,2))
+      fromHint('부호가 다른 두 수의 덧셈','(−7) + (+4)',iA(-7,4)),
+      fromHint('뺄셈은 빼는 수의 부호를 바꾸어 덧셈으로','(+3) − (−8)',iS(3,-8)),
+      fromHint('괄호가 없는 식 — 양수끼리, 음수끼리','−3 + 8 − 6',iT(-3,8,-6)),
+      fromHint('곱셈 — 부호를 먼저 정하고 절댓값끼리 곱하기','(−6) × (+7)',iM(-6,7)),
+      fromHint('나눗셈 — 곱셈과 부호 규칙이 같아요','(−42) ÷ (−6)',iD(-42,-6)),
+      fromHint('음수의 거듭제곱 — 괄호 안 전체를 거듭','(−2)³',iP(-2,3)),
+      fromHint('괄호가 없으면 수에만 거듭제곱','−3²',iN(3,2))
     ],
     miss:[
-      {w:'(−7) + (+4) = −11', r:'(−7) + (+4) = −3', y:'부호가 다르면 절댓값을 빼요. 7 − 4 = 3, 큰 쪽 7의 부호 − 를 붙여 −3.'},
-      {w:'(+3) − (−8) = −5', r:'(+3) − (−8) = +11', y:'빼는 수의 부호를 바꾸지 않았어요. (+3) + (+8) = +11.'},
-      {w:'−3² = 9', r:'−3² = −9', y:'괄호가 없으면 3에만 제곱을 해요. −(3 × 3) = −9. (−3)² 이어야 9.'},
-      {w:'(−2) × (−3) × (−1) = 6', r:'= −6', y:'음수가 세 개(홀수)이면 부호는 − 예요.'}
+      {w:'(−7) + (+4) = −11', r:'−3', y:'부호가 다른 두 수는 절댓값의 차(7 − 4 = 3)에 절댓값이 큰 수 −7 의 부호를 붙여요.'},
+      {w:'(+3) − (−8) = −5', r:'+11', y:'빼는 수 −8 의 부호를 바꾸어 더해요: (+3) + (+8) = +11.'},
+      {w:'(−42) ÷ (−6) = −7', r:'+7', y:'부호가 같은 두 수의 나눗셈은 + 예요. 곱셈과 규칙이 같아요.'},
+      {w:'(−2) × (−3) × (−1) = 6', r:'−6', y:'음수가 세 개(홀수 개)이면 곱의 부호는 − 예요.'},
+      {w:'−3² = 9', r:'−9', y:'괄호가 없으면 3에만 제곱을 해요: −(3 × 3) = −9. 9가 되려면 (−3)² 이어야 해요.'}
     ]};
   /* pyth */
   return {
-    sub:'제곱의 합과 차 · 빗변 · 다른 한 변 · 피타고라스 수',
+    sub:'피타고라스 정리 a² + b² = c² · 빗변의 길이 · 다른 한 변의 길이 · 직각삼각형이 되는 조건 · 피타고라스 수',
     memo:[
-      {h:'피타고라스 정리', html:`${pythSVG(3,4,5,'')}<div class="hl" style="font-size:15px;margin-top:6px">직각삼각형에서 <b>(빗변)² = (직각변)² + (직각변)²</b><br>3² + 4² = 9 + 16 = 25 = 5²</div>`},
+      {h:'피타고라스 정리', html:`<div class="kcp">직각삼각형에서 직각을 낀 두 변의 길이를 각각 a, b 라 하고, <b>빗변</b>(직각의 대변)의 길이를 c 라고 하면</div>
+        <div class="kcp" style="text-align:center;font-size:21px;font-weight:800;margin:6px 0">a² + b² = c²</div>${pySqSVG(3,4)}
+        <div class="kcp" style="text-align:center">직각을 낀 두 변 위의 정사각형 넓이의 합 = 빗변 위의 정사각형 넓이<br>9 + 16 = 25</div>`},
+      {h:'직각삼각형이 되는 조건', html:`<div class="kcp">세 변의 길이가 a, b, c (c 가 가장 긴 변) 인 삼각형에서 <b>a² + b² = c²</b> 이면 빗변의 길이가 c 인 직각삼각형이에요.</div>
+        <table class="kct"><thead><tr><th>세 변의 길이</th><th>작은 두 변의 제곱의 합 · 가장 긴 변의 제곱</th><th>직각삼각형</th></tr></thead><tbody>
+        <tr><td>6, 8, 10</td><td>36 + 64 = 100 = 10²</td><td><b>○</b></td></tr>
+        <tr><td>5, 12, 13</td><td>25 + 144 = 169 = 13²</td><td><b>○</b></td></tr>
+        <tr><td>2, 3, 4</td><td>4 + 9 = 13, 4² = 16</td><td><b>×</b></td></tr></tbody></table>`},
       {h:'자주 나오는 피타고라스 수', html:`${chipList(PY_BASE.map(t=>`(${t.join(', ')})`))}
-        <div class="hl" style="font-size:14.5px;margin-top:6px">같은 수를 곱해도 피타고라스 수예요: (6, 8, 10), (9, 12, 15), (10, 24, 26) …</div>`}
+        <div class="kcp" style="margin-top:8px">세 수에 같은 수를 곱하거나 나누어도 직각삼각형의 세 변이 돼요(닮은 직각삼각형).<br>(6, 8, 10) · (9, 12, 15) · (10, 24, 26) · (0.6, 0.8, 1)</div>`}
     ],
     ways:[
-      fromHint('제곱해서 더하기','6² + 8²',yS(6,8)),
-      fromHint('두 직각변을 제곱해 더하기','5² + 12² = □²',yH(5,12)),
-      fromHint('빗변의 제곱에서 빼기','□² + 15² = 17²',yL(17,15)),
-      fromHint('닮음으로 늘리기','9² + 12² = □²',yH(9,12))
+      fromHint('빗변의 길이 구하기','4² + 3² = □²',yH(4,3)),
+      fromHint('다른 한 변의 길이 구하기 — 빗변의 제곱에서 빼기','□² + 12² = 15²',yL(15,12)),
+      {t:'넓이로 보기 — 세 변 위의 정사각형', ex:'직각을 낀 두 변 위의 정사각형 넓이가 36, 64 일 때, 빗변 위의 정사각형 넓이와 빗변의 길이', svg:pySqSVG(6,8),
+        lines:['36 + 64 = 100 → 빗변 위의 정사각형 넓이', '100 = 10² 이므로 빗변의 길이는 <b>10</b>',
+          '<span class="tip">한 변의 길이가 x 인 정사각형의 넓이는 x² — 피타고라스 정리는 넓이의 관계예요.</span>']},
+      {t:'직각삼각형인지 판별하기', ex:'세 변의 길이가 5 cm, 12 cm, 13 cm 인 삼각형은 직각삼각형일까요?', svg:pythSVG(12,5,13,''),
+        lines:['가장 긴 변 13 cm 가 빗변이 될 수 있는지 봐요', '5² + 12² = 25 + 144 = 169 = 13²', '빗변의 길이가 <b>13 cm</b>인 직각삼각형이에요',
+          '<span class="tip">가장 긴 변의 제곱을 따로 두고, 나머지 두 변의 제곱의 합과 비교해요.</span>']},
+      fromHint('닮은 직각삼각형 — 피타고라스 수의 배수','9² + 12² = □²',yH(9,12))
     ],
     miss:[
-      {w:'3² + 4² = 7²', r:'3² + 4² = 5²', y:'제곱의 합은 합의 제곱이 아니에요. 9 + 16 = 25 = 5².'},
-      {w:'□² + 12² = 13² → □ = 1', r:'□ = 5', y:'13 − 12 = 1 처럼 변의 길이를 그냥 빼면 안 돼요. 제곱끼리 빼요: 169 − 144 = 25 = 5².'},
-      {w:'6² + 8² = □² → □ = 100', r:'□ = 10', y:'100은 □² 의 값이에요. □ 는 제곱해서 100이 되는 수 10.'},
-      {w:'빗변이 아닌 변에 더하기', r:'가장 긴 변이 빗변', y:'빗변은 직각의 맞은편에 있는 가장 긴 변이에요. 빗변의 제곱이 혼자 한쪽에 와요.'}
+      {w:'3² + 4² = 7²', r:'5²', y:'제곱의 합은 합의 제곱이 아니에요: 9 + 16 = 25 = 5².'},
+      {w:'x² + 12² = 13² → x = 1', r:'x = 5', y:'변의 길이를 그대로 빼면 안 돼요. 제곱끼리 빼요: 169 − 144 = 25 = 5².'},
+      {w:'x² = 100 → x = 100', r:'x = 10', y:'100 은 x² 의 값이에요. x 는 제곱해서 100 이 되는 수 10 이에요.'},
+      {w:'x² = 25 → x = 5 또는 −5', r:'x = 5', y:'변의 길이는 양수예요. 교과서처럼 "x > 0 이므로 x = 5" 라고 써요.'},
+      {w:'빗변 13, 한 변 5 → 5² + 13² = x²', r:'5² + x² = 13²', y:'빗변은 직각의 대변이고 가장 긴 변이에요. 빗변의 제곱이 혼자 한쪽에 와요.'}
     ]};
 }
+
 
 /* ═══════════════════ 중등 주제 더하기 — 지수법칙 · 제곱근 ═══════════════════
    10b_more.js 의 고리(extFact …)를 감싸서 이어 붙입니다.
@@ -4081,52 +4153,75 @@ function midPreview(t,n){
 
 /* ═══ 정리 노트 ═══ */
 function midNote(t,fromHint){
-  
+  const FR=(n,d)=>`<span class="ifr"><i>${n}</i><i>${d}</i></span>`;
   if(t==='expo') return {
-    sub:'거듭제곱 · 지수의 합과 차 · 거듭제곱의 거듭제곱 · 곱의 거듭제곱',
+    sub:'거듭제곱 · 지수법칙 ⑴ 거듭제곱의 곱셈 · ⑵ 거듭제곱의 거듭제곱 · ⑶ 거듭제곱의 나눗셈 · ⑷ 곱 또는 몫의 거듭제곱',
     memo:[
-      {h:'지수법칙 네 가지', html:`<div class="ftabs">
-        <div class="ftab"><h4>곱하면 더하기</h4><div>aᵐ × aⁿ = aᵐ⁺ⁿ<br>a³ × a⁴ = a⁷</div></div>
-        <div class="ftab"><h4>나누면 빼기</h4><div>aᵐ ÷ aⁿ = aᵐ⁻ⁿ<br>a⁷ ÷ a³ = a⁴</div></div>
-        <div class="ftab"><h4>거듭제곱의 거듭제곱</h4><div>(aᵐ)ⁿ = aᵐⁿ<br>(a³)⁴ = a¹²</div></div>
-        <div class="ftab"><h4>곱의 거듭제곱</h4><div>(ab)ⁿ = aⁿbⁿ<br>(2a)³ = 8a³</div></div></div>`},
-      {h:'2의 거듭제곱', html:chipList(range(1,10).map(k=>`2${sup(k)} = <b>${Math.pow(2,k)}</b>`))}
+      {h:'거듭제곱', html:`<div class="kcp">같은 수나 문자를 여러 번 곱한 것을 <b>거듭제곱</b>으로 나타내요. a 를 n 번 곱한 것은 aⁿ — a 를 <b>밑</b>, n 을 <b>지수</b>라고 해요.</div>
+        ${chipList(['2⁵ = 2 × 2 × 2 × 2 × 2 = <b>32</b>','a × a × a = <b>a³</b>','a = a¹'])}`},
+      {h:'지수법칙 (m, n 은 자연수)', html:`<div class="ftabs">
+        <div class="ftab"><h4>⑴ 거듭제곱의 곱셈</h4><div>aᵐ × aⁿ = <b>aᵐ⁺ⁿ</b><br>a² × a³ = a⁵<br><small>지수의 합</small></div></div>
+        <div class="ftab"><h4>⑵ 거듭제곱의 거듭제곱</h4><div>(aᵐ)ⁿ = <b>aᵐⁿ</b><br>(a²)³ = a⁶<br><small>지수의 곱</small></div></div>
+        <div class="ftab"><h4>⑶ 거듭제곱의 나눗셈 (a ≠ 0)</h4><div>aᵐ ÷ aⁿ 은<br>m &gt; n : <b>aᵐ⁻ⁿ</b><br>m = n : <b>1</b><br>m &lt; n : ${FR('1','aⁿ⁻ᵐ')}<br><small>a⁵ ÷ a² = a³</small></div></div>
+        <div class="ftab"><h4>⑷ 곱 또는 몫의 거듭제곱</h4><div>(ab)ⁿ = <b>aⁿbⁿ</b><br>(${FR('a','b')})ⁿ = ${FR('aⁿ','bⁿ')} (b ≠ 0)<br><small>(3a)² = 9a²</small></div></div></div>`},
+      {h:'더할까? 곱할까?', html:`<div class="kcvs">
+        <div class="kcv add"><em>⑴ 거듭제곱의 곱셈</em><b>a² × a³</b><span>a 를 2개, 3개 곱해 모두 2 + 3 개</span><strong style="font-size:20px">a⁵</strong><small>지수끼리 더해요</small></div>
+        <div class="kcv mul"><em>⑵ 거듭제곱의 거듭제곱</em><b>(a²)³</b><span>a² 를 3번 곱해 2 × 3 개</span><strong style="font-size:20px">a⁶</strong><small>지수끼리 곱해요</small></div></div>`},
+      {h:'자주 쓰는 거듭제곱', html:chipList(range(1,10).map(k=>`2${sup(k)} = <b>${Math.pow(2,k)}</b>`).concat(['3⁴ = <b>81</b>','5³ = <b>125</b>','10³ = <b>1000</b>']))}
     ],
     ways:[
-      fromHint('곱하면 지수끼리 더하기','a³ × a⁴',eM('a',3,4)),
-      fromHint('나누면 지수끼리 빼기','a⁷ ÷ a³',eD('a',7,3)),
-      fromHint('괄호 밖 지수는 곱하기','(a³)⁴',eP('a',3,4)),
-      fromHint('괄호 안의 수에도 지수','(2a)³',eC(2,'a',3)),
-      fromHint('몇 번 곱했나 세기','2□ = 32',eL(2,5))
+      fromHint('거듭제곱의 값 — 밑을 지수만큼 곱하기','2⁵',eV(2,5)),
+      fromHint('지수 찾기 — 몇 번 곱했나 세기','2□ = 32',eL(2,5)),
+      fromHint('⑴ 거듭제곱의 곱셈 — 지수의 합','a² × a³',eM('a',2,3)),
+      fromHint('⑶ 거듭제곱의 나눗셈 — 지수의 차','a⁵ ÷ a²',eD('a',5,2)),
+      fromHint('⑵ 거듭제곱의 거듭제곱 — 지수의 곱','(a²)³',eP('a',2,3)),
+      fromHint('⑷ 곱의 거듭제곱 — 괄호 안의 수에도 지수','(3a)²',eC(3,'a',2))
     ],
     miss:[
-      {w:'a³ × a⁴ = a¹²', r:'a⁷', y:'곱셈에서는 지수끼리 더해요. 곱하는 것은 (a³)⁴ 처럼 괄호가 있을 때.'},
-      {w:'a⁶ ÷ a² = a³', r:'a⁴', y:'나눗셈에서는 지수끼리 빼요: 6 − 2 = 4.'},
-      {w:'(2a)³ = 2a³', r:'8a³', y:'괄호 안의 2에도 세제곱이 붙어요: 2³ = 8.'},
-      {w:'2³ = 6', r:'2³ = 8', y:'거듭제곱은 곱하기 3이 아니라 2를 세 번 곱하는 것: 2 × 2 × 2.'}
+      {w:'a³ × a⁴ = a¹²', r:'a⁷', y:'거듭제곱의 곱셈은 지수끼리 더해요: 3 + 4 = 7. 지수끼리 곱하는 것은 (a³)⁴ 처럼 거듭제곱의 거듭제곱일 때예요.'},
+      {w:'(a²)³ = a⁵', r:'a⁶', y:'(a²)³ = a² × a² × a² 이므로 지수끼리 곱해요: 2 × 3 = 6.'},
+      {w:'a⁶ ÷ a² = a³', r:'a⁴', y:'거듭제곱의 나눗셈은 지수끼리 빼요: 6 − 2 = 4. 나누기가 아니에요.'},
+      {w:'a³ ÷ a³ = 0', r:'1', y:'같은 것으로 나누면 1 이에요. 지수가 같으면 aᵐ ÷ aᵐ = 1.'},
+      {w:'(2a)³ = 2a³', r:'8a³', y:'괄호 안의 2 에도 세제곱이 붙어요: 2³ × a³ = 8a³.'},
+      {w:'2³ = 6', r:'8', y:'2³ 은 2 × 3 이 아니라 2 를 세 번 곱한 것: 2 × 2 × 2 = 8.'}
     ]};
   /* root */
   return {
-    sub:'√ 의 값 · 제곱근의 성질 · 근호 밖과 안 · 곱셈과 나눗셈',
+    sub:'제곱근의 뜻 · 근호 √ · 제곱근의 성질 · 근호 밖으로·안으로 · 제곱근의 곱셈과 나눗셈',
     memo:[
-      {h:'제곱근의 뜻', html:`<div class="hl" style="font-size:14.5px">x² = a 일 때 x 를 a 의 제곱근이라고 해요. 9 의 제곱근은 <b>3 과 −3</b>, √9 는 그 가운데 양수인 <b>3</b>.</div>
-        ${chipList(range(11,20).map(k=>`√${k*k} = <b>${k}</b>`))}`},
-      {h:'자주 쓰는 성질', html:chipList(['(√a)² = a','√(−a)² = a','√a × √b = √ab','√(a²b) = a√b'])}
+      {h:'제곱근의 뜻', html:`<div class="kcp">어떤 수 x 를 제곱하여 a 가 될 때, 즉 <b>x² = a</b> 일 때 x 를 a 의 <b>제곱근</b>이라고 해요.
+        양수의 제곱근은 양수와 음수 두 개이고, 양수인 것을 <b>√a</b>, 음수인 것을 <b>−√a</b> 로 나타내요. √ 를 근호라고 읽어요.</div>
+        <table class="kct"><thead><tr><th>a</th><th>a 의 제곱근</th><th>√a</th></tr></thead><tbody>
+        <tr><td>9</td><td>3, −3</td><td><b>3</b></td></tr><tr><td>16</td><td>4, −4</td><td><b>4</b></td></tr>
+        <tr><td>7</td><td>√7, −√7</td><td><b>√7</b></td></tr><tr><td>0</td><td>0 (하나뿐)</td><td><b>0</b></td></tr></tbody></table>
+        <div class="kcp" style="margin-top:6px">음수의 제곱근은 생각하지 않아요(제곱해서 음수가 되는 수는 없어요).</div>`},
+      {h:'제곱근의 성질 (a > 0)', html:`${chipList(['(√a)² = a','(−√a)² = a','√(a²) = a','√(−a)² = a'])}
+        <div class="kcp" style="margin-top:8px">√ 의 값은 언제나 0 이상이에요. 예: (√5)² = 5, √(−5)² = √25 = 5</div>`},
+      {h:'근호가 있는 식의 계산 (a > 0, b > 0)', html:`<div class="kcvs">
+        <div class="kcv add"><em>곱셈·나눗셈</em><b>√a × √b = √ab</b><span>√a ÷ √b = √(a ÷ b)</span><strong style="font-size:15px">√2 × √8 = √16 = 4</strong></div>
+        <div class="kcv mul"><em>근호 밖으로·안으로</em><b>√(a²b) = a√b</b><span>밖의 수는 제곱해서 안으로</span><strong style="font-size:15px">√12 = √(4 × 3) = 2√3</strong></div></div>
+        <div class="kcp" style="margin-top:8px">덧셈은 근호 안끼리 합칠 수 없어요: √9 + √16 = 3 + 4 = 7 (√25 가 아니에요).</div>`},
+      {h:'자주 쓰는 제곱수', html:chipList(range(11,20).map(k=>`${k}² = <b>${k*k}</b>`))}
     ],
     ways:[
-      fromHint('제곱해서 그 수가 되는 양수','√169',qS(13)),
-      fromHint('√ 의 값은 0 이상','√(−5)²',qN(5)),
-      fromHint('제곱수를 찾아 밖으로','√12 = □√3',qO(2,3)),
-      fromHint('밖의 수를 제곱해서 안으로','3√2 = √□',qI(3,2)),
-      fromHint('√ 끼리 곱하기','√2 × √8',qM(2,8))
+      fromHint('√a — 제곱해서 a 가 되는 양수','√169',qS(13)),
+      fromHint('(√a)² = a','(√7)²',qP(7)),
+      fromHint('√(−a)² = a — √ 의 값은 0 이상','√(−5)²',qN(5)),
+      fromHint('근호 안의 제곱수를 밖으로','√12 = □√3',qO(2,3)),
+      fromHint('근호 밖의 수를 제곱해서 안으로','3√2 = √□',qI(3,2)),
+      fromHint('제곱근의 곱셈','√2 × √8',qM(2,8)),
+      fromHint('제곱근의 나눗셈','√18 ÷ √2',qD(18,2))
     ],
     miss:[
-      {w:'√(−5)² = −5', r:'5', y:'√ 의 값은 음수가 될 수 없어요. (−5)² = 25, √25 = 5.'},
+      {w:'16 의 제곱근은 4', r:'16 의 제곱근은 4 와 −4', y:'제곱해서 16 이 되는 수는 4 와 −4 두 개예요. √16 = 4 는 그 가운데 양수만 가리켜요.'},
+      {w:'√16 = ±4', r:'4', y:'√16 은 16 의 양의 제곱근 하나만 나타내요.'},
+      {w:'√(−5)² = −5', r:'5', y:'(−5)² = 25 이므로 √25 = 5. √ 의 값은 음수가 될 수 없어요.'},
       {w:'√12 = 3√2', r:'2√3', y:'12 = 4 × 3. 제곱수 4 를 찾아 √4 = 2 를 밖으로 꺼내요.'},
-      {w:'3√2 = √6', r:'√18', y:'밖의 3을 안으로 넣을 때는 제곱해서 9 로: √(9 × 2) = √18.'},
-      {w:'√9 + √16 = √25 = 5', r:'3 + 4 = 7', y:'√ 끼리 더할 때는 안의 수를 더하면 안 돼요. 곱셈·나눗셈만 √ 안에서 합칠 수 있어요.'}
+      {w:'3√2 = √6', r:'√18', y:'근호 밖의 3 은 제곱해서 9 로 안에 넣어요: √(9 × 2) = √18.'},
+      {w:'√9 + √16 = √25 = 5', r:'3 + 4 = 7', y:'근호 안끼리 합칠 수 있는 것은 곱셈·나눗셈뿐이에요.'}
     ]};
 }
+
 
 /* ═══ 고리 잇기 ═══ */
 const MID=['expo','root'];
@@ -4474,66 +4569,106 @@ function hsPreview(t,n){
 
 /* ═══ 정리 노트 ═══ */
 function hsNote(t,fromHint){
-  if(t==='trig') return {
-    sub:'특수각의 값 · 각도 찾기 · 직각삼각형 · 변의 길이 · 계산',
+  /* 예시 칸에는 실제 문제 모양(문장 + 식)을 그대로 */
+  const W=(title,f,tip)=>f?fromHint(title,eqText(f,false),f,tip):null;
+  const done=o=>(o.ways=o.ways.filter(Boolean),o);
+  const tdA='style="width:auto;text-align:left"';
+  if(t==='trig') return done({
+    sub:'삼각비의 뜻 · 특수각(30°, 45°, 60°)의 삼각비 · 삼각비로 변의 길이 구하기 · 삼각비의 계산',
     memo:[
-      {h:'특수각의 삼각비 표', html:`<div class="ftabs">${FNS.map(fn=>`<div class="ftab"><h4>${FN[fn]}</h4>${ANG.map(d=>`<div>${d}° → <b>${TVAL[fn+d]}</b></div>`).join('')}</div>`).join('')}</div>`},
+      {h:'삼각비의 뜻', html:`<div class="kcp">∠C = 90°인 직각삼각형 ABC에서 ∠A의 크기가 정해지면, 삼각형의 크기와 관계없이 두 변의 길이의 비가 일정해요. 이 비를 ∠A의 <b>삼각비</b>라고 해요.</div>
+        ${trigSVG(4,3,{a:'BC',b:'AC',c:'AB'},0)}
+        <table class="kct"><thead><tr><th>삼각비</th><th>뜻</th><th>식</th></tr></thead><tbody>
+        <tr><td style="white-space:nowrap"><b>sin A</b></td><td>(마주 보는 변) ÷ (빗변)</td><td ${tdA}>BC/AB</td></tr>
+        <tr><td style="white-space:nowrap"><b>cos A</b></td><td>(이웃한 변) ÷ (빗변)</td><td ${tdA}>AC/AB</td></tr>
+        <tr><td style="white-space:nowrap"><b>tan A</b></td><td>(마주 보는 변) ÷ (이웃한 변)</td><td ${tdA}>BC/AC</td></tr></tbody></table>
+        <div class="kcp" style="margin-top:6px">∠A를 기준으로 <b>마주 보는 변</b>은 BC, ∠A를 끼고 있는 빗변이 아닌 <b>이웃한 변</b>은 AC예요.</div>`},
+      {h:'특수각의 삼각비', html:`<table class="kct"><thead><tr><th>A</th>${ANG.map(d=>`<th style="text-align:center">${d}°</th>`).join('')}</tr></thead><tbody>
+        ${FNS.map(fn=>`<tr><td style="white-space:nowrap"><b>${FN[fn]} A</b></td>${ANG.map(d=>`<td style="text-align:center;width:auto"><b>${TVAL[fn+d]}</b></td>`).join('')}</tr>`).join('')}</tbody></table>
+        <div class="kcp" style="margin-top:6px">각이 커질수록 sin A, tan A 는 커지고 cos A 는 작아져요.</div>`},
       {h:'두 삼각자에서 나오는 값', html:`<div class="ftabs"><div class="ftab"><h4>30° · 60°</h4>${specialSVG(30)}<div>세 변 1 : √3 : 2</div></div>
         <div class="ftab"><h4>45°</h4>${specialSVG(45)}<div>세 변 1 : 1 : √2</div></div></div>`}
     ],
     ways:[
-      fromHint('30° 의 직각삼각형으로','sin 30°',tV('s',30)),
-      fromHint('∠A 에서 본 세 변','sin A',tR(3,4,'s')),
-      fromHint('맞은편 = 빗변 × sin','AB = 10, ∠A = 30°',tS(30,10,'o')),
-      fromHint('값을 넣어 계산','tan 60° × tan 30°',tC(1))
+      W('직각삼각형에서 삼각비 구하기',tR(3,4,'s')),
+      W('특수각의 삼각비',tV('s',30),'30°·60° 삼각자의 세 변 1 : √3 : 2 를 떠올리면 표를 외우지 않아도 돼요.'),
+      W('삼각비의 값으로 각 찾기',tA('s',60)),
+      W('빗변과 각으로 변의 길이 구하기',tS(30,10,'o'),'BC = AB × sin A, AC = AB × cos A'),
+      W('특수각의 삼각비 계산',tC(1),'각끼리 계산하지 말고, 삼각비의 값을 넣어 계산해요.')
     ],
     miss:[
-      {w:'sin 30° = √3/2', r:'1/2', y:'sin 은 각이 커질수록 커져요. 30° 는 작은 각이니 작은 값 1/2.'},
-      {w:'tan A = AC/BC', r:'BC/AC', y:'tan 은 맞은편 ÷ 이웃. ∠A 를 기준으로 어느 변이 맞은편인지 먼저 정해요.'},
-      {w:'cos A = BC/AB', r:'AC/AB', y:'cos 은 ∠A 에 붙어 있는(이웃한) 변 ÷ 빗변.'},
-      {w:'sin 30° + sin 30° = sin 60°', r:'1', y:'각끼리 더하면 안 돼요. 값을 넣어 1/2 + 1/2 = 1.'}
-    ]};
-  if(t==='logx') return {
-    sub:'거듭제곱근 · 유리수 지수 · 로그의 값 · 로그의 성질 · 방정식',
+      {w:'sin 30° = √3/2', r:'1/2', y:'√3/2 는 sin 60° 예요. 30°에서 마주 보는 변이 가장 짧은 1이니 sin 30° = 1/2.'},
+      {w:'tan A = AC/BC', r:'BC/AC', y:'tan A = (마주 보는 변) ÷ (이웃한 변). ∠A와 마주 보는 변 BC가 분자예요.'},
+      {w:'cos A = BC/AB', r:'AC/AB', y:'cos A 는 ∠A의 이웃한 변 AC를 빗변으로 나눠요.'},
+      {w:'sin B = BC/AB', r:'AC/AB', y:'기준각이 B로 바뀌면 마주 보는 변도 AC로 바뀌어요.'},
+      {w:'AB = 10, ∠A = 30° → BC = 10 cos 30°', r:'BC = 10 sin 30° = 5', y:'BC는 ∠A와 마주 보는 변이라 sin 을 써요.'},
+      {w:'sin 30° + sin 30° = sin 60°', r:'1', y:'각끼리 더하면 안 돼요. 값을 넣으면 1/2 + 1/2 = 1.'}
+    ]});
+  if(t==='logx') return done({
+    sub:'거듭제곱근 · 지수의 확장(유리수 지수) · 로그의 뜻 · 밑과 진수 · 로그의 성질 · 상용로그 · 방정식',
     memo:[
-      {h:'지수와 로그는 서로 거꾸로', html:`${chipList(['2⁵ = 32','log₂ 32 = 5'])}<div class="hl" style="font-size:14.5px;margin-top:6px">aˣ = N ⇔ x = logₐ N (a > 0, a ≠ 1, N > 0)</div>`},
-      {h:'로그의 성질', html:chipList(['logₐ MN = logₐ M + logₐ N','logₐ (M/N) = logₐ M − logₐ N','logₐ Mᵏ = k logₐ M','logₐ b = log<sub>c</sub> b ÷ log<sub>c</sub> a','logₐ a = 1 · logₐ 1 = 0'])}
+      {h:'거듭제곱근', html:`<div class="kcp">n이 2 이상의 정수일 때, n제곱하여 실수 a가 되는 수, 곧 xⁿ = a 를 만족시키는 x를 a의 <b>n제곱근</b>이라고 해요.
+        a > 0 이고 n이 짝수이면 양수인 것을 ⁿ√a 로 나타내요.</div>${chipList(['∛8 = <b>2</b>','∜81 = <b>3</b>','∛(−27) = <b>−3</b>','√(a²) = |a|'])}`},
+      {h:'지수의 확장', html:`${chipList(['a⁰ = <b>1</b>','a⁻ⁿ = <b>1/aⁿ</b>','a<sup>m/n</sup> = <b>ⁿ√aᵐ</b>'])}
+        <div class="kcp" style="margin-top:6px">지수가 유리수일 때는 <b>밑 a > 0</b> 이어야 해요. 지수법칙은 그대로 쓸 수 있어요.</div>`},
+      {h:'로그의 뜻', html:`<div class="kcvs"><div class="kcv mul"><em>지수</em><b>aˣ = N</b><span>a를 x번 곱하면 N</span></div>
+        <div class="kcv add"><em>로그</em><b>x = logₐ N</b><span>a를 몇 번 곱해야 N이 되나</span></div></div>
+        <table class="kct"><thead><tr><th>지수로</th><th>로그로</th><th ${tdA}>값</th></tr></thead><tbody>
+        <tr><td>2⁵ = 32</td><td>log₂ 32</td><td ${tdA}><b>5</b></td></tr>
+        <tr><td>10² = 100</td><td>log 100</td><td ${tdA}><b>2</b></td></tr>
+        <tr><td>3⁻² = 1/9</td><td>log₃ (1/9)</td><td ${tdA}><b>−2</b></td></tr></tbody></table>
+        <div class="kcp" style="margin-top:6px">logₐ N 에서 a는 <b>밑</b>, N은 <b>진수</b>예요. <b>밑 조건</b> a > 0, a ≠ 1 · <b>진수 조건</b> N > 0.</div>`},
+      {h:'로그의 성질 (a > 0, a ≠ 1, M > 0, N > 0)', html:chipList(['logₐ 1 = <b>0</b>','logₐ a = <b>1</b>','logₐ MN = logₐ M + logₐ N','logₐ (M ÷ N) = logₐ M − logₐ N',
+        'logₐ Mᵏ = k logₐ M','밑의 변환: logₐ b = log<sub>c</sub> b ÷ log<sub>c</sub> a'])+
+        `<div class="kcp" style="margin-top:6px">지수법칙 aᵐ × aⁿ = aᵐ⁺ⁿ 에서 나온 성질이에요. 밑이 10인 <b>상용로그</b> log₁₀ N 은 밑을 빼고 log N 으로 써요.</div>`}
     ],
     ways:[
-      fromHint('n번 곱해서 되는 수','∛27',lR(3,3)),
-      fromHint('밑을 거듭제곱으로','8<sup>2/3</sup>',lQ(8,2,3)),
-      fromHint('몇 제곱하면 되나','log₂ (1/8)',lL(2,-3)),
-      fromHint('더하면 곱하기','log₆ 4 + log₆ 9',lP(1)),
-      fromHint('밑을 맞추기','2ˣ⁺¹ = 16',lE(2))
+      W('거듭제곱근 — n제곱해서 그 수가 되는 수',lR(3,3)),
+      W('유리수 지수 — 밑을 거듭제곱으로 바꾸기',lQ(8,2,3)),
+      W('로그의 뜻으로 값 구하기',lL(2,-3)),
+      W('로그의 성질 — 진수끼리 곱하기',lP(1)),
+      W('밑을 같게 하여 지수 비교하기',lE(2))
     ],
     miss:[
-      {w:'log₂ 8 = 4', r:'3', y:'8 을 2 로 나눈 것이 아니라, 2 를 몇 번 곱하면 8 인가: 2³ = 8.'},
-      {w:'log 2 + log 5 = log 7', r:'1', y:'로그끼리 더하면 진수끼리 곱해요: log 10 = 1.'},
-      {w:'8<sup>2/3</sup> = 16/3', r:'4', y:'지수가 분수면 거듭제곱근: 8 = 2³ 이므로 (2³)<sup>2/3</sup> = 2² = 4.'},
-      {w:'2⁻³ = −8', r:'1/8', y:'음수 지수는 역수예요. 값이 음수가 되는 것이 아니에요.'}
-    ]};
-  return {
-    sub:'팩토리얼 · 순열 · 조합 · n 찾기 · 상황 문제',
+      {w:'log₂ 8 = 4', r:'3', y:'8 ÷ 2 가 아니라 2를 몇 번 곱하면 8인가예요: 2³ = 8.'},
+      {w:'log 2 + log 5 = log 7', r:'1', y:'더하면 진수끼리 곱해요: log (2 × 5) = log 10 = 1.'},
+      {w:'log₂ (2 + 6) = log₂ 2 + log₂ 6', r:'3', y:'진수의 합은 나눌 수 없어요. 먼저 더하면 log₂ 8 = 3. 성질은 "곱 ↔ 합"이에요.'},
+      {w:'8<sup>2/3</sup> = 16/3', r:'4', y:'지수가 분수면 거듭제곱근이에요: (2³)<sup>2/3</sup> = 2² = 4.'},
+      {w:'2⁻³ = −8', r:'1/8', y:'지수가 음수이면 역수예요. 값이 음수가 되는 것이 아니에요.'},
+      {w:'logₓ 49 = 2 → x = ±7', r:'7', y:'밑은 양수이고 1이 아니어야 해요(밑 조건). 그래서 −7은 안 돼요.'}
+    ]});
+  return done({
+    sub:'합의 법칙과 곱의 법칙 · 순열 ₙPᵣ · 계승 n! · 조합 ₙCᵣ · 상황 속 경우의 수',
     memo:[
-      {h:'세 가지 공식', html:`<div class="ftabs">
-        <div class="ftab"><h4>n!</h4><div>n × (n − 1) × … × 1<br>0! = 1</div></div>
-        <div class="ftab"><h4>ₙPᵣ (순서 O)</h4><div>n 부터 r개 곱하기<br>₅P₂ = 5 × 4 = 20</div></div>
-        <div class="ftab"><h4>ₙCᵣ (순서 X)</h4><div>ₙPᵣ ÷ r!<br>₅C₂ = 20 ÷ 2 = 10</div></div></div>`},
-      {h:'합의 법칙 · 곱의 법칙', html:`<div class="hl" style="font-size:14.5px">"또는" 이면 더하고, "그리고(동시에)" 면 곱해요. 티셔츠 4벌과 바지 3벌로 입는 방법 = 4 × 3 = 12.</div>`}
+      {h:'합의 법칙과 곱의 법칙', html:`<div class="kcvs">
+        <div class="kcv add"><em>합의 법칙</em><b>A 또는 B</b><span>두 사건이 <u>동시에 일어나지 않을 때</u></span><strong>m + n</strong></div>
+        <div class="kcv mul"><em>곱의 법칙</em><b>A와 B가 잇달아</b><span>A 의 <u>각각에 대하여</u> B 가 n가지</span><strong>m × n</strong></div></div>`},
+      {h:'순열과 계승', html:`<div class="kcp">서로 다른 n개에서 r개(0 < r ≤ n)를 택하여 <b>일렬로 나열</b>하는 것을 n개에서 r개를 택하는 <b>순열</b>이라 하고, 그 수를 ₙPᵣ 로 나타내요.
+        1부터 n까지의 자연수를 모두 곱한 것을 n의 <b>계승</b>이라 하고 n! 로 나타내요.</div>
+        ${chipList(['ₙPᵣ = n(n − 1)(n − 2) × … × (n − r + 1) — r개','ₙPₙ = <b>n!</b>','ₙPᵣ = n! ÷ (n − r)!','0! = <b>1</b> · ₙP₀ = <b>1</b>'])}`},
+      {h:'조합', html:`<div class="kcp">서로 다른 n개에서 <b>순서를 생각하지 않고</b> r개를 택하는 것을 <b>조합</b>이라 하고, 그 수를 ₙCᵣ 로 나타내요.</div>
+        ${chipList(['ₙCᵣ = ₙPᵣ ÷ r!','ₙCᵣ = n! ÷ {r! (n − r)!}','ₙCᵣ = <b>ₙCₙ₋ᵣ</b>','ₙC₀ = <b>1</b>'])}`},
+      {h:'순열일까, 조합일까', html:`<table class="kct"><thead><tr><th>5명 가운데</th><th>식</th><th>경우의 수</th></tr></thead><tbody>
+        <tr><td>회장 1명, 부회장 1명<br><small>자리가 달라요 → 순서 O</small></td><td>₅P₂ = 5 × 4</td><td><b>20</b></td></tr>
+        <tr><td>대표 2명<br><small>자격이 같아요 → 순서 X</small></td><td>₅C₂ = 20 ÷ 2!</td><td><b>10</b></td></tr>
+        <tr><td>5명 모두 한 줄로</td><td>₅P₅ = 5!</td><td><b>120</b></td></tr></tbody></table>`}
     ],
     ways:[
-      fromHint('1까지 차례로 곱하기','5!',cF(5)),
-      fromHint('n 부터 r개 곱하기','₆P₃',cP(6,3)),
-      fromHint('순열을 r! 로 나누기','₇C₃',cC(7,3)),
-      fromHint('연속한 수의 곱으로','ₙC₂ = 15',cN('C',6,2)),
-      fromHint('이웃하면 한 묶음','A, B 가 이웃',cW(12))
+      W('계승 — 1까지 차례로 곱하기',cF(5)),
+      W('순열 — n부터 1씩 줄여 r개 곱하기',cP(6,3)),
+      W('조합 — 순열을 r! 로 나누기',cC(7,3)),
+      W('ₙCᵣ = ₙCₙ₋ᵣ — r개를 고르면 나머지가 정해져요',cS(10,3)),
+      W('ₙCᵣ 의 값으로 n 구하기',cN('C',6,2)),
+      W('이웃하면 한 묶음으로',cW(12))
     ],
     miss:[
-      {w:'₅C₂ = 20', r:'10', y:'20 은 ₅P₂ 예요. 순서 없이 뽑으면 (A,B) 와 (B,A) 가 같으니 2! 로 나눠요.'},
-      {w:'6명 중 회장·부회장 = 15', r:'30', y:'회장과 부회장은 자리가 달라 순서가 있어요: ₆P₂ = 30.'},
-      {w:'0! = 0', r:'0! = 1', y:'아무것도 없는 것을 늘어놓는 방법은 1가지로 약속해요.'},
-      {w:'0~4 로 두 자리 수 = ₅P₂ = 20', r:'0~4 로 두 자리 수 = 4 × 4 = 16', y:'십의 자리에 0 이 올 수 없어요. 십의 자리 4가지, 일의 자리도 (0 을 넣어) 4가지.'}
-    ]};
+      {w:'₅C₂ = 20', r:'10', y:'20 은 ₅P₂ 예요. 조합은 순서를 생각하지 않으니 2! 로 나눠요.'},
+      {w:'₅P₂ = 5 × 2', r:'= 5 × 4 = 20', y:'5부터 1씩 줄여 가며 2개를 곱해요. 5 × 2 가 아니에요.'},
+      {w:'6명 중 회장·부회장 → ₆C₂ = 15', r:'₆P₂ = 30', y:'회장과 부회장은 자리가 달라 순서가 있는 순열이에요.'},
+      {w:'0! = 0', r:'0! = 1', y:'ₙPₙ = n! ÷ 0! 이 성립하도록 0! = 1 로 정해요.'},
+      {w:'남 4명, 여 3명 중 남 2명과 여 1명 → ₄C₂ + ₃C₁ = 9', r:'₄C₂ × ₃C₁ = 18', y:'남학생과 여학생을 함께 뽑으니 곱의 법칙이에요.'},
+      {w:'0~4로 만드는 두 자리 자연수 → ₅P₂ = 20', r:'4 × 4 = 16', y:'십의 자리에 0이 올 수 없어요. 십의 자리 4가지, 일의 자리는 0을 넣어 4가지.'}
+    ]});
 }
 
 /* ═══ 고리 잇기 ═══ */
@@ -4845,31 +4980,49 @@ function tfnPreview(t,n){
 
 /* ═══ 정리 노트 ═══ */
 function tfnNote(t,fromHint){
-  const tab=`<div class="ftabs">${['s','c','t'].map(fn=>`<div class="ftab"><h4>${FN3[fn]}</h4>${[30,45,60,120,135,150].map(d=>`<div>${radTxt(d)} → <b>${exactOf(fn,d)}</b></div>`).join('')}</div>`).join('')}</div>`;
-  return {
-    sub:'호도법 · 부채꼴 · 삼각함수의 값 · 관계 · 그래프 · 사인법칙과 코사인법칙',
+  const W=(title,f,tip)=>f?fromHint(title,eqText(f,false),f,tip):null;
+  const tdA='style="width:auto;text-align:center"';
+  const tab=`<table class="kct"><thead><tr><th>θ</th>${['s','c','t'].map(fn=>`<th style="text-align:center">${FN3[fn]} θ</th>`).join('')}</tr></thead><tbody>
+    ${[30,45,60,120,135,150].map(d=>`<tr><td>${radTxt(d)}</td>${['s','c','t'].map(fn=>`<td ${tdA}><b>${exactOf(fn,d)}</b></td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const o={
+    sub:'일반각과 호도법 · 부채꼴 · 삼각함수의 뜻 · 삼각함수 사이의 관계 · 그래프 · 사인법칙과 코사인법칙',
     memo:[
-      {h:'호도법과 부채꼴', html:chipList(['180° = π','1 라디안 ≈ 57°','l = rθ','S = ½ r²θ = ½ rl'])},
-      {h:'단위원과 부호 (얼싸안코)', html:unitSVG(150)+`<div class="hl" style="font-size:14px">제1사분면 모두 +, 제2 sin +, 제3 tan +, 제4 cos +</div>`},
-      {h:'자주 쓰는 값', html:tab},
-      {h:'그래프 y = a sin bx + c', html:chipList(['최댓값 |a| + c','최솟값 −|a| + c','주기 2π ÷ |b|','tan 의 주기 π ÷ |b|'])},
-      {h:'삼각형', html:chipList(['a ÷ sin A = 2R','a² = b² + c² − 2bc cos A','넓이 = ½ bc sin A'])}
+      {h:'일반각과 호도법', html:`<div class="kcp">시초선 OX에서 동경 OP까지 회전한 양으로 각을 나타내요. 동경 OP가 나타내는 각은 <b>360° × n + α</b> (n은 정수) 꼴로 쓰고, 이것을 동경 OP의 <b>일반각</b>이라고 해요.<br>
+        반지름의 길이와 호의 길이가 같은 부채꼴의 중심각의 크기를 <b>1라디안</b>이라 하고, 이 단위로 각을 나타내는 방법을 <b>호도법</b>이라고 해요.</div>
+        ${chipList(['180° = <b>π</b>','1° = π/180','1라디안 = 180°/π ≈ 57°','30° = π/6','45° = π/4','60° = π/3','90° = π/2'])}`},
+      {h:'부채꼴의 호의 길이와 넓이', html:`<div class="kcp">반지름의 길이가 r, 중심각의 크기가 θ(라디안)인 부채꼴에서</div>${chipList(['호의 길이 l = <b>rθ</b>','넓이 S = <b>½ r²θ = ½ rl</b>'])}`},
+      {h:'삼각함수의 뜻', html:`<div class="kcp">원점 O를 중심으로 하고 반지름의 길이가 r인 원 위의 점 P(x, y)에 대하여 동경 OP가 나타내는 각을 θ라 하면</div>
+        ${chipList(['sin θ = y/r','cos θ = x/r','tan θ = y/x (x ≠ 0)'])}${unitSVG(150)}
+        <div class="kcp">사분면마다 양수인 삼각함수: 제1사분면 모두 · 제2 sin · 제3 tan · 제4 cos</div>`},
+      {h:'삼각함수 사이의 관계', html:chipList(['tan θ = <b>sin θ ÷ cos θ</b>','sin²θ + cos²θ = <b>1</b>'])+
+        `<div class="kcp" style="margin-top:6px">값의 크기는 관계식으로, 부호는 θ가 속한 사분면으로 정해요.</div>`},
+      {h:'자주 쓰는 삼각함수의 값', html:tab},
+      {h:'삼각함수의 그래프', html:`<table class="kct"><thead><tr><th>함수</th><th>치역</th><th>주기</th></tr></thead><tbody>
+        <tr><td>y = sin x</td><td>−1 ≤ y ≤ 1</td><td><b>2π</b></td></tr>
+        <tr><td>y = cos x</td><td>−1 ≤ y ≤ 1</td><td><b>2π</b></td></tr>
+        <tr><td>y = tan x</td><td>실수 전체</td><td><b>π</b></td></tr></tbody></table>
+        ${chipList(['y = a sin bx + c : 최댓값 |a| + c','최솟값 −|a| + c','주기 2π ÷ |b|','y = a tan bx 의 주기 π ÷ |b|'])}`},
+      {h:'사인법칙과 코사인법칙', html:chipList(['a ÷ sin A = b ÷ sin B = c ÷ sin C = <b>2R</b>','a² = b² + c² − 2bc cos A','△ABC 의 넓이 = ½ bc sin A'])+
+        `<div class="kcp" style="margin-top:6px">R은 외접원의 반지름. 두 변과 그 끼인각을 알면 코사인법칙, 마주 보는 변과 각의 짝을 알면 사인법칙.</div>`}
     ],
     ways:[
-      fromHint('× π/180','135°',fD(135)),
-      fromHint('l = rθ','r = 6, θ = π/3',fA(6,60)),
-      fromHint('단위원에서 부호와 기준각','cos 2π/3',fV('c',120)),
-      fromHint('sin²θ + cos²θ = 1','sin θ = 3/5 (제2사분면)',fR(0)),
-      fromHint('진폭과 주기','y = 3 sin 2x + 1',fG(4)),
-      fromHint('코사인법칙','b = 3, c = 5, A = 120°',fL(0))
+      W('호도법 — 도에 π/180 곱하기',fD(135)),
+      W('부채꼴의 호의 길이 l = rθ',fA(6,60)),
+      W('단위원에서 부호와 기준각',fV('c',120)),
+      W('sin²θ + cos²θ = 1 로 나머지 값',fR(0)),
+      W('그래프의 최댓값·최솟값·주기',fG(4)),
+      W('코사인법칙 — 두 변과 끼인각',fL(0)),
+      W('사인법칙 — 변과 마주 보는 각',fL(12))
     ],
     miss:[
-      {w:'60° = π/6', r:'π/3', y:'60 ÷ 180 = 1/3. π/6 은 30° 예요.'},
+      {w:'60° = π/6', r:'π/3', y:'60° = 180° × 1/3 이니 π/3. π/6 은 30° 예요.'},
       {w:'cos 2π/3 = 1/2', r:'−1/2', y:'2π/3 = 120° 는 제2사분면, 여기서 cos 은 음수예요.'},
-      {w:'y = sin 2x 의 주기 4π', r:'y = sin 2x 의 주기 π', y:'x 앞의 수로 나눠요: 2π ÷ 2 = π. 곱하는 것이 아니에요.'},
-      {w:'y = 2 cos x − 1 의 최솟값 −1', r:'y = 2 cos x − 1 의 최솟값 −3', y:'2 cos x 가 −2 까지 내려가요. −2 − 1 = −3.'},
-      {w:'a² = b² + c² − 2bc (A = 120°)', r:'a² = b² + c² + bc', y:'cos 120° = −1/2 이라서 빼기가 더하기로 바뀌어요.'}
+      {w:'sin 150° = −1/2', r:'1/2', y:'150° 는 제2사분면, 제2사분면에서는 sin 이 양수예요.'},
+      {w:'y = sin 2x 의 주기 4π', r:'y = sin 2x 의 주기 π', y:'x 앞의 수로 나눠요: 2π ÷ 2 = π.'},
+      {w:'y = tan x 의 주기 2π', r:'y = tan x 의 주기 π', y:'tan 는 π마다 같은 모양이 되풀이돼요.'},
+      {w:'a² = b² + c² − 2bc (A = 120°)', r:'a² = b² + c² + bc', y:'cos 120° = −1/2 이라서 −2bc cos A 가 +bc 로 바뀌어요.'}
     ]};
+  o.ways=o.ways.filter(Boolean); return o;
 }
 
 /* ═══ 고리 잇기 ═══ */
@@ -5110,14 +5263,31 @@ function elemPreview(t,n){
 function elemNote(t,fromHint){
   
   if(t==='boxq') return {
-    sub:'덧셈↔뺄셈 · 곱셈↔나눗셈 · 거꾸로 되돌리기',
-    memo:[{h:'서로 거꾸로인 계산', html:chipList(['+ 3 ↔ − 3','× 4 ↔ ÷ 4'])+
-      `<div class="hl" style="font-size:14.5px;margin-top:6px">□ 를 구한 뒤 식에 넣어 맞는지 확인하는 습관을 들여요.</div>`}],
-    ways:[fromHint('빼서 찾기','□ + 27 = 63',qA(1,27,63)), fromHint('빼는 수 찾기','80 − □ = 35',qA(3,80,35)),
-          fromHint('곱해서 찾기','□ ÷ 6 = 8',qMd(3,6,8)), fromHint('거꾸로 두 번','□ × 3 + 4 = 19',qT(1,3,4,5)),
-          fromHint('괄호가 있을 때','(□ + 6) × 4 = 44',qT(4,4,6,5))],
-    miss:[{w:'80 − □ = 35 → □ = 115', r:'45', y:'빼는 수를 찾을 때는 80 − 35. 더하면 안 돼요.'},
-          {w:'□ × 3 + 4 = 19 → □ = 19 ÷ 3 − 4', r:'5', y:'마지막에 한 + 4 부터 되돌려요: 19 − 4 = 15, 15 ÷ 3 = 5.'}]};
+    sub:'덧셈과 뺄셈의 관계 · 곱셈과 나눗셈의 관계 · □를 사용한 식 · 거꾸로 두 번 계산하기',
+    memo:[
+      {h:'□의 값은 거꾸로 계산해서 구해요', html:`<div class="kcvs">
+        <div class="kcv add"><em>덧셈과 뺄셈의 관계</em><b>+ 와 − 는 서로 거꾸로</b><span>□ + 27 = 63 이면</span><strong style="font-size:19px">□ = 63 − 27</strong><small>□ = 36</small></div>
+        <div class="kcv mul"><em>곱셈과 나눗셈의 관계</em><b>× 와 ÷ 는 서로 거꾸로</b><span>□ × 6 = 48 이면</span><strong style="font-size:19px">□ = 48 ÷ 6</strong><small>□ = 8</small></div></div>`},
+      {h:'□의 자리에 따라 계산이 달라져요', html:`<table class="kct"><thead><tr><th>식</th><th>□를 구하는 식</th><th>□</th></tr></thead><tbody>
+        <tr><td>□ + 18 = 45</td><td>45 − 18</td><td><b>27</b></td></tr>
+        <tr><td>□ − 18 = 45</td><td>45 + 18</td><td><b>63</b></td></tr>
+        <tr><td>80 − □ = 35<br><small>빼는 수를 구할 때</small></td><td>80 − 35</td><td><b>45</b></td></tr>
+        <tr><td>□ × 7 = 56</td><td>56 ÷ 7</td><td><b>8</b></td></tr>
+        <tr><td>□ ÷ 6 = 8</td><td>8 × 6</td><td><b>48</b></td></tr>
+        <tr><td>42 ÷ □ = 6<br><small>나누는 수를 구할 때</small></td><td>42 ÷ 6</td><td><b>7</b></td></tr></tbody></table>
+        <div class="kcp" style="margin-top:8px">구한 수를 □에 넣어 식이 맞는지 꼭 <b>확인</b>해요.</div>`}
+    ],
+    ways:[fromHint('덧셈식의 □는 빼서 구하기','□ + 27 = 63',qA(1,27,63)),
+          fromHint('뺄셈식의 □ — 빼는 수 구하기','80 − □ = 35',qA(3,80,35)),
+          fromHint('뺄셈식의 □ — 빼지는 수 구하기','□ − 18 = 45',qA(4,18,45)),
+          fromHint('나눗셈식의 □는 곱해서 구하기','□ ÷ 6 = 8',qMd(3,6,8)),
+          fromHint('나중에 한 계산부터 거꾸로 두 번','□ × 3 + 4 = 19',qT(1,3,4,5)),
+          fromHint('괄호가 있으면 괄호 밖부터 되돌리기','(□ + 6) × 4 = 44',qT(4,4,6,5))],
+    miss:[{w:'80 − □ = 35 → □ = 115', r:'45', y:'빼는 수를 구할 때는 80 − 35예요. 더하면 안 돼요. 확인: 80 − 45 = 35.'},
+          {w:'□ − 18 = 45 → □ = 27', r:'63', y:'빼지는 수는 전체예요. 남은 45에 뺀 18을 더해요: 45 + 18 = 63.'},
+          {w:'42 ÷ □ = 6 → □ = 252', r:'7', y:'나누는 수를 구할 때는 42 ÷ 6이에요. 확인: 42 ÷ 7 = 6.'},
+          {w:'□ × 3 + 4 = 19 → □ = 19 ÷ 3 − 4', r:'5', y:'마지막에 한 + 4부터 되돌려요: 19 − 4 = 15, 15 ÷ 3 = 5.'},
+          {w:'(□ + 6) × 4 = 44 → □ = 44 − 6 ÷ 4', r:'5', y:'괄호 밖의 × 4를 먼저 되돌려요: 44 ÷ 4 = 11, 11 − 6 = 5.'}]};
   
   
   
@@ -5235,24 +5405,24 @@ function lineqHint(f){
   const chk=s=>tip(`확인: ${s}`);
   switch(f.k){
     case 'lq1':{ const {form,a,x,c}=f;
-      if(form==='p') return {t:'+ 를 반대쪽으로 넘기면 −', lines:[`x + ${a} = ${MI(c)}`, `x = ${MI(c)} − ${a}`, `x = ${B(x)}`, chk(`${MI(x)} + ${a} = ${MI(c)}`)]};
-      if(form==='m') return {t:'− 를 반대쪽으로 넘기면 +', lines:[`x − ${a} = ${MI(c)}`, `x = ${MI(c)} + ${a}`, `x = ${B(x)}`, chk(`${MI(x)} − ${a} = ${MI(c)}`)]};
-      if(form==='t') return {t:'양변을 x 앞의 수로 나누기', lines:[`${a}x = ${MI(c)}`, `x = ${MI(c)} ÷ ${a}`, `x = ${B(x)}`, chk(`${a} × ${PV(x)} = ${MI(c)}`)]};
+      if(form==='p') return {t:'이항: + 는 − 로 바뀌어요', lines:[`x + ${a} = ${MI(c)}`, `x = ${MI(c)} − ${a}`, `x = ${B(x)}`, chk(`${MI(x)} + ${a} = ${MI(c)}`)]};
+      if(form==='m') return {t:'이항: − 는 + 로 바뀌어요', lines:[`x − ${a} = ${MI(c)}`, `x = ${MI(c)} + ${a}`, `x = ${B(x)}`, chk(`${MI(x)} − ${a} = ${MI(c)}`)]};
+      if(form==='t') return {t:'양변을 x의 계수로 나누기', lines:[`${a}x = ${MI(c)}`, `x = ${MI(c)} ÷ ${a}`, `x = ${B(x)}`, chk(`${a} × ${PV(x)} = ${MI(c)}`)]};
       return {t:'양변에 분모를 곱하기', lines:[`${xOverT(a)} = ${MI(c)}`, `x = ${MI(c)} × ${a}`, `x = ${B(x)}`, chk(`${MI(x)} ÷ ${a} = ${MI(c)}`)]};
     }
     case 'lq2':{ const {a,b,x,c}=f;
-      return {t:'상수항 먼저 넘기고, 그다음 나누기', lines:[`${poly([[a,'x'],[b,'']])} = ${MI(c)}`,
+      return {t:'상수항을 이항한 뒤 x의 계수로 나누기', lines:[`${poly([[a,'x'],[b,'']])} = ${MI(c)}`,
         `${a}x = ${MI(c)} ${b<0?'+ '+(-b):'− '+b} = ${MI(c-b)}`, `x = ${MI(c-b)} ÷ ${a} = ${B(x)}`, chk(`${a} × ${PV(x)}${sgnT(b)} = ${MI(c)}`)]};
     }
     case 'lq3':{ const {a,b,c,d,x}=f, k=a-c, r=d-b;
-      return {t:'x 는 왼쪽으로, 수는 오른쪽으로', lines:[`${poly([[a,'x'],[b,'']])} = ${poly([[c,'x'],[d,'']])}`,
+      return {t:'x가 있는 항은 좌변, 상수항은 우변으로 이항', lines:[`${poly([[a,'x'],[b,'']])} = ${poly([[c,'x'],[d,'']])}`,
         `${a}x − ${c===1?'':c}x = ${MI(d)} ${b<0?'+ '+(-b):'− '+b}`, ...(k===1?[`x = ${B(x)}`]:[`${k}x = ${MI(r)}`, `x = ${MI(r)} ÷ ${k} = ${B(x)}`]),
-        tip('넘어간 항은 부호가 바뀌어요')]};
+        tip('이항한 항은 부호가 바뀌어요')]};
     }
     case 'lq4':{ const {form,a,b,x,c}=f;
       if(form==='b') return {t:'양변을 괄호 앞의 수로 먼저 나누기', lines:[`${a}(x${sgnT(b)}) = ${MI(c)}`,
         `x${sgnT(b)} = ${MI(c)} ÷ ${a} = ${MI(c/a)}`, `x = ${MI(c/a)} ${b<0?'+ '+(-b):'− '+b} = ${B(x)}`, tip('괄호를 풀어도 되지만, 나누어떨어지면 나누는 쪽이 빨라요')]};
-      return {t:'상수항 넘기고 분모 곱하기', lines:[`${xOverT(a)}${sgnT(b)} = ${MI(c)}`,
+      return {t:'상수항을 이항하고 양변에 분모 곱하기', lines:[`${xOverT(a)}${sgnT(b)} = ${MI(c)}`,
         `${xOverT(a)} = ${MI(c)} ${b<0?'+ '+(-b):'− '+b} = ${MI(c-b)}`, `x = ${MI(c-b)} × ${a} = ${B(x)}`]};
     }
   }
@@ -5268,16 +5438,30 @@ function lineqPreview(t,n){
   return H(lq4('b',2,3,4),'괄호 앞의 수로 양변을 나누거나, 분수면 양변에 분모를 곱해요.',{body:neg});
 }
 function lineqNote(t,fromHint){
+  const fq=lq4('f',3,2,6);
   return {
-    sub:'이항 · 등식의 성질 · 양변에 x · 괄호와 분수',
-    memo:[{h:'등식의 성질 = 이항', html:chipList(['양변에 같은 수를 더하고 빼도 등식은 성립','양변에 같은 수를 곱하고 (0이 아닌 수로) 나눠도 성립','넘어간 항은 부호가 바뀜'])},
-          {h:'푸는 순서', html:chipList(['① 괄호·분모 정리','② x 는 왼쪽, 수는 오른쪽','③ 정리 ax = b','④ 양변 ÷ a','⑤ 대입해서 확인'])}],
-    ways:[fromHint('이항','x + 7 = 15',lq1('p',7,8)), fromHint('나누기','3x = 21',lq1('t',3,7)),
-          fromHint('두 단계','2x + 3 = 11',lq2(2,3,4)), fromHint('양변에 x','5x − 3 = 2x + 9',lq3(5,-3,2,4)),
-          fromHint('괄호','2(x + 3) = 14',lq4('b',2,3,4))],
-    miss:[{w:'x + 7 = 15 → x = 22', r:'8', y:'+ 7 을 넘기면 − 7: 15 − 7 = 8.'},
-          {w:'2x + 3 = 11 → x = 11 ÷ 2 − 3', r:'4', y:'상수항 3 을 먼저 넘겨요: 2x = 8, x = 4.'},
-          {w:'5x − 3 = 2x + 9 → 7x = 6', r:'x = 4', y:'2x 를 넘기면 −2x, −3 을 넘기면 +3: 3x = 12.'}]};
+    sub:'방정식과 해 · 등식의 성질 · 이항 · 일차방정식 풀기 · 괄호가 있는 식 · 계수가 분수인 식',
+    memo:[{h:'방정식과 해', html:`<div class="kcp">x의 값에 따라 참이 되기도 하고 거짓이 되기도 하는 등식을 <b>x에 대한 방정식</b>, 방정식을 참이 되게 하는 x의 값을 그 방정식의 <b>해</b> 또는 <b>근</b>이라고 해요.</div>
+        <div class="kcvs" style="margin-top:8px">
+          <div class="kcv add"><em>방정식</em><b>x + 2 = 5</b><span>x = 3일 때만 참</span><strong>해: x = 3</strong></div>
+          <div class="kcv mul"><em>항등식</em><b>2(x + 1) = 2x + 2</b><span>x에 어떤 값을 넣어도 참</span><strong>항상 참</strong></div></div>`},
+      {h:'등식의 성질', html:`<table class="kct"><thead><tr><th>a = b 이면</th><th style="width:auto;text-align:left">예</th></tr></thead><tbody>
+        <tr><td>a + c = b + c<br><small>양변에 같은 수를 더해도</small></td><td style="width:auto;text-align:left">x − 3 + 3 = 5 + 3 → x = 8</td></tr>
+        <tr><td>a − c = b − c<br><small>양변에서 같은 수를 빼도</small></td><td style="width:auto;text-align:left">x + 4 = 9 → x = 9 − 4 = 5</td></tr>
+        <tr><td>a × c = b × c<br><small>양변에 같은 수를 곱해도</small></td><td style="width:auto;text-align:left">x ÷ 2 = 6 → x = 6 × 2 = 12</td></tr>
+        <tr><td>a ÷ c = b ÷ c (c ≠ 0)<br><small>양변을 0이 아닌 같은 수로 나누어도</small></td><td style="width:auto;text-align:left">3x = 12 → x = 12 ÷ 3 = 4</td></tr></tbody></table>
+        <div class="kcp" style="margin-top:8px">등식은 여전히 성립해요.</div>`},
+      {h:'이항', html:`<div class="kcp">등식의 성질을 이용하여 등식의 한 변에 있는 항을 <b>부호를 바꾸어</b> 다른 변으로 옮기는 것을 <b>이항</b>이라고 해요.</div>
+        ${chipList(['x <b>+ 7</b> = 15 → x = 15 <b>− 7</b>','5x = 2x <b>+ 9</b> → 5x <b>− 2x</b> = 9'])}`},
+      {h:'일차방정식을 푸는 순서', html:chipList(['① 괄호가 있으면 분배법칙으로 풀고, 계수가 분수이면 분모의 최소공배수를 곱해요','② x가 있는 항은 좌변, 상수항은 우변으로 이항','③ 정리하여 ax = b 꼴로','④ 양변을 x의 계수 a로 나누기','⑤ 구한 해를 처음 식에 넣어 확인'])}],
+    ways:[fromHint('이항하여 풀기','x + 7 = 15',lq1('p',7,8)), fromHint('양변을 x의 계수로 나누기','3x = 21',lq1('t',3,7)),
+          fromHint('이항한 뒤 나누기','2x + 3 = 11',lq2(2,3,4)), fromHint('x가 있는 항은 좌변, 상수항은 우변','5x − 3 = 2x + 9',lq3(5,-3,2,4)),
+          fromHint('괄호가 있는 방정식','2(x + 3) = 14',lq4('b',2,3,4)), fq?fromHint('계수가 분수이면 분모를 곱해서',eqText(fq,false),fq):null].filter(Boolean),
+    miss:[{w:'x + 7 = 15 → x = 22', r:'8', y:'+ 7을 이항하면 − 7이 돼요: x = 15 − 7 = 8.'},
+          {w:'2x + 3 = 11 → x = 11 ÷ 2 − 3', r:'4', y:'상수항 3을 먼저 이항해요: 2x = 8, 양변을 2로 나누어 x = 4.'},
+          {w:'5x − 3 = 2x + 9 → 7x = 6', r:'x = 4', y:'2x를 이항하면 − 2x, − 3을 이항하면 + 3: 5x − 2x = 9 + 3, 3x = 12.'},
+          {w:'2(x + 3) = 14 → 2x + 3 = 14', r:'2x + 6 = 14', y:'분배법칙으로 괄호 안의 두 항에 모두 2를 곱해요. 그러면 2x = 8, x = 4.'},
+          {w:'−2x = 8 → x = 4', r:'x = −4', y:'양변을 x의 계수 −2로 나누어요. 부호까지 나누어야 해요: 8 ÷ (−2) = −4.'}]};
 }
 { const f0=extFact, v0=extVariant, h0=extHint, p0=extPreview, n0=extNote;
   extFact=k=>f0(k)||lineqFact(k);
@@ -6255,53 +6439,140 @@ function currPreview(t,n){
   return null;
 }
 
+/* ── 정리 노트용 그림 (분수 · 비 · 인수분해) ── */
+const NTF='font-family="Pretendard,system-ui,sans-serif"';
+/* 분수 막대 — rows: [{n 분모, k 칠한 칸, c 색, l 왼쪽 글자}] */
+function frBarSVG(rows){ const X=62, W=220, h=24, gap=12; let g='';
+  rows.forEach((r,i)=>{ const y=6+i*(h+gap), w=W/r.n;
+    for(let j=0;j<r.n;j++) g+=`<rect x="${(X+j*w).toFixed(1)}" y="${y}" width="${w.toFixed(1)}" height="${h}" fill="${j<r.k?r.c:'#fff'}" stroke="#9aa3b5" stroke-width="1.2"/>`;
+    g+=`<text x="${X-8}" y="${y+h/2+4.5}" text-anchor="end" font-size="13" font-weight="800" fill="#333">${r.l}</text>`; });
+  return `<svg class="vis" viewBox="0 0 ${X+W+4} ${rows.length*(h+gap)}" ${NTF} data-keep="1" aria-label="분수 막대">${g}</svg>`; }
+/* 넓이로 보는 분수의 곱셈 a/b × c/d — 세로로 b 칸 중 a 칸, 가로로 d 칸 중 c 칸, 겹친 곳이 답 */
+function frAreaSVG(a,b,c,d){ const S=150, X=40, Y=10, cw=S/b, rh=S/d; let g='';
+  for(let i=0;i<d;i++) for(let j=0;j<b;j++){ const A=j<a, C=i<c;
+    g+=`<rect x="${(X+j*cw).toFixed(1)}" y="${(Y+i*rh).toFixed(1)}" width="${cw.toFixed(1)}" height="${rh.toFixed(1)}" fill="${A&&C?'#2f5bea':A?'#c9d6fb':C?'#ffe0b8':'#fff'}" stroke="#9aa3b5" stroke-width="1.2"/>`; }
+  g+=`<text x="${X+a*cw/2}" y="${Y+S+16}" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">${a}/${b}</text>`;
+  g+=`<text x="${X-8}" y="${Y+c*rh/2+4}" text-anchor="end" font-size="12" font-weight="800" fill="#e8590c">${c}/${d}</text>`;
+  g+=`<text x="${X+S+12}" y="${Y+S/2-6}" font-size="12" font-weight="700" fill="#333">진한 칸</text><text x="${X+S+12}" y="${Y+S/2+12}" font-size="13" font-weight="800" fill="#2f5bea">${a*c} / ${b*d}</text>`;
+  return `<svg class="vis" viewBox="0 0 ${X+S+70} ${Y+S+24}" ${NTF} data-keep="1" style="max-width:280px" aria-label="넓이 모형">${g}</svg>`; }
+/* 비례식의 외항과 내항 */
+function rtTermSVG(a,b,c,d){ const y=70; let g='';
+  [a,':',b,'=',c,':',d].forEach((v,i)=>{ const x=[40,66,92,130,168,194,220][i];
+    g+=`<text x="${x}" y="${y}" text-anchor="middle" font-size="22" font-weight="800" fill="${i===0||i===6?'#e8590c':i===2||i===4?'#2f5bea':'#888'}">${v}</text>`; });
+  g+=`<path d="M40,${y-24} Q130,${y-64} 220,${y-24}" fill="none" stroke="#e8590c" stroke-width="2"/><text x="130" y="${y-50}" text-anchor="middle" font-size="12" font-weight="800" fill="#e8590c">외항</text>`;
+  [[40,'전항'],[92,'후항'],[168,'전항'],[220,'후항']].forEach(([x,t])=>{ g+=`<text x="${x}" y="${y+18}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#888">${t}</text>`; });
+  g+=`<path d="M92,${y+26} Q130,${y+54} 168,${y+26}" fill="none" stroke="#2f5bea" stroke-width="2"/><text x="130" y="${y+58}" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">내항</text>`;
+  return `<svg class="vis" viewBox="0 0 260 ${y+64}" ${NTF} data-keep="1" style="max-width:280px" aria-label="외항과 내항">${g}</svg>`; }
+/* 비례배분 띠 — 전체 T 를 p : q 로 */
+function rtTapeSVG(T,p,q,na,nb){ const n=p+q, X=10, W=260, w=W/n, one=T/n; let g='';
+  for(let i=0;i<n;i++) g+=`<rect x="${(X+i*w).toFixed(1)}" y="26" width="${w.toFixed(1)}" height="30" fill="${i<p?'#c9d6fb':'#ffe0b8'}" stroke="#7d869a" stroke-width="1.2"/><text x="${(X+i*w+w/2).toFixed(1)}" y="46" text-anchor="middle" font-size="12" font-weight="700" fill="#333">${one}</text>`;
+  g+=`<text x="${X+p*w/2}" y="18" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">${na} ${p}묶음 = ${one*p}</text>`;
+  g+=`<text x="${X+p*w+q*w/2}" y="18" text-anchor="middle" font-size="12" font-weight="800" fill="#e8590c">${nb} ${q}묶음 = ${one*q}</text>`;
+  g+=`<text x="${X+W/2}" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#555">전체 ${T} ÷ (${p} + ${q}) = 한 묶음 ${one}</text>`;
+  return `<svg class="vis" viewBox="0 0 280 84" ${NTF} data-keep="1" aria-label="비례배분 띠">${g}</svg>`; }
+/* 넓이로 보는 인수분해 x² + (a+b)x + ab = (x + a)(x + b) */
+function fcAreaSVG(a,b){ const X=34, Y=24, x=96, u=22, W=x+a*u, H=x+b*u; let g='';
+  const R=(x0,y0,w,h,f,t)=>`<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="${f}" stroke="#5b6377" stroke-width="1.2"/>`+(t?`<text x="${x0+w/2}" y="${y0+h/2+4.5}" text-anchor="middle" font-size="${w<30||h<30?11:15}" font-weight="800" fill="#1f2433">${t}</text>`:'');
+  g+=R(X,Y,x,x,'#c9d6fb','x²');
+  for(let i=0;i<a;i++) g+=R(X+x+i*u,Y,u,x,'#ffe0b8','x');
+  for(let j=0;j<b;j++) g+=R(X,Y+x+j*u,x,u,'#c8efd8','x');
+  for(let i=0;i<a;i++) for(let j=0;j<b;j++) g+=R(X+x+i*u,Y+x+j*u,u,u,'#fff3bf','1');
+  g+=`<text x="${X+x/2}" y="${Y-8}" text-anchor="middle" font-size="12" font-weight="800" fill="#333">x</text><text x="${X+x+a*u/2}" y="${Y-8}" text-anchor="middle" font-size="12" font-weight="800" fill="#e8590c">${a}</text>`;
+  g+=`<text x="${X-8}" y="${Y+x/2+4}" text-anchor="end" font-size="12" font-weight="800" fill="#333">x</text><text x="${X-8}" y="${Y+x+b*u/2+4}" text-anchor="end" font-size="12" font-weight="800" fill="#127a45">${b}</text>`;
+  return `<svg class="vis" viewBox="0 0 ${X+W+8} ${Y+H+8}" ${NTF} data-keep="1" style="max-width:240px" aria-label="넓이 모형">${g}</svg>`; }
+
 /* ════════ 정리 노트 ════════ */
 function currNote(t,fromHint){
   /* 예시 칸에는 실제 문제 모양(문장 + 식)을 그대로 보여 줘요 */
   const W=(title,f,tip)=>f?fromHint(title,eqText(f,false),f,tip):null;
   const done=o=>(o.ways=o.ways.filter(Boolean),o);
+  /* 노트 칸에 그림 붙이기 */
+  const WS=(title,f,svg,tip)=>{ const w=W(title,f,tip); if(w&&svg) w.svg=svg; return w; };
   if(t==='fadd') return done({
-    sub:'분모가 같은 분수 · 가분수와 대분수 · 대분수의 덧셈과 뺄셈 · 약분과 통분 · 분모가 다른 분수',
-    memo:[{h:'계산 순서 한눈에', html:chipList(['분모가 같으면 → 분자끼리','대분수 → 자연수끼리, 분수끼리','분수끼리 뺄 수 없으면 → 1 을 받아내림','분모가 다르면 → 통분 먼저','분모가 다른 계산의 답 → 기약분수로'])},
-          {h:'1 은 분모와 분자가 같은 분수', html:chipList(['1 = 2/2','1 = 3/3','1 = 4/4','1 = 5/5','1 = 8/8'])+
-            `<div class="hl" style="font-size:14px;margin-top:8px">받아올림과 받아내림은 모두 이 1 을 자연수와 분수 사이에서 주고받는 거예요.</div>`},
-          {h:'가분수 ↔ 대분수', html:chipList(['7/3 = 2와 1/3 · 7 ÷ 3 = 2 … 1','2와 1/3 = 7/3 · 2 × 3 + 1 = 7'])}],
-    ways:[W('분모는 그대로, 분자끼리',nfF('a',[0,2,7],[0,3,7],'F','n')), W('가분수 → 대분수',nfF('c',[0,7,3],null,'M','n')),
-          W('대분수 → 가분수',nfF('c',[2,1,3],null,'F','n')), W('자연수끼리, 분수끼리',nfF('a',[2,4,5],[1,3,5],'M','n')),
-          W('1 을 받아내려 빼기',nfF('s',[3,1,4],[1,3,4],'M','n')), W('약분 — 공약수로 나누기',frF('e',12,18,2,3,'d')),
-          W('통분해서 더하기',nfF('a',[0,1,2],[0,1,3],'m','n')), W('통분한 뒤 대분수로',nfF('a',[0,4,5],[0,1,2],'m','d'))],
-    miss:[{w:'2/7 + 3/7 = 5/14', r:'5/7', y:'분모끼리 더하면 안 돼요. 1/7 이 2개와 3개 → 1/7 이 5개.'},
-          {w:'1/2 + 1/3 = 2/5', r:'5/6', y:'분모가 다르면 6 으로 통분해요: 3/6 + 2/6 = 5/6.'},
-          {w:'2와 4/5 + 1과 3/5 = 3과 7/5', r:'4와 2/5', y:'분수 부분 7/5 은 1 보다 커요. 5/5 = 1 을 자연수로 올려요.'},
-          {w:'3과 1/4 − 1과 3/4 = 2와 2/4', r:'1과 2/4', y:'1/4 에서 3/4 을 뺄 수 없어 자연수에서 1 을 받아내려요: 2와 5/4 − 1과 3/4 = 1과 2/4.'},
-          {w:'3 − 1과 1/4 = 2와 1/4', r:'1과 3/4', y:'3 을 2와 4/4 로 바꿔서 빼요: 2와 4/4 − 1과 1/4 = 1과 3/4.'}]});
+    sub:'진분수 · 가분수 · 대분수 · 분모가 같은 분수의 덧셈과 뺄셈 · 약분과 통분 · 분모가 다른 분수의 덧셈과 뺄셈',
+    memo:[
+      {h:'분수의 이름', html:`<table class="kct"><thead><tr><th>이름</th><th>뜻</th><th style="width:auto;text-align:right;white-space:nowrap">예</th></tr></thead><tbody>
+        <tr><td><b style="font-size:14px">진분수</b></td><td>분자가 분모보다 작은 분수</td><td style="width:auto;text-align:right;white-space:nowrap">3/4</td></tr>
+        <tr><td><b style="font-size:14px">가분수</b></td><td>분자가 분모와 같거나 분모보다 큰 분수</td><td style="width:auto;text-align:right;white-space:nowrap">7/4</td></tr>
+        <tr><td><b style="font-size:14px">대분수</b></td><td>자연수와 진분수로 이루어진 분수</td><td style="width:auto;text-align:right;white-space:nowrap">1과 3/4</td></tr>
+        <tr><td><b style="font-size:14px">기약분수</b></td><td>분모와 분자의 공약수가 1뿐인 분수</td><td style="width:auto;text-align:right;white-space:nowrap">2/3</td></tr></tbody></table>`},
+      {h:'약분과 통분', html:`<div class="kcvs">
+        <div class="kcv add"><em>약분</em><b>공약수로 나누기</b><span>분모와 분자를 그들의 공약수로 나누어 간단히 해요</span><strong style="font-size:17px">12/18 = 2/3</strong><small>최대공약수 6으로 나누면 한 번에 기약분수</small></div>
+        <div class="kcv mul"><em>통분</em><b>분모를 같게</b><span>분수의 분모를 같게 해요 · 같게 한 분모를 <u>공통분모</u>라고 해요</span><strong style="font-size:17px">1/2, 1/3 → 3/6, 2/6</strong><small>두 분모의 최소공배수를 공통분모로</small></div></div>`},
+      {h:'분수의 덧셈과 뺄셈', html:`<table class="kct"><thead><tr><th>이럴 때</th><th style="width:auto;text-align:left">이렇게 계산해요</th></tr></thead><tbody>
+        <tr><td>분모가 같을 때</td><td style="width:auto;text-align:left">분모는 그대로 두고 분자끼리 더하거나 빼요</td></tr>
+        <tr><td>대분수일 때</td><td style="width:auto;text-align:left">자연수끼리, 분수끼리 계산해요 (가분수로 바꾸어 계산해도 돼요)</td></tr>
+        <tr><td>분수끼리 뺄 수 없을 때</td><td style="width:auto;text-align:left">자연수에서 1을 받아내려요 (1 = 4/4)</td></tr>
+        <tr><td>분모가 다를 때</td><td style="width:auto;text-align:left">통분한 뒤 계산하고, 답은 기약분수로 나타내요</td></tr></tbody></table>`},
+      {h:'가분수 ↔ 대분수', html:chipList(['7/3 → 7 ÷ 3 = 2 … 1 → 2와 1/3','2와 1/3 → 2 × 3 + 1 = 7 → 7/3'])}
+    ],
+    ways:[WS('분모가 같은 분수의 덧셈',nfF('a',[0,2,7],[0,3,7],'F','n'),frBarSVG([{n:7,k:2,c:'#c9d6fb',l:'2/7'},{n:7,k:3,c:'#ffe0b8',l:'3/7'},{n:7,k:5,c:'#2f5bea',l:'합'}]),
+            '1/7이 2개와 3개 → 1/7이 5개'),
+          W('가분수를 대분수로',nfF('c',[0,7,3],null,'M','n')),
+          W('대분수의 덧셈 — 자연수끼리, 분수끼리',nfF('a',[2,4,5],[1,3,5],'M','n')),
+          W('받아내림이 있는 대분수의 뺄셈',nfF('s',[3,1,4],[1,3,4],'M','n')),
+          W('약분하여 기약분수로',frF('e',12,18,2,3,'d')),
+          WS('통분하여 더하기',nfF('a',[0,1,2],[0,1,3],'m','n'),frBarSVG([{n:2,k:1,c:'#c9d6fb',l:'1/2'},{n:6,k:3,c:'#c9d6fb',l:'3/6'},{n:3,k:1,c:'#ffe0b8',l:'1/3'},{n:6,k:2,c:'#ffe0b8',l:'2/6'}])),
+          W('통분한 뒤 가분수는 대분수로',nfF('a',[0,4,5],[0,1,2],'m','d'))],
+    miss:[{w:'2/7 + 3/7 = 5/14', r:'5/7', y:'분모끼리 더하면 안 돼요. 1/7이 2개와 3개 → 1/7이 5개예요.'},
+          {w:'1/2 + 1/3 = 2/5', r:'5/6', y:'분모가 다르면 통분부터 해요: 3/6 + 2/6 = 5/6.'},
+          {w:'2와 4/5 + 1과 3/5 = 3과 7/5', r:'4와 2/5', y:'분수 부분 7/5는 가분수예요. 5/5 = 1을 자연수로 올려요.'},
+          {w:'3과 1/4 − 1과 3/4 = 2와 2/4', r:'1과 2/4', y:'1/4에서 3/4을 뺄 수 없으니 자연수에서 1을 받아내려요: 2와 5/4 − 1과 3/4 = 1과 2/4.'},
+          {w:'3 − 1과 1/4 = 2와 1/4', r:'1과 3/4', y:'3을 2와 4/4로 바꾸어 빼요: 2와 4/4 − 1과 1/4 = 1과 3/4.'},
+          {w:'5/6 − 1/3 = 4/3', r:'1/2', y:'분모끼리, 분자끼리 빼면 안 돼요. 통분하면 5/6 − 2/6 = 3/6이고, 약분하여 기약분수 1/2로 나타내요.'}]});
   if(t==='fmul') return done({
-    sub:'분수 × 자연수 · 자연수 × 분수 · 분수 × 분수 · 분수 ÷ 자연수 · 분수 ÷ 분수',
-    memo:[{h:'곱셈', html:chipList(['분수 × 자연수 → 분자에 곱하기','분수 × 분수 → 분자끼리, 분모끼리','대분수 → 가분수로 바꾼 뒤 곱하기','곱하기 전에 약분하면 수가 작아져요'])},
-          {h:'나눗셈', html:chipList(['÷ 자연수 → × 1/자연수','÷ 분수 → 뒤집어서 곱하기','분모가 같으면 → 분자끼리 나누기'])},
-          {h:'"■ 의 ▲" 는 곱하기', html:chipList(['12의 2/3 = 12 × 2/3 = 8','24의 3/4 = 24 × 3/4 = 18'])+
-            `<div class="hl" style="font-size:14px;margin-top:8px">12 를 3 묶음으로 나눈 것 가운데 2 묶음 — 12 ÷ 3 × 2 = 8</div>`}],
-    ways:[W('몇 묶음 가운데 몇 묶음',nfF('o',[12,0,1],[0,2,3],'i','i')), W('분자에 곱하기',nfF('m',[0,3,4],[2,0,1],'m','n')),
-          W('자연수 × 분수',nfF('m',[6,0,1],[0,2,3],'m','n')), W('분자끼리, 분모끼리',nfF('m',[0,2,3],[0,3,4],'m','d')),
-          W('대분수는 가분수로',nfF('m',[1,1,2],[0,2,3],'m','n')), W('÷ 자연수 = × 1/자연수',nfF('d',[0,3,4],[2,0,1],'m','d')),
-          W('뒤집어서 곱하기',nfF('d',[0,3,4],[0,3,8],'m','n')), W('자연수 ÷ 분수',nfF('d',[6,0,1],[0,2,3],'m','n'))],
+    sub:'(분수) × (자연수) · (자연수) × (분수) · (분수) × (분수) · (분수) ÷ (자연수) · (분수) ÷ (분수)',
+    memo:[
+      {h:'분수의 곱셈', html:`<table class="kct"><thead><tr><th>꼴</th><th>계산 방법</th><th style="width:auto;text-align:right;white-space:nowrap">예</th></tr></thead><tbody>
+        <tr><td>(분수) × (자연수)</td><td>분자와 자연수를 곱해요</td><td style="width:auto;text-align:right;white-space:nowrap">2/5 × 3 = 6/5</td></tr>
+        <tr><td>(자연수) × (분수)</td><td>자연수와 분자를 곱해요</td><td style="width:auto;text-align:right;white-space:nowrap">6 × 2/3 = 4</td></tr>
+        <tr><td>(분수) × (분수)</td><td>분자는 분자끼리, 분모는 분모끼리 곱해요</td><td style="width:auto;text-align:right;white-space:nowrap">2/3 × 3/4 = 1/2</td></tr>
+        <tr><td>대분수가 있으면</td><td>가분수로 바꾸어 곱해요</td><td style="width:auto;text-align:right;white-space:nowrap">1과 1/2 × 4 = 6</td></tr></tbody></table>
+        <div class="kcp" style="margin-top:8px">곱하기 전에 약분할 수 있으면 먼저 약분해요 — 계산이 쉬워져요.</div>`},
+      {h:'분수의 나눗셈', html:`<table class="kct"><thead><tr><th>꼴</th><th>계산 방법</th><th style="width:auto;text-align:right;white-space:nowrap">예</th></tr></thead><tbody>
+        <tr><td>(분수) ÷ (자연수)</td><td>÷ 2를 × 1/2로 바꾸듯이 곱셈으로 바꾸어요</td><td style="width:auto;text-align:right;white-space:nowrap">4/5 ÷ 2 = 2/5</td></tr>
+        <tr><td>분모가 같은 (분수) ÷ (분수)</td><td>분자끼리 나눠요</td><td style="width:auto;text-align:right;white-space:nowrap">6/7 ÷ 2/7 = 3</td></tr>
+        <tr><td>(분수) ÷ (분수)</td><td>나누는 분수의 분모와 분자를 바꾸어 곱해요</td><td style="width:auto;text-align:right;white-space:nowrap">3/4 ÷ 3/8 = 2</td></tr>
+        <tr><td>(자연수) ÷ (분수)</td><td>나누는 분수의 분모와 분자를 바꾸어 곱해요</td><td style="width:auto;text-align:right;white-space:nowrap">6 ÷ 2/3 = 9</td></tr></tbody></table>`},
+      {h:'"■의 ▲"는 곱셈', html:chipList(['12의 2/3 = 12 × 2/3 = 8','24의 3/4 = 24 × 3/4 = 18'])+
+        `<div class="kcp" style="margin-top:8px">12의 2/3는 12를 똑같이 3묶음으로 나눈 것 가운데 2묶음이에요: 12 ÷ 3 × 2 = 8</div>`}
+    ],
+    ways:[W('전체의 얼마 — 몇 묶음 가운데 몇 묶음',nfF('o',[12,0,1],[0,2,3],'i','i')),
+          W('(분수) × (자연수)',nfF('m',[0,3,4],[2,0,1],'m','n')),
+          WS('(분수) × (분수) — 넓이로 보기',nfF('m',[0,2,3],[0,3,4],'m','d'),frAreaSVG(2,3,3,4)),
+          W('대분수는 가분수로 바꾸어 곱하기',nfF('m',[1,1,2],[0,2,3],'m','n')),
+          W('(분수) ÷ (자연수) — ÷ 2는 × 1/2',nfF('d',[0,3,4],[2,0,1],'m','d')),
+          W('(분수) ÷ (분수) — 바꾸어 곱하기',nfF('d',[0,3,4],[0,3,8],'m','n')),
+          W('(자연수) ÷ (분수)',nfF('d',[6,0,1],[0,2,3],'m','n'))],
     miss:[{w:'1/2 × 4 = 4/8', r:'2', y:'자연수는 분자에만 곱해요: 1/2 × 4 = 4/2 = 2.'},
-          {w:'4/5 ÷ 2 = 8/5', r:'2/5', y:'÷ 2 는 × 1/2 이에요: 4/5 × 1/2 = 4/10 = 2/5.'},
-          {w:'3/4 ÷ 3/8 = 9/32', r:'2', y:'나누는 분수를 뒤집어 곱해요: 3/4 × 8/3 = 2.'},
-          {w:'6 ÷ 2/3 = 4', r:'9', y:'6 × 2/3 을 해 버렸어요. 나눌 때는 뒤집어 곱해요: 6 × 3/2 = 9.'},
-          {w:'1과 1/2 × 4 = 4와 1/2', r:'6', y:'자연수 부분에만 곱하면 안 돼요. 가분수로 바꿔 곱해요: 3/2 × 4 = 6.'}]});
+          {w:'1과 1/2 × 4 = 4와 1/2', r:'6', y:'자연수 부분에만 곱하면 안 돼요. 가분수로 바꾸어 곱해요: 3/2 × 4 = 6.'},
+          {w:'4/5 ÷ 2 = 8/5', r:'2/5', y:'÷ 2는 × 1/2이에요: 4/5 × 1/2 = 4/10 = 2/5.'},
+          {w:'3/4 ÷ 3/8 = 9/32', r:'2', y:'나누는 분수의 분모와 분자를 바꾸어 곱해요: 3/4 × 8/3 = 2.'},
+          {w:'6 ÷ 2/3 = 4', r:'9', y:'6 × 2/3을 계산했어요. 나눌 때는 바꾸어 곱해요: 6 × 3/2 = 9.'},
+          {w:'3/4 ÷ 3/8 = 4/3 × 3/8', r:'3/4 × 8/3', y:'바꾸는 것은 나누는 분수(÷ 뒤의 분수)예요. 앞의 분수는 그대로 둬요.'}]});
   if(t==='ratio') return done({
-    sub:'비율과 백분율 · 비의 성질 · 간단한 자연수의 비 · 비례식 · 비례배분',
-    memo:[{h:'비와 비율', html:chipList(['a : b 에서 b 가 기준량','비율 = 비교하는 양 ÷ 기준량','백분율 = 비율 × 100','"20에 대한 5" → 기준량 20'])},
-          {h:'비례식', html:chipList(['비의 성질: 앞항·뒤항에 같은 수를 곱하거나 나눠요','외항의 곱 = 내항의 곱','비례배분: 전체 × 부분/합'])+
-            `<div class="hl" style="font-size:14px;margin-top:8px">3 : 4 = 9 : 12 → 바깥쪽 3 × 12 = 36, 안쪽 4 × 9 = 36</div>`}],
-    ways:[W('비율 → 백분율',rtP(5,20,1)), W('백분율만큼 구하기',rtN(80,25)), W('비의 성질',rtK(3,4,3,'x',3)),
-          W('간단한 자연수의 비로',rtS(1,1,2,1,3,0)), W('외항의 곱 = 내항의 곱',rtR(4,6,10,15,3)),
-          W('문장을 비례식으로',rtW(2,3,4,12)), W('비례배분',rtB(0,20,3,2,1))],
-    miss:[{w:'20에 대한 5의 비율 = 400%', r:'25%', y:'"20에 대한" 이니 20 이 기준량이에요. 5 ÷ 20 = 0.25 → 25%.'},
-          {w:'3 : 4 = 9 : 10', r:'3 : 4 = 9 : 12', y:'3 → 9 는 6 을 더한 것이 아니라 × 3 이에요. 뒤항도 × 3: 4 × 3 = 12.'},
+    sub:'비와 비율 · 백분율 · 비의 성질 · 간단한 자연수의 비 · 비례식 · 비례배분',
+    memo:[
+      {h:'비와 비율', html:`<div class="kcp">두 수를 나눗셈으로 비교하기 위해 기호 : 를 사용하여 나타낸 것을 <b>비</b>라고 해요. 3 : 4에서 기호 : 의 오른쪽에 있는 4가 <b>기준량</b>, 왼쪽에 있는 3이 <b>비교하는 양</b>이에요.</div>
+        <table class="kct"><thead><tr><th style="width:auto;text-align:left">3 : 4 를 읽는 방법</th></tr></thead><tbody><tr><td style="width:auto;text-align:left">3 대 4 · 3과 4의 비 · 4에 대한 3의 비 · 3의 4에 대한 비</td></tr></tbody></table>
+        <div class="kcvs" style="margin-top:10px">
+        <div class="kcv add"><em>비율</em><b>(비교하는 양) ÷ (기준량)</b><span>기준량에 대한 비교하는 양의 크기</span><strong style="font-size:18px">3/4 = 0.75</strong></div>
+        <div class="kcv mul"><em>백분율</em><b>(비율) × 100</b><span>기준량을 100으로 할 때의 비율 · 기호 %</span><strong style="font-size:18px">75%</strong></div></div>`},
+      {h:'비례식', html:`<div class="kcp">비율이 같은 두 비를 기호 = 를 사용하여 나타낸 식을 <b>비례식</b>이라고 해요. 비 3 : 4에서 3을 <b>전항</b>, 4를 <b>후항</b>이라 하고, 비례식에서 바깥쪽 두 항을 <b>외항</b>, 안쪽 두 항을 <b>내항</b>이라고 해요.</div>
+        ${rtTermSVG(3,4,9,12)}
+        <div class="kcp" style="margin-top:4px">비례식에서 <b>외항의 곱과 내항의 곱은 같아요</b>: 3 × 12 = 36, 4 × 9 = 36</div>`},
+      {h:'비의 성질과 비례배분', html:chipList(['전항과 후항에 0이 아닌 같은 수를 곱해도 비율은 같아요 — 3 : 4 = 9 : 12',
+        '전항과 후항을 0이 아닌 같은 수로 나누어도 비율은 같아요 — 10 : 15 = 2 : 3'])+
+        `<div class="kcp" style="margin-top:8px">전체를 주어진 비로 나누는 것을 <b>비례배분</b>이라고 해요. 20을 3 : 2로 나누면 20 × 3/5 = 12, 20 × 2/5 = 8</div>`}
+    ],
+    ways:[W('비율을 백분율로',rtP(5,20,1)), W('백분율로 비교하는 양 구하기',rtN(80,25)), W('비의 성질 — 같은 수를 곱하기',rtK(3,4,3,'x',3)),
+          W('간단한 자연수의 비로 나타내기',rtS(1,1,2,1,3,0)), WS('외항의 곱 = 내항의 곱',rtR(4,6,10,15,3),rtTermSVG(4,6,10,'□')),
+          W('문장을 비례식으로',rtW(2,3,4,12)), WS('비례배분',rtB(0,20,3,2,1),rtTapeSVG(20,3,2,'형','동생'))],
+    miss:[{w:'20에 대한 5의 비율 = 400%', r:'25%', y:'"20에 대한"이니 20이 기준량이에요. 5 ÷ 20 = 0.25 → 25%.'},
+          {w:'2 : 5의 비율 = 5/2', r:'2/5', y:'기호 : 의 오른쪽 5가 기준량이에요. 비율은 (비교하는 양) ÷ (기준량) = 2 ÷ 5.'},
+          {w:'3 : 4 = 9 : 10', r:'3 : 4 = 9 : 12', y:'3 → 9는 6을 더한 것이 아니라 × 3이에요. 후항에도 3을 곱해요: 4 × 3 = 12.'},
           {w:'4 : 6 = 10 : □ → □ = 12', r:'□ = 15', y:'외항의 곱 = 내항의 곱: 4 × □ = 6 × 10 = 60, □ = 15.'},
-          {w:'사탕 20개를 3 : 2 로 → 형 20 × 3/2 = 30개', r:'사탕 20개를 3 : 2 로 → 형 20 × 3/5 = 12개', y:'전체를 3 + 2 = 5 묶음으로 나눠요. 형은 그 가운데 3 묶음이에요.'}]});
+          {w:'사탕 20개를 3 : 2로 → 형 20 × 3/2 = 30개', r:'사탕 20개를 3 : 2로 → 형 20 × 3/5 = 12개', y:'전체를 3 + 2 = 5묶음으로 나눠요. 형은 그 가운데 3묶음이에요.'}]});
   if(t==='cnt') return done({
     sub:'사건과 경우의 수 · 합의 법칙(또는) · 곱의 법칙(동시에) · 표와 나뭇가지 그림 · 수 만들기 · 대표 뽑기 · 한 줄로 세우기',
     memo:[
@@ -6351,16 +6622,41 @@ function currNote(t,fromHint){
           {w:'5명 가운데 대표 2명 → 5 × 4 = 20', r:'5 × 4 ÷ 2 = 10', y:'대표 2명은 자격이 같아서 (A, B)와 (B, A)가 같은 경우예요.'},
           {w:'0, 1, 2, 3으로 두 자리 자연수 → 4 × 3 = 12', r:'3 × 3 = 9', y:'십의 자리에 0은 올 수 없어요. 십의 자리 3가지, 일의 자리는 0을 포함해 남은 3가지.'}]});
   if(t==='factor') return done({
-    sub:'공통인수 · 완전제곱식 · 합과 차의 곱 · x² + (a+b)x + ab · acx² + (ad+bc)x + bd',
-    memo:[{h:'인수분해 공식', html:chipList(['ma + mb = m(a + b)','a² + 2ab + b² = (a + b)²','a² − 2ab + b² = (a − b)²','a² − b² = (a + b)(a − b)','x² + (a+b)x + ab = (x + a)(x + b)'])},
-          {h:'전개와 인수분해는 거꾸로', html:chipList(['(x + 2)(x + 3) → x² + 5x + 6 (전개)','x² + 5x + 6 → (x + 2)(x + 3) (인수분해)'])+
-            `<div class="hl" style="font-size:14px;margin-top:8px">답을 구하면 다시 전개해서 처음 식이 나오는지 확인해요.</div>`}],
-    ways:[W('공통인수로 묶기',fcC(1,3,2,3,'b')), W('완전제곱식',fcS(1,3,'q')), W('합과 차의 곱',fcD(1,7,'q')),
-          W('곱과 합으로 두 수 찾기',fcT(5,-3,'b')), W('대각선으로 곱해 더하기',fcA(2,1,1,3,'s'))],
-    miss:[{w:'6x + 9 = 3(2x + 9)', r:'3(2x + 3)', y:'두 항을 모두 3 으로 나눠야 해요: 9 ÷ 3 = 3.'},
-          {w:'x² + 6x + 9 = (x + 9)²', r:'(x + 3)²', y:'9 = 3², 6x = 2 × 3 × x. 괄호 안에는 3 이 들어가요.'},
-          {w:'x² − 49 = (x − 7)²', r:'(x + 7)(x − 7)', y:'(x − 7)² 을 전개하면 x² − 14x + 49 예요. 제곱의 차는 합과 차의 곱.'},
-          {w:'x² + 2x − 15 = (x − 5)(x + 3)', r:'(x + 5)(x − 3)', y:'곱이 −15, 합이 +2 인 두 수는 5 와 −3 이에요.'}]});
+    sub:'인수와 인수분해 · 공통인수 · 완전제곱식 · 인수분해 공식 · 넓이로 보는 인수분해',
+    memo:[
+      {h:'인수분해', html:`<div class="kcp">하나의 다항식을 두 개 이상의 다항식의 곱으로 나타낼 때, 각각의 식을 처음 다항식의 <b>인수</b>라고 해요. 하나의 다항식을 인수의 곱으로 나타내는 것을 그 다항식을 <b>인수분해</b>한다고 해요.</div>
+        <div class="kcvs" style="margin-top:10px">
+        <div class="kcv mul"><em>인수분해</em><b>x² + 5x + 6</b><span>→ 곱으로</span><strong style="font-size:17px">(x + 2)(x + 3)</strong></div>
+        <div class="kcv add"><em>전개</em><b>(x + 2)(x + 3)</b><span>→ 합으로</span><strong style="font-size:17px">x² + 5x + 6</strong></div></div>
+        <div class="kcp" style="margin-top:8px">인수분해와 전개는 서로 반대 과정이에요. 답을 구하면 다시 전개해서 처음 식이 나오는지 확인해요.</div>`},
+      {h:'공통인수와 완전제곱식', html:`<table class="kct"><tbody>
+        <tr><td style="width:auto;text-align:left"><b style="font-size:14px">공통인수</b> — 다항식의 각 항에 공통으로 들어 있는 인수<br><small>3x + 6 = 3(x + 2) · 공통인수 3</small></td></tr>
+        <tr><td style="width:auto;text-align:left"><b style="font-size:14px">완전제곱식</b> — 다항식의 제곱으로 된 식이나 이 식에 상수를 곱한 식<br><small>(x + 3)², 2(x − 1)²</small></td></tr></tbody></table>`},
+      {h:'인수분해 공식', html:`<table class="kct"><tbody>
+        <tr><td style="width:auto;text-align:left"><b style="font-size:14.5px;color:var(--ink)">ma + mb = m(a + b)</b><br><small>예) 2x² − 6x = 2x(x − 3)</small></td></tr>
+        <tr><td style="width:auto;text-align:left"><b style="font-size:14.5px;color:var(--ink)">a² + 2ab + b² = (a + b)²</b><br><small>예) x² + 6x + 9 = (x + 3)²</small></td></tr>
+        <tr><td style="width:auto;text-align:left"><b style="font-size:14.5px;color:var(--ink)">a² − 2ab + b² = (a − b)²</b><br><small>예) x² − 10x + 25 = (x − 5)²</small></td></tr>
+        <tr><td style="width:auto;text-align:left"><b style="font-size:14.5px;color:var(--ink)">a² − b² = (a + b)(a − b)</b><br><small>예) x² − 49 = (x + 7)(x − 7)</small></td></tr>
+        <tr><td style="width:auto;text-align:left"><b style="font-size:14.5px;color:var(--ink)">x² + (a + b)x + ab = (x + a)(x + b)</b><br><small>예) x² + 5x + 6 = (x + 2)(x + 3)</small></td></tr>
+        <tr><td style="width:auto;text-align:left"><b style="font-size:14.5px;color:var(--ink)">acx² + (ad + bc)x + bd = (ax + b)(cx + d)</b><br><small>예) 2x² + 7x + 3 = (2x + 1)(x + 3)</small></td></tr></tbody></table>`},
+      {h:'인수분해하는 순서', html:chipList(['① 공통인수가 있으면 먼저 묶어요','② 남은 식에 맞는 공식을 찾아요','③ 더 인수분해되는지 확인해요'])+
+        `<div class="kcp" style="margin-top:8px">2x² − 18 = 2(x² − 9) = 2(x + 3)(x − 3)</div>`}
+    ],
+    ways:[W('공통인수로 묶기',fcC(1,3,2,3,'b')),
+          W('완전제곱식 — 상수항이 제곱수, 일차항이 2 × (곱)',fcS(1,3,'q')),
+          W('합과 차의 곱 — 제곱의 차',fcD(1,7,'q')),
+          W('곱이 상수항, 합이 x의 계수인 두 수 찾기',fcT(5,-3,'b')),
+          {t:'넓이로 보는 인수분해', ex:'x² + 5x + 6을 인수분해하기', svg:fcAreaSVG(2,3),
+            lines:['넓이가 x²인 정사각형 1개, x인 직사각형 5개, 1인 정사각형 6개를 빈틈없이 모아 직사각형 하나를 만들어요',
+              '가로는 x + 2, 세로는 x + 3', 'x² + 5x + 6 = <b>(x + 2)(x + 3)</b>',
+              '<span class="tip">곱해서 6, 더해서 5가 되는 두 수 2와 3이 직사각형의 두 변에 나타나요.</span>']},
+          W('대각선으로 곱해 더하기 — x²의 계수가 1이 아닐 때',fcA(2,1,1,3,'s'))],
+    miss:[{w:'6x + 9 = 3(2x + 9)', r:'3(2x + 3)', y:'공통인수 3으로 두 항을 모두 나눠야 해요: 9 ÷ 3 = 3.'},
+          {w:'x² + 6x + 9 = (x + 9)²', r:'(x + 3)²', y:'9 = 3², 6x = 2 × x × 3이에요. 괄호 안에는 3이 들어가요.'},
+          {w:'x² − 49 = (x − 7)²', r:'(x + 7)(x − 7)', y:'(x − 7)²을 전개하면 x² − 14x + 49예요. 제곱의 차는 합과 차의 곱이에요.'},
+          {w:'x² + 2x − 15 = (x − 5)(x + 3)', r:'(x + 5)(x − 3)', y:'곱이 −15, 합이 +2인 두 수는 5와 −3이에요. 전개해서 확인해요.'},
+          {w:'2x² − 18 = 2(x² − 9)', r:'2(x + 3)(x − 3)', y:'x² − 9를 더 인수분해할 수 있어요. 인수분해는 더 이상 나눌 수 없을 때까지 해요.'},
+          {w:'x² + 5x + 6 = x(x + 5) + 6', r:'(x + 2)(x + 3)', y:'인수분해는 식 전체를 곱의 꼴로 나타내는 거예요. 뒤에 + 6이 남으면 인수분해가 아니에요.'}]});
   return null;
 }
 
