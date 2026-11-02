@@ -7966,11 +7966,11 @@ function stageGradeP(p,t,n){ const c=GRADE_CUT[t], bt=p&&p.bt&&p.bt['s'+n]; if(!
 const gBadge=g=>g?`<span class="gbadge g-${g}">${g}</span>`:'';
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
-let CFG={shop:{open:false},rk:{today:true,all:false,class:true,coin:true},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
+let CFG={shop:{open:false},rk:{today:true,all:true,class:true,coin:true},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
 async function loadCfg(){
   try{ const c=await dbGet('config',null);
     if(c&&c.shop) CFG.shop={open:c.shop.open===true};
-    if(c&&c.rk) CFG.rk=Object.assign({today:true,all:false,class:true,coin:true},c.rk);
+    if(c&&c.rk) CFG.rk=Object.assign({today:true,all:true,class:true,coin:true},c.rk);
     if(c&&c.lock) CFG.lock={on:c.lock.on!==false, goal:Object.assign({},c.lock.goal||{})};
     if(c&&c.tl){ const vs=x=>Object.values(x||{}).filter(v=>typeof v==='string');
       CFG.tl=c.tl.open!=null&&c.tl.v==null?{v:2,p:vs(c.tl.open),r:vs(c.tl.open),b:vs(c.tl.open)}:{v:2,p:vs(c.tl.p),r:vs(c.tl.r),b:vs(c.tl.b)}; }
@@ -8324,11 +8324,11 @@ function press(k){
   if(k==='ok'){ if(/\d/.test(G.typed)) submit(); return; }
   if(k==='neg'){ if(!topicOf(G.t).neg) return;
     G.typed=G.typed[0]==='-'?G.typed.slice(1):'-'+G.typed; paintTyped();
-    if(AUTO_OK&&G.clean&&G.typed===String(G.ask.ans)) submit(); return; }
+    if(AUTO_OK&&G.typed===String(G.ask.ans)) submit(); return; }
   if(G.typed.replace('-','').length>=4) return;
   if(G.typed==='0') G.typed=''; if(G.typed==='-0') G.typed='-';
   G.typed+=k; paintTyped();
-  if(AUTO_OK&&G.clean&&G.typed===String(G.ask.ans)) submit();
+  if(AUTO_OK&&G.typed===String(G.ask.ans)) submit();
 }
 function submit(){
   const f=G.ask, ok=(+G.typed===f.ans), sec=(performance.now()-G.qStart)/1000;
@@ -8728,7 +8728,7 @@ let RK={school:'e',topic:'addsub',tab:'today',users:null,scope:'school'};
 const rkTopicsOf=k=>schoolOf(k).topics.filter(t=>modeOpen(t,'r'));
 async function openRank(){
   stopTimer(); G=null;
-  RK.school=CUR.school; RK.topic=CUR.topic; show('s-rank');
+  RK.school=CUR.school; RK.topic=CUR.topic; RK.autoT=true; show('s-rank');
   await loadCfg();
   if(!RK.users) await loadRank(); else paintRank();
 }
@@ -8828,6 +8828,11 @@ function paintRank(){
   const SN={e:'초등',m:'중등',h:'고등'}, open=SCHOOLS.filter(x=>rkTopicsOf(x.k).length), all=open.flatMap(x=>rkTopicsOf(x.k));
   if(!all.length){ el('rkSub').innerHTML='아직 열린 실전 모드가 없어요.'; el('rkTopics').innerHTML='';
     el('rkBody').innerHTML='<div class="empty">선생님이 실전 모드를 열면 랭킹이 보여요.</div>'; return; }
+  /* 처음 열 때는 기록이 있는 주제로 — 지금 주제에 기록이 없으면 기록이 가장 많은 주제 */
+  if(RK.autoT&&RK.users){ RK.autoT=false;
+    const key=RK.tab==='today'?'today':'best', U=RK.users, cnt=t=>Object.keys(U).filter(sid=>userStat(sid,U[sid],t,null)[key]>0).length;
+    const C=all.map(t=>[t,cnt(t)]), cur=C.find(([t])=>t===RK.topic);
+    if(!(cur&&cur[1]>0)){ const best=C.slice().sort((a,b)=>b[1]-a[1])[0]; if(best&&best[1]>0) RK.topic=best[0]; } }
   if(!all.includes(RK.topic)) RK.topic=all[0];
   const t=RK.topic; RK.school=(SCHOOLS.find(x=>x.topics.includes(t))||SCHOOLS[0]).k;
   el('rkSub').innerHTML=`${live} · <b>실전 모드</b>(${REAL_SEC/60}분 무실수)에서 맞힌 개수로 매겨요`;
