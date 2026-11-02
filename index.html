@@ -1503,6 +1503,24 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .tms{display:flex;gap:8px;font-size:12.5px;align-items:flex-start;background:var(--soft);border-radius:10px;padding:7px 9px}
 .tms i{font-style:normal;font-weight:800;color:var(--dim)}.tms.done i{color:var(--o)}
 .tms em{font-style:normal;color:var(--dim);font-weight:700}.tms small{display:block;color:var(--dim)}
+
+/* 오늘의 미션 — 위로 뜨는 창 + 학교 화면의 한 줄 단추 (2026-11-03) */
+.overlay.ovtop{align-items:flex-start;padding-top:max(14px,env(safe-area-inset-top))}
+.mspop{position:relative;padding:18px 16px 10px}
+.mpx{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:none;background:var(--soft);font:inherit;font-size:16px;font-weight:800;color:var(--ink2);cursor:pointer;z-index:1}
+.mspop .msh{padding-right:40px}
+.mschip{display:flex;align-items:center;gap:8px;width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:14px;background:#fff;font:inherit;color:inherit;cursor:pointer;text-align:left}
+.mschip i{flex:none;width:24px;height:24px;border-radius:50%;background:#e6edff;color:var(--blue);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:12px;font-weight:800}
+.mschip b{font-size:14.5px;font-weight:800}
+.mschip span{font-size:13px;color:var(--dim);font-weight:700;flex:1}
+.mschip em{font-style:normal;font-size:12.5px;font-weight:800;color:var(--blue)}
+.mschip.alldone i{background:var(--o);color:#fff}
+.ccvote.lock,.txvote.lock,.dcopt:not(.done){opacity:.85;background:var(--soft)}
+.ccvote.lock small,.txvote.lock small,.dcopt:not(.done) .state{color:#b8860b;font-weight:800;display:inline-flex;align-items:center;gap:2px}
+.ccvote.lock small svg,.txvote.lock small svg,.dcopt .state svg{width:11px;height:11px}
+.dcopt{font:inherit;color:inherit;cursor:pointer}
+@media(max-width:520px){.cccols{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.overlay.ovtop .modal{margin:0 auto auto}
 </style>
 </head>
 <body>
@@ -1836,14 +1854,17 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
   </div>
 </div>
 
-<div class="overlay" id="ovAtt" onclick="if(event.target===this)close_('ovAtt')">
+<div class="overlay ovtop" id="ovMs" onclick="if(event.target===this)closeMissions()">
+  <div class="modal mspop"><button class="mpx" onclick="closeMissions()" aria-label="닫기">✕</button><div id="msPop"></div></div>
+</div>
+<div class="overlay" id="ovAtt" onclick="if(event.target===this){close_('ovAtt'); paintMissionBox()}">
   <div class="modal attm">
     <div class="attstamp" id="attStamp">출석</div>
     <h3 id="attTitle">오늘도 왔어요!</h3>
     <div class="sub" id="attSub"></div>
     <div class="attweek" id="attWeek"></div>
     <div class="attgain" id="attGain"></div>
-    <div class="row"><button class="btn primary" onclick="close_('ovAtt')">좋아요</button></div>
+    <div class="row"><button class="btn primary" onclick="close_('ovAtt'); paintMissionBox()">좋아요</button></div>
   </div>
 </div>
 <div class="overlay" id="ovHs" onclick="if(event.target===this)close_('ovHs')">
@@ -2067,7 +2088,7 @@ async function dbTx(path,fn){
          gy 발 높이 · fdx 두 발 간격 반 · x0 x1 y0 y1 몸의 바깥 상자 }            */
 const FONT="'Pretendard','Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif";
 /* 그리기 도우미(P·C·R·G …)가 다른 파일의 이름과 부딪히지 않도록 한 덩어리로 감쌉니다 */
-const {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,CLASS_TXT,CLS_PERSONAL}=(()=>{
+const {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,CLASS_TXT,CLASS_DECO}=(()=>{
 const INK='#1f2433';
 
 /* ── 그리기 도우미 ── */
@@ -2749,7 +2770,9 @@ const BOX_ITEMS=[
    반 모두가 함께 입는 '공통 아이템'은 발밑 받침 세 가지뿐 — 받침 자리는 개인 아이템이 쓰지 않는 자리라
    어떤 꾸미기와도 겹치지 않아요. 받침의 색(반 색)과 글자(b.ct)는 반마다 바꿀 수 있어요.          */
 const CLASS_COLS=[{k:'blue',n:'파랑',c:'#4f6bff'},{k:'red',n:'빨강',c:'#ff4f6d'},{k:'green',n:'초록',c:'#18b07a'},
-                  {k:'purple',n:'보라',c:'#7b61ff'},{k:'orange',n:'주황',c:'#ff8a1f'},{k:'sky',n:'하늘',c:'#22a7e0'}];
+                  {k:'purple',n:'보라',c:'#7b61ff'},{k:'orange',n:'주황',c:'#ff8a1f'},{k:'sky',n:'하늘',c:'#22a7e0'},
+                  {k:'pink',n:'분홍',c:'#f06595',p:500},{k:'navy',n:'남색',c:'#2b3a8c',p:500},{k:'gold',n:'금색',c:'#d4a106',p:800}];
+CLASS_COLS.forEach(c=>{ if(!c.p) c.p=300; });   /* 반 번호로 정해지는 기본 색 하나만 처음부터 쓰고, 나머지는 반이 사서 써요 */
 const CC=b=>b.cc||'#4f6bff';
 const CLS_PERSONAL=[
 /* 1단계 600 */
@@ -2784,10 +2807,10 @@ const CLS_PERSONAL=[
   return P(`M${x-26},${b.ny-18} L${x-8},${y-14} M${x+26},${b.ny-18} L${x+8},${y-14}`,'none',INK,9)+P(`M${x-26},${b.ny-18} L${x-8},${y-14} M${x+26},${b.ny-18} L${x+8},${y-14}`,'none',CC(b),5.5)+
     C(x,y,20,'#ffd23f',INK,2.4)+C(x,y,14,'none','#f0a400',2)+T(x,y+5,b.cl,b.cl.length>3?9:11.5,'#a87400',900)+SPARK(x+20,y-16,5,'#fff');}},
 /* 5단계 10000 */
-{id:'clsStars',cat:'fx',p:1500,cls:1,under:1,n:'우리 반 별빛',d:b=>{let g=E(110,(b.y0+b.y1)/2,128,110,'#fff6c8',0,0,'.35');
+{id:'clsStars',cat:'fx',p:1500,cls:1,hide:1,under:1,n:'우리 반 별빛',d:b=>{let g=E(110,(b.y0+b.y1)/2,128,110,'#fff6c8',0,0,'.35');
   for(let i=0;i<10;i++){const a=i*36*Math.PI/180; g+=STAR(110+Math.cos(a)*122,(b.y0+b.y1)/2+Math.sin(a)*104,i%2?7:10,i%2?'#ffe066':'#ffd23f');}
   return g+R(110-30,-46,60,20,10,CC(b),INK,2)+T(110,-31,'★ '+b.cl,12,'#fff',900);}},
-{id:'clsHearts',cat:'fx',p:1400,cls:1,under:1,n:'우리 반 하트비',d:b=>{const H=(x,y,r,f)=>P(`M${x},${y+r*.9} C${x-r*1.6},${y-r*.2} ${x-r*.7},${y-r*1.4} ${x},${y-r*.5} C${x+r*.7},${y-r*1.4} ${x+r*1.6},${y-r*.2} ${x},${y+r*.9} Z`,f,INK,1.6);
+{id:'clsHearts',cat:'fx',p:1400,cls:1,hide:1,under:1,n:'우리 반 하트비',d:b=>{const H=(x,y,r,f)=>P(`M${x},${y+r*.9} C${x-r*1.6},${y-r*.2} ${x-r*.7},${y-r*1.4} ${x},${y-r*.5} C${x+r*.7},${y-r*1.4} ${x+r*1.6},${y-r*.2} ${x},${y+r*.9} Z`,f,INK,1.6);
   let g=''; [[-14,-20,9],[30,-36,7],[200,-30,9],[236,40,7],[-24,90,8],[244,130,9],[-10,190,7],[226,210,8],[60,220,6],[170,226,7]].forEach(([x,y,r],i)=>{ g+=H(x,y,r,i%2?'#fff':CC(b)); });
   return g+R(110-30,-46,60,20,10,CC(b),INK,2)+T(110,-31,'♥ '+b.cl,12,'#fff',900);}},
 /* 6단계 15000 */
@@ -2799,7 +2822,7 @@ const CLS_PERSONAL=[
 /* 7단계 22000 */
 {id:'clsAura',cat:'frame',p:2200,cls:1,under:1,n:'우리 반 오라',d:b=>{const cy=(b.y0+b.y1)/2;
   return [CC(b),'#ffd23f','#ff6b9a'].map((c,i)=>E(110,cy,140-i*14,120-i*12,'none',c,4,'.55')).join('')+T(110,Math.min(b.y1+40,236),b.cl,13,CC(b),900);}},
-{id:'clsRing',cat:'frame',p:2400,cls:1,under:1,n:'우리 반 빛 고리',d:b=>{const cy=(b.y0+b.y1)/2; let g='';
+{id:'clsRing',cat:'frame',p:2400,cls:1,hide:1,under:1,n:'우리 반 빛 고리',d:b=>{const cy=(b.y0+b.y1)/2; let g='';
   for(let k=0;k<24;k++){ const a=k*15*Math.PI/180; g+=C(110+Math.cos(a)*120,cy+Math.sin(a)*104,k%3?3.5:6,k%3?'#fff6c8':CC(b),INK,1.4); }
   return C(110,cy,112,'none',CC(b),2,'.35').replace('<circle','<ellipse').replace(/r="112"/,'rx="120" ry="104"')+g+T(110,Math.min(b.y1+40,236),b.cl,13,CC(b),900);}},
 /* 8단계 30000 */
@@ -2834,7 +2857,18 @@ const CLASS_ITEMS=[
 /* 모금액이 단계 기준을 넘으면 그 받침이 열리고, 반 모두가 가장 높은 단계의 받침에 서요 */
 const CLASS_TIERS=CLASS_ITEMS.map(i=>({t:i.tier, goal:i.goal, opts:[i.id]}));
 /* 반 글자 — 반 친구들이 고르는 문구(투표) · 선생님이 정한 글자가 있으면 그 글자가 먼저 */
-const CLASS_TXT=[{k:'cl',f:c=>c},{k:'best',f:c=>c+' 최고!'},{k:'go',f:c=>c+' 화이팅'},{k:'king',f:c=>'계산왕 '+c},{k:'star',f:c=>'★ '+c+' ★'}];
+const CLASS_TXT=[{k:'cl',p:0,f:c=>c},{k:'best',p:300,f:c=>c+' 최고!'},{k:'go',p:300,f:c=>c+' 화이팅'},{k:'king',p:500,f:c=>'계산왕 '+c},
+  {k:'star',p:500,f:c=>'★ '+c+' ★'},{k:'one',p:800,f:c=>c+' 1등!'},{k:'genius',p:800,f:c=>'수학천재 '+c}];
+/* 둘레 장식 — 반 모두의 캐릭터 바깥쪽 둘레를 꾸며요(몸에 붙는 개인 꾸미기보다 바깥이라 겹치지 않아요). 반이 사서 하나를 골라 써요 */
+const DECO_CY=b=>(b.y0+b.y1)/2;
+const CLASS_DECO=[
+{id:'cdStars',cat:'class',under:1,deco:1,p:1500,n:'반 별빛 둘레',d:b=>{const cy=Math.max(96,Math.min(112,DECO_CY(b))); let g=E(110,cy,118,104,'#fff6c8',0,0,'.3');
+  for(let i=0;i<12;i++){const a=(i*30+15)*Math.PI/180; g+=STAR(110+Math.cos(a)*116,cy+Math.sin(a)*102,i%2?6:9,i%2?'#ffe066':'#ffd23f');} return g;}},
+{id:'cdHearts',cat:'class',under:1,deco:1,p:1500,n:'반 하트 둘레',d:b=>{const cy=Math.max(96,Math.min(112,DECO_CY(b))); const H=(x,y,r,f)=>P(`M${x},${y+r*.9} C${x-r*1.6},${y-r*.2} ${x-r*.7},${y-r*1.4} ${x},${y-r*.5} C${x+r*.7},${y-r*1.4} ${x+r*1.6},${y-r*.2} ${x},${y+r*.9} Z`,f,INK,1.5);
+  let g=''; for(let i=0;i<10;i++){ const a=(i*36+18)*Math.PI/180; g+=H(110+Math.cos(a)*116,cy+Math.sin(a)*100,i%2?6:8,i%2?'#fff':CC(b)); } return g;}},
+{id:'cdRing',cat:'class',under:1,deco:1,p:2500,n:'반 빛 고리',d:b=>{const cy=Math.max(96,Math.min(112,DECO_CY(b))); let g=E(110,cy,118,104,'none',CC(b),2,'.35');
+  for(let k=0;k<24;k++){ const a=k*15*Math.PI/180; g+=C(110+Math.cos(a)*118,cy+Math.sin(a)*104,k%3?3:5.5,k%3?'#fff6c8':CC(b),INK,1.3); } return g;}}
+];
 /* ═══ 새 꾸미기 (2026-10-31) — 사각형 게임에서 인기가 많았던 갈래(동물 친구 · 빛나는 검 · 불사조 날개)를 중심으로 ═══
    그 전에 NEW 였던 물건은 NEW 표시를 떼고, 이번 묶음만 NEW 칸에 보여요. 값은 아래 REPRICE 에서 정해요.          */
 ITEMS.forEach(i=>{ delete i.nw; }); BOX_ITEMS.forEach(i=>{ delete i.nw; }); CH_COLORS.forEach(c=>{ delete c.nw; }); CH_SHAPES.forEach(c=>{ c.nw=false; });
@@ -2949,7 +2983,7 @@ CLS_PERSONAL.forEach(i=>{ i.nw=1; }); ITEMS.push(...CLS_PERSONAL);
 { const L=ITEMS, m=L.reduce((a,i)=>a+i.p,0)/L.length, K=1.25;
   const f=p=>p>=m?m+K*(p-m):m*Math.pow(p/m,K), sc=m*L.length/L.reduce((a,i)=>a+f(i.p),0);
   L.forEach(i=>{ i.p=Math.max(40,R10(f(i.p)*sc)); }); }
-ITEMS.push(...BOX_ITEMS,...CLASS_ITEMS);
+ITEMS.push(...BOX_ITEMS,...CLASS_DECO,...CLASS_ITEMS);
 const ITEM=id=>ITEMS.find(i=>i.id===id);
 const CATS=[{k:'hat',n:'머리'},{k:'face',n:'표정'},{k:'eye',n:'얼굴'},{k:'neck',n:'목·몸'},{k:'hand',n:'손'},
             {k:'back',n:'등'},{k:'foot',n:'발'},{k:'fx',n:'효과'},{k:'pet',n:'친구'},{k:'frame',n:'테두리'},{k:'stage',n:'배경'}];
@@ -2988,7 +3022,7 @@ function avatarSVG(ch,opt){
 }
 const avatarWith=(ch,id)=>avatarSVG({s:ch.s,c:ch.c,cl:ch.cl,cc:ch.cc,ct:ch.ct,items:[id]});
 
-return {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,CLASS_TXT,CLS_PERSONAL};
+return {BOX_ITEMS,CLASS_ITEMS,CLASS_TIERS,CLASS_COLS,CH_SHAPES,CH_COLORS,ITEMS,ITEM,CATS,CAT_OF,colorOf,shapeInfo,TIERNAME2,avatarSVG,avatarWith,BODY,CLASS_TXT,CLASS_DECO};
 })();
 
 /* ═══════════════════ 계산 내용 ═══════════════════
@@ -7699,7 +7733,7 @@ function classBattleHTML(list,mine,classes,opt){
   if(!list.length) return `<div class="empty">아직 학급 기록이 없어요. 실전 모드에 도전하면 우리 반 점수가 올라가요!</div>`;
   const R=rankList(list,g=>g.sum), top=list[0].sum||1, meSid=ME&&ME.sid;
   return R.map(({r:g,rank})=>{
-    const me=mine===g.c, c=(classes||{})[g.c]||null, cc=clsColor(c,g.c), it=clsTopOf(c), ct=clsText(c,g.c);
+    const me=mine===g.c, c=(classes||{})[g.c]||null, cc=clsColor(c,g.c), it=clsTopOf(c), ct=clsText(c,g.c), dc=clsDecoOf(c);
     const open=CB_OPEN[g.c]!=null?CB_OPEN[g.c]:me, more=g.mem.length-CB_FOLD, show=open||more<=0?g.mem:g.mem.slice(0,CB_FOLD);
     const nx=CLASS_TIERS.find(T=>((c&&c.fund)||0)<T.goal);
     return `<div class="cbcard${me?' me':''}" style="--cc:${cc.c}">
@@ -7708,7 +7742,7 @@ function classBattleHTML(list,mine,classes,opt){
           <span>참여 ${g.play} / ${g.n}명 · 1인 평균 ${g.avg.toFixed(1)}점</span></div>
         <div class="sc">${cn(g.sum)}<small>점</small></div></div>
       <i class="cbbar"><em style="width:${Math.max(3,g.sum/top*100).toFixed(1)}%"></em></i>
-      <div class="cbitem"><i style="background:${cc.c}"></i>${it?`<span>학급 아이템 <b>${ITEM(it).n}</b> · 글자 <b>${esc(ct)}</b></span>`
+      <div class="cbitem"><i style="background:${cc.c}"></i>${it?`<span>학급 아이템 <b>${ITEM(it).n}</b>${dc?` · <b>${ITEM(dc).n}</b>`:''} · 구호 <b>${esc(ct)}</b></span>`
         :`<span>아직 학급 아이템이 없어요${nx?` · 모금 ${nx.goal}코인이면 <b>${ITEM(nx.opts[0]).n}</b>`:''}</span>`}</div>
       <div class="cbgrid">${show.map((m,i)=>`<div class="cbm${m.sc>0?'':' dim'}${meSid===m.sid?' me':''}${i===0&&m.sc>0?' mvp':''}" data-sid="${esc(m.sid)}">
           <div class="cbav">${avatarSVG(m.ch,{tight:true})}</div><b>${esc(m.sid)}</b><em>${m.sc}</em></div>`).join('')}</div>
@@ -8650,7 +8684,7 @@ function stageStat(fs,t,n){
 function weakStages(fs,only){
   const L=[];
   TOPIC_ORDER.forEach(t=>{ if(only&&!only(t)) return; (TOPICS[t].stages||[]).forEach(s=>{ const st=stageStat(fs,t,s.n);
-    if(st.c>=6&&st.acc<.88) L.push(Object.assign({t,n:s.n},st)); }); });
+    if(st.c>=6&&st.raw<.85&&st.acc<.85) L.push(Object.assign({t,n:s.n},st)); }); });
   return L.sort((a,b)=>a.acc-b.acc||b.sec-a.sec);
 }
 /* 강한 스테이지 — 8문제 이상, 정답률 높고 빠른 순 */
@@ -8759,7 +8793,7 @@ function missionText(m){
   if(m.k==='again') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:'한 번 더 빠르게 — 연습 한 번 클리어'};
   return {h:`${T.n} 실전`, w:'1분 무실수 실전에 한 번 도전 (1개 이상 맞히기)'};
 }
-function missionGo(i){ const m=ME&&ME.ms&&ME.ms.L[i]; if(!m) return;
+function missionGo(i){ const m=ME&&ME.ms&&ME.ms.L[i]; if(!m) return; close_('ovMs'); ME.ms.x=1;
   if(m.k==='real') tryReal(m.t); else { CUR.topic=m.t; startStage(m.t,m.n); } }
 function missionHTML(opt){
   const M=ensureMissions(); if(!M) return '';
@@ -8773,7 +8807,17 @@ function missionHTML(opt){
         <span class="msgo">${m.done?'완료':'하기 →'}</span></button>`; }).join('')}
   </div>`;
 }
-function paintMissionBox(){ const b=el('msBox'); if(!b) return; b.innerHTML=ME?missionHTML():''; }
+/* 학교 고르기 화면 — 미션은 위로 뜨는 창(✕로 닫기)으로 보여 주고, 화면에는 한 줄 단추만 남겨 메뉴가 밀려 내려가지 않게 해요.
+   닫으면 그날은 다시 저절로 뜨지 않아요(ms.x). 출석 창이 떠 있으면 그 창을 닫은 뒤에 떠요. */
+function paintMissionBox(auto){
+  const b=el('msBox'); if(!b) return;
+  const M=ME&&ensureMissions(); if(!M){ b.innerHTML=''; return; }
+  const done=M.L.filter(m=>m.done).length;
+  b.innerHTML=`<button class="mschip${done===M.L.length?' alldone':''}" onclick="openMissions()"><i>✓</i><b>오늘의 미션</b><span>${done} / ${M.L.length}${M.b?' · 모두 끝!':''}</span><em>보기 →</em></button>`;
+  if(auto!==false&&!M.x&&el('s-school').classList.contains('on')&&!document.querySelector('.overlay.on')) openMissions();
+}
+function openMissions(){ const M=ensureMissions(); if(!M) return; el('msPop').innerHTML=missionHTML({flat:1}); openM('ovMs'); }
+function closeMissions(){ close_('ovMs'); if(ME&&ME.ms&&!ME.ms.x){ ME.ms.x=1; saveMe(); } paintMissionBox(false); }
 
 /* ═══ ⑧ 마이페이지 진단 ═══ */
 /* 주제마다 실력 단계 — 0 기록 없음 · 1 다지는 중(정답률 70% 아래) · 2 연습 중 · 3 익숙함 · 4 마스터 */
@@ -8943,7 +8987,7 @@ function mergeFrom(u){
   /* 출석 · 미션 · 주간 성장 · 주별 풀이 — 늦은 날짜가 이기고, 같은 날이면 더 많이 한 쪽으로 */
   if(u.att&&u.att.d&&(!ME.att||u.att.d>ME.att.d||(u.att.d===ME.att.d&&(u.att.s||0)>(ME.att.s||0)))) ME.att=u.att;
   if(u.ms&&u.ms.d){ if(!ME.ms||u.ms.d>ME.ms.d) ME.ms=u.ms;
-    else if(u.ms.d===ME.ms.d){ const L=arr(u.ms.L); arr(ME.ms.L).forEach((m,i)=>{ if(L[i]&&L[i].done&&L[i].t===m.t) m.done=1; }); ME.ms.b=ME.ms.b||u.ms.b; } }
+    else if(u.ms.d===ME.ms.d){ const L=arr(u.ms.L); arr(ME.ms.L).forEach((m,i)=>{ if(L[i]&&L[i].done&&L[i].t===m.t) m.done=1; }); ME.ms.b=ME.ms.b||u.ms.b; ME.ms.x=ME.ms.x||u.ms.x; } }
   if(u.gw&&u.gw.w){ if(!ME.gw||u.gw.w>ME.gw.w) ME.gw=u.gw; else if(u.gw.w===ME.gw.w) ME.gw.t=uniq(ME.gw.t,u.gw.t); }
   if(u.wk&&typeof u.wk==='object'){ const W=ME.wk||(ME.wk={}); Object.keys(u.wk).forEach(k=>{ const b=arr(u.wk[k]), a=arr(W[k]);
     W[k]=[0,1,2].map(i=>Math.max(+a[i]||0,+b[i]||0)); }); }
@@ -9163,8 +9207,8 @@ function openSchool(){
   stopTimer(); G=null;
   show('s-school');
   el('schoolHi').innerHTML=`<b>${esc(ME.sid)}</b> 님, 오늘은 어디서 시작할까요?`;
-  paintSchools(); paintMissionBox();
-  loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')){ paintSchools(); paintMissionBox(); checkAttendance(); } });
+  paintSchools(); paintMissionBox(false);
+  loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')){ paintSchools(); checkAttendance(); paintMissionBox(); } });
   /* 우리 반 색이 바뀌었으면 내 캐릭터에도 반영 (학급 아이템이 그 색으로 그려져요) */
   loadClass().catch(()=>{});
 }
@@ -10124,8 +10168,8 @@ function goodsList(cat){
   if(cat==='color') return CH_COLORS.map(Co);
   if(cat==='new'||cat==='hs'){ const f=x=>cat==='new'?x.nw:x.hs, ord=c=>CATS.findIndex(x=>x.k===c);
     return CH_SHAPES.filter(f).map(S).concat(CH_COLORS.filter(f).map(Co),
-      ITEMS.filter(i=>i.cat!=='class'&&f(i)).sort((a,b)=>ord(a.cat)-ord(b.cat)||(a.box?1:0)-(b.box?1:0)||byP(a,b)).map(It)); }
-  return ITEMS.filter(i=>i.cat===cat).sort((a,b)=>(a.box?1:0)-(b.box?1:0)||byP(a,b)).map(It);
+      ITEMS.filter(i=>i.cat!=='class'&&!i.hide&&f(i)).sort((a,b)=>ord(a.cat)-ord(b.cat)||(a.box?1:0)-(b.box?1:0)||byP(a,b)).map(It)); }
+  return ITEMS.filter(i=>i.cat===cat&&!i.hide).sort((a,b)=>(a.box?1:0)-(b.box?1:0)||byP(a,b)).map(It);
 }
 const goodsGroup=g=>g.kind==='shape'?'몸':g.kind==='color'?'색':((CATS.find(c=>c.k===g.cat)||{}).n||'');
 function wearOn(ch,g){
@@ -10148,7 +10192,7 @@ function paintShop(){
   el('shopAvatar').innerHTML=avatarSVG(look);
   el('shopStage').classList.toggle('trying',!!TRY);
   el('shopCoin').textContent=ME.coin;
-  const total=ITEMS.filter(i=>i.cat!=='class').length+CH_SHAPES.length+CH_COLORS.length;
+  const total=ITEMS.filter(i=>i.cat!=='class'&&!i.hide).length+CH_SHAPES.length+CH_COLORS.length;
   const mine=ownItems().length+ownShapes().length+ownColors().length;
   el('shopSub').innerHTML=`모은 것 <b>${mine}</b> / ${total} · 입은 꾸미기 ${(ME.ch.items||[]).length}개`;
   const cnt=k=>{ if(k==='box') return [ownItems().filter(id=>BOX_ITEMS.some(i=>i.id===id)).length,BOX_ITEMS.length];
@@ -10166,8 +10210,10 @@ function paintShop(){
     box.querySelectorAll('.boxbuy').forEach(b=>b.onclick=()=>openBox(b.dataset.b));
     box.querySelectorAll('.givebtn').forEach(b=>b.onclick=()=>giveClass(+b.dataset.v));
     box.querySelectorAll('.item[data-kind="item"]').forEach(b=>b.onclick=()=>tapGoods('item',b.dataset.k));
-    box.querySelectorAll('.ccvote').forEach(b=>b.onclick=()=>voteClassColor(b.dataset.c));
-    box.querySelectorAll('.txvote').forEach(b=>b.onclick=()=>voteClassText(b.dataset.x));
+    box.querySelectorAll('.ccvote[data-c]').forEach(b=>b.onclick=()=>voteClassColor(b.dataset.c));
+    box.querySelectorAll('.txvote[data-x]').forEach(b=>b.onclick=()=>voteClassText(b.dataset.x));
+    box.querySelectorAll('.dcopt[data-dc]').forEach(b=>b.onclick=()=>voteClassDeco(b.dataset.dc));
+    box.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buyClassGood(b.dataset.buy));
     el('shopStrip').onclick=async()=>{ endTry(); ME.ch.items=[]; await saveMe(); paintShop(); paintMe(); toast('꾸미기를 모두 벗었어요'); };
     paintTry(); return;
   }
@@ -10266,7 +10312,7 @@ const BOXES=[
   {k:'gold',n:'황금 상자',p:2000,odds:{n:0,r:.35,l:.65},bx:.5,col:'#e8a800',desc:'전설이 훨씬 자주! 전설이 나오면 2번 중 1번은 상자 한정(황금 Σ 왕관·오로라 하늘…)'}
 ];
 /* 고등 전용 물건은 고등학교가 열린 뒤에만 상자에서 나옵니다 */
-const boxPool=k=>ITEMS.filter(i=>i.cat!=='class'&&rarityOf(i)===k&&(!i.hs||hsOpen()));
+const boxPool=k=>ITEMS.filter(i=>i.cat!=='class'&&!i.hide&&rarityOf(i)===k&&(!i.hs||hsOpen()));
 const REFUND=.4;
 function rollBox(box){
   let r=Math.random(), k='n';
@@ -10337,24 +10383,33 @@ let CLS=null;
 const clsKey=()=>classOf(ME.sid);
 const clsShort=()=>shortCls(ME.sid);
 const tally=o=>{ const n={}; Object.values(o||{}).forEach(v=>{ n[v]=(n[v]||0)+1; }); return n; };
-/* 우리 반 색 — 표가 가장 많은 색, 같으면 목록 앞쪽 */
-function clsColor(c,key){
-  const n=tally((c||{}).col), best=CLASS_COLS.slice().sort((a,b)=>(n[b.k]||0)-(n[a.k]||0))[0];
-  if(best&&n[best.k]) return best;
-  const num=parseInt(String(key||clsKey()).slice(1),10)||0; return CLASS_COLS[num%CLASS_COLS.length];
-}
-/* 반 글자 — 선생님이 정한 글자 → 표가 가장 많은 문구 → 반 이름('2-5') */
-const clsTxtLead=c=>{ const n=tally((c||{}).tx); const b=CLASS_TXT.slice().sort((x,y)=>(n[y.k]||0)-(n[x.k]||0))[0]; return b&&n[b.k]?b:CLASS_TXT[0]; };
+/* 반이 산 것 — classes/반/buy = {'col:red':산 학번, 'tx:best':…, 'dc:cdStars':…}
+   기본으로 쓰는 것 : 반 번호로 정해지는 색 하나 · 글자 '2-5'. 나머지 색·구호·둘레 장식은 반 친구 누군가 코인을 내고 사야 써요. */
+const clsBought=(c,kind,k)=>!!(((c||{}).buy||{})[kind+':'+k]);
+const clsDefCol=key=>{ const num=parseInt(String(key||clsKey()).slice(1),10)||0; return CLASS_COLS[num%6]; };
+/* 투표는 산 것 가운데서만 — 표가 가장 많은 것, 같으면 목록 앞쪽 */
+function clsLeadOf(c,list,vk,has,fallback){ const n=tally((c||{})[vk]);
+  const L=list.filter(has).sort((a,b)=>(n[b.k]||0)-(n[a.k]||0)); return L.find(x=>n[x.k])||fallback(L); }
+const clsColHas=(c,key)=>x=>x.k===clsDefCol(key).k||clsBought(c,'col',x.k);
+function clsColor(c,key){ return clsLeadOf(c,CLASS_COLS,'col',clsColHas(c,key),()=>clsDefCol(key)); }
+/* 반 글자 — 선생님이 정한 글자 → 산 구호 가운데 표가 가장 많은 것 → 반 이름('2-5') */
+const clsTxHas=c=>x=>!x.p||clsBought(c,'tx',x.k);
+const clsTxtLead=c=>clsLeadOf(c,CLASS_TXT,'tx',clsTxHas(c),()=>CLASS_TXT[0]);
 function clsText(c,key){ const cl=shortCls(String(key)+'00');
   if(c&&c.ttx) return String(c.ttx).slice(0,10); return clsTxtLead(c).f(cl); }
+/* 둘레 장식 — 산 것 가운데 표가 가장 많은 것(아무도 안 골랐으면 먼저 산 것), '없음' 표가 이기면 안 써요 */
+function clsDecoOf(c){ const own=CLASS_DECO.filter(d=>clsBought(c,'dc',d.id)); if(!own.length) return null;
+  const n=tally((c||{}).dc), L=[{id:'none'}].concat(own).sort((a,b)=>(n[b.id]||0)-(n[a.id]||0));
+  const top=n[L[0].id]?L[0].id:own[0].id; return top==='none'?null:top; }
 /* 열린 받침 가운데 가장 높은 단계 */
 const clsTopOf=c=>{ const f=(c&&c.fund)||0; let top=null; CLASS_TIERS.forEach(T=>{ if(f>=T.goal) top=T.opts[0]; }); return top; };
 const clsOld=c=>Object.values((c&&c.pick)||{}).filter(id=>ITEM(id)&&ITEM(id).cls);
 /* 다른 학생 캐릭터를 그릴 때 — 그 반의 색·이름·글자와 받침을 입혀서 (own : 그 학생이 가진 물건, 있으면 안 가진 반 아이템은 벗겨요) */
 function clsCh(sid,ch,classes,own){
-  const k=classOf(sid), c=(classes||{})[k]||null, o=cleanCh(ch), top=clsTopOf(c), old=clsOld(c);
+  const k=classOf(sid), c=(classes||{})[k]||null, o=cleanCh(ch), top=clsTopOf(c), old=clsOld(c), dc=clsDecoOf(c);
   o.cl=shortCls(sid); o.cc=clsColor(c,k).c; o.ct=clsText(c,k);
   o.items=o.items.filter(id=>CAT_OF(id)!=='class'&&!(own&&ITEM(id).cls&&!arr(own).includes(id)&&!old.includes(id)));
+  if(dc) o.items.push(dc);
   if(top) o.items.push(top);
   return o;
 }
@@ -10366,7 +10421,7 @@ function clsApplyMe(){
   ME.ch.items=o.items; ME.ch.cc=o.cc; ME.ch.ct=o.ct; ME.ch.cl=o.cl;
   return !same;
 }
-const clsFrom=d=>({fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, tx:d.tx||{}, ttx:d.ttx||'', pick:d.pick||{}});
+const clsFrom=d=>({fund:d.fund||0, gv:d.gv||{}, col:d.col||{}, tx:d.tx||{}, dc:d.dc||{}, buy:d.buy||{}, ttx:d.ttx||'', pick:d.pick||{}});
 async function loadClass(){
   const d=(await dbGet('classes/'+clsKey(),null))||{};
   CLS=clsFrom(d);
@@ -10403,13 +10458,21 @@ function classPanelHTML(){
     <div class="give">${[10,50,100,300].map(v=>`<button class="btn givebtn" data-v="${v}" ${ME.coin<v?'disabled':''}>${v}코인 내기</button>`).join('')}</div>
     <div class="sub" style="margin-top:6px">내가 낸 코인 <b>${mine}</b> · 함께한 친구 <b>${givers.length}명</b></div>
     ${givers.length?`<div class="givers">${givers.slice(0,8).map((g,i)=>`<span class="gv${g.s===ME.sid?' me':''}">${i+1}. ${esc(g.s)} <b>${g.n}</b></span>`).join('')}</div>`:''}
-    <h4 class="boxh">우리 반 색 <small>한 사람에 한 표 · 바꿀 수 있어요</small></h4>
-    <div class="cccols">${CLASS_COLS.map(c=>`<button class="ccvote${c.k===cc.k?' on':''}${myCol===c.k?' mine':''}" data-c="${c.k}" style="--c:${c.c}">
-      <i></i><b>${c.n}</b><small>${cn[c.k]||0}표${myCol===c.k?' · 내 표':''}</small></button>`).join('')}</div>
-    <h4 class="boxh">받침 글자 <small>${CLS.ttx?`지금은 선생님이 정한 <b>${esc(CLS.ttx)}</b>`:'한 사람에 한 표 · 표가 가장 많은 문구'}</small></h4>
-    <div class="txvotes">${CLASS_TXT.map(x=>`<button class="txvote${!CLS.ttx&&x.k===lead.k?' on':''}${myTx===x.k?' mine':''}" data-x="${x.k}">
-      <b>${esc(x.f(cl))}</b><small>${tn[x.k]||0}표${myTx===x.k?' · 내 표':''}</small></button>`).join('')}</div>
-    <div class="shopnote" style="margin-top:12px"><span>예전 학급 아이템(배지·깃발·망토·날개·왕관 …)은 이제 <b>상점의 개인 아이템</b>이에요. 우리 반 이름과 색으로 그려지고, '새로 나옴' 칸에서 살 수 있어요.</span></div>
+    <div class="shopnote" style="margin:14px 0 4px"><span>색·구호·둘레 장식은 <b>반 친구 누군가 코인을 내고 사면</b> 반 모두가 써요. 산 것 가운데 무엇을 쓸지는 <b>한 사람에 한 표</b>로 골라요. 사는 데 낸 코인도 모금함에 더해져요.</span></div>
+    <h4 class="boxh">우리 반 색 <small>지금 ${cc.n}</small></h4>
+    <div class="cccols">${CLASS_COLS.map(c=>{ const has=clsColHas(CLS,clsKey())(c);
+      return `<button class="ccvote${c.k===cc.k?' on':''}${myCol===c.k?' mine':''}${has?'':' lock'}" ${has?`data-c="${c.k}"`:`data-buy="col:${c.k}"`} style="--c:${c.c}">
+      <i></i><b>${c.n}</b><small>${has?`${cn[c.k]||0}표${myCol===c.k?' · 내 표':''}`:`${LOCKI}${c.p}코인`}</small></button>`; }).join('')}</div>
+    <h4 class="boxh">받침 구호 <small>${CLS.ttx?`지금은 선생님이 정한 <b>${esc(CLS.ttx)}</b>`:`지금 '${esc(lead.f(cl))}'`}</small></h4>
+    <div class="txvotes">${CLASS_TXT.map(x=>{ const has=clsTxHas(CLS)(x);
+      return `<button class="txvote${!CLS.ttx&&x.k===lead.k?' on':''}${myTx===x.k?' mine':''}${has?'':' lock'}" ${has?`data-x="${x.k}"`:`data-buy="tx:${x.k}"`}>
+      <b>${esc(x.f(cl))}</b><small>${has?`${tn[x.k]||0}표${myTx===x.k?' · 내 표':''}`:`${LOCKI}${x.p}코인`}</small></button>`; }).join('')}</div>
+    <h4 class="boxh">둘레 장식 <small>캐릭터 바깥 둘레를 꾸며요 · 개인 꾸미기와 겹치지 않아요</small></h4>
+    <div class="ctiers c3">${[{id:'none',n:'장식 없음',p:0}].concat(CLASS_DECO).map(d=>{ const has=d.id==='none'||clsBought(CLS,'dc',d.id), on=(clsDecoOf(CLS)||'none')===d.id, mine=CLS.dc[ME.sid]===d.id;
+      return `<button class="ctier dcopt${has?' done':''}${on?' wear':''}" ${has?`data-dc="${d.id}"`:`data-buy="dc:${d.id}"`}>
+        <div class="ic">${avatarSVG(Object.assign({},look,{items:(d.id==='none'?[]:[d.id]).concat(look.items)}),{tight:true})}</div>
+        <div class="nm2">${d.n}</div><span class="state${on?' wear':has?' own':''}">${on?'지금 사용 중':has?`${tally(CLS.dc)[d.id]||0}표${mine?' · 내 표':''}`:`${LOCKI}${d.p}코인`}</span></button>`; }).join('')}</div>
+    <div class="shopnote" style="margin-top:12px"><span>배지·깃발·망토·날개·왕관 같은 '우리 반 시리즈'는 <b>개인 아이템</b>이에요 — 우리 반 이름과 색으로 그려지고 '새로 나옴' 칸에서 살 수 있어요.</span></div>
   </div>`;
 }
 /* 모금 — 트랜잭션으로 더하고, 새로 넘은 단계가 있으면 알려 줘요 */
@@ -10432,6 +10495,35 @@ async function voteClassColor(k){
   await dbSet(`classes/${clsKey()}/col/${ME.sid}`,k);
   await loadClass(); await saveMe(); paintShop(); paintMe();
   toast(`우리 반 색으로 ${CLASS_COLS.find(c=>c.k===k).n}에 투표했어요`);
+}
+/* 반 물건 사기 — 낸 코인은 모금함에도 더해져요(받침 단계도 함께 올라가요). 이미 누가 샀으면 코인을 쓰지 않아요 */
+const clsGood=key=>{ const [kind,k]=key.split(':');
+  if(kind==='col'){ const c=CLASS_COLS.find(x=>x.k===k); return c&&{kind,k,n:`반 색 '${c.n}'`,p:c.p}; }
+  if(kind==='tx'){ const x=CLASS_TXT.find(o=>o.k===k); return x&&{kind,k,n:`구호 '${x.f(clsShort())}'`,p:x.p}; }
+  if(kind==='dc'){ const d=CLASS_DECO.find(o=>o.id===k); return d&&{kind,k,n:d.n,p:d.p}; } return null; };
+async function buyClassGood(key){
+  const g=clsGood(key); if(!ME||!g) return;
+  await refreshMe(); await loadClass();
+  if(clsBought(CLS,g.kind,g.k)){ paintShop(); return toast('이미 우리 반이 산 거예요'); }
+  if(ME.coin<g.p) return toast(`코인이 ${g.p-ME.coin}개 모자라요`);
+  if(!confirm(`${g.n}을(를) ${g.p}코인에 사서 우리 반 모두가 쓸 수 있게 할까요?\n낸 코인은 모금함에도 더해지고, 돌려받을 수 없어요.`)) return;
+  const f0=CLS.fund||0; let dup=false;
+  const r=await dbTx('classes/'+clsKey(),cur=>{ cur=cur||{fund:0,gv:{}}; cur.buy=cur.buy||{};
+    if(cur.buy[key]){ dup=true; return cur; }
+    cur.buy[key]=ME.sid; cur.fund=(cur.fund||0)+g.p; cur.gv=cur.gv||{}; cur.gv[ME.sid]=(cur.gv[ME.sid]||0)+g.p;
+    const vk={col:'col',tx:'tx',dc:'dc'}[g.kind]; cur[vk]=cur[vk]||{}; cur[vk][ME.sid]=g.k; return cur; });
+  if(r&&r.val) CLS=clsFrom(r.val);
+  if(dup){ paintShop(); return toast('방금 다른 친구가 먼저 샀어요 · 코인은 그대로예요'); }
+  ME.coin-=g.p; spendLog('g',g.p); clsApplyMe(); await saveMe();
+  const opened=CLASS_TIERS.filter(T=>CLS.fund>=T.goal&&f0<T.goal).map(T=>ITEM(T.opts[0]).n);
+  paintShop(); paintMe();
+  toast(`🎉 ${g.n}을(를) 우리 반에 들였어요!${opened.length?` · ${opened.join(', ')}도 열렸어요`:''}`);
+}
+async function voteClassDeco(id){
+  if(!ME) return;
+  await dbSet(`classes/${clsKey()}/dc/${ME.sid}`,id);
+  await loadClass(); await saveMe(); paintShop(); paintMe();
+  toast(id==='none'?'둘레 장식 없음에 투표했어요':`${ITEM(id).n}에 투표했어요`);
 }
 async function voteClassText(k){
   const x=CLASS_TXT.find(o=>o.k===k); if(!ME||!x) return;
