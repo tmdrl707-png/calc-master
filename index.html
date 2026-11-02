@@ -1339,6 +1339,24 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .tsort{padding:0 0 12px 0}
 .stuhead .who span .tno{font-style:normal;display:inline-block;min-width:18px;margin-right:4px;color:var(--blue);font-weight:800}
 .rkpod .cbp em small{font-size:11px;color:var(--dim);margin-left:1px;font-weight:600}
+/* ── 경우의 수 정리 노트 ── */
+.nb2 .kcp{font-size:14.5px;line-height:1.65;color:var(--ink2);word-break:keep-all}
+.nb2 .kcp b{color:var(--ink)}
+.nb2 .kct{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.5px;word-break:keep-all}
+.nb2 .kct th{font-size:12px;font-weight:700;color:var(--dim);text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);background:var(--paper)}
+.nb2 .kct td{padding:8px;border-bottom:1px solid var(--hair);vertical-align:middle;line-height:1.45}
+.nb2 .kct td:last-child,.nb2 .kct th:last-child{text-align:center;width:64px}
+.nb2 .kct td b{font-size:17px;color:var(--tc)}
+.nb2 .kct td small{color:var(--dim);font-size:11.5px}
+.nb2 .kcvs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.nb2 .kcv{border-radius:14px;padding:11px 10px;display:flex;flex-direction:column;gap:3px;text-align:center;word-break:keep-all}
+.nb2 .kcv.add{background:#eef9f2}.nb2 .kcv.mul{background:#eef2fe}
+.nb2 .kcv em{font-style:normal;font-size:11.5px;font-weight:800;color:var(--dim)}
+.nb2 .kcv b{font-size:15px;font-weight:800}
+.nb2 .kcv span{font-size:12.5px;line-height:1.45;color:var(--ink2)}
+.nb2 .kcv strong{font-size:24px;font-weight:800;margin:4px 0 2px}
+.nb2 .kcv.add strong{color:#127a45}.nb2 .kcv.mul strong{color:var(--blue)}
+.nb2 .kcv small{font-size:11.5px;color:var(--dim);line-height:1.4}
 </style>
 </head>
 <body>
@@ -5868,6 +5886,46 @@ function kcF(id,ps){
   return F({key:'KC'+id+'_'+ps.join('_'), sk:T.sk, t:'cnt', k:'kc', id, ps, o, cond:o.q, cb:'w', eq:['?',{u:o.unit||'가지'}], ans:o.ans});
 }
 /* 경우의 수 그림 — 길 잇기(A→B→C 와 바로 가는 길) · 나뭇가지(하나씩 짝짓기) */
+/* ── 정리 노트용 그림 ── */
+const KCF='font-family="Pretendard,system-ui,sans-serif"';
+/* 주사위 두 개 6 × 6 표 — 합이 s 인 칸을 칠해요 */
+function kcGridSVG(s){ const c=26, x0=34, y0=40; let g='';
+  for(let i=1;i<=6;i++){ g+=`<text x="${x0+(i-.5)*c}" y="${y0-9}" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">${i}</text>`;
+    g+=`<text x="${x0-11}" y="${y0+(i-.5)*c+4}" text-anchor="middle" font-size="12" font-weight="800" fill="#e8590c">${i}</text>`; }
+  for(let a=1;a<=6;a++) for(let b=1;b<=6;b++){ const on=a+b===s, x=x0+(b-1)*c, y=y0+(a-1)*c;
+    g+=`<rect x="${x}" y="${y}" width="${c}" height="${c}" fill="${on?'#2f5bea':'#fff'}" stroke="#d6dbe6"/>`;
+    g+=`<text x="${x+c/2}" y="${y+c/2+4}" text-anchor="middle" font-size="11" font-weight="${on?800:500}" fill="${on?'#fff':'#9aa0ac'}">${a+b}</text>`; }
+  g+=`<text x="${x0+3*c}" y="11" text-anchor="middle" font-size="11" font-weight="700" fill="#2f5bea">주사위 B</text>`;
+  g+=`<text x="10" y="${y0+3*c}" text-anchor="middle" font-size="11" font-weight="700" fill="#e8590c" transform="rotate(-90 10 ${y0+3*c})">주사위 A</text>`;
+  return `<svg class="vis" viewBox="0 0 ${x0+6*c+8} ${y0+6*c+6}" ${KCF} data-keep="1" aria-label="두 주사위 표">${g}</svg>`; }
+/* 두 묶음 — a 개 또는 b 개 */
+function kcGroupSVG(a,b,na,nb){ const w=30, gp=8, W1=a*(w+gp)+gp, W2=b*(w+gp)+gp, X2=W1+44, H=86; let g='';
+  g+=`<rect x="0" y="18" width="${W1}" height="${w+20}" rx="12" fill="#eef2fe"/><rect x="${X2}" y="18" width="${W2}" height="${w+20}" rx="12" fill="#fff4e6"/>`;
+  for(let i=0;i<a;i++) g+=`<rect x="${gp+i*(w+gp)}" y="28" width="${w}" height="${w}" rx="8" fill="#2f5bea"/>`;
+  for(let i=0;i<b;i++) g+=`<rect x="${X2+gp+i*(w+gp)}" y="28" width="${w}" height="${w}" rx="8" fill="#f08c00"/>`;
+  g+=`<text x="${W1/2}" y="12" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">${na} ${a}</text><text x="${X2+W2/2}" y="12" text-anchor="middle" font-size="12" font-weight="800" fill="#e8590c">${nb} ${b}</text>`;
+  g+=`<text x="${W1+22}" y="49" text-anchor="middle" font-size="12" font-weight="800" fill="#555">또는</text>`;
+  g+=`<text x="${(X2+W2)/2}" y="${H-4}" text-anchor="middle" font-size="14" font-weight="800" fill="#111">${a} + ${b} = ${a+b}</text>`;
+  return `<svg class="vis" viewBox="0 0 ${X2+W2} ${H}" ${KCF} data-keep="1" aria-label="두 묶음">${g}</svg>`; }
+/* 나뭇가지 그림 — 왼쪽 A 가지마다 오른쪽 B 전부 */
+function kcTreeSVG(A,B){ const N=A.length*B.length, rh=22, H=N*rh+30, y0=30; let g='';
+  const ly=i=>y0+(i*B.length+(B.length-1)/2)*rh, ry=k=>y0+k*rh;
+  A.forEach((x,i)=>{ B.forEach((y,j)=>{ const k=i*B.length+j;
+      g+=`<line x1="96" y1="${ly(i)}" x2="162" y2="${ry(k)}" stroke="#c9d3f5" stroke-width="1.8"/>`;
+      g+=`<circle cx="168" cy="${ry(k)}" r="5" fill="#2f5bea"/><text x="180" y="${ry(k)+4}" font-size="12" font-weight="700" fill="#333">${y}</text>`;
+      g+=`<text x="300" y="${ry(k)+4}" text-anchor="end" font-size="11" font-weight="600" fill="#9aa0ac">${x}·${y}</text>`; });
+    g+=`<rect x="8" y="${ly(i)-13}" width="88" height="26" rx="13" fill="#f08c00"/><text x="52" y="${ly(i)+4.5}" text-anchor="middle" font-size="12" font-weight="800" fill="#fff">${x}</text>`; });
+  g+=`<text x="52" y="14" text-anchor="middle" font-size="12" font-weight="800" fill="#e8590c">크림 ${A.length}</text><text x="200" y="14" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">과일 ${B.length}씩</text>`;
+  return `<svg class="vis" viewBox="0 0 304 ${H}" ${KCF} data-keep="1" aria-label="나뭇가지 그림">${g}</svg>`; }
+/* 자리 칸 — [[이름, 가짓수]] 를 × 로 이어서 */
+function kcSlotSVG(L){ const w=58, gp=26, H=78; let g='', x=0;
+  L.forEach(([n,v],i)=>{ if(i) g+=`<text x="${x-gp/2}" y="44" text-anchor="middle" font-size="16" font-weight="800" fill="#888">×</text>`;
+    g+=`<rect x="${x}" y="18" width="${w}" height="42" rx="10" fill="#eef2fe" stroke="#2f5bea" stroke-width="1.6"/>`;
+    g+=`<text x="${x+w/2}" y="46" text-anchor="middle" font-size="18" font-weight="800" fill="#2f5bea">${v}</text>`;
+    g+=`<text x="${x+w/2}" y="12" text-anchor="middle" font-size="11" font-weight="700" fill="#555">${n}</text>`; x+=w+gp; });
+  const tot=L.reduce((a,[,v])=>a*v,1);
+  g+=`<text x="${(x-gp)/2}" y="${H-2}" text-anchor="middle" font-size="13" font-weight="800" fill="#111">= ${tot}</text>`;
+  return `<svg class="vis" viewBox="0 0 ${x-gp} ${H}" ${KCF} data-keep="1" style="max-width:${Math.round((x-gp)*1.15)}px" aria-label="자리마다 가짓수">${g}</svg>`; }
 function kcSVG(f){
   const F2='font-family="Pretendard,system-ui,sans-serif"';
   if(f.id==='r2'){ const [a,b,c]=f.ps, A=[34,96], B=[150,26], C=[266,96];
@@ -6245,17 +6303,53 @@ function currNote(t,fromHint){
           {w:'4 : 6 = 10 : □ → □ = 12', r:'□ = 15', y:'외항의 곱 = 내항의 곱: 4 × □ = 6 × 10 = 60, □ = 15.'},
           {w:'사탕 20개를 3 : 2 로 → 형 20 × 3/2 = 30개', r:'사탕 20개를 3 : 2 로 → 형 20 × 3/5 = 12개', y:'전체를 3 + 2 = 5 묶음으로 나눠요. 형은 그 가운데 3 묶음이에요.'}]});
   if(t==='cnt') return done({
-    sub:'한 사건의 경우의 수 · 합의 법칙 · 곱의 법칙 · 합과 곱 함께 · 줄 세우기 · 대표 뽑기 · 수 만들기',
-    memo:[{h:'더할까, 곱할까', html:`<div class="hl" style="font-size:15px;line-height:1.75">두 사건이 <b>동시에 일어나지 않고</b> 둘 중 하나 → <b>더하기</b> (합의 법칙)<br>두 사건이 <b>함께·잇달아</b> 일어남 → <b>곱하기</b> (곱의 법칙)</div>`},
-          {h:'자주 쓰는 수', html:chipList(['동전 1개: 2가지','주사위 1개: 6가지','동전 2개: 4가지','주사위 2개: 36가지','n명 한 줄: n × (n−1) × … × 1'])},
-          {h:'순서가 있나, 없나', html:chipList(['회장·부회장 (자격이 다름) → n × (n−1)','대표 2명 (자격이 같음) → n × (n−1) ÷ 2','두 자리 수 (순서 있음) → 십의 자리 × 일의 자리'])}],
-    ways:[W('빠짐없이, 겹치지 않게 세기',kcF('ds',[5])), W('합의 법칙 — 더하기',kcF('or1',[0,3,2])), W('곱의 법칙 — 곱하기',kcF('and1',[0,3,4])),
-          W('곱한 다음 더하기',kcF('r2',[2,3,1])), W('더한 다음 곱하기',kcF('set',[2,3,2])), W('한 줄로 세우기',kcF('ln',[4])),
-          W('자격이 다르면 줄 세우기처럼',kcF('rp',[5])), W('자격이 같으면 ÷ 2',kcF('r2c',[5])), W('0 이 있는 카드',kcF('n0',[4]))],
-    miss:[{w:'버스 3, 지하철 2 → 6가지', r:'5가지', y:'버스 또는 지하철 하나만 타니 동시에 일어나지 않아요. 더해요: 3 + 2 = 5.'},
-          {w:'주사위 두 개, 합이 5 → (1, 4), (2, 3) 2가지', r:'(1, 4), (2, 3), (3, 2), (4, 1) 4가지', y:'서로 다른 주사위 두 개에서는 (1, 4) 와 (4, 1) 이 다른 경우예요.'},
-          {w:'5명 중 대표 2명 → 20가지', r:'10가지', y:'(A, B) 와 (B, A) 는 같은 대표라 5 × 4 를 2 로 나눠요.'},
-          {w:'0, 1, 2, 3 으로 두 자리 수 → 12개', r:'9개', y:'십의 자리에 0 은 올 수 없어요: 3 × 3 = 9.'}]});
+    sub:'사건과 경우의 수 · 합의 법칙(또는) · 곱의 법칙(동시에) · 표와 나뭇가지 그림 · 수 만들기 · 대표 뽑기 · 한 줄로 세우기',
+    memo:[
+      {h:'사건과 경우의 수', html:`<div class="kcp">같은 조건에서 되풀이할 수 있는 실험·관찰의 결과를 <b>사건</b>, 사건이 일어나는 가짓수를 그 사건의 <b>경우의 수</b>라고 해요.</div>
+        <table class="kct"><thead><tr><th>주사위 한 개를 던질 때</th><th>일어나는 경우</th><th>경우의 수</th></tr></thead><tbody>
+        <tr><td>짝수의 눈이 나온다</td><td>2, 4, 6</td><td><b>3</b></td></tr>
+        <tr><td>5의 약수의 눈이 나온다</td><td>1, 5</td><td><b>2</b></td></tr>
+        <tr><td>4 이상의 눈이 나온다</td><td>4, 5, 6</td><td><b>3</b></td></tr></tbody></table>`},
+      {h:'더할까? 곱할까?', html:`<div class="kcvs">
+        <div class="kcv add"><em>합의 법칙</em><b>A 또는 B</b><span>두 사건이 <u>동시에 일어나지 않을 때</u></span><strong>m + n</strong>
+          <small>"또는" · "~ 가운데 하나" · "이거나"</small></div>
+        <div class="kcv mul"><em>곱의 법칙</em><b>A와 B가 동시에</b><span>A 의 <u>각각에 대하여</u> B 가 n가지</span><strong>m × n</strong>
+          <small>"동시에" · "하나씩" · "잇달아" · "거쳐서"</small></div></div>
+        <div class="kcp" style="margin-top:8px">A 가 일어나는 경우의 수 m, B 가 일어나는 경우의 수 n</div>`},
+      {h:'기본으로 알아 둘 경우의 수', html:chipList(['동전 1개 → <b>2</b>','동전 2개 → 2 × 2 = <b>4</b>','동전 3개 → 2 × 2 × 2 = <b>8</b>',
+        '주사위 1개 → <b>6</b>','주사위 2개 → 6 × 6 = <b>36</b>','동전 1개와 주사위 1개 → 2 × 6 = <b>12</b>'])},
+      {h:'순서가 있을까, 없을까', html:`<table class="kct"><thead><tr><th>4명(A, B, C, D) 가운데 2명</th><th>계산</th><th>경우의 수</th></tr></thead><tbody>
+        <tr><td>회장 1명, 부회장 1명<br><small>자격이 달라요 — (A, B) ≠ (B, A)</small></td><td>4 × 3</td><td><b>12</b></td></tr>
+        <tr><td>대표 2명<br><small>자격이 같아요 — (A, B) = (B, A)</small></td><td>4 × 3 ÷ 2</td><td><b>6</b></td></tr>
+        <tr><td>한 줄로 세우기 (4명 모두)</td><td>4 × 3 × 2 × 1</td><td><b>24</b></td></tr></tbody></table>`}
+    ],
+    ways:[
+      {t:'표를 그려 빠짐없이 세기', ex:'서로 다른 주사위 두 개를 동시에 던질 때, 두 눈의 수의 합이 5인 경우의 수', svg:kcGridSVG(5),
+        lines:['모든 경우는 6 × 6 = 36칸 — 칸 하나가 경우 하나', '합이 5인 칸: (1, 4), (2, 3), (3, 2), (4, 1)', `모두 ${B_(4)}가지`,
+          '<span class="tip">(1, 4)와 (4, 1)은 서로 다른 칸이에요. 표로 그리면 빠뜨리거나 겹쳐 세지 않아요.</span>']},
+      {t:'"또는" — 합의 법칙', ex:'가방 가게에 백팩 3가지와 크로스 백 2가지가 있어요. 이 가운데 한 가지를 사는 경우의 수', svg:kcGroupSVG(3,2,'백팩','크로스 백'),
+        lines:['백팩을 사면 크로스 백은 사지 않아요 → 두 사건은 동시에 일어나지 않아요', `3 + 2 = ${B_(5)}`,
+          '<span class="tip">동시에 일어날 수 있는 두 사건(예: 2의 배수 또는 3의 배수)은 겹치는 것을 한 번만 세야 해요.</span>']},
+      {t:'"동시에" — 곱의 법칙', ex:'와플 가게에서 크림 2가지와 과일 3가지 가운데 하나씩 골라 주문하는 경우의 수', svg:kcTreeSVG(['생크림','초코크림'],['딸기','키위','바나나']),
+        lines:['크림 하나를 고를 때마다 그 각각에 대하여 과일을 3가지씩 고를 수 있어요', `2 × 3 = ${B_(6)}`,
+          '<span class="tip">나뭇가지 그림(수형도)에서 맨 끝 가지의 개수가 경우의 수예요.</span>']},
+      W('길 찾기 — 곱한 다음 더하기',kcF('r2',[2,3,1])),
+      {t:'카드로 두 자리 자연수 만들기', ex:'1, 2, 3, 4가 각각 적힌 카드 4장 가운데 2장을 뽑아 만들 수 있는 두 자리 자연수의 개수', svg:kcSlotSVG([['십의 자리',4],['일의 자리',3]]),
+        lines:['십의 자리: 1, 2, 3, 4 → 4가지', '일의 자리: 십의 자리에 쓴 카드를 뺀 3가지', `4 × 3 = ${B_(12)}`,
+          '<span class="tip">0이 있으면 십의 자리에 0을 쓸 수 없어요. 0, 1, 2, 3 → 3 × 3 = 9개.</span>']},
+      {t:'자격이 다르면 그대로, 같으면 ÷ 2', ex:'후보 4명 가운데 ① 회장 1명과 부회장 1명, ② 대표 2명을 뽑는 경우의 수', svg:kcSlotSVG([['회장',4],['부회장',3]]),
+        lines:['① 회장 4가지, 그 각각에 대하여 부회장 3가지 → 4 × 3 = <b>12</b>', '② 대표는 (A, B)와 (B, A)가 같은 뽑기 → 같은 짝을 두 번 센 셈',
+          `12 ÷ 2 = ${B_(6)}`]},
+      {t:'한 줄로 세우기 — 자리마다 남은 사람 수', ex:'4명을 한 줄로 세우는 경우의 수', svg:kcSlotSVG([['첫째',4],['둘째',3],['셋째',2],['넷째',1]]),
+        lines:['첫째 자리 4명 → 둘째 자리는 남은 3명 → 셋째 2명 → 넷째 1명', `4 × 3 × 2 × 1 = ${B_(24)}`,
+          '<span class="tip">4명 가운데 2명만 뽑아 세우면 앞 두 자리만: 4 × 3 = 12</span>']}
+    ],
+    miss:[{w:'버스 3가지, 지하철 2가지 가운데 하나를 타기 → 3 × 2 = 6', r:'3 + 2 = 5', y:'버스를 타면 지하철은 타지 않아요. 동시에 일어나지 않는 "또는"이라 더해요.'},
+          {w:'티셔츠 3벌과 바지 2벌을 짝 지어 입기 → 3 + 2 = 5', r:'3 × 2 = 6', y:'티셔츠 하나마다 바지 2벌을 각각 입어 볼 수 있어요. 둘을 동시에 고르니 곱해요.'},
+          {w:'서로 다른 동전 2개, 앞면 1개·뒷면 1개 → 1가지', r:'(앞, 뒤), (뒤, 앞) 2가지', y:'서로 다른 동전이라 첫째 동전이 앞면인 것과 둘째 동전이 앞면인 것은 다른 경우예요.'},
+          {w:'출입구 5개, 들어온 곳과 다른 곳으로 나가기 → 5 × 5 = 25', r:'5 × 4 = 20', y:'나갈 때는 들어온 출입구를 빼고 4가지예요.'},
+          {w:'5명 가운데 대표 2명 → 5 × 4 = 20', r:'5 × 4 ÷ 2 = 10', y:'대표 2명은 자격이 같아서 (A, B)와 (B, A)가 같은 경우예요.'},
+          {w:'0, 1, 2, 3으로 두 자리 자연수 → 4 × 3 = 12', r:'3 × 3 = 9', y:'십의 자리에 0은 올 수 없어요. 십의 자리 3가지, 일의 자리는 0을 포함해 남은 3가지.'}]});
   if(t==='factor') return done({
     sub:'공통인수 · 완전제곱식 · 합과 차의 곱 · x² + (a+b)x + ab · acx² + (ad+bc)x + bd',
     memo:[{h:'인수분해 공식', html:chipList(['ma + mb = m(a + b)','a² + 2ab + b² = (a + b)²','a² − 2ab + b² = (a − b)²','a² − b² = (a + b)(a − b)','x² + (a+b)x + ab = (x + a)(x + b)'])},
