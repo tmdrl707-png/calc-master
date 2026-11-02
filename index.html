@@ -1388,6 +1388,11 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .bttm b{font-weight:600;font-variant-numeric:tabular-nums}.bttm em{font-style:normal;font-weight:800;color:var(--tc)}
 .bttm.mvp{box-shadow:0 0 0 1.5px #f5b301}
 .bttm.mvp::after{content:'MVP';font-size:9.5px;font-weight:800;color:#a87400;margin-left:2px}
+/* 대전 값 고르기 바퀴 — 양옆 단추 (바퀴 위에 얹어서 가운데 칸이 그대로 가운데) */
+.btwrap{position:relative}
+.btarr{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:38px;height:50px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:24px;font-weight:700;color:var(--blue);line-height:1;box-shadow:var(--sh1)}
+.btarr[data-d="-1"]{left:4px}.btarr[data-d="1"]{right:4px}
+.btarr:active{background:#eef2fe}
 </style>
 </head>
 <body>
@@ -7290,7 +7295,10 @@ function btLenHTML(kind,v,team){
     <div class="chips" id="btKinds">${BT_KINDS.filter(([k])=>!(team&&k==='s')).map(([k,n])=>`<button class="chip${k===kind?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>
     <div class="btkhelp">${kind==='t'?'정한 시간이 끝났을 때 많이 맞힌 사람이 우승':kind==='n'?'정한 문제를 다 풀었을 때 많이 맞힌 사람이 우승':'1등과 맞힌 개수가 정한 만큼 벌어지면 그 순간 탈락 · 마지막까지 남으면 우승'}</div>
     <div class="btlab">${kind==='t'?'시간':kind==='n'?'문제 수':'탈락 기준 (1등과의 차이)'} <b id="btWv">${btValLabel(kind,v)}</b></div>
-    <div class="btwheel" id="btWheel" data-kind="${kind}">${vals.map((x,i)=>`<button class="btw${x===v?' on':''}" data-i="${i}">${kind==='t'?secLabel(x).replace(' ','<br>'):x}</button>`).join('')}</div>`;
+    <div class="btwrap"><button class="btarr" data-d="-1" aria-label="작게">‹</button>
+    <div class="btwheel" id="btWheel" data-kind="${kind}">${vals.map((x,i)=>`<button class="btw${x===v?' on':''}" data-i="${i}">${kind==='t'?secLabel(x).replace(' ','<br>'):x}</button>`).join('')}</div>
+    <button class="btarr" data-d="1" aria-label="크게">›</button></div>
+    <div class="btkhelp" style="text-align:center">옆으로 밀거나 ‹ › 를 눌러 골라요${matchMedia('(pointer:fine)').matches?' · 마우스 휠도 돼요':''}</div>`;
 }
 /* 바퀴 움직이기 — 멈춘 자리의 값을 onPick 으로 */
 function btWheelWire(v,onPick){
@@ -7302,7 +7310,21 @@ function btWheelWire(v,onPick){
   const mark=i=>{ w.querySelectorAll('.btw').forEach((b,j)=>b.classList.toggle('on',j===i)); el('btWv').textContent=btValLabel(kind,vals[i]); };
   w.addEventListener('scroll',()=>{ BT.wheelAt=Date.now(); const i=Math.max(0,Math.min(vals.length-1,Math.round(w.scrollLeft/BT_WW))); mark(i);
     clearTimeout(tm); tm=setTimeout(()=>onPick(vals[i]),260); },{passive:true});
-  w.querySelectorAll('.btw').forEach(b=>b.onclick=()=>{ w.scrollTo({left:+b.dataset.i*BT_WW,behavior:'smooth'}); });
+  w.querySelectorAll('.btw').forEach(b=>b.onclick=()=>{ if(w._drag) return; w.scrollTo({left:+b.dataset.i*BT_WW,behavior:'smooth'}); });
+  /* 한 칸씩 옮기기 — ‹ › 단추 · 마우스 휠 */
+  const cur=()=>Math.max(0,Math.min(vals.length-1,Math.round(w.scrollLeft/BT_WW)));
+  const step=d=>{ const i=Math.max(0,Math.min(vals.length-1,cur()+d)); w.scrollTo({left:i*BT_WW,behavior:'smooth'}); };
+  (w.parentNode.querySelectorAll('.btarr')||[]).forEach(b=>b.onclick=()=>step(+b.dataset.d));
+  let wl=0;
+  w.addEventListener('wheel',e=>{ const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY; if(!d) return;
+    e.preventDefault(); if(Date.now()-wl<140) return; wl=Date.now(); step(d>0?1:-1); },{passive:false});
+  /* 컴퓨터에서 마우스로 끌기 */
+  w.addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') return; const x0=e.clientX, s0=w.scrollLeft; w._drag=false;
+    w.style.scrollSnapType='none';
+    const mv=ev=>{ if(Math.abs(ev.clientX-x0)>4) w._drag=true; w.scrollLeft=s0-(ev.clientX-x0); };
+    const up=()=>{ removeEventListener('pointermove',mv); removeEventListener('pointerup',up); w.style.scrollSnapType='';
+      w.scrollTo({left:cur()*BT_WW,behavior:'smooth'}); setTimeout(()=>{ w._drag=false; },60); };
+    addEventListener('pointermove',mv); addEventListener('pointerup',up); });
 }
 
 function btPaintMenu(){
@@ -9272,8 +9294,30 @@ async function tapClassItem(id){
   toast('학급 아이템은 우리 반 모두에게 자동으로 입혀져요 · 학급 랭킹 단체 사진도 꾸며져요');
 }
 
+/* ═══ 뒤로 가기 — 사이트를 나가지 않고 메인(학교 고르기)으로 ═══
+   들어올 때 기록을 하나 더 쌓아 두고, 뒤로 가기가 오면 화면만 바꾼 뒤 다시 쌓아요.
+   · 창(모달)이 떠 있으면 창만 닫아요  · 대전 중이면 자리를 지켜요(나가려면 '그만하기'·'나가기')
+   · 이미 메인이면 한 번 더 누를 때 나가요  · 로그인 화면에서는 그대로 나가요                         */
+let BACK_ARM=0;
+const backGuard=()=>{ try{ history.pushState({cm:1},''); }catch(e){} };
+function onBack(){
+  const on=document.querySelector('.screen.on'), id=on?on.id:'';
+  if(id==='s-gate'){ history.back(); return; }
+  const ov=[...document.querySelectorAll('.overlay.on')];
+  if(ov.length){ ov.forEach(o=>o.classList.remove('on')); backGuard(); return; }
+  const inBattle=(G&&G.mode==='battle'&&!G.over)||(typeof BT!=='undefined'&&BT.code&&id==='s-battle');
+  if(inBattle){ backGuard(); toast(G&&G.mode==='battle'&&!G.over?'대전 중이에요 — 나가려면 위의 [그만하기]를 눌러요':'대기실이에요 — 나가려면 [나가기]를 눌러요'); return; }
+  const main=isTeacher?'s-teach':'s-school';
+  if(id===main){ if(Date.now()-BACK_ARM<2500){ history.back(); return; } BACK_ARM=Date.now(); backGuard(); toast('한 번 더 누르면 나가요'); return; }
+  backGuard();
+  if(isTeacher){ show('s-teach'); return; }
+  if(ME) openSchool(); else show('s-gate');
+}
+window.addEventListener('popstate',onBack);
+
 /* ═══════════════════ 시작 ═══════════════════ */
 async function boot(){
+  try{ history.replaceState({cm:0},''); }catch(e){} backGuard();
   buildKeypad();
   loadCfg(); syncClock();
   fbInit().then(db=>{ const n=el('netStat'); if(!n) return;
