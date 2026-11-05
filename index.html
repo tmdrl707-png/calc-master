@@ -8123,9 +8123,9 @@ async function teacherWipe(){
    판정 — 서버(싱가포르)에 먼저 도착한 사람이 아니라, '문제가 보인 순간부터 정답을 누를 때까지 걸린 시간(rt)'이
    가장 짧은 사람이 이겨요. 정답을 맞히면 a/{i}/{학번}=rt 를 올리고, 첫 정답이 보이고 0.8초 기다린 뒤
    가장 짧은 rt 의 주인을 w/{i} 에 적어요(누가 적어도 한 번만). 통신이 느린 친구도 손해 보지 않게.
-   코인 : 2명 이상이 한 판을 끝내면 1위 20 · 2위 12 · 3위 8 · 그 밖 4 (1개 이상 맞혔을 때), 하루 5판까지.
+   코인 : 2명 이상이 한 판을 끝내면 1위 30 · 2위 20 · 3위 14 · 그 밖 8 (1개 이상 맞혔을 때), 하루 판 수 제한 없음.
    팀전은 팀 순위대로 팀 전원이 받아요(맞힌 개수와 상관없이). */
-const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[30,20,14], BT_COIN_ELSE=8, BT_DAY_MAX=5, BT_PEN=1000;   /* 틀리면 1초 멈춤 */
+const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[30,20,14], BT_COIN_ELSE=8, BT_PEN=1000;   /* 틀리면 1초 멈춤 */
 const BT_KINDS=[['t','시간제'],['n','개수제'],['s','서바이벌']];
 const BT_VALS={t:range(1,10).map(k=>k*30), n:range(5,30), s:range(2,10)};
 const BT_DEF={t:60, n:10, s:5};
@@ -8313,7 +8313,7 @@ function btPaintMenu(){
         <button class="btn primary btwide" id="btJoin">들어가기</button>
       </div>
     </div>
-    <div class="btnote">${online()?`한 방에 ${BT_MAX}명까지 · 2명 이상이 끝까지 하면 1위 ${BT_COIN[0]} · 2위 ${BT_COIN[1]} · 3위 ${BT_COIN[2]}코인 (하루 ${BT_DAY_MAX}판까지)`
+    <div class="btnote">${online()?`한 방에 ${BT_MAX}명까지 · 2명 이상이 끝까지 하면 1위 ${BT_COIN[0]} · 2위 ${BT_COIN[1]} · 3위 ${BT_COIN[2]}코인`
       :'지금은 서버에 연결되지 않아 <b>이 기기 안에서만</b> 대전할 수 있어요 (같은 브라우저의 다른 창끼리).'}</div>
     <div class="btrow"><button class="btn" onclick="openSchool()">← 처음으로</button></div>`;
   el('btTopics').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ BT.t=b.dataset.t; btPaintMenu(); });
@@ -8672,9 +8672,8 @@ function btReward(rank,n,score,my){
   const d=todayKey(); if(!ME.bt||ME.bt.d!==d) ME.bt={d,n:0};
   let coin=0, msg='';
   if(score<=0&&!(my&&my.team)) msg='한 문제 이상 먼저 맞혀야 코인을 받아요.';   /* 팀전은 팀 순위대로 팀 전원이 받아요 */
-  else if(ME.bt.n>=BT_DAY_MAX) msg=`오늘 대전 코인은 다 받았어요 (하루 ${BT_DAY_MAX}판). 내일 또 겨뤄요!`;
   else{ coin=rank<=3?BT_COIN[rank-1]:BT_COIN_ELSE; ME.bt.n++; ME.coin+=coin;
-    msg=`${my&&my.team?`${n}팀 중 우리 팀 <b>${rank}위</b>`:`${n}명 중 <b>${rank}위</b>`} — <b>+${coin}코인</b> (오늘 ${ME.bt.n} / ${BT_DAY_MAX}판)`; }
+    msg=`${my&&my.team?`${n}팀 중 우리 팀 <b>${rank}위</b>`:`${n}명 중 <b>${rank}위</b>`} — <b>+${coin}코인</b> (오늘 ${ME.bt.n}판째)`; }
   /* 마이페이지 대전 기록 — 최근 30판 */
   { const ms=markMission('battle'); if(ms){ coin+=ms.coin; msg+=` · ${ms.msg}`; } }
   if(my){ H.push(Object.assign({d:Date.now(), t:my.t||'', len:my.len||'', n:score, r:rank, np:n, c:coin},my.team?{tm:1}:{})); if(H.length>30) H.splice(0,H.length-30); }
