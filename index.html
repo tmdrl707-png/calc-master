@@ -8932,6 +8932,8 @@ const REAL_SEC=60, COIN_PER=3, CLEAR_FIRST=30, PRAC_Q=1, REAL_FULL=15, NOTE_COIN
    단, 지우기를 한 번이라도 누른 문항은 '확인'을 눌러야 합니다 —
    숫자를 바꿔 가며 넣어 보는 것으로 답을 맞히지 못하게.                  */
 const AUTO_OK=true;
+/* 연습 모드는 [확인]을 눌러야 채점해요 — 숫자를 바꿔 가며 찍어서 맞히지 못하게 */
+const autoOk=()=>AUTO_OK&&G&&G.mode!=='practice';
 
 let CUR={school:'e', topic:'addsub'};
 let G=null;
@@ -9344,7 +9346,7 @@ function renderStages(){
   el('stNoteT').textContent=`${T.n} 정리 노트`;
   el('stNote').onclick=()=>openBook(t);
   el('stTitle').textContent=`${T.n} · 연습 스테이지`;
-  el('stSub').innerHTML=`스테이지의 문항을 <b>모두 맞히면 클리어</b>예요. 틀린 문항은 풀이를 보고 조금 뒤에 다시 나와요.<br>
+  el('stSub').innerHTML=`스테이지의 문항을 <b>모두 맞히면 클리어</b>예요. 답을 쓰고 <b>[확인]</b>을 눌러야 채점해요. 틀린 문항은 풀이를 보고 조금 뒤에 다시 나와요.<br>
     아직 클리어하지 않은 스테이지는 <b>맞힌 문제마다 ${PRAC_Q}코인</b>, 클리어하면 <b>보너스 ${CLEAR_FIRST}코인</b>. 이미 클리어한 스테이지는 코인이 없어요.`;
   el('stBar').innerHTML=T.stages.map(s=>`<i class="${p.c.includes(s.n)?'done':''}"></i>`).join('');
   el('stageList').innerHTML=T.stages.map(s=>{
@@ -9552,13 +9554,13 @@ function press(k){
   if(k==='ok'){ if(/\d/.test(G.typed)) submit(); return; }
   if(k==='neg'){ if(!topicOf(G.t).neg) return;
     G.typed=G.typed[0]==='-'?G.typed.slice(1):'-'+G.typed; paintTyped();
-    if(AUTO_OK&&G.typed===String(G.ask.ans)) submit(); return; }
+    if(autoOk()&&G.typed===String(G.ask.ans)) submit(); return; }
   if(k==='dot'){ if(!topicOf(G.t).dec||G.typed.includes('.')) return;
     G.typed=(G.typed===''||G.typed==='-'?G.typed+'0':G.typed)+'.'; paintTyped(); return; }
   if(G.typed.replace(/[-.]/g,'').length>=(topicOf(G.t).dec?6:4)) return;
   if(G.typed==='0') G.typed=''; if(G.typed==='-0') G.typed='-';
   G.typed+=k; paintTyped();
-  if(AUTO_OK&&G.typed===String(G.ask.ans)) submit();
+  if(autoOk()&&G.typed===String(G.ask.ans)) submit();
 }
 function submit(){
   const f=G.ask, ok=(Math.abs(+G.typed-f.ans)<1e-9&&/\d/.test(G.typed)), sec=(performance.now()-G.qStart)/1000;
