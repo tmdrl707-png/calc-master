@@ -1521,6 +1521,10 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .dcopt{font:inherit;color:inherit;cursor:pointer}
 @media(max-width:520px){.cccols{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .overlay.ovtop .modal{margin:0 auto auto}
+
+/* 대전 — 틀리면 1초 멈춤 */
+body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
+.qmsg.bad{color:var(--x)}
 </style>
 </head>
 <body>
@@ -8044,7 +8048,7 @@ async function teacherWipe(){
 
    규칙 — 빨리 맞히기
    · 모두 같은 문제를 같은 순간에 봅니다. 가장 먼저 맞힌 사람이 1개, 그 순간 다 같이 다음 문제로.
-   · 틀려도 아무 일 없어요(감점 없음, 입력칸만 비워져요). 누군가 맞히거나 10초가 지나면 다음 문제.
+   · 틀리면 감점은 없지만 1초 동안 입력이 멈춰요(찍어서 맞히기 막기). 누군가 맞히거나 10초가 지나면 다음 문제.
    · 뒤로 갈수록 실전 모드의 뒤 단계(어려운 문제)가 나와요.
    방식
    · 시간제 't' (기본) : sec 초 동안 (30초 ~ 5분) — 끝났을 때 많이 맞힌 사람이 우승
@@ -8059,7 +8063,7 @@ async function teacherWipe(){
    가장 짧은 rt 의 주인을 w/{i} 에 적어요(누가 적어도 한 번만). 통신이 느린 친구도 손해 보지 않게.
    코인 : 2명 이상이 한 판을 끝내면 1위 20 · 2위 12 · 3위 8 · 그 밖 4 (1개 이상 맞혔을 때), 하루 5판까지.
    팀전은 팀 순위대로 팀 전원이 받아요(맞힌 개수와 상관없이). */
-const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[30,20,14], BT_COIN_ELSE=8, BT_DAY_MAX=5;
+const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[30,20,14], BT_COIN_ELSE=8, BT_DAY_MAX=5, BT_PEN=1000;   /* 틀리면 1초 멈춤 */
 const BT_KINDS=[['t','시간제'],['n','개수제'],['s','서바이벌']];
 const BT_VALS={t:range(1,10).map(k=>k*30), n:range(5,30), s:range(2,10)};
 const BT_DEF={t:60, n:10, s:5};
@@ -8230,7 +8234,7 @@ function btWheelWire(v,onPick){
 function btPaintMenu(){
   el('btBody').innerHTML=`
     <div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>친구와 대전</h2>
-      <p class="sub">모두 같은 문제를 동시에 봐요. <b>가장 먼저 맞힌 사람이 1개</b>, 그 순간 다 같이 다음 문제로! 틀려도 감점은 없어요. 뒤로 갈수록 문제가 어려워져요. <b>팀전</b>은 방을 만든 뒤 대기실에서 고르고, 방장이 팀을 나눠요.</p></div></div>
+      <p class="sub">모두 같은 문제를 동시에 봐요. <b>가장 먼저 맞힌 사람이 1개</b>, 그 순간 다 같이 다음 문제로! 틀려도 감점은 없지만 <b>1초 동안 멈춰요</b>. 뒤로 갈수록 문제가 어려워져요. <b>팀전</b>은 방을 만든 뒤 대기실에서 고르고, 방장이 팀을 나눠요.</p></div></div>
     <div class="btgrid">
       <div class="btcard">
         <h3>방 만들기</h3>
@@ -8429,7 +8433,7 @@ function btStartPlay(room){
   G.tId=setInterval(btTick,80);
 }
 const btCdHTML=s=>`<div class="btcd"><span>${s}</span><p>${topicOf(G.t).n} · ${G.len}</p>
-  <small>가장 먼저 맞히면 1개! 틀려도 감점 없이 다시 쓸 수 있어요.</small></div>`;
+  <small>가장 먼저 맞히면 1개! 틀리면 1초 쉬었다가 다시 쓸 수 있어요.</small></div>`;
 function btQLabel(){ return `${G.qi+1}번째 문제 · 먼저 맞히면 1개${G.kind==='s'?` · ${G.v}개 차이 나면 탈락`:''}`; }
 /* 다음 문제로 — 여러 명이 동시에 눌러도 한 번만 넘어가게, 넘기는 사람이 다음 문항을 뽑아요 */
 function btAdvance(i){
@@ -8516,8 +8520,13 @@ async function btAnswer(ok,f){
     const m=el('qmsg'); if(m){ m.className='qmsg'; m.innerHTML=`정답! <b>${btSecTxt(rt)}</b> — 누가 가장 빨랐는지 보는 중…`; }
     dbSet(`battles/${G.code}/a/${i}/${ME.sid}`,rt);
   }else{
-    /* 틀리면 아무 일 없이 입력칸만 비워요 — 다시 쓸 수 있어요 */
-    G.typed=''; G.clean=true; G.locked=false; paintTyped('');
+    /* 틀리면 1초 동안 입력을 멈춰요 — 찍어서 맞히기를 막으려고. 그 뒤 입력칸을 비우고 다시 쓸 수 있어요 */
+    G.locked=true; paintTyped('no'); document.body.classList.add('btpen');
+    const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML=`틀렸어요 — <b>${BT_PEN/1000}초</b> 쉬었다가 다시 써요`; }
+    setTimeout(()=>{ document.body.classList.remove('btpen');
+      if(!G||G.mode!=='battle'||G.phase!=='q'||G.qi!==i) return;
+      G.typed=''; G.clean=true; G.locked=false; paintTyped('');
+      const m2=el('qmsg'); if(m2){ m2.className='qmsg'; m2.innerHTML=''; } },BT_PEN);
   }
   updHUD();
 }
