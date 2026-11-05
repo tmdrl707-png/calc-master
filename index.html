@@ -10226,7 +10226,10 @@ function goodsOf(kind,k){
   const it=ITEM(k); return {kind:'item',k,n:it.n,p:it.p,box:!!it.box,hs:!!it.hs,nw:!!it.nw,cat:it.cat,has:ownItems().includes(k),on:(ME.ch.items||[]).includes(k)};
 }
 /* 갈래마다 보여 줄 물건 — 꾸미기는 값이 싼 것부터, '새로 나옴'·'고등 전용'은 몸 → 색 → 부위 차례로 */
-function goodsList(cat){
+/* 고등 전용은 고등학교가 열리기 전에는 상점에 보이지 않아요 (이미 가진 것은 보여요) */
+const hsHid=g=>!!g.hs&&!g.has&&!hsOpen();
+function goodsList(cat){ return goodsList0(cat).filter(g=>!hsHid(g)); }
+function goodsList0(cat){
   const S=x=>goodsOf('shape',x.k), Co=x=>goodsOf('color',x.k), It=i=>goodsOf('item',i.id), byP=(a,b)=>a.p-b.p;
   if(cat==='shape') return CH_SHAPES.map(S);
   if(cat==='color') return CH_COLORS.map(Co);
@@ -10256,7 +10259,7 @@ function paintShop(){
   el('shopAvatar').innerHTML=avatarSVG(look);
   el('shopStage').classList.toggle('trying',!!TRY);
   el('shopCoin').textContent=ME.coin;
-  const total=ITEMS.filter(i=>i.cat!=='class'&&!i.hide).length+CH_SHAPES.length+CH_COLORS.length;
+  const total=['shape','color'].concat(CATS.map(c=>c.k)).reduce((a,k)=>a+goodsList(k).length,0);
   const mine=ownItems().length+ownShapes().length+ownColors().length;
   el('shopSub').innerHTML=`모은 것 <b>${mine}</b> / ${total} · 입은 꾸미기 ${(ME.ch.items||[]).length}개`;
   const cnt=k=>{ if(k==='box') return [ownItems().filter(id=>BOX_ITEMS.some(i=>i.id===id)).length,BOX_ITEMS.length];
@@ -10264,7 +10267,7 @@ function paintShop(){
     const L=goodsList(k); return [L.filter(g=>g.has).length,L.length]; };
   const tab=c=>{ const [a,b]=cnt(c.k);
     return `<button class="tab${shopCat===c.k?' on':''}${c.k==='new'?' tnew':c.k==='hs'?' ths':''}" data-k="${c.k}">${c.n} <small>${a}/${b}</small></button>`; };
-  el('shopTabs').innerHTML=`<div class="snrow"><span class="snl">둘러보기</span>${SHOP_TOP.map(tab).join('')}</div>
+  el('shopTabs').innerHTML=`<div class="snrow"><span class="snl">둘러보기</span>${SHOP_TOP.filter(c=>c.k!=='hs'||hsOpen()).map(tab).join('')}</div>
     <div class="snrow"><span class="snl">꾸미기</span>${CATS.map(tab).join('')}</div>`;
   el('shopTabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ shopCat=b.dataset.k; paintShop(); });
   const box=el('shopItems');
