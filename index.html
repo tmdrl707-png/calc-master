@@ -3885,7 +3885,8 @@ const PY_ALL=PY_BASE.concat(PY_L2,PY_L3);
 const pyPick=l=>sampleN(l.filter(f=>pyLv(f)===1),4).concat(sampleN(l.filter(f=>pyLv(f)===2),3),sampleN(l.filter(f=>pyLv(f)===3),1));
 const PY_MULT=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[30,40,50],[10,24,26],[15,36,39],[16,30,34],[14,48,50]];
 /* 연습용 배수: (3,4,5)는 2~5배, 나머지는 2배까지 */
-const PY_MULT_P=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[10,24,26],[16,30,34],[14,48,50]];
+/* 연습 — 몇 배인지 바로 보이는 것만: (3, 4, 5)의 2·3·4·5·10배와 (5, 12, 13)의 2배 */
+const PY_MULT_P=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[30,40,50],[10,24,26]];
 const PY_BIG =[[20,21,29]];
 /* 분수·소수로 줄인 피타고라스 수 — 답은 늘 자연수가 되게 골랐어요.
    [종류 h(빗변)/l(다른 변), a, b, c, a², b², c², 바탕 피타고라스 수, 몇 배] — l 은 a 가 답 */
@@ -3905,7 +3906,7 @@ const PY_FD=[
   ['l','12','3.5','12.5','144','12.25','156.25',[7,24,25],'1/2배']
 ];
 /* 연습용 분수·소수: 2 또는 5로 나눈 것만 (실전 최고 단계에는 모두 나옴) */
-const PY_FD_P=[0,3,6,8,9,10,11,12];
+const PY_FD_P=[0,1,2,3,6,9];   /* (3, 4, 5)를 줄이거나 늘린 것만 */
 const pyNum=x=>{ const m=String(x).split('/'); return m.length>1?(+m[0])/(+m[1]):+x; };
 const pyTok=x=>{ const m=String(x).split('/'); return m.length>1?{fr:[m[0],m[1]]}:String(x); };
 const yX=i=>{ const [k,a,b,c]=PY_FD[i];
@@ -3958,15 +3959,15 @@ Object.assign(TOPICS,{
       {n:2, name:'다른 한 변 구하기', ex:'□² + 12² = 13²', take:8,
        facts:()=>PY_LS(PY_ALL), pick:pyPick},
       {n:3, name:'닮은 직각삼각형 (늘리기·줄이기)', ex:'0.6² + 0.8² = □²', take:12,
-       facts:()=>pyFacts(PY_MULT_P,true).concat(pyFacts(PY_BIG,true),PY_FD_P.map(yX)),
-       pick:l=>sampleN(l.filter(f=>f.k!=='yX'&&f.c!==29),6).concat(sampleN(l.filter(f=>f.c===29),2),sampleN(l.filter(f=>f.k==='yX'),4))},
+       facts:()=>pyFacts(PY_MULT_P,true).concat(PY_FD_P.map(yX)),
+       pick:l=>sampleN(l.filter(f=>f.k!=='yX'),8).concat(sampleN(l.filter(f=>f.k==='yX'),4))},
       {n:4, name:'삼각형의 분류 (예각·직각·둔각)', ex:'세 변 5, 12, 14', take:12, gen:()=>genYC(1)}
     ],
     /* 실전은 마지막 단계에서 배수·분수·소수가 더 다양하게 */
     realStages:[
       {n:1, name:'빗변 구하기', facts:()=>PY_HS(PY_BASE.concat(PY_L2))},
       {n:2, name:'다른 한 변 구하기', facts:()=>PY_LS(PY_BASE.concat(PY_L2))},
-      {n:3, name:'닮은 직각삼각형', facts:()=>pyFacts(PY_MULT,true).concat(pyFacts(PY_BIG,true),pyFacts(PY_L3.filter(t=>t[2]!==29),true),PY_FD.map((_,i)=>yX(i)))},
+      {n:3, name:'닮은 직각삼각형', facts:()=>pyFacts(PY_MULT,true).concat(PY_FD.map((_,i)=>yX(i)))},   /* 실전은 배수만 조금 더 (8, 15, 17)·(7, 24, 25)의 배수까지 */
       {n:4, name:'삼각형의 분류', gen:()=>genYC(2)}
     ],
     cats:[['빗변 구하기',sk=>/^yH/.test(sk)],['다른 한 변 구하기',sk=>/^yL/.test(sk)],['분수·소수',sk=>/^yX/.test(sk)],
@@ -4155,7 +4156,8 @@ function extPreview(t,n){
   if(n===4) return Object.assign(H(yC(5,12,14),'가장 긴 변을 찾아 그 제곱을 나머지 두 변의 제곱의 합과 비교해요.'),
       {body:chipList(['c² &lt; a² + b² → <b>예각삼각형</b>','c² = a² + b² → <b>직각삼각형</b>','c² &gt; a² + b² → <b>둔각삼각형</b>'])});
   return Object.assign(H(yX(0),'피타고라스 수에 같은 수를 곱해도(나눠도) 피타고라스 수예요. 분수·소수로 줄여도 마찬가지!'),
-      {body:chipList(PY_MULT_P.concat(PY_BIG).map(t=>`(${t.join(', ')})`).concat(['(0.6, 0.8, 1)','(3/5, 4/5, 1)','(1.5, 2, 2.5)']))});
+      {body:chipList(PY_MULT_P.map(t=>{ const b=PY_BASE.find(x=>t[0]%x[0]===0&&t[1]*x[0]===x[1]*t[0]); return `(${b.join(', ')}) × <b>${t[0]/b[0]}</b> = (${t.join(', ')})`; })
+        .concat(['(3, 4, 5) × <b>0.2</b> = (0.6, 0.8, 1)','(3, 4, 5) ÷ <b>5</b> = (3/5, 4/5, 1)','(3, 4, 5) × <b>0.5</b> = (1.5, 2, 2.5)']))});
 }
 
 /* ═══ 정리 노트 ═══ */
