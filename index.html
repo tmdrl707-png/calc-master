@@ -1443,6 +1443,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .msrow:first-of-type{border-top:none}
 .msk{flex:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:13px;font-weight:800;background:var(--soft2);color:var(--ink2)}
 .msk.k-pre{background:#fff1d6;color:#a86400}.msk.k-weak{background:#ffe3ea;color:#c2255c}.msk.k-real{background:#e6edff;color:var(--blue)}.msk.k-new,.msk.k-again{background:#e6f6ec;color:#1f7a45}
+.msk.k-first,.msk.k-firstR{background:#f1e6ff;color:#7b3fd6}.msk.k-realN{background:#e6edff;color:var(--blue)}.msk.k-perfect,.msk.k-multi,.msk.k-speed,.msk.k-battle{background:#fff0e0;color:#c25a00}
 .mst{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .mst em{font-style:normal;font-size:11px;font-weight:700;color:var(--dim)}
 .mst b{font-size:14.5px;font-weight:800;word-break:keep-all}
@@ -8675,6 +8676,7 @@ function btReward(rank,n,score,my){
   else{ coin=rank<=3?BT_COIN[rank-1]:BT_COIN_ELSE; ME.bt.n++; ME.coin+=coin;
     msg=`${my&&my.team?`${n}팀 중 우리 팀 <b>${rank}위</b>`:`${n}명 중 <b>${rank}위</b>`} — <b>+${coin}코인</b> (오늘 ${ME.bt.n} / ${BT_DAY_MAX}판)`; }
   /* 마이페이지 대전 기록 — 최근 30판 */
+  { const ms=markMission('battle'); if(ms){ coin+=ms.coin; msg+=` · ${ms.msg}`; } }
   if(my){ H.push(Object.assign({d:Date.now(), t:my.t||'', len:my.len||'', n:score, r:rank, np:n, c:coin},my.team?{tm:1}:{})); if(H.length>30) H.splice(0,H.length-30); }
   saveMe(); paintMe(); if(coin) toast(`+${coin}코인!`);
   return {coin,msg};
@@ -8805,12 +8807,14 @@ const PREQ={
 const stName=(t,n)=>{ const s=(TOPICS[t]&&TOPICS[t].stages||[]).find(x=>x.n===n); return s?s.name:''; };
 const hasStage=(t,n)=>!!(TOPICS[t]&&TOPICS[t].stages.some(s=>s.n===n));
 
-/* ═══ ⑦ 오늘의 미션 — 하루 세 개 · 하나에 15코인, 셋 다 하면 +25 ═══
-   ① 기초 다지기 : 가장 약한 스테이지의 선수 학습 (그것도 충분히 잘하면 건너뛰어요)
-   ② 약점 다시 잡기 : 가장 약한 스테이지를 연습으로 한 번 클리어
-   ③ 실전 도전 : 요즘 하는 주제에서 실전 한 번 (1개 이상 맞히기)
-   기록이 아직 적으면 '다음 단계 도전'으로 채워요. 연습·실전이 잠긴 주제는 미션에 넣지 않아요.            */
-const MS_COIN=15, MS_ALL=25;
+/* ═══ ⑦ 오늘의 미션 — 하루 네 개, 날마다 종류가 바뀌어요 ═══
+   ① 나에게 맞춘 것 : 기초 다지기 / 약점 다시 잡기 / 다음 단계 도전 / 등급 올리기 (기록에 따라)
+   ② 처음 해보기   : 한 번도 안 해 본 주제의 1단계 · 처음 해보는 실전 · 아직 안 연 단계 가운데 하나
+   ③ 실전          : 실전 한 판 · 실전 목표 개수 넘기기
+   ④ 오늘의 도전   : 한 번도 안 틀리고 클리어 · 연습 3개 클리어 · 내 최고 기록 깨기 · 친구 대전 한 판 (날마다 하나)
+   미션마다 코인이 달라요(m.c). 네 개를 다 하면 보너스. 학생·날짜로 섞어서 친구마다, 날마다 달라요.               */
+const MS_COIN=25, MS_ALL=60, MS_V=2;
+const MS_C={pre:30,weak:30,new:30,again:25,first:40,firstR:40,real:25,realN:35,perfect:35,multi:35,speed:35,battle:35};
 /* 요즘 하는 주제 — 최근 14일 실전 횟수 + 계산 기록 수가 많은 순 */
 function busyTopics(){
   const fs=ME.fs||{}, from=addDay(todayKey(),-14), sc={};
@@ -8818,76 +8822,132 @@ function busyTopics(){
   Object.keys(fs).forEach(k=>{ const t=skTopic(k); if(t&&sc[t]!=null) sc[t]+=Math.min(200,+(fs[k]||[])[0]||0); });
   return TOPIC_ORDER.slice().sort((a,b)=>sc[b]-sc[a]).filter(t=>sc[t]>0);
 }
+/* 한 번도 손대지 않은 주제 / 실전을 한 번도 안 한 주제 */
+function triedTopics(){ const S=new Set();
+  Object.keys(ME.fs||{}).forEach(k=>{ const t=skTopic(k); if(t) S.add(t); });
+  Object.keys(ME.P||{}).forEach(t=>{ if(arr((ME.P[t]||{}).c).length) S.add(t); });
+  Object.keys(ME.R||{}).forEach(t=>{ if(arr((ME.R[t]||{}).hist).length) S.add(t); });
+  return S; }
+const realPlayed=t=>arr(((ME.R||{})[t]||{}).hist).length>0;
 function makeMissions(){
   const fs=ME.fs||{}, L=[], seen=new Set(), key=(t,n)=>t+':'+n;
+  const rnd=seedRand(todayKey()+'|ms|'+(ME.sid||'')), pick=A=>A.length?A[Math.floor(rnd()*A.length)]:null;
   const canP=(t,n)=>hasStage(t,n)&&modeOpen(t,'p')&&!seen.has(key(t,n));
-  const add=m=>{ if(m.k!=='real') seen.add(key(m.t,m.n)); L.push(Object.assign({done:0},m)); };
+  const add=m=>{ if(m.n!=null) seen.add(key(m.t,m.n)); L.push(Object.assign({done:0,c:MS_C[m.k]||MS_COIN},m)); };
+  const mySchool=schoolOf(ME.sc||CUR.school).topics;
+  const pool=[...new Set(busyTopics().concat([CUR.topic],mySchool,TOPIC_ORDER))].filter(t=>TOPICS[t]&&modeOpen(t,'p'));
+  const firstUncleared=t=>{ const c=arr(((ME.P||{})[t]||{}).c); return TOPICS[t].stages.find(x=>!c.includes(x.n)&&canP(t,x.n)); };
+
+  /* ① 나에게 맞춘 것 */
   const W=weakStages(fs,t=>modeOpen(t,'p'));
   if(W.length){ const w=W[0];
     const pre=(PREQ[key(w.t,w.n)]||[]).filter(([t,n])=>canP(t,n)).map(([t,n])=>Object.assign({t,n},stageStat(fs,t,n)))
       .filter(x=>x.c<8||x.acc<.95).sort((a,b)=>a.acc-b.acc)[0];
-    if(pre) add({k:'pre',t:pre.t,n:pre.n,ft:w.t,fn:w.n,acc:Math.round(w.raw*100)});
-    if(canP(w.t,w.n)) add({k:'weak',t:w.t,n:w.n,acc:Math.round(w.raw*100)});
-    const w2=W.slice(1).find(x=>canP(x.t,x.n));
-    if(L.length<2&&w2) add({k:'weak',t:w2.t,n:w2.n,acc:Math.round(w2.raw*100)});
+    if(pre&&rnd()<.5) add({k:'pre',t:pre.t,n:pre.n,ft:w.t,fn:w.n,acc:Math.round(w.raw*100)});
+    else if(canP(w.t,w.n)) add({k:'weak',t:w.t,n:w.n,acc:Math.round(w.raw*100)});
   }
-  /* 다음 단계 도전 — 요즘 하는 주제 → 지금 고른 학교의 열린 주제 차례로, 아직 클리어 못 한 첫 스테이지 */
-  const pool=[...new Set(busyTopics().concat([CUR.topic],schoolOf(ME.sc||CUR.school).topics,TOPIC_ORDER))].filter(t=>TOPICS[t]&&modeOpen(t,'p'));
-  for(const t of pool){ if(L.length>=2) break;
-    const p=prog(t), s=TOPICS[t].stages.find(x=>!p.c.includes(x.n)&&canP(t,x.n));
-    if(s) add({k:'new',t,n:s.n}); }
-  /* 실전 도전 */
-  const rt=busyTopics().concat([CUR.topic],pool).find(t=>TOPICS[t]&&modeOpen(t,'r'));
-  if(rt) add({k:'real',t:rt});
-  /* 그래도 셋이 안 되면 클리어한 스테이지 가운데 등급이 낮은 것 다시 */
-  for(const t of pool){ if(L.length>=3) break;
+  if(!L.length){ const C=pool.map(t=>({t,s:firstUncleared(t)})).filter(x=>x.s).slice(0,3);
+    const G=['B','A','S','SS','SSS'], low=pool.flatMap(t=>arr(((ME.P||{})[t]||{}).c).filter(n=>canP(t,n)&&G.indexOf(stageGrade(t,n)||'B')<3).map(n=>({t,n}))).slice(0,6);
+    if(low.length&&(rnd()<.35||!C.length)){ const x=pick(low); add({k:'again',t:x.t,n:x.n}); }
+    else if(C.length){ const x=pick(C); add({k:'new',t:x.t,n:x.s.n}); } }
+
+  /* ② 처음 해보기 — 우리 학교 주제 가운데 안 해 본 것 먼저 */
+  const tried=triedTopics();
+  const freshP=mySchool.filter(t=>TOPICS[t]&&modeOpen(t,'p')&&!tried.has(t)&&canP(t,TOPICS[t].stages[0].n));
+  const freshR=mySchool.filter(t=>TOPICS[t]&&modeOpen(t,'r')&&!realPlayed(t)&&tried.has(t));
+  const opts=[]; if(freshP.length) opts.push('first','first'); if(freshR.length) opts.push('firstR');
+  const o=pick(opts);
+  if(o==='first'){ const t=pick(freshP); add({k:'first',t,n:TOPICS[t].stages[0].n}); }
+  else if(o==='firstR') add({k:'firstR',t:pick(freshR)});
+  else { const C=pool.map(t=>({t,s:firstUncleared(t)})).filter(x=>x.s).slice(0,4), x=pick(C); if(x) add({k:'new',t:x.t,n:x.s.n}); }
+
+  /* ③ 실전 */
+  const rts=[...new Set(busyTopics().concat([CUR.topic],pool))].filter(t=>TOPICS[t]&&modeOpen(t,'r')&&!L.some(m=>m.t===t&&m.n==null));
+  const rt=pick(rts.slice(0,3));
+  if(rt){ const best=+(((ME.R||{})[rt]||{}).best)||0;
+    if(best>=4&&rnd()<.6) add({k:'realN',t:rt,g:Math.max(3,Math.ceil(best*.8))}); else add({k:'real',t:rt}); }
+
+  /* ④ 오늘의 도전 — 날마다 하나 */
+  const cleared=pool.filter(t=>arr(((ME.P||{})[t]||{}).c).length);
+  const fun=['perfect','multi'];
+  if(cleared.some(t=>Object.keys(((ME.P||{})[t]||{}).bt||{}).length)) fun.push('speed');
+  if(typeof online==='function'&&online()&&TOPIC_ORDER.some(t=>modeOpen(t,'b'))) fun.push('battle');
+  const f=pick(fun);
+  if(f==='speed'){ const t=pick(cleared.filter(t=>Object.keys(((ME.P||{})[t]||{}).bt||{}).length));
+    const bt=((ME.P||{})[t]||{}).bt, n=+pick(Object.keys(bt)).slice(1); add({k:'speed',t,n,s:bt['s'+n]}); }
+  else if(f) add({k:f,t:'',p:0});
+
+  /* 그래도 모자라면 등급 올리기 */
+  for(const t of pool){ if(L.length>=4) break;
     const G=['B','A','S','SS','SSS'], gi=n=>G.indexOf(stageGrade(t,n)||'B');
     const s=TOPICS[t].stages.filter(x=>canP(t,x.n)).sort((a,b)=>gi(a.n)-gi(b.n))[0];
     if(s) add({k:'again',t,n:s.n}); }
-  return L.slice(0,3);
+  return L.slice(0,4);
 }
 function ensureMissions(){
   if(!ME||!CFG_OK) return (ME&&ME.ms&&ME.ms.d===todayKey())?ME.ms:null;
   const d=todayKey();
-  if(!ME.ms||ME.ms.d!==d||!Array.isArray(ME.ms.L)){
+  if(!ME.ms||ME.ms.d!==d||!Array.isArray(ME.ms.L)||(ME.ms.v!==MS_V&&!ME.ms.L.some(m=>m.done))){
     const L=makeMissions(); if(!L.length) return null;
-    ME.ms={d,L,b:0}; saveMe();
+    ME.ms={d,L,b:0,v:MS_V}; saveMe();
   }
   return ME.ms;
 }
-/* 미션 확인 — 연습 클리어(stage) · 실전 끝(real) 때 불러요. 받은 코인과 알림 문구를 돌려줘요 (저장은 부른 쪽에서) */
-function markMission(kind,t,n,score){
+/* 미션 확인 — 연습 클리어(stage) · 실전 끝(real) · 대전 끝(battle) 때 불러요. 받은 코인과 알림 문구를 돌려줘요 (저장은 부른 쪽에서)
+   x : 연습이면 {perfect, sec} · 실전이면 {score}                                                          */
+function markMission(kind,t,n,x){
   const M=ME&&ME.ms; if(!M||M.d!==todayKey()) return null;
+  x=(x&&typeof x==='object')?x:{score:x};
   let coin=0; const got=[];
-  M.L.forEach(m=>{ if(m.done) return;
-    const hit=kind==='stage'?(m.k!=='real'&&m.t===t&&m.n===n):(m.k==='real'&&m.t===t&&score>0);
-    if(hit){ m.done=1; coin+=MS_COIN; got.push(m); } });
-  if(got.length&&!M.b&&M.L.every(m=>m.done)){ M.b=1; coin+=MS_ALL; }
+  M.L.forEach(m=>{ if(m.done) return; let hit=false;
+    if(kind==='stage'){
+      if(['pre','weak','new','again','first'].includes(m.k)) hit=m.t===t&&m.n===n;
+      else if(m.k==='perfect') hit=!!x.perfect;
+      else if(m.k==='multi'){ m.p=(m.p||0)+1; hit=m.p>=3; }
+      else if(m.k==='speed') hit=m.t===t&&m.n===n&&x.sec!=null&&x.sec<m.s;
+    } else if(kind==='real'){
+      if(m.k==='real'||m.k==='firstR') hit=m.t===t&&x.score>0;
+      else if(m.k==='realN') hit=m.t===t&&x.score>=m.g;
+    } else if(kind==='battle') hit=m.k==='battle';
+    if(hit){ m.done=1; coin+=(m.c||MS_COIN); got.push(m); } });
+  const all=M.L.every(m=>m.done);
+  if(got.length&&!M.b&&all){ M.b=1; coin+=MS_ALL; }
   if(!coin) return null;
   ME.coin+=coin;
-  return {coin,all:!!M.b&&M.L.every(m=>m.done),msg:`오늘의 미션 완료 +${coin}코인${M.b&&M.L.every(m=>m.done)?' · 세 개 모두 끝!':''}`};
+  return {coin,all,msg:`오늘의 미션 완료 +${coin}코인${all&&M.b?` · ${M.L.length}개 모두 끝!`:''}`};
 }
-const MS_TAG={pre:'기초 다지기',weak:'약점 다시 잡기',new:'다음 단계 도전',again:'등급 올리기',real:'실전 도전'};
+const MS_TAG={pre:'기초 다지기',weak:'약점 다시 잡기',new:'다음 단계 도전',again:'등급 올리기',first:'처음 해보기',firstR:'처음 해보기',
+  real:'실전 도전',realN:'실전 목표',perfect:'오늘의 도전',multi:'오늘의 도전',speed:'오늘의 도전',battle:'오늘의 도전'};
 function missionText(m){
-  const T=topicOf(m.t);
+  const T=m.t?topicOf(m.t):{n:''};
   if(m.k==='pre') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:`${topicOf(m.ft).n} '${stName(m.ft,m.fn)}' 정답률이 ${m.acc}%예요. 그 바탕이 되는 이것부터 다져요 — 연습 한 번 클리어`};
   if(m.k==='weak') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:`정답률 ${m.acc}% — 자주 막히는 곳이에요. 연습으로 한 번 클리어`};
   if(m.k==='new') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:'아직 클리어하지 않은 단계예요. 연습 한 번 클리어'};
   if(m.k==='again') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:'한 번 더 빠르게 — 연습 한 번 클리어'};
+  if(m.k==='first') return {h:`${T.n} · ${stName(m.t,m.n)}`, w:'한 번도 안 해 본 주제예요! 1단계 연습을 클리어해 봐요'};
+  if(m.k==='firstR') return {h:`${T.n} 첫 실전`, w:'연습만 해 본 주제예요. 처음으로 실전에 나가 봐요 (1개 이상 맞히기)'};
+  if(m.k==='realN') return {h:`${T.n} 실전 ${m.g}개 넘기기`, w:`실전 한 판에 ${m.g}개 이상 맞히기 (내 최고 기록의 80%)`};
+  if(m.k==='perfect') return {h:'한 번도 안 틀리고 클리어', w:'아무 연습 스테이지나 실수 없이 끝까지'};
+  if(m.k==='multi') return {h:`연습 스테이지 3개 클리어${m.p&&!m.done?` (${m.p}/3)`:''}`, w:'주제·단계는 마음대로 — 오늘 세 번 클리어'};
+  if(m.k==='speed') return {h:`${T.n} · ${stName(m.t,m.n)} 기록 깨기`, w:`내 최고 기록 ${m.s}초보다 빨리 클리어`};
+  if(m.k==='battle') return {h:'친구 대전 한 판', w:'친구와 대전을 끝까지 한 판 (2명 이상)'};
   return {h:`${T.n} 실전`, w:'1분 무실수 실전에 한 번 도전 (1개 이상 맞히기)'};
 }
 function missionGo(i){ const m=ME&&ME.ms&&ME.ms.L[i]; if(!m) return; close_('ovMs'); ME.ms.x=1;
-  if(m.k==='real') tryReal(m.t); else { CUR.topic=m.t; startStage(m.t,m.n); } }
+  if(m.k==='real'||m.k==='realN'||m.k==='firstR') return tryReal(m.t);
+  if(m.k==='battle') return typeof openBattle==='function'?openBattle():openSchool();
+  if(m.k==='perfect'||m.k==='multi') return openSchool();
+  CUR.topic=m.t; startStage(m.t,m.n); }
 function missionHTML(opt){
   const M=ensureMissions(); if(!M) return '';
   const done=M.L.filter(m=>m.done).length;
   return `<div class="mscard${opt&&opt.flat?' flat':''}">
-    <div class="msh"><b>오늘의 미션</b><span>${done} / ${M.L.length}${M.b?' · 모두 끝!':` · 하나에 ${MS_COIN}코인, 다 하면 +${MS_ALL}`}</span></div>
+    <div class="msh"><b>오늘의 미션</b><span>${done} / ${M.L.length}${M.b?' · 모두 끝!':` · 다 하면 보너스 +${MS_ALL}`}</span></div>
     ${M.L.map((m,i)=>{ const x=missionText(m);
       return `<button class="msrow${m.done?' done':''}" ${m.done?'disabled':`onclick="missionGo(${i})"`}>
         <i class="msk k-${m.k}">${m.done?'✓':i+1}</i>
         <span class="mst"><em>${MS_TAG[m.k]}</em><b>${esc(x.h)}</b><small>${esc(x.w)}</small></span>
-        <span class="msgo">${m.done?'완료':'하기 →'}</span></button>`; }).join('')}
+        <span class="msgo">${m.done?'완료':`+${m.c||MS_COIN}`}</span></button>`; }).join('')}
   </div>`;
 }
 /* 학교 고르기 화면 — 미션은 위로 뜨는 창(✕로 닫기)으로 보여 주고, 화면에는 한 줄 단추만 남겨 메뉴가 밀려 내려가지 않게 해요.
@@ -9721,7 +9781,7 @@ async function stageClear(){
   const prevBt=p.bt['s'+n], newBt=!prevBt||sec<prevBt;
   if(newBt) p.bt['s'+n]=+sec.toFixed(1);
   ME.coin+=coin;
-  const ms=markMission('stage',t,n);
+  const ms=markMission('stage',t,n,{perfect:G.wrongOnce.size===0,sec:+sec.toFixed(1)});
   const retry=G.wrongOnce.size, need=G.need, wrongs=[...G.wrongOnce.values()];
   G.over=true;
   saveMe();
@@ -9770,7 +9830,7 @@ async function finish(timeUp){
   r.hist=(r.hist||[]).concat([{d:day,n:score,ts:Date.now()}]).slice(-120);
   if(miss){ const w=wrongOf(t); if(!w.includes(miss.key)) w.push(miss.key); }
   ME.coin+=coin;
-  const grow=weeklyGrowth(t,score), ms=markMission('real',t,null,score);
+  const grow=weeklyGrowth(t,score), ms=markMission('real',t,null,{score});
   RK.users=null;
 
   el('endTitle').textContent = G.quit?`${T.n} · 중간에 그만두었어요 · 맞힌 문항`
