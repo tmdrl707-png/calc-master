@@ -3185,6 +3185,12 @@ const TOPICS={
        facts:()=>SQ_N().filter(n=>n>=2).map(sqr).concat(CUR_N().map(cur)),
        pick:l=>sampleN(l.filter(f=>f.k==='sqr'&&f.n<=20),7).concat(sampleN(l.filter(f=>f.k==='sqr'&&f.n>20),2),
          sampleN(l.filter(f=>f.k!=='sqr'&&f.n<=10),4),sampleN(l.filter(f=>f.k!=='sqr'&&f.n>10),1))}
+    ],
+    /* 실전 — 제곱수를 30² 까지 넓혀 문제 풀을 늘려요 */
+    realStages:[
+      {n:1, name:'제곱수', facts:()=>range(1,30).concat([40,50,60,70,80,90]).map(sq)},
+      {n:2, name:'세제곱수', facts:()=>CU_N().map(cu)},
+      {n:3, name:'거꾸로 찾기', facts:()=>range(2,30).concat([40,50,60,70,80,90]).map(sqr).concat(CUR_N().map(cur))}
     ]}
 };
 const TOPIC_ORDER=[];
@@ -3192,19 +3198,27 @@ const topicOf=k=>TOPICS[k]||TOPICS.addsub;
 const stageOf=(t,n)=>topicOf(t).stages[n-1];
 
 /* 한 판에 낼 문항 — 같은 문항이 한 판에 두 번 나오지 않게 */
-/* 연습 한 판 — 고른 문제를 쉬운 것부터 어려운 것 차례로 (비슷한 난이도끼리는 섞어요) */
+/* 연습 한 판 — 스테이지마다 하루 5문제. 날짜로 정해서 그날은 반 친구 모두 같은 5문제, 다음 날엔 바뀌어요.
+   쉬운 것부터 어려운 것 차례로 (비슷한 난이도끼리는 섞어요) */
+const PRAC_N=5;
+function seedRand(str){ let h=2166136261>>>0; for(const c of String(str)){ h^=c.charCodeAt(0); h=Math.imul(h,16777619)>>>0; }
+  return ()=>{ h=(h+0x6D2B79F5)>>>0; let x=h; x=Math.imul(x^x>>>15,x|1); x^=x+Math.imul(x^x>>>7,x|61); return ((x^x>>>14)>>>0)/4294967296; }; }
+/* 그 안에서만 Math.random 을 날짜로 정한 난수로 바꿔 둬요 (문제 만드는 함수들이 모두 Math.random 을 써요) */
+function withSeed(seed,fn){ const r=Math.random; Math.random=seedRand(seed); try{ return fn(); } finally{ Math.random=r; } }
 function stageRun(t,n){
-  const st=stageOf(t,n); let out;
-  if(st.facts){
-    const all=st.facts();
-    out=all.length<=st.take?all.slice():(st.pick?st.pick(all):sampleN(all,st.take));
-  }else{
-    out=[]; const seen=new Set();
-    for(let g=0;out.length<st.take&&g<st.take*30;g++){
-      const f=st.gen(); if(seen.has(f.key)) continue; seen.add(f.key); out.push(f);
+  const st=stageOf(t,n), N=Math.min(PRAC_N,st.take);
+  const out=withSeed(todayKey()+'|'+t+'|'+n,()=>{ let L;
+    if(st.facts){
+      const all=st.facts();
+      L=all.length<=N?all.slice():sampleN(st.pick?st.pick(all):all,N);
+    }else{
+      L=[]; const seen=new Set();
+      for(let g=0;L.length<N&&g<N*40;g++){
+        const f=st.gen(); if(seen.has(f.key)) continue; seen.add(f.key); L.push(f);
+      }
     }
-  }
-  return easyFirst(out);
+    return easyFirst(L); });
+  return out;
 }
 /* 문제 난이도 어림 — 문제가 정한 값(dl)이 있으면 그것, 없으면
    식에 나온 숫자의 자릿수 · 계산 기호 수 · 답의 자릿수 · 음수 · 받아올림 · 문장 길이로 어림해요 */
@@ -3224,7 +3238,15 @@ const easyFirst=L=>L.map(f=>[fDiff(f)+Math.random()*.9,f]).sort((x,y)=>x[0]-y[0]
    지금 단계 문제가 가장 자주, 다음 단계 문제가 L 이 오를수록 조금씩 섞여 나옵니다.
    L 을 주지 않으면(친구 대전 등) 맞힌 개수로 어림합니다.                                    */
 const REAL_STEP=4;
-const realStagesOf=t=>{ const T=topicOf(t); return T.realStages||T.stages; };
+/* 실전 문제 풀 — 실전 단계와 같은 번호의 연습 단계 문제를 합쳐서 넓게 (연습은 하루 5문제만 나오니까 나머지도 실전에서 만나요) */
+const REAL_CACHE={};
+function realStagesOf(t){
+  if(REAL_CACHE[t]) return REAL_CACHE[t];
+  const T=topicOf(t); if(!T.realStages) return REAL_CACHE[t]=T.stages;
+  return REAL_CACHE[t]=T.realStages.map(rs=>{ const ps=T.stages.find(x=>x.n===rs.n);
+    if(!rs.facts||!ps||!ps.facts||!(ps.name.startsWith(rs.name)||rs.name.startsWith(ps.name))) return rs;   /* 같은 유형일 때만 합쳐요 */
+    return Object.assign({},rs,{facts:()=>{ const m=new Map(); rs.facts().concat(ps.facts()).forEach(f=>{ if(f&&!m.has(f.key)) m.set(f.key,f); }); return [...m.values()]; }}); });
+}
 const realLOf=n=>1+(n-1)/REAL_STEP;
 /* 한 문항을 맞힌 뒤 L 이 오르는 만큼 — 1분 실전 'S' 등급 속도를 기준으로 */
 function realGain(t,sec){
@@ -4848,9 +4870,11 @@ const TB_ALL=()=>FNS.flatMap(f1=>ANG.flatMap(d=>FNS.filter(f2=>f2!==f1).map(f2=>
 const TR_ALL=()=>[[3,4],[4,3],[5,12],[12,5],[8,15],[15,8],[6,8],[8,6],[7,24],[24,7],[9,12],[12,9]].flatMap(([a,b])=>FNS.map(fn=>tR(a,b,fn)));
 const TS_ALL=()=>ANG.flatMap(d=>[2,4,6,8,10,12].flatMap(c=>[tS(d,c,'o'),tS(d,c,'j')]));
 const TC_ALL=()=>TCALC.map((_,i)=>tC(i));
-const LR_ALL=()=>[lR(3,2),lR(3,3),lR(3,4),lR(3,5),lR(3,-2),lR(3,-3),lR(4,2),lR(4,3),lR(5,2),lR(5,3),lR(5,-2),lR(2,12)];
+const LR_ALL=()=>[lR(3,2),lR(3,3),lR(3,4),lR(3,5),lR(3,-2),lR(3,-3),lR(4,2),lR(4,3),lR(5,2),lR(5,3),lR(5,-2),lR(2,12),
+  lR(3,6),lR(3,10),lR(3,-4),lR(3,-5),lR(4,4),lR(4,5),lR(5,4),lR(6,2),lR(7,2),lR(2,13),lR(2,15),lR(3,1),lR(5,-3)];
 const LQ_ALL=()=>[[8,2,3],[27,2,3],[16,3,4],[4,3,2],[9,3,2],[32,2,5],[25,3,2],[64,2,3],[81,3,4],[100,3,2],[8,1,3],
-                  [8,-2,3],[27,-1,3],[4,-3,2],[9,-1,2],[16,-1,4]].map(([a,p,q])=>lQ(a,p,q));
+                  [8,-2,3],[27,-1,3],[4,-3,2],[9,-1,2],[16,-1,4],
+                  [16,3,2],[36,1,2],[49,1,2],[125,2,3],[1000,2,3],[32,3,5],[81,1,4],[27,4,3],[64,5,6],[100,1,2],[8,5,3],[125,-1,3],[32,-2,5]].map(([a,p,q])=>lQ(a,p,q));
 const LL_ALL=()=>[[2,3],[2,5],[2,6],[2,-3],[2,0],[3,2],[3,4],[3,-2],[5,3],[5,-1],[10,3],[10,-2],[2,1],[3,5],
                   [2,2],[2,4],[2,7],[2,8],[2,10],[2,-1],[2,-2],[2,-4],[3,1],[3,3],[3,0],[3,-1],[3,-3],[4,2],[4,3],[4,-1],
                   [5,2],[5,4],[5,0],[5,-2],[6,2],[7,2],[8,2],[9,2],[10,1],[10,4],[10,0],[10,-1],[10,-3]].map(([b,e])=>lL(b,e));
@@ -6527,10 +6551,10 @@ const KC={
       const L=[]; for(let m=0;m<(1<<n);m++){ const s=range(0,n-1).map(i=>(m>>(n-1-i))&1?'앞':'뒤'); if(s.filter(x=>x==='앞').length===k) L.push(`(${s.join(', ')})`); }
       return {q:`서로 다른 동전 ${n}개를 동시에 던질 때, ${k===n?'모두 앞면이':`앞면이 ${k}개만`} 나오는 경우의 수는`, ans:L.length, t:'모두 적어 보기', lines:[L.join(', '), `모두 ${B_(L.length)}가지`]}; }},
   ds:{sk:'KC1', gen:()=>[ri(3,11)], make:([s])=>{ const L=kcSum(s);
-      return {q:`서로 다른 주사위 2개를 던질 때, 두 눈의 수의 합이 ${s}인 경우의 수는`, ans:L.length, t:'순서쌍으로 세기',
+      return {q:`서로 다른 두 개의 주사위를 <em class="kw">동시에</em> 던질 때, 나오는 두 눈의 수의 합이 ${s}인 경우의 수는`, ans:L.length, t:'순서쌍으로 세기',
         lines:[L.join(', '), `모두 ${B_(L.length)}가지`, cTip('(1, 2) 와 (2, 1) 은 서로 다른 경우예요')]}; }},
   dd:{sk:'KC1', gen:()=>[ri(1,5)], make:([d])=>{ const L=kcPairs((i,j)=>Math.abs(i-j)===d);
-      return {q:`서로 다른 주사위 2개를 던질 때, 두 눈의 수의 차가 ${d}인 경우의 수는`, ans:L.length, t:'순서쌍으로 세기',
+      return {q:`서로 다른 두 개의 주사위를 <em class="kw">동시에</em> 던질 때, 나오는 두 눈의 수의 차가 ${d}인 경우의 수는`, ans:L.length, t:'순서쌍으로 세기',
         lines:[L.join(', '), `모두 ${B_(L.length)}가지`]}; }},
   pay:{sk:'KC4', gen:()=>{ for(let g=0;g<60;g++){ const P=pickOne([200,300,400,500]), x=ri(2,5), y=ri(2,8), n=kcPay(P,x,y).length; if(n>=2&&n<=5) return [P,x,y]; } return [300,3,4]; },
       make:([P,x,y])=>{ const L=kcPay(P,x,y);
@@ -6541,7 +6565,7 @@ const KC={
       lines:['두 가지 가운데 하나만 일어나요 (동시에 일어나지 않아요)', `${a} + ${b} = ${B_(a+b)}`]})},
   or2:{sk:'KC2', gen:()=>{ for(let g=0;g<40;g++){ const s1=ri(2,12), s2=ri(2,12); if(s1<s2) return [s1,s2]; } return [4,9]; },
       make:([s1,s2])=>{ const L1=kcSum(s1), L2=kcSum(s2);
-      return {q:`서로 다른 주사위 2개를 던질 때, 두 눈의 수의 합이 ${s1} 또는 ${s2}인 경우의 수는`, ans:L1.length+L2.length, t:'합의 법칙',
+      return {q:`서로 다른 두 개의 주사위를 동시에 던질 때, 나오는 두 눈의 수의 합이 ${s1} <em class="kw">또는</em> ${s2}인 경우의 수는`, ans:L1.length+L2.length, t:'합의 법칙',
         lines:[`합이 ${s1}: ${L1.join(', ')} → ${L1.length}가지`, `합이 ${s2}: ${L2.join(', ')} → ${L2.length}가지`,
           `동시에 일어나지 않으니 ${L1.length} + ${L2.length} = ${B_(L1.length+L2.length)}`]}; }},
   or5:{sk:'KC2', gen:()=>[ri(0,KC_DOR.length-1)], make:([v])=>{ const [[n1,L1],[n2,L2]]=KC_DOR[v];
@@ -6585,7 +6609,7 @@ const KC={
       lines:[`첫째 자리 ${n}명, 둘째 자리 ${n-1}명, …`, `${kcDown(n,n).join(' × ')} = ${B_(kcFact(n))}`]})},
   lr:{sk:'KC5', gen:()=>[ri(4,5),2], make:([n,r])=>{ const s=kcDown(n,r), ans=s.reduce((x,y)=>x*y,1);
       return {q:`${n}명의 학생 중에서 ${r}명을 뽑아 한 줄로 세우는 경우의 수는`, ans, t:'자리마다 남은 사람 수를 곱해요', lines:[`${r}자리만 채워요`, `${s.join(' × ')} = ${B_(ans)}`]}; }},
-  lf:{sk:'KC5', gen:()=>[ri(4,5),ri(0,1)], make:([n,v])=>({q:`A를 포함한 ${n}명을 한 줄로 세울 때, A가 맨 ${v?'뒤':'앞'}에 서는 경우의 수는`, ans:kcFact(n-1), t:'정해진 자리를 빼고 세기',
+  lf:{sk:'KC5', gen:()=>[ri(4,5),ri(0,1)], make:([n,v])=>({q:`A를 포함한 ${n}명의 학생을 한 줄로 세울 때, A가 맨 ${v?'뒤':'앞'}에 서는 경우의 수는`, ans:kcFact(n-1), t:'정해진 자리를 빼고 세기',
       lines:['A 의 자리는 정해져 있어요', `나머지 ${n-1}명을 한 줄로: ${kcDown(n-1,n-1).join(' × ')} = ${B_(kcFact(n-1))}`]})},
   la:{sk:'KC5', gen:()=>[ri(3,5)], make:([n])=>({q:`A, B를 포함한 ${n}명을 한 줄로 세울 때, A와 B가 이웃하는 경우의 수는`, ans:2*kcFact(n-1), t:'이웃하면 한 묶음으로',
       lines:[`A, B 를 한 묶음으로 보면 ${n-1}명을 세우는 것: ${kcDown(n-1,n-1).join(' × ')} = ${kcFact(n-1)}`, '묶음 안에서 A, B 가 자리를 바꾸는 2가지', `${kcFact(n-1)} × 2 = ${B_(2*kcFact(n-1))}`]})},
@@ -6615,7 +6639,7 @@ const KC={
       lines:[`들어갈 때 ${n}가지, 나올 때는 들어간 문을 뺀 ${n-1}가지`, `${n} × ${n-1} = ${B_(n*(n-1))}`]})},
   n0:{sk:'KC5', gen:()=>[ri(4,5)], make:([n])=>({q:`0부터 ${n-1}까지의 숫자가 각각 적힌 카드 ${n}장 중에서 2장을 뽑아 만들 수 있는 두 자리 자연수의 개수는`, ans:(n-1)*(n-1), unit:'개', t:'0 은 맨 앞에 올 수 없어요',
       lines:[`십의 자리: 0 을 뺀 ${n-1}가지`, `일의 자리: 십의 자리 숫자를 뺀 ${n-1}가지 (0 도 돼요)`, `${n-1} × ${n-1} = ${B_((n-1)*(n-1))}`]})},
-  n3:{sk:'KC5', gen:()=>[ri(4,5)], make:([n])=>({q:`1~${n}${ig(n)} 적힌 카드 ${n}장 중 3장으로 만드는 세 자리 자연수의 개수는`, ans:n*(n-1)*(n-2), unit:'개', t:'자리마다 남은 카드 수',
+  n3:{sk:'KC6', gen:()=>[ri(4,5)], make:([n])=>({q:`1부터 ${n}까지의 숫자가 각각 적힌 카드 ${n}장 중에서 3장을 뽑아 만들 수 있는 세 자리 자연수의 개수는`, ans:n*(n-1)*(n-2), unit:'개', t:'자리마다 남은 카드 수',
       lines:[`백의 자리 ${n}, 십의 자리 ${n-1}, 일의 자리 ${n-2}가지`, `${n} × ${n-1} × ${n-2} = ${B_(n*(n-1)*(n-2))}`]})},
   ne:{sk:'KC5', gen:()=>[ri(4,6)], make:([n])=>{ const E=range(1,n).filter(x=>x%2===0);
       return {q:`1~${n}${ig(n)} 적힌 카드 ${n}장 중 2장으로 만드는 두 자리 짝수의 개수는`, ans:E.length*(n-1), unit:'개', t:'조건이 있는 자리부터',
@@ -6705,6 +6729,9 @@ function kcSVG(f){
   return '';
 }
 const genKC=s=>()=>{ const id=pickOne(KC_ST[s]); return kcF(id,KC[id].gen()); };
+/* 실전 — 연습 틀에 한 걸음 더 나간 틀을 조금 섞어 문제 풀을 넓혀요 (주사위 두 개의 합·차, 길 그림, 세 자리 수, 정해진 자리) */
+const KC_RT=[KC_ST[0].concat(['ds','dd']), KC_ST[1].concat(['or2']), KC_ST[2].concat(['set','r2','r4']), KC_ST[3].concat(['n3','ne']), KC_ST[4].concat(['lf','hs','r3c'])];
+const genKCR=s=>()=>{ const id=pickOne(KC_RT[s]); return kcF(id,KC[id].gen()); };
 function kcVariant(f){ for(let g=0;g<6;g++){ const v=kcF(f.id,KC[f.id].gen()); if(v&&v.key!==f.key) return v; } return f; }
 
 /* ════════ 인수분해 (중3) ════════
@@ -6921,6 +6948,7 @@ Object.assign(TOPICS,{
       {n:4, name:'카드로 수 만들기',    ex:'1, 2, 3, 4 → 두 자리 자연수', gen:genKC(3), take:8},
       {n:5, name:'대표 뽑기 · 줄 세우기', ex:'회장·부회장 · 대표 2명',      gen:genKC(4), take:8}
     ],
+    realStages:[1,2,3,4,5].map(n=>({n, name:['사건과 경우의 수','합의 법칙','곱의 법칙','카드로 수 만들기','대표 뽑기 · 줄 세우기'][n-1], gen:genKCR(n-1)})),
     cats:[['KC1'],['KC2'],['KC3'],['KC6'],['KC5']], sv:2},BLUE),
   factor:Object.assign({k:'factor', n:'인수분해', sym:'( )( )', school:'m',
     desc:'공통인수 · 완전제곱식 · 합과 차 · x² + (a+b)x + ab · acx² + …',
@@ -9217,7 +9245,7 @@ function gradeBadge(t){ const n=(rec(t).best)||0, g=gradeOfRec(t,n); if(!gradeCu
   return `<span class="gbadge g-${g}" title="실전 최고 ${n}개${nx?` · ${nx[0]}까지 ${nx[1]-n}개 더`:''}">${g}</span>`; }
 /* 연습 스테이지 등급 — 스테이지 최고 시간을 문항 수로 나눈 '문항당 초'로 매깁니다.
    실전 기준 개수 c 를 1분에 푸는 속도(60 ÷ c 초)와 같으면 그 등급. 클리어만 해도 B. */
-const stageCount=(t,n)=>{ const s=stageOf(t,n); return s.facts?Math.min(s.take,s.facts().length):s.take; };
+const stageCount=(t,n)=>{ const s=stageOf(t,n), N=Math.min(PRAC_N,s.take); return s.facts?Math.min(N,s.facts().length):N; };
 function stageGrade(t,n){ return stageGradeP(prog(t),t,n); }
 function stageGradeP(p,t,n){ const c=GRADE_CUT[t], bt=p&&p.bt&&p.bt['s'+n]; if(!c||!bt) return null;
   const spq=bt/stageCount(t,n), names=['SSS','SS','S','A'];
@@ -9384,7 +9412,7 @@ function renderStages(){
   el('stBar').innerHTML=T.stages.map(s=>`<i class="${p.c.includes(s.n)?'done':''}"></i>`).join('');
   el('stageList').innerHTML=T.stages.map(s=>{
     const done=p.c.includes(s.n), td=today.includes(t+s.n), bt=p.bt['s'+s.n];
-    const cnt=s.facts?Math.min(s.take,s.facts().length):s.take;
+    const cnt=stageCount(t,s.n);
     return `<button class="st ${done?'done':''}" onclick="startStage('${t}',${s.n})">
       <div class="stamp">✓</div><div class="no">${s.n}</div>
       <div class="ex${(n=>n>13?' exs':n>9?' exm':'')(s.ex.replace(/(\d+|□)\/(\d+|□)/g,'F').length)}">${mfmt(esc(s.ex))}</div>
@@ -9556,7 +9584,7 @@ function paintTyped(state){ const e=el('eq'); if(e) e.innerHTML=eqHTML(G.ask,G.t
 function pickPad(L){
   KP_NEG='pick'; const kp=el('keypad'); kp.classList.remove('neg'); kp.classList.add('pickpad');
   kp.innerHTML=L.map((x,i)=>`<button class="kb pk2" data-i="${i+1}">${x}</button>`).join('');
-  kp.querySelectorAll('.pk2').forEach(b=>b.addEventListener('pointerdown',e=>{ if(e.button>0) return; e.preventDefault();
+  kp.querySelectorAll('.pk2').forEach(b=>b.addEventListener('pointerdown',e=>{ if(e.button>0) return; e.preventDefault(); KP_AT=performance.now();
     if(G&&G.phase==='hint'&&G.onNext&&performance.now()-(G.hintAt||0)>300) return G.onNext();
     if(!G||G.phase!=='q'||G.locked) return; G.typed=b.dataset.i; paintTyped(); submit(); }));
 }
@@ -9564,6 +9592,14 @@ function pickPad(L){
 /* 정수 주제에서는 − 단추가 붙은 네 줄 숫자판 */
 /* 소수 주제에서는 − 대신 소수점(.) 단추 */
 let KP_NEG=null;
+/* 휴대폰 '유령 터치' 막기 — 숫자판은 손가락이 닿는 순간(pointerdown) 반응해요.
+   손을 뗄 때 브라우저가 한 번 더 보내는 click 이, 그사이 바뀐 화면의 다른 단추(다시 풀기 등)를
+   눌러 버리지 않도록 ① 숫자판 터치의 click 을 없애고 ② 직후 잠깐 바깥 click 을 무시해요. */
+let KP_AT=-1e9;
+(function(){ const kp=document.getElementById('keypad');
+  if(kp) kp.addEventListener('touchstart',e=>{ if(e.target.closest('.kb')){ KP_AT=performance.now(); if(e.cancelable) e.preventDefault(); } },{passive:false});
+  document.addEventListener('click',e=>{ if(performance.now()-KP_AT<600&&!(e.target.closest&&e.target.closest('#keypad'))){ e.stopPropagation(); e.preventDefault(); } },true);
+})();
 const kpMode=t=>{ const T=topicOf(t); return T.neg?'neg':T.dec?'dec':false; };
 function buildKeypad(mode){
   mode=mode||false; if(KP_NEG===mode) return; KP_NEG=mode; el('keypad').classList.remove('pickpad');
@@ -9575,7 +9611,7 @@ function buildKeypad(mode){
   el('keypad').innerHTML=K.map(x=>`<button class="kb${x==='del'?' del':x==='ok'?' okk':x==='neg'||x==='dot'?' negk':''}${neg&&x==='0'?' zero':''}" data-k="${x}"
       aria-label="${x==='del'?'지우기':x==='ok'?'확인':x==='neg'?'음수 부호':x==='dot'?'소수점':x}">${lab(x)}</button>`).join('');
   el('keypad').querySelectorAll('.kb').forEach(b=>b.addEventListener('pointerdown',e=>{
-    if(e.button>0) return; e.preventDefault(); press(b.dataset.k);
+    if(e.button>0) return; e.preventDefault(); KP_AT=performance.now(); press(b.dataset.k);
     b.classList.add('down'); setTimeout(()=>b.classList.remove('down'),110); }));
 }
 function press(k){
