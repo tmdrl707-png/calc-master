@@ -10204,7 +10204,8 @@ async function loadRank(){
   el('rkBody').innerHTML='<div class="empty">불러오는 중…</div>';
   try{ RK.users=(await dbGet('users',{}))||{}; }catch(e){ RK.users={}; }
   try{ RK.classes=(await dbGet('classes',{}))||{}; }catch(e){ RK.classes={}; }
-  Object.keys(RK.users||{}).forEach(sid=>{ if(isTestSid(sid)&&sid!==TEACHER_ID) delete RK.users[sid]; else nkOf(sid,RK.users[sid]); });
+  /* 000 으로 시작하는 계정(00000 선생님 · 00001 같은 시험용)도 랭킹에 보여요 — 학급 대항에서만 빠져요 */
+  Object.keys(RK.users||{}).forEach(sid=>nkOf(sid,RK.users[sid]));
   paintRank();
 }
 /* ═══ 랭킹 지표 — 학생 화면과 선생님 모드가 함께 써요 ═══
