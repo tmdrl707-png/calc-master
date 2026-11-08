@@ -1529,6 +1529,15 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
 
 /* 경우의 수 — 문제 속 핵심 말(또는 · 각각 · 동시에 …)을 파란색으로 */
 .cond em.kw,.eq em.kw,.miss em.kw{font-style:normal;color:var(--blue);font-weight:800}
+
+/* 닉네임 · 선생님 */
+.nsid{font-size:10px;font-weight:600;color:var(--dim);margin-left:4px;font-variant-numeric:tabular-nums}
+.tchn{color:#c2255c;font-weight:900}
+.nickbox{display:flex;flex-direction:column;align-items:stretch;gap:8px;margin-top:10px;font-size:13px;min-width:0}
+.nickbox small{color:var(--dim)}
+.nickbox .btn{padding:8px 10px;font-size:12.5px;width:100%;box-sizing:border-box;white-space:nowrap}
+.nkin{width:100%;margin-top:14px;font-size:20px;font-weight:800;padding:12px 14px;border:2px solid var(--line);border-radius:14px;text-align:center;box-sizing:border-box}
+.nkin:focus{outline:none;border-color:var(--blue)}
 </style>
 </head>
 <body>
@@ -1797,6 +1806,7 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
       <div class="shopstage" id="shopStage"><span class="trytag">입어 보는 중</span><div id="shopAvatar"></div></div>
       <div class="wallet"><span>내 코인</span><b id="shopCoin">0</b></div>
       <div class="shopmeta" id="shopSub"></div>
+      <div class="nickbox" id="nickBox"></div>
       <div class="shopact"><button class="btn" id="shopStrip">꾸미기 모두 벗기</button></div>
     </aside>
     <div class="shopmain">
@@ -1815,7 +1825,7 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
   <div class="rank">
     <div class="thead">
       <h2>선생님 모드</h2>
-      <button class="btn" onclick="leaveTeacher()">나가기</button>
+      <span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="teacherPlay()">▶ 선생님으로 플레이</button><button class="btn" onclick="leaveTeacher()">나가기</button></span>
     </div>
     <div class="sub" id="tSub"></div>
     <div class="tnav" id="tTabs"></div>
@@ -1864,6 +1874,15 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
 
 <div class="overlay ovtop" id="ovMs" onclick="if(event.target===this)closeMissions()">
   <div class="modal mspop"><button class="mpx" onclick="closeMissions()" aria-label="닫기">✕</button><div id="msPop"></div></div>
+</div>
+<div class="overlay" id="ovNick" onclick="if(event.target===this) close_('ovNick')">
+  <div class="modal">
+    <h3>닉네임 바꾸기</h3>
+    <div class="sub">랭킹과 친구 대전에 닉네임이 보여요. 학번도 옆에 작게 함께 보여요.<br>바르고 고운 이름으로 지어 주세요 — 선생님이 지울 수 있어요.</div>
+    <input id="nkIn" class="nkin" maxlength="8" autocomplete="off" placeholder="2~8글자" onkeydown="if(event.key==='Enter') buyNick()">
+    <div class="sub" id="nkMsg" style="margin-top:6px"></div>
+    <div class="row"><button class="btn" onclick="close_('ovNick')">취소</button><button class="btn primary" onclick="buyNick()">바꾸기</button></div>
+  </div>
 </div>
 <div class="overlay" id="ovAtt" onclick="if(event.target===this){close_('ovAtt'); paintMissionBox()}">
   <div class="modal attm">
@@ -7735,7 +7754,7 @@ async function loadTeacher(){
   el('tSub').textContent='불러오는 중…';
   try{ tUsers=(await dbGet('users',{}))||{}; }catch(e){ tUsers={}; }
   try{ tClasses=(await dbGet('classes',{}))||{}; }catch(e){ tClasses={}; }
-  tTest=0; Object.keys(tUsers).forEach(sid=>{ if(isTestSid(sid)){ if(sid!==TEACHER_ID) tTest++; delete tUsers[sid]; } });
+  tTest=0; Object.keys(tUsers).forEach(sid=>{ nkOf(sid,tUsers[sid]); if(isTestSid(sid)){ if(sid!==TEACHER_ID) tTest++; delete tUsers[sid]; } });
   await loadCfg();
   paintTeacher();
 }
@@ -7859,7 +7878,7 @@ function classBattleHTML(list,mine,classes,opt){
       <div class="cbitem"><i style="background:${cc.c}"></i>${it?`<span>학급 아이템 <b>${ITEM(it).n}</b>${dc?` · <b>${ITEM(dc).n}</b>`:''} · 구호 <b>${esc(ct)}</b></span>`
         :`<span>아직 학급 아이템이 없어요${nx?` · 모금 ${nx.goal}코인이면 <b>${ITEM(nx.opts[0]).n}</b>`:''}</span>`}</div>
       <div class="cbgrid">${show.map((m,i)=>`<div class="cbm${m.sc>0?'':' dim'}${meSid===m.sid?' me':''}${i===0&&m.sc>0?' mvp':''}" data-sid="${esc(m.sid)}">
-          <div class="cbav">${avatarSVG(m.ch,{tight:true})}</div><b>${esc(m.sid)}</b><em>${m.sc}</em></div>`).join('')}</div>
+          <div class="cbav">${avatarSVG(m.ch,{tight:true})}</div><b>${whoHTML(m.sid)}</b><em>${m.sc}</em></div>`).join('')}</div>
       ${more>0?`<button class="cbmore" data-c="${g.c}">${open?'접기 ▴':`모두 보기 ▾ <small>+${more}명</small>`}</button>`:''}
       ${opt.teacher?`<div class="cbadm">
         <label><span>받침 글자</span><input class="cbtx" data-c="${g.c}" maxlength="10" placeholder="${esc(clsTxtLead(c).f(shortCls(g.c+'00')))} (반 투표)" value="${esc((c&&c.ttx)||'')}"></label>
@@ -8052,7 +8071,7 @@ function paintTStu(rows){
     return `<div class="stu${open?' open':''}">
       <button class="stuhead" data-sid="${esc(r.sid)}">
         <span class="av2">${avatarSVG(r.ch,{tight:true})}</span>
-        <span class="who"><b>${esc(r.sid)}</b>
+        <span class="who"><b>${esc(r.sid)}${u.nk?` <small class="nsid">${esc(u.nk)}</small>`:''}</b>
           <span>${tSort==='sid'?'':`<i class="tno">${ri+1}</i>`}${val(r)} · 기록 있는 주제 ${nRec}개</span>
           <span>코인 ${cn(r.have)} · 쓴 코인 ${cu.exact?'':'약 '}${cn(cu.spent)}${r.wrong?` · 오답노트 ${r.wrong}`:''}${tMsLine(u)}</span></span>
         <span class="arw">${open?'▲':'▼'}</span>
@@ -8085,6 +8104,7 @@ function paintTStu(rows){
           <input type="tel" maxlength="4" inputmode="numeric" class="pwin"
                  id="pwn_${esc(r.sid)}" placeholder="새 비밀번호 (비우면 0000)">
           <button class="btn" data-reset="${esc(r.sid)}">비밀번호 초기화</button>
+          ${u.nk?`<button class="btn" data-nkdel="${esc(r.sid)}">닉네임 지우기</button>`:''}
           <button class="btn danger" data-del="${esc(r.sid)}">계정 삭제</button>
         </div>
         <div class="admin">
@@ -8101,6 +8121,7 @@ function paintTStu(rows){
     tOpen=(tOpen===b.dataset.sid)?null:b.dataset.sid; paintTStu(teacherRows(tTopic)); });
   el('tBody').querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>resetPw(b.dataset.reset));
   el('tBody').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteStudent(b.dataset.del));
+  el('tBody').querySelectorAll('[data-nkdel]').forEach(b=>b.onclick=()=>clearNick(b.dataset.nkdel));
   el('tBody').querySelectorAll('[data-give]').forEach(b=>b.onclick=()=>{ const sid=b.dataset.give, v=+((el('gcn_'+sid)||{}).value||'').replace(/\D/g,'');
     tGiveCoins([sid],v,sid); });
 }
@@ -8111,6 +8132,21 @@ function tMsLine(u){ const M=tMsToday(u); const a=u&&u.att;
 function tMsHTML(u){ const M=tMsToday(u); if(!M) return '<div class="chartlab" style="margin:10px 0 0;text-align:left">오늘의 미션 — 아직 오늘 들어오지 않았어요</div>';
   return `<div class="chartlab" style="margin:10px 0 6px;text-align:left">오늘의 미션 — 학생 기록으로 자동으로 골라요 (약한 곳 → 그 바탕이 되는 곳)</div>
     <div class="tmsl">${M.L.map(m=>{ const x=missionText(m); return `<div class="tms${m.done?' done':''}"><i>${m.done?'✓':'·'}</i><span><em>${MS_TAG[m.k]}</em> <b>${esc(x.h)}</b><small>${esc(x.w)}</small></span></div>`; }).join('')}</div>`; }
+/* 닉네임 지우기 — 학번으로 돌아가요 (쓴 코인은 돌려주지 않아요) */
+async function clearNick(sid){ const u=tUsers[sid]; if(!u) return;
+  if(!confirm(`${sid} 학생의 닉네임 '${u.nk}'을(를) 지울까요?\n학번으로 다시 보여요.`)) return;
+  const t=Date.now(); await dbUpdate('users/'+sid,{nk:'',nkt:t}); u.nk=''; u.nkt=t; NKS[sid]='';
+  toast('닉네임을 지웠어요'); paintTeacher(); }
+/* 선생님 플레이 — 00000 계정으로 학생처럼 풀고, 랭킹에 '선생님'으로 보여요. 선생님 모드는 다시 00000 · 비밀번호로 */
+async function teacherPlay(){
+  const sid=TEACHER_ID, h=hash4(sid,TEACHER_PW); let u=null;
+  try{ u=await dbGet('users/'+sid,null); }catch(e){}
+  if(!(u&&u.h)){ const s0=CH_SHAPES.filter(x=>!x.p).map(x=>x.k), c0=CH_COLORS.filter(x=>!x.p).map(x=>x.k);
+    u={h, ch:{s:DEF_CH.s,c:DEF_CH.c,items:[]}, coin:0, own:[], ownS:s0, ownC:c0, at:Date.now()};
+    await dbSet('users/'+sid,u); }
+  isTeacher=false; ME=meFrom(sid,u); ME._c0=ME.coin; LS.set(MEKEY,{sid,h:u.h});
+  openSchool(); toast('선생님 캐릭터로 들어왔어요 · 랭킹에 "선생님"으로 보여요');
+}
 async function resetPw(sid){
   const box=el('pwn_'+sid);
   let pw=((box&&box.value)||'').replace(/\D/g,'');
@@ -8212,7 +8248,7 @@ function btTeamScores(room,P){
   (P||btPlayers(room)).forEach(p=>{ const g=L[T[p.sid]]; if(g){ g.sum+=p.n||0; g.mem.push(p); } });
   return L.filter(g=>g.mem.length).map(g=>{ g.mem.sort((a,b)=>b.n-a.n||a.sid.localeCompare(b.sid)); return g; }).sort((a,b)=>b.sum-a.sum||a.i-b.i);
 }
-const btMe=()=>({ch:{s:ME.ch.s,c:ME.ch.c,items:(ME.ch.items||[]).slice()}, rd:0, done:false, j:Date.now(), hb:serverNow()});
+const btMe=()=>({nk:ME.nk||'', ch:{s:ME.ch.s,c:ME.ch.c,items:(ME.ch.items||[]).slice()}, rd:0, done:false, j:Date.now(), hb:serverNow()});
 /* ── 방 지키기 ──
    휴대폰에서 카톡·메시지로 잠깐 나가도 자리를 그대로 두고(15초마다 '여기 있어요' 신호 hb), 돌아오면 바로 이어서 해요.
    새로고침되어도 이 휴대폰에 방 번호를 적어 두어 3시간 안이면 다시 들어가요. */
@@ -8261,7 +8297,7 @@ function btPickKey(t,prog,used){
 function btPlayers(room){
   const P=(room&&room.p)||{}, kind=btKind(room), S=kind==='s'?btSurv(room):null;
   return Object.keys(P).map(sid=>{ const p=P[sid]||{}, n=btWins(room,sid), o=S?S.out[sid]:undefined;
-    return {sid, ch:cleanCh(p.ch), n, out:o, rk:S?(o?o*1000:1e6)+n:n, host:sid===room.host, j:p.j||0, away:btAway(p)}; });
+    return {sid, nk:nkOf(sid,p), ch:cleanCh(p.ch), n, out:o, rk:S?(o?o*1000:1e6)+n:n, host:sid===room.host, j:p.j||0, away:btAway(p)}; });
 }
 const btSort=P=>P.sort((a,b)=>b.rk-a.rk||a.sid.localeCompare(b.sid));
 
@@ -8463,7 +8499,7 @@ function btPaintRoom(){
   const host=room.host===ME.sid, T=topicOf(room.t), kind=btKind(room), team=btTeamOn(room), n=btTN(room);
   const P=btPlayers(room).sort((a,b)=>(b.host-a.host)||a.j-b.j), TM=team?btTeams(room):{};
   const card=p=>`<div class="btp${p.sid===ME.sid?' me':''}${host&&team?' tap':''}" data-sid="${esc(p.sid)}"${team?` style="--tc:${BT_TEAMS[TM[p.sid]].c}"`:''}>
-      <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${esc(p.sid)}</b>${p.host?'<em>방장</em>':p.sid===ME.sid?'<em class="me">나</em>':''}${p.away&&p.sid!==ME.sid?'<small class="btaway">잠깐 자리 비움</small>':''}</div>`;
+      <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${whoHTML(p.sid,p)}</b>${p.host?'<em>방장</em>':p.sid===ME.sid?'<em class="me">나</em>':''}${p.away&&p.sid!==ME.sid?'<small class="btaway">잠깐 자리 비움</small>':''}</div>`;
   const teamsHTML=team?`<div class="btteams">${range(0,n-1).map(i=>{ const L=P.filter(p=>TM[p.sid]===i), t=BT_TEAMS[i];
       return `<div class="btteam" style="--tc:${t.c};--ts:${t.s}"><h4><i></i>${t.n}<small>${L.length}명</small></h4>
         <div class="btplayers">${L.map(card).join('')||'<div class="btempty">아직 없어요</div>'}</div></div>`; }).join('')}</div>`
@@ -8639,7 +8675,7 @@ function paintBLive(){
   const team=btTeamOn(BT.room), TM=team?btTeams(BT.room):{};
   const tl=team?btTeamScores(BT.room,P).map(g=>`<span class="blt${g.mem.some(p=>p.sid===ME.sid)?' me':''}" style="--tc:${g.c}"><b>${g.n}</b><em>${g.sum}</em></span>`).join(''):'';
   box.innerHTML=tl+R.map(({r:p,rank})=>`<span class="blv${p.sid===ME.sid?' me':''}${p.out?' out':''}"${team?` style="--tc:${BT_TEAMS[TM[p.sid]].c}"`:''}><i>${p.out?'✕':rank}</i>
-    <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${esc(p.sid)}</b><em>${p.n}</em></span>`).join('');
+    <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${whoHTML(p.sid,p)}</b><em>${p.n}</em></span>`).join('');
 }
 async function btFinish(quit){
   if(!G||G.mode!=='battle'||G.over) return;
@@ -8673,10 +8709,10 @@ function btPaintResult(){
   const sub=p=>my.kind==='s'?(p.out?`${p.out}번째 문제에서 탈락 · 맞힌 문제 ${p.n}개`:`끝까지 살아남음 · 맞힌 문제 ${p.n}개`):`맞힌 문제 ${p.n}개`;
   const teamHTML=team?`<div class="btteamres">${TR.map(({r:g,rank})=>`<div class="bttr${final&&rank===1?' win':''}${g.mem.some(p=>p.sid===ME.sid)?' me':''}" style="--tc:${g.c};--ts:${g.s}">
       <div class="bttrh"><span class="medal ${final&&rank<=3?'m'+rank:''}">${final?rank:'·'}</span><b>${g.n}</b>${final&&rank===1?'<em>우승</em>':''}<strong>${g.sum}<small>개</small></strong></div>
-      <div class="bttrm">${g.mem.map((p,j)=>`<span class="bttm${j===0&&p.n>0?' mvp':''}"><i>${avatarSVG(p.ch,{tight:true})}</i><b>${esc(p.sid)}</b><em>${p.n}</em></span>`).join('')}</div></div>`).join('')}</div>`:'';
+      <div class="bttrm">${g.mem.map((p,j)=>`<span class="bttm${j===0&&p.n>0?' mvp':''}"><i>${avatarSVG(p.ch,{tight:true})}</i><b>${whoHTML(p.sid,p)}</b><em>${p.n}</em></span>`).join('')}</div></div>`).join('')}</div>`:'';
   const pod=!team&&final&&P.length>=2?`<div class="cbpod btpod">${[1,0,2].filter(i=>R[i]).map(i=>{ const {r:p,rank}=R[i];
       return `<div class="cbp p${Math.min(rank,3)}${p.sid===ME.sid?' me':''}"><div class="cbpav">${avatarSVG(p.ch,{tight:true})}</div>
-        <span class="medal m${Math.min(rank,3)}">${rank}</span><b>${esc(p.sid)}</b><em>${p.n}개</em><i style="height:${[0,64,46,34][Math.min(rank,3)]}px"></i></div>`; }).join('')}</div>`:'';
+        <span class="medal m${Math.min(rank,3)}">${rank}</span><b>${whoHTML(p.sid,p)}</b><em>${p.n}개</em><i style="height:${[0,64,46,34][Math.min(rank,3)]}px"></i></div>`; }).join('')}</div>`:'';
   el('btBody').innerHTML=`
     <div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>${final?(team?(myTR===1?'우리 팀 우승!':'팀전 결과'):(mr===1&&P.length>1?'우승!':'대전 결과')):'친구들이 끝나기를 기다리는 중…'}</h2>
       <p class="sub">${T.n} · ${my.len} · 방 ${room.code}</p></div></div>
@@ -8685,7 +8721,7 @@ function btPaintResult(){
     <div class="btres">${R.map(({r:p,rank})=>`<div class="rk${rank<=3&&final?' top':''}${p.sid===ME.sid?' me':''}"${team?` style="border-left:4px solid ${BT_TEAMS[TM[p.sid]].c}"`:''}>
       <div class="no2"><span class="medal ${final&&rank<=3?'m'+rank:''}">${final?rank:'·'}</span></div>
       <div class="av2">${avatarSVG(p.ch,{tight:true})}</div>
-      <div class="who"><b>${esc(p.sid)}${p.sid===ME.sid?' <em class="mytag">나</em>':''}</b><span>${sub(p)}</span></div>
+      <div class="who"><b>${whoHTML(p.sid,p)}${p.sid===ME.sid?' <em class="mytag">나</em>':''}</b><span>${sub(p)}</span></div>
       <div class="sc">${p.n}<small>개</small></div></div>`).join('')}</div>
     ${gain?`<div class="gainbox${gain.coin?' good':''}">${gain.msg}</div>`:''}
     ${!live?`<div class="btnote">${BT.closed?'방이 닫혔어요.':''} 새로 대전하려면 방을 다시 만들어요.</div>`
@@ -9111,7 +9147,21 @@ function cleanCh(c){
   ch.items=arr(ch.items).filter(id=>ITEM(id));
   return ch;
 }
-const shortCls=sid=>{ const c=String(sid).slice(0,3); return `${c[0]}-${+c.slice(1)}`; };
+const shortCls=sid=>{ if(String(sid)===TEACHER_ID) return '쌤'; const c=String(sid).slice(0,3); return `${c[0]}-${+c.slice(1)}`; };
+/* ═══ 닉네임 · 선생님 표시 ═══
+   랭킹·대전에는 닉네임(있으면)과 작은 학번을 함께 보여요. 선생님 플레이 계정(00000)은 '선생님'으로.         */
+const NICK_P=2000, NKS={};
+function nkOf(sid,u){ if(u&&typeof u.nk==='string') NKS[sid]=u.nk; return NKS[sid]||''; }
+function whoPlain(sid,u){ if(String(sid)===TEACHER_ID) return '선생님'; return nkOf(sid,u)||String(sid); }
+function whoHTML(sid,u){ if(String(sid)===TEACHER_ID) return '<span class="tchn">선생님</span>';
+  const n=nkOf(sid,u); return n?`${esc(n)}<small class="nsid">${esc(sid)}</small>`:esc(sid); }
+const NICK_BAD=['시발','씨발','ㅅㅂ','병신','ㅂㅅ','개새','좆','존나','지랄','미친','썅','엿먹','닥쳐','fuck','shit','bitch','sex','섹스','선생','쌤','teacher','관리자','운영자'];
+function nickErr(s){ s=String(s||'').trim();
+  if(s.length<2||s.length>8) return '닉네임은 2~8글자로 지어 주세요.';
+  if(!/^[가-힣a-zA-Z0-9 _]+$/.test(s)) return '한글(완성된 글자)·영어·숫자만 쓸 수 있어요.';
+  if(/^[\d ]+$/.test(s)) return '숫자만으로는 지을 수 없어요 (학번과 헷갈려요).';
+  const z=s.replace(/[ _]/g,'').toLowerCase(); if(NICK_BAD.some(w=>z.includes(w))) return '쓸 수 없는 낱말이 들어 있어요.';
+  return ''; }
 function meFrom(sid,u){
   const ownS=arr(u.ownS).filter(k=>CH_SHAPES.some(x=>x.k===k));
   const ownC=arr(u.ownC).filter(k=>CH_COLORS.some(x=>x.k===k));
@@ -9119,7 +9169,7 @@ function meFrom(sid,u){
           ownS:ownS.length?ownS:null, ownC:ownC.length?ownC:null,
           sc:u.sc||'', boxN:u.boxN||0, R:u.R||{}, P:u.P||{}, pc:u.pc||null, W:u.W||{}, fs:u.fs||{},
           hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, bh:arr(u.bh), h:u.h||'', cu:Object.assign({},u.cu||{}),
-          att:u.att||null, ms:u.ms||null, gw:u.gw||null, wk:u.wk||{}, pq:u.pq||{}};
+          att:u.att||null, ms:u.ms||null, gw:u.gw||null, wk:u.wk||{}, pq:u.pq||{}, nk:nkOf(sid,u), nkt:u.nkt||0};
 }
 function rec(t){ const R=ME.R||(ME.R={}); const r=R[t]||(R[t]={best:0,hist:[]});
   if(!Array.isArray(r.hist)) r.hist=[]; return r; }
@@ -9173,6 +9223,7 @@ function mergeFrom(u){
   if(u.wk&&typeof u.wk==='object'){ const W=ME.wk||(ME.wk={}); Object.keys(u.wk).forEach(k=>{ const b=arr(u.wk[k]), a=arr(W[k]);
     W[k]=[0,1,2].map(i=>Math.max(+a[i]||0,+b[i]||0)); }); }
   if(u.pq&&typeof u.pq==='object'){ const P=ME.pq||(ME.pq={}); Object.keys(u.pq).forEach(k=>{ P[k]=Math.max(+P[k]||0,+u.pq[k]||0); }); }
+  if((u.nkt||0)>(ME.nkt||0)){ ME.nk=u.nk||''; ME.nkt=u.nkt; NKS[ME.sid]=ME.nk; }
   giftNote(u);
 }
 let SAVEQ=Promise.resolve();
@@ -9189,7 +9240,7 @@ function saveMe(){
       ownS:ownShapes(),ownC:ownColors(),sc:ME.sc||'',R:ME.R||{},P:ME.P||{},
       pc:ME.pc||null,W:ME.W||{},fs:ME.fs||{},boxN:ME.boxN||0,
       hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,bh:(ME.bh||[]).slice(-30),cu:ME.cu||{},
-      att:ME.att||null,ms:ME.ms||null,gw:ME.gw||null,wk:ME.wk||{},pq:ME.pq||{},
+      att:ME.att||null,ms:ME.ms||null,gw:ME.gw||null,wk:ME.wk||{},pq:ME.pq||{},nk:ME.nk||'',nkt:ME.nkt||0,
       h:ME.h||((LS.get(MEKEY,{})||{}).h)||''})));
   });
   return SAVEQ;
@@ -9388,7 +9439,7 @@ function openSchool(){
   if(!ME) return;
   stopTimer(); G=null;
   show('s-school');
-  el('schoolHi').innerHTML=`<b>${esc(ME.sid)}</b> 님, 오늘은 어디서 시작할까요?`;
+  el('schoolHi').innerHTML=`<b>${esc(whoPlain(ME.sid))}</b>${ME.sid===TEACHER_ID?'':' 님'}, 오늘은 어디서 시작할까요?`;
   paintSchools(); paintMissionBox(false);
   loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')){ paintSchools(); checkAttendance(); paintMissionBox(); } });
   /* 우리 반 색이 바뀌었으면 내 캐릭터에도 반영 (학급 아이템이 그 색으로 그려져요) */
@@ -9476,7 +9527,7 @@ function paintMe(){
   ['meBar','meBar2','meBar3','meBar4','meBar5','meBar6','meBar7'].forEach(id=>{ const n=el(id); if(n) n.innerHTML=h; });
   if(!ME) return;
   el('hMe').innerHTML=`<span style="width:28px;height:28px;display:block">${avatarSVG(ME.ch,{tight:true})}</span>
-    <b style="font-size:13px;font-variant-numeric:tabular-nums">${esc(ME.sid)}</b>`;
+    <b style="font-size:13px;font-variant-numeric:tabular-nums">${esc(whoPlain(ME.sid))}</b>`;
   paintSide();
 }
 function paintSide(){
@@ -9488,7 +9539,7 @@ function paintSide(){
   else if(G&&G.mode==='practice'){ const bt=prog(G.t).bt['s'+G.st];
     fig=`<div class="sfig"><b>${bt?bt.toFixed(1):'—'}</b><span>이 스테이지 최고 시간(초)</span></div>`; }
   p.innerHTML=`<div class="sav">${avatarSVG(ME.ch)}</div>
-    <div class="ssid">${esc(ME.sid)}</div>
+    <div class="ssid">${esc(whoPlain(ME.sid))}</div>
     <div class="scoin"><span class="coin"><i></i>${ME.coin}</span></div>${fig}`;
 }
 
@@ -9802,6 +9853,17 @@ function quitPlay(){
   if(mode==='practice') openStages(t); else goHome();
 }
 
+/* ═══ 닉네임 바꾸기 (상점 · 2000코인) ═══ */
+function openNick(){ if(!ME) return; el('nkIn').value=ME.nk||''; nickMsg(''); el('ovNick').classList.add('on'); setTimeout(()=>{ try{ el('nkIn').focus(); }catch(e){} },80); }
+function nickMsg(m,ok){ const n=el('nkMsg'); n.textContent=m||`${NICK_P}코인 · 내 코인 ${ME.coin} · 2~8글자 (한글·영어·숫자)`; n.style.color=m&&!ok?'var(--x)':''; }
+async function buyNick(){
+  const s=String(el('nkIn').value||'').trim().replace(/\s+/g,' ');
+  const e=nickErr(s); if(e) return nickMsg(e);
+  if(s===ME.nk) return nickMsg('지금 닉네임과 같아요.');
+  if(ME.coin<NICK_P) return nickMsg(`${NICK_P-ME.coin}코인 더 모으면 바꿀 수 있어요.`);
+  ME.coin-=NICK_P; spendLog('n',NICK_P); ME.nk=s; ME.nkt=Date.now(); NKS[ME.sid]=s;
+  await saveMe(); close_('ovNick'); paintShop(); paintMe(); toast(`이제 랭킹에 '${s}'(으)로 보여요`);
+}
 /* ═══ 스테이지 클리어 ═══ */
 async function stageClear(){
   const t=G.t, n=G.st, T=topicOf(t), s=stageOf(t,n), p=prog(t);
@@ -10122,7 +10184,7 @@ function coinUse(u,sid,classes){
   const cg=classes&&classes[classOf(sid)]&&classes[classOf(sid)].gv;
   const gift=Math.max(cu.g||0,(cg&&cg[sid])||0);
   const exact=!!u.cu&&!(u.boxN>(cu.bn||0))&&shop===(cu.s||0);
-  const have=u.coin||0, spent=shop+box+gift;
+  const have=u.coin||0, spent=shop+box+gift+(+cu.n||0);
   return {have, shop, nOwn, box, boxN, gift, spent, total:have+spent, exact};
 }
 const cn=v=>Number(v||0).toLocaleString('ko-KR');
@@ -10142,7 +10204,7 @@ async function loadRank(){
   el('rkBody').innerHTML='<div class="empty">불러오는 중…</div>';
   try{ RK.users=(await dbGet('users',{}))||{}; }catch(e){ RK.users={}; }
   try{ RK.classes=(await dbGet('classes',{}))||{}; }catch(e){ RK.classes={}; }
-  Object.keys(RK.users||{}).forEach(sid=>{ if(isTestSid(sid)) delete RK.users[sid]; });
+  Object.keys(RK.users||{}).forEach(sid=>{ if(isTestSid(sid)&&sid!==TEACHER_ID) delete RK.users[sid]; else nkOf(sid,RK.users[sid]); });
   paintRank();
 }
 /* ═══ 랭킹 지표 — 학생 화면과 선생님 모드가 함께 써요 ═══
@@ -10185,7 +10247,7 @@ function podiumHTML(R,val,unit,meSid){
   if(R.length<2) return '';
   return `<div class="cbpod rkpod">${[1,0,2].filter(i=>R[i]&&R[i].rank<=3).map(i=>{ const {r,rank}=R[i];
     return `<div class="cbp p${rank}${meSid&&r.sid===meSid?' me':''}" data-sid="${esc(r.sid)}"><div class="cbpav">${avatarSVG(r.ch,{tight:true})}</div>
-      <span class="medal m${rank}">${rank}</span><b>${esc(r.sid)}</b><em>${val(r)}${unit?`<small>${unit}</small>`:''}</em><i style="height:${[0,58,42,30][rank]}px"></i></div>`; }).join('')}</div>`;
+      <span class="medal m${rank}">${rank}</span><b>${whoHTML(r.sid,r.u)}</b><em>${val(r)}${unit?`<small>${unit}</small>`:''}</em><i style="height:${[0,58,42,30][rank]}px"></i></div>`; }).join('')}</div>`;
 }
 const belowPod=R=>R.length>=2?R.filter(o=>o.rank>3):R;
 function rkRow(o,val,sub,unit,opt){
@@ -10193,7 +10255,7 @@ function rkRow(o,val,sub,unit,opt){
   return `<div class="rk${rank<=3?' top':''}${me?' me':''}${opt.go?' rkgo':''}" data-sid="${esc(r.sid)}">
       <div class="no2"><span class="medal ${rank<=3?'m'+rank:''}">${rank}</span></div>
       <div class="av2">${avatarSVG(r.ch,{tight:true})}</div>
-      <div class="who"><b>${esc(r.sid)}${me?' <em class="mytag">나</em>':''}</b><span>${sub(r)}</span></div>
+      <div class="who"><b>${whoHTML(r.sid,r.u)}${me?' <em class="mytag">나</em>':''}</b><span>${sub(r)}</span></div>
       <div class="sc">${val(r)}<small>${unit}</small>${opt.badge?opt.badge(r):''}</div>
     </div>`;
 }
@@ -10207,7 +10269,7 @@ function rankBoard(kind,stats,t,opt){
     (list.length?podiumHTML(list,show,K.unit,meSid)+belowPod(list).map(o=>rkRow(o,show,K.sub,K.unit,opt)).join('')
       :`<div class="empty">${K.empty}</div>`)+
     (opt&&opt.noMine||!ME?'':`<div class="myplace">${mi<0?'아직 순위에 들어가지 않았어요. 도전해 보세요!'
-      :`${esc(ME.sid)} 님은 <b>${show(R[mi].r)}${K.unit}</b> · ${rows.length}명 중 <b>${R[mi].rank}위</b>예요.`}</div>`);
+      :`${ME.sid===TEACHER_ID?'선생님은':esc(whoPlain(ME.sid))+' 님은'} <b>${show(R[mi].r)}${K.unit}</b> · ${rows.length}명 중 <b>${R[mi].rank}위</b>예요.`}</div>`);
 }
 
 /* ═══ 학생 화면 랭킹 ═══
@@ -10389,6 +10451,10 @@ function paintShop(){
   el('shopAvatar').innerHTML=avatarSVG(look);
   el('shopStage').classList.toggle('trying',!!TRY);
   el('shopCoin').textContent=ME.coin;
+  { const nb=el('nickBox'); if(nb){ const tch=ME.sid===TEACHER_ID;
+    nb.innerHTML=tch?'<span>랭킹에 <b>선생님</b>으로 보여요</span>'
+      :`<span>내 이름 <b>${esc(ME.nk||ME.sid)}</b>${ME.nk?` <small>${esc(ME.sid)}</small>`:''}</span><button class="btn" id="nickBtn">닉네임 ${ME.nk?'바꾸기':'짓기'} · ${NICK_P}코인</button>`;
+    const b=el('nickBtn'); if(b) b.onclick=openNick; } }
   const total=['shape','color'].concat(CATS.map(c=>c.k)).reduce((a,k)=>a+goodsList(k).length,0);
   const mine=ownItems().length+ownShapes().length+ownColors().length;
   el('shopSub').innerHTML=`모은 것 <b>${mine}</b> / ${total} · 입은 꾸미기 ${(ME.ch.items||[]).length}개`;
