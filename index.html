@@ -6500,7 +6500,7 @@ function rtVariant(o){
 
 /* ════════ 경우의 수 (중2) ════════
    문장 틀(KC)에 수를 넣어 만듭니다. 열쇠 : KC + 틀 이름 + _수_수…
-   KC1 사건과 경우의 수 · KC2 합의 법칙 · KC3 곱의 법칙 · KC6 카드로 수 만들기 · KC5 대표 뽑기·줄 세우기 (KC4 합과 곱 함께는 예전 기록용)          */
+   KC1 하나씩 세기 · KC2 합의 법칙 · KC3 곱의 법칙(+ KC6 카드로 수 만들기 · KC5 대표 뽑기) · KC7 전체에서 빼기 (KC4 는 예전 기록용)          */
 const KC_DIE=[['짝수',[2,4,6]],['홀수',[1,3,5]],['소수',[2,3,5]],['3의 배수',[3,6]],['4 이상인 수',[4,5,6]],
               ['6의 약수',[1,2,3,6]],['5 이하인 수',[1,2,3,4,5]],['2 이하인 수',[1,2]]];
 const kcPairs=fn=>{ const o=[]; for(let i=1;i<=6;i++) for(let j=1;j<=6;j++) if(fn(i,j)) o.push(`(${i}, ${j})`); return o; };
@@ -6646,15 +6646,47 @@ const KC={
       return {q:`1~${n}${ig(n)} 적힌 카드 ${n}장 중 2장으로 만드는 두 자리 짝수의 개수는`, ans:E.length*(n-1), unit:'개', t:'조건이 있는 자리부터',
         lines:[`일의 자리가 짝수: ${E.join(', ')} → ${E.length}가지`, `십의 자리: 일의 자리 숫자를 뺀 ${n-1}가지`, `${E.length} × ${n-1} = ${B_(E.length*(n-1))}`]}; }},
   hs:{sk:'KC5', gen:()=>[ri(4,10)], make:([n])=>({q:`${n}명이 서로 한 번씩 악수할 때, 악수는 모두 몇 번?`, ans:n*(n-1)/2, unit:'번', t:'두 사람이 한 번 → ÷ 2',
-      lines:[`한 사람이 ${n-1}명과 악수 → ${n} × ${n-1} = ${n*(n-1)}`, 'A–B 와 B–A 는 같은 악수 → ÷ 2', `${n*(n-1)} ÷ 2 = ${B_(n*(n-1)/2)}`]})}
+      lines:[`한 사람이 ${n-1}명과 악수 → ${n} × ${n-1} = ${n*(n-1)}`, 'A–B 와 B–A 는 같은 악수 → ÷ 2', `${n*(n-1)} ÷ 2 = ${B_(n*(n-1)/2)}`]})},
+  /* ── 4 전체에서 빼기 (~가 아닌 · 적어도) — 교과서 8.3 확률의 성질 예제·해결해요를 '경우의 수'로 ── */
+  nt1:{sk:'KC7', gen:()=>{ const N=ri(10,30); return [ri(0,KC_NT.length-1),N,ri(2,Math.floor(N/2))]; }, make:([c,N,a])=>({q:KC_NT[c](N,a), ans:N-a, t:'전체에서 빼기',
+      lines:['아닌 것 = 전체 − 그것', `${N} − ${a} = ${B_(N-a)}`]})},
+  nt2:{sk:'KC7', gen:()=>[ri(0,KC_DIE.length-1)], make:([e])=>{ const [n,L]=KC_DIE[e], O=range(1,6).filter(x=>!L.includes(x));
+      return {q:`주사위 한 개를 던질 때, ${n}가 <em class="kw">아닌</em> 눈이 나오는 경우의 수는`, ans:6-L.length, t:'전체에서 빼기',
+        lines:[`${n}: ${L.join(', ')} → ${L.length}가지`, `전체 6가지에서 빼면 6 − ${L.length} = ${B_(6-L.length)}`, cTip(`직접 세어 봐도 ${O.join(', ')}`)]}; }},
+  nt3:{sk:'KC7', gen:()=>[pickOne([10,12,15,20]),ri(2,5)], make:([N,m])=>{ const k=Math.floor(N/m);
+      return {q:`1부터 ${N}까지의 자연수가 각각 적힌 카드 ${N}장 중에서 한 장을 뽑을 때, ${m}의 배수가 <em class="kw">아닌</em> 수가 나오는 경우의 수는`, ans:N-k, t:'전체에서 빼기',
+        lines:[`${m}의 배수: ${range(1,k).map(i=>i*m).join(', ')} → ${k}가지`, `${N} − ${k} = ${B_(N-k)}`]}; }},
+  al1:{sk:'KC7', gen:()=>[ri(2,3),ri(0,1)], make:([n,v])=>{ const f=v?'뒷면':'앞면', o=v?'앞면':'뒷면', T=2**n;
+      return {q:`서로 다른 동전 ${n}개를 동시에 던질 때, <em class="kw">적어도</em> 한 개는 ${f}이 나오는 경우의 수는`, ans:T-1, t:'적어도 → 전체 − 반대',
+        lines:[`전체: ${Array(n).fill(2).join(' × ')} = ${T}`, `반대: 모두 ${o} → 1가지`, `${T} − 1 = ${B_(T-1)}`]}; }},
+  al2:{sk:'KC7', gen:()=>[ri(0,KC_AL.length-1)], make:([v])=>{ const [c,b,why]=KC_AL[v];
+      return {q:`서로 다른 두 개의 주사위를 동시에 던질 때, ${c} 경우의 수는`, ans:36-b, t:'전체 − 반대',
+        lines:['전체: 6 × 6 = 36', why, `36 − ${b} = ${B_(36-b)}`]}; }},
+  al3:{sk:'KC7', gen:()=>[ri(2,4),ri(1,3)], make:([a,b])=>{ const T=(a+b)*(a+b-1)/2, M=a*(a-1)/2;
+      return {q:`남학생 ${a}명과 여학생 ${b}명 중에서 대표 2명을 뽑을 때, <em class="kw">적어도</em> 한 명은 여학생이 뽑히는 경우의 수는`, ans:T-M, t:'적어도 → 전체 − 반대',
+        lines:[`전체: ${a+b}명 중 대표 2명 → ${a+b} × ${a+b-1} ÷ 2 = ${T}`, `반대(모두 남학생): ${a} × ${a-1} ÷ 2 = ${M}`, `${T} − ${M} = ${B_(T-M)}`]}; }}
 };
+const KC_NT=[   /* ~가 아닌 — 전체 N 중 a */
+  (N,a)=>`붕어빵 ${N}개 중 ${a}개가 슈크림 붕어빵이다. 이 중에서 한 개를 고를 때, 슈크림 붕어빵이 <em class="kw">아닌</em> 것을 고르는 경우의 수는`,
+  (N,a)=>`어느 반 학생 ${N}명 중 ${a}명이 안경을 썼다. 이 반에서 한 명을 고를 때, 안경을 쓰지 <em class="kw">않은</em> 학생을 고르는 경우의 수는`,
+  (N,a)=>`추첨권 ${N}장 중 당첨권이 ${a}장이다. 한 장을 뽑을 때, 당첨권이 <em class="kw">아닌</em> 것을 뽑는 경우의 수는`,
+  (N,a)=>`상자에 젤리 ${N}개가 있고, 그중 ${a}개가 딸기 맛이다. 한 개를 꺼낼 때, 딸기 맛이 <em class="kw">아닌</em> 젤리를 꺼내는 경우의 수는`
+];
+const KC_AL=[   /* 두 주사위 — [조건, 반대 경우의 수, 반대 풀이] */
+  ['<em class="kw">적어도</em> 한 개는 홀수의 눈이 나오는', 9, '반대: 두 개 모두 짝수 → 3 × 3 = 9'],
+  ['<em class="kw">적어도</em> 한 개는 짝수의 눈이 나오는', 9, '반대: 두 개 모두 홀수 → 3 × 3 = 9'],
+  ['서로 <em class="kw">다른</em> 눈이 나오는', 6, '반대: 같은 눈 (1, 1), (2, 2), …, (6, 6) → 6가지'],
+  ['<em class="kw">적어도</em> 한 개는 6의 눈이 나오는', 25, '반대: 두 개 모두 6이 아님 → 5 × 5 = 25'],
+  ['<em class="kw">적어도</em> 한 개는 3의 배수의 눈이 나오는', 16, '반대: 두 개 모두 3의 배수가 아님 (1, 2, 4, 5) → 4 × 4 = 16']
+];
 /* 스테이지마다 나오는 틀 — 교과서(동아 중2 8.1) 수준에 맞춰 수를 작게 (2026-11-03)
    주사위 두 개의 합·차, 동전 3개의 '이상·이하', 돈 내기, 이웃하게 세우기, 대표 3명, 악수 등은 빼 두었어요(틀은 남겨 예전 오답노트는 그대로 열려요) */
-const KC_ST=[['d1','d1','k1','k2','k3','c1'], ['or1','or1','or5','or3'], ['and1','and1','and1','cd','and3','and4','rt'],
-             ['nd','nd','nz','ngt','ne2'], ['rp','rp','r2c','r2c','ln','lr','gate']];
+/* 2026-11-08 — 시험지(경우의 수 유형별 평가)와 같은 네 유형: 하나씩 세기 · 더하기(합) · 곱하기(곱, 자리 채우기) · 전체에서 빼기 */
+const KC_ST=[['d1','d1','k1','k2','k3','c1'], ['or1','or1','or5','or3'],
+             ['and1','and1','cd','and3','and4','nd','rp','gate'], ['nt1','nt1','nt2','nt3','al1','al2','al3']];
 /* 연습 순서용 난이도 — 틀마다 정한 값 + 답이 클수록 조금 더 (쉬운 것부터 나와요) */
 const KC_DL={d1:1,k1:2,k2:2.5,k3:2.5,c1:3, or1:1,or5:2,or3:3, and1:1,cd:1.5,and3:2,rt:2.5,and4:3, set:1,r2:2,r4:3,
-  nd:1,nz:2.5,ngt:2,ne2:2.5, rp:1,gate:1.5,r2c:2,ln:2,lr:2.5};
+  nd:2,nz:2.5,ngt:2,ne2:2.5, rp:2,gate:2,r2c:2.5,ln:2,lr:2.5, nt1:1,nt2:1.5,nt3:2,al1:2,al2:3,al3:3};
 function kcF(id,ps){
   const T=KC[id]; if(!T) return null;
   const o=T.make(ps); if(!o||!(o.ans>0)) return null;
@@ -6731,7 +6763,8 @@ function kcSVG(f){
 }
 const genKC=s=>()=>{ const id=pickOne(KC_ST[s]); return kcF(id,KC[id].gen()); };
 /* 실전 — 연습 틀에 한 걸음 더 나간 틀을 조금 섞어 문제 풀을 넓혀요 (주사위 두 개의 합·차, 길 그림, 세 자리 수, 정해진 자리) */
-const KC_RT=[KC_ST[0].concat(['ds','dd']), KC_ST[1].concat(['or2']), KC_ST[2].concat(['set','r2','r4']), KC_ST[3].concat(['n3','ne']), KC_ST[4].concat(['lf','hs','r3c'])];
+const KC_RT=[KC_ST[0].concat(['ds','dd','pay']), KC_ST[1].concat(['or2']),
+  KC_ST[2].concat(['rt','nz','ne2','ngt','n3','ln','lr','r2c','set','r2']), KC_ST[3].concat(['al2','al3'])];
 const genKCR=s=>()=>{ const id=pickOne(KC_RT[s]); return kcF(id,KC[id].gen()); };
 function kcVariant(f){ for(let g=0;g<6;g++){ const v=kcF(f.id,KC[f.id].gen()); if(v&&v.key!==f.key) return v; } return f; }
 
@@ -6903,7 +6936,7 @@ Object.assign(SK_EXT,{
   RTp:{t:'ratio',n:'비율 → 백분율'}, RTn:{t:'ratio',n:'몇 % 는 얼마'}, RTd:{t:'ratio',n:'소수·분수 → 백분율'},
   RTk:{t:'ratio',n:'비의 성질'}, RTs:{t:'ratio',n:'간단한 자연수의 비'}, RTr:{t:'ratio',n:'비례식'}, RTw:{t:'ratio',n:'비례식 활용'}, RTb:{t:'ratio',n:'비례배분'},
   KC1:{t:'cnt',n:'사건과 경우의 수'}, KC2:{t:'cnt',n:'합의 법칙'}, KC3:{t:'cnt',n:'곱의 법칙'}, KC4:{t:'cnt',n:'합과 곱 함께'},
-  KC5:{t:'cnt',n:'대표 뽑기 · 줄 세우기'}, KC6:{t:'cnt',n:'카드로 수 만들기'},
+  KC5:{t:'cnt',n:'대표 뽑기 · 줄 세우기'}, KC6:{t:'cnt',n:'카드로 수 만들기'}, KC7:{t:'cnt',n:'전체에서 빼기'},
   FCc:{t:'factor',n:'공통인수로 묶기'}, FCs:{t:'factor',n:'완전제곱식'}, FCd:{t:'factor',n:'합과 차의 곱'},
   FCt:{t:'factor',n:'x² + (a+b)x + ab'}, FCa:{t:'factor',n:'acx² + (ad+bc)x + bd'}
 });
@@ -6941,16 +6974,15 @@ Object.assign(TOPICS,{
     ],
     cats:[['RTp'],['RTn'],['RTd'],['RTk'],['RTs'],['RTr'],['RTw'],['RTb']]},BLUE),
   cnt:Object.assign({k:'cnt', n:'경우의 수', sym:'2×3', school:'m',
-    desc:'사건과 경우의 수 · 합의 법칙 · 곱의 법칙 · 카드로 수 만들기 · 대표 뽑기',
+    desc:'하나씩 세기 · 더하기(합의 법칙) · 곱하기(곱의 법칙) · 전체에서 빼기',
     stages:[
-      {n:1, name:'사건과 경우의 수', ex:'주사위 한 개, 짝수의 눈',  gen:genKC(0), take:8},
-      {n:2, name:'합의 법칙',           ex:'버스 3가지 또는 지하철 2가지', gen:genKC(1), take:8},
-      {n:3, name:'곱의 법칙',           ex:'티셔츠 3벌 × 바지 4벌',    gen:genKC(2), take:8},
-      {n:4, name:'카드로 수 만들기',    ex:'1, 2, 3, 4 → 두 자리 자연수', gen:genKC(3), take:8},
-      {n:5, name:'대표 뽑기 · 줄 세우기', ex:'회장·부회장 · 대표 2명',      gen:genKC(4), take:8}
+      {n:1, name:'하나씩 세기',         ex:'주사위 한 개, 짝수의 눈',        gen:genKC(0), take:8},
+      {n:2, name:'더하기 (합의 법칙)',  ex:'버스 3가지 또는 지하철 2가지',   gen:genKC(1), take:8},
+      {n:3, name:'곱하기 (곱의 법칙)',  ex:'티셔츠 3벌 × 바지 4벌 · 카드 수', gen:genKC(2), take:8},
+      {n:4, name:'전체에서 빼기',       ex:'적어도 한 개 · ~가 아닌',         gen:genKC(3), take:8}
     ],
-    realStages:[1,2,3,4,5].map(n=>({n, name:['사건과 경우의 수','합의 법칙','곱의 법칙','카드로 수 만들기','대표 뽑기 · 줄 세우기'][n-1], gen:genKCR(n-1)})),
-    cats:[['KC1'],['KC2'],['KC3'],['KC6'],['KC5']], sv:2},BLUE),
+    realStages:[1,2,3,4].map(n=>({n, name:['하나씩 세기','더하기 (합의 법칙)','곱하기 (곱의 법칙)','전체에서 빼기'][n-1], gen:genKCR(n-1)})),
+    cats:[['KC1'],['KC2'],['KC3','KC6','KC5'],['KC7']], sv:3},BLUE),
   factor:Object.assign({k:'factor', n:'인수분해', sym:'( )( )', school:'m',
     desc:'공통인수 · 완전제곱식 · 합과 차 · x² + (a+b)x + ab · acx² + …',
     stages:[
@@ -7069,13 +7101,11 @@ function currPreview(t,n){
       KD('경우의 수','사건이 일어나는 가짓수<br><small>예) 짝수의 눈 → 2, 4, 6 → 3가지</small>'),'');
     if(n===2) return P(kcF('or1',[0,3,2]),'"또는"이 나오면 더해요.',
       KD('합의 법칙','두 사건 A, B가 동시에 일어나지 않을 때<br>(A 또는 B가 일어나는 경우의 수) = m + n<br><small>A가 일어나는 경우의 수 m, B가 일어나는 경우의 수 n</small>'));
-    if(n===3) return P(kcF('and1',[0,3,4]),'"동시에", "하나씩", "거쳐서"가 나오면 곱해요.',
-      KD('곱의 법칙','A가 일어나는 경우의 수가 m이고, 그 각각에 대하여 B가 일어나는 경우의 수가 n일 때<br>(A와 B가 동시에 일어나는 경우의 수) = m × n'));
-    if(n===4) return P(kcF('nd',[1,2,3,4]),'십의 자리부터 정하고, 일의 자리는 십의 자리에 쓴 카드를 빼고 세요.',
-      KD('카드로 두 자리 자연수','(십의 자리에 올 수 있는 수) × (일의 자리에 올 수 있는 수)<br><small>한 장은 한 번만 써요 · 0은 십의 자리에 올 수 없어요</small>'),'');
-    return P(kcF('rp',[4]),'자리(자격)마다 남은 사람 수를 곱해요. 자격이 같으면 겹친 만큼 나눠요.',
-      KD('한 줄로 세우기','n명을 한 줄로 → n × (n − 1) × … × 1')+
-      KD('대표 뽑기','회장·부회장(자격이 다름) → n × (n − 1)<br>대표 2명(자격이 같음) → n × (n − 1) ÷ 2'),'');
+    if(n===3) return P(kcF('and1',[0,3,4]),'"동시에", "하나씩", "거쳐서"가 나오면 곱해요. 카드로 수 만들기·회장 뽑기도 자리마다 곱해요.',
+      KD('곱의 법칙','A가 일어나는 경우의 수가 m이고, 그 각각에 대하여 B가 일어나는 경우의 수가 n일 때<br>(A와 B가 동시에 일어나는 경우의 수) = m × n')+
+      KD('자리 채우기','카드 두 자리 수 · 회장과 부회장 → (첫째 자리) × (남은 것)<br><small>예) 1, 2, 3, 4 → 4 × 3 = 12 · 0은 십의 자리에 올 수 없어요</small>'));
+    return P(kcF('al1',[2,0]),'"적어도", "~가 아닌"이 나오면 직접 세지 말고 전체에서 반대를 빼요.',
+      KD('전체에서 빼기','(A가 아닌 경우의 수) = (모든 경우의 수) − (A의 경우의 수)<br><small>적어도 한 개는 앞면 → 전체 − 모두 뒷면</small>'),'');
   }
   if(t==='factor'){
     if(n===1) return H(fcC(1,3,2,3,'b'),'각 항에 공통으로 들어 있는 수·문자를 괄호 밖으로 꺼내요.');
@@ -7215,7 +7245,7 @@ function currNote(t,fromHint){
           {w:'4 : 6 = 10 : □ → □ = 12', r:'□ = 15', y:'외항의 곱 = 내항의 곱: 4 × □ = 6 × 10 = 60, □ = 15.'},
           {w:'사탕 20개를 3 : 2로 → 형 20 × 3/2 = 30개', r:'사탕 20개를 3 : 2로 → 형 20 × 3/5 = 12개', y:'전체를 3 + 2 = 5묶음으로 나눠요. 형은 그 가운데 3묶음이에요.'}]});
   if(t==='cnt') return done({
-    sub:'사건과 경우의 수 · 합의 법칙(또는) · 곱의 법칙(동시에) · 표와 나뭇가지 그림 · 수 만들기 · 대표 뽑기 · 한 줄로 세우기',
+    sub:'하나씩 세기 · 합의 법칙(또는) · 곱의 법칙(동시에) · 전체에서 빼기(적어도) · 표와 나뭇가지 그림 · 수 만들기 · 대표 뽑기',
     memo:[
       {h:'사건과 경우의 수', html:`<div class="kcp">같은 조건에서 되풀이할 수 있는 실험·관찰의 결과를 <b>사건</b>, 사건이 일어나는 가짓수를 그 사건의 <b>경우의 수</b>라고 해요.</div>
         <table class="kct"><thead><tr><th>주사위 한 개를 던질 때</th><th>일어나는 경우</th><th>경우의 수</th></tr></thead><tbody>
@@ -7228,6 +7258,11 @@ function currNote(t,fromHint){
         <div class="kcv mul"><em>곱의 법칙</em><b>A와 B가 동시에</b><span>A 의 <u>각각에 대하여</u> B 가 n가지</span><strong>m × n</strong>
           <small>"동시에" · "하나씩" · "잇달아" · "거쳐서"</small></div></div>
         <div class="kcp" style="margin-top:8px">A 가 일어나는 경우의 수 m, B 가 일어나는 경우의 수 n</div>`},
+      {h:'전체에서 빼기',html:`<div class="kcp">"<b>적어도</b>", "<b>~가 아닌</b>"이 나오면 직접 세기보다 <b>(전체) − (반대)</b>가 빨라요.</div>
+        <table class="kct"><thead><tr><th>문제</th><th>반대 경우</th><th>계산</th></tr></thead><tbody>
+        <tr><td>동전 3개, 적어도 한 개는 앞면</td><td>모두 뒷면 1</td><td>8 − 1 = <b>7</b></td></tr>
+        <tr><td>주사위 2개, 적어도 한 개는 홀수</td><td>모두 짝수 3 × 3</td><td>36 − 9 = <b>27</b></td></tr>
+        <tr><td>주사위 2개, 서로 다른 눈</td><td>같은 눈 6</td><td>36 − 6 = <b>30</b></td></tr></tbody></table>`},
       {h:'기본으로 알아 둘 경우의 수', html:chipList(['동전 1개 → <b>2</b>','동전 2개 → 2 × 2 = <b>4</b>','동전 3개 → 2 × 2 × 2 = <b>8</b>',
         '주사위 1개 → <b>6</b>','주사위 2개 → 6 × 6 = <b>36</b>','동전 1개와 주사위 1개 → 2 × 6 = <b>12</b>'])},
       {h:'순서가 있을까, 없을까', html:`<table class="kct"><thead><tr><th>4명(A, B, C, D) 가운데 2명</th><th>계산</th><th>경우의 수</th></tr></thead><tbody>
@@ -8795,13 +8830,13 @@ const PREQ={
   'lineq:1':[['int',1],['boxq',1]], 'lineq:2':[['boxq',3],['int',3]], 'lineq:3':[['int',2],['lineq',2]], 'lineq:4':[['fadd',2],['fmul',3],['int',3]],
   'expo:1':[['power',1],['power',2]], 'expo:2':[['expo',1]], 'expo:3':[['expo',2],['gugu',9]], 'expo:4':[['expo',3]],
   'pyth:1':[['power',1]], 'pyth:2':[['power',1],['power',3]], 'pyth:3':[['pyth',1],['gugu',9]], 'pyth:4':[['power',1],['pyth',1]],
-  'cnt:2':[['cnt',1]], 'cnt:3':[['cnt',1],['gugu',9]], 'cnt:4':[['cnt',2],['cnt',3]], 'cnt:5':[['cnt',3]],
+  'cnt:2':[['cnt',1]], 'cnt:3':[['cnt',1],['gugu',9]], 'cnt:4':[['cnt',1],['cnt',3]],
   'root:1':[['power',1],['power',3]], 'root:2':[['power',1],['root',1]], 'root:3':[['root',2],['gugu',9]],
   'factor:1':[['gugu',9]], 'factor:2':[['power',1]], 'factor:3':[['power',1]], 'factor:4':[['int',3],['gugu',9]], 'factor:5':[['factor',4]],
   'trig:1':[['root',1]], 'trig:2':[['pyth',1],['fadd',2]], 'trig:3':[['trig',1]], 'trig:4':[['trig',1],['root',3]],
   'logx:1':[['expo',1],['root',1]], 'logx:2':[['expo',1],['power',2]], 'logx:3':[['logx',2]], 'logx:4':[['logx',2],['expo',2]],
   'tfn:1':[['fmul',3]], 'tfn:2':[['trig',1]], 'tfn:3':[['tfn',2],['trig',2]], 'tfn:4':[['tfn',2]], 'tfn:5':[['trig',4],['root',2]],
-  'comb:1':[['cnt',5]], 'comb:2':[['comb',1]], 'comb:3':[['cnt',5],['comb',2]]
+  'comb:1':[['cnt',3]], 'comb:2':[['comb',1]], 'comb:3':[['cnt',3],['comb',2]]
 };
 const stName=(t,n)=>{ const s=(TOPICS[t]&&TOPICS[t].stages||[]).find(x=>x.n===n); return s?s.name:''; };
 const hasStage=(t,n)=>!!(TOPICS[t]&&TOPICS[t].stages.some(s=>s.n===n));
