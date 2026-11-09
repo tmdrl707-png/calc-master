@@ -3192,7 +3192,9 @@ const TOPICS={
        pick:l=>sampleN(l.filter(f=>f.b>=3),14).concat(sampleN(l.filter(f=>f.b<3),4))},
       {n:2, name:'6단 ~ 9단',  ex:'7 × 8', facts:()=>DAN([6,7,8,9]), take:18, old:[3,4],
        pick:l=>sampleN(l.filter(f=>f.b>=3),15).concat(sampleN(l.filter(f=>f.b<3),3))},
-      {n:3, name:'거꾸로 찾기', ex:'7 × □ = 56', facts:DANR, take:15, old:[6]}
+      /* 실전 마지막 단계 — 빈칸만 나오지 않도록 곱하기(3단~9단)와 거꾸로 찾기를 반반 섞어요 */
+      {n:3, name:'섞어서', ex:'7 × 8 · 7 × □ = 56', take:15, old:[6],
+       facts:()=>DAN([3,4,5,6,7,8,9]).filter(f=>f.b>=3).concat(DANR().filter(f=>f.a>=3&&f.b>=3))}
     ]},
   power:{k:'power', n:'제곱수 · 세제곱수', sym:'x²', school:'m', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'1²~25², 1³~12³ 과 거꾸로 찾기',
