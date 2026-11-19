@@ -797,7 +797,10 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 /* 식의 값 조건 줄 · 지수 빈칸 · √□ */
 .eq .cond{flex-basis:100%;font-size:19px;font-weight:600;color:var(--dim);letter-spacing:0;margin-bottom:-2px;word-break:keep-all}
 .eq.small .cond{font-size:14px;text-align:left}
-.eq sup .abox.esup{font-size:1em;min-width:1.1em;height:1.15em;border-bottom-width:2px;padding:0 .1em}
+.eq sup{align-self:flex-start}
+.eq sup .abox.esup{font-size:1.25em;min-width:1.15em;height:1.25em;padding:0 .12em;border:2px solid var(--blue);border-radius:7px;margin-left:1px;line-height:1}
+.eq sup .abox.esup.ok{border:2px solid var(--o);color:var(--o)}
+.eq sup .abox.esup.no{border:2px solid var(--x);color:var(--x)}
 .eq .rt{display:inline-flex;align-items:center}
 @media(max-width:520px){.eq .cond{font-size:16px}}
 /* 분수 빈칸 · 아래첨자 빈칸 */
@@ -10071,13 +10074,16 @@ Object.assign(TOPIC_SYMH,{dadd:'<span style="font-size:.6em;letter-spacing:-.5px
    모두 '원리를 알면 손이 기억하는 계산'만 골랐어요. 답은 모두 정수(일차함수는 음수도).        */
 
 const G2T=['pfac','rdec','linf','angle','simr','prob'];
+/* 숫자 뒤 조사 — 읽는 소리의 받침으로 (일·삼·육·칠·팔·십·영은 받침 있음) */
+const josa=(num,a,b)=>{ const d=String(num).replace(/\D/g,''), last=d.slice(-1), zero=/0$/.test(d)&&d.length>1&&+d!==0;
+  return (zero||'013678'.includes(last))?a:b; };
 Object.assign(SK_EXT,{
   PF1:{t:'pfac',n:'소인수분해 — 지수'}, PF2:{t:'pfac',n:'약수의 개수'}, PF3:{t:'pfac',n:'최대공약수'}, PF4:{t:'pfac',n:'최소공배수'},
-  RD1:{t:'rdec',n:'0.ȧ = a/9'}, RD2:{t:'rdec',n:'0.ȧḃ = ab/99'}, RD3:{t:'rdec',n:'0.aḃ = (ab − a)/90'}, RD4:{t:'rdec',n:'기약분수로'},
-  LF1:{t:'linf',n:'함숫값'}, LF2:{t:'linf',n:'기울기'}, LF3:{t:'linf',n:'x절편 · y절편'}, LF4:{t:'linf',n:'직선의 식 구하기'},
+  RD1:{t:'rdec',n:'유한소수 · 순환소수 판별'}, RD2:{t:'rdec',n:'순환마디 한 자리 (분모 9)'}, RD3:{t:'rdec',n:'순환마디 두·세 자리 (99 · 999)'}, RD4:{t:'rdec',n:'순환하지 않는 부분이 있을 때 (90 · 990)'}, RD5:{t:'rdec',n:'기약분수로'},
+  LF1:{t:'linf',n:'함숫값 f(a)'}, LF2:{t:'linf',n:'평행이동 · x절편 · y절편'}, LF3:{t:'linf',n:'기울기 · 증가량'}, LF4:{t:'linf',n:'일차함수의 식 구하기'},
   AG1:{t:'angle',n:'삼각형의 내각·외각'}, AG2:{t:'angle',n:'이등변삼각형'}, AG3:{t:'angle',n:'다각형의 내각'}, AG4:{t:'angle',n:'정다각형의 외각'},
-  SR1:{t:'simr',n:'대응변의 길이'}, SR2:{t:'simr',n:'넓이의 비'}, SR3:{t:'simr',n:'부피의 비'}, SR4:{t:'simr',n:'닮음비 거꾸로'},
-  PB1:{t:'prob',n:'한 개 — 주사위·카드'}, PB2:{t:'prob',n:'두 개 — 주사위·동전'}, PB3:{t:'prob',n:'일어나지 않을 확률'}, PB4:{t:'prob',n:'기약분수로'}
+  SR1:{t:'simr',n:'닮음비 · 대응변 · 둘레'}, SR2:{t:'simr',n:'넓이의 비'}, SR3:{t:'simr',n:'부피의 비'}, SR4:{t:'simr',n:'닮음비 거꾸로'},
+  PB1:{t:'prob',n:'확률의 뜻 — 한 개'}, PB2:{t:'prob',n:'두 개를 던질 때'}, PB3:{t:'prob',n:'일어나지 않을 확률 · 적어도'}, PB4:{t:'prob',n:'확률의 덧셈 (또는)'}, PB5:{t:'prob',n:'확률의 곱셈 (동시에)'}
 });
 const DEG={u:'°'};
 const lcmN=(a,b)=>a/gcd(a,b)*b;
@@ -10105,53 +10111,82 @@ function genPF2(){ const n=pickOne(range(12,200).filter(n=>factorize(n).length>=
 function genPF3(){ for(let g=0;g<60;g++){ const d=ri(2,15), a=d*ri(2,9), b=d*ri(2,9); if(a!==b&&a<=120&&b<=120&&gcd(a,b)>=2) return pf3(Math.min(a,b),Math.max(a,b)); } return pf3(12,18); }
 function genPF4(){ for(let g=0;g<60;g++){ const a=ri(4,30), b=ri(4,30); const l=lcmN(a,b); if(a!==b&&l<=180&&l!==Math.max(a,b)) return pf4(Math.min(a,b),Math.max(a,b)); } return pf4(12,18); }
 
-/* ════════ 순환소수 ════════ 순환마디의 처음과 끝 숫자 위에 점 */
+/* ════════ 순환소수 ════════ 교과서 1단원 순서: 유한소수·순환소수 판별 → 순환소수를 분수로 → 기약분수
+   I 정수 부분 · nr 순환하지 않는 소수 부분 · rp 순환마디(처음과 끝 숫자 위에 점)
+   값 = (I nr rp − I nr) ÷ (순환마디 자릿수만큼 9, 이어서 nr 자릿수만큼 0) — 교과서의 '10의 거듭제곱을 곱해 빼기' */
 const rdDot=s=>{ s=String(s); return s.length===1?`<span class="rdd">${s}</span>`:`<span class="rdd">${s[0]}</span>${s.slice(1,-1)}<span class="rdd">${s.slice(-1)}</span>`; };
-const rdHTML=(nr,rp)=>`0.${nr}${rdDot(rp)}`;
-const rdText=(nr,rp)=>`0.${nr}(${rp})`;
-/* k 1: 0.ȧ  2: 0.ȧḃ  3: 0.aḃ  4: 기약분수(form 1·2·3 중 하나를 약분) */
-function rdVal(form,d){ const s=String(d);
-  if(form===1) return [+s,9,'',s];
-  if(form===2) return [+s,99,'',s.padStart(2,'0')];
-  return [+s-Math.floor(+s/10),90,s[0],s[1]]; }
-function rd(k,form,d){
-  const [n,q,nr,rp]=rdVal(form,d), g=gcd(n,q), cond=`${rdHTML(nr,rp)}을 분수로`;
-  if(k<4) return F({key:'RD'+k+'_'+d, sk:'RD'+k, t:'rdec', k:'rd', lv:k, form, d, n, q, nr, rp, cond, cb:true, eq:[{fr:['?',String(q)]}], ans:n});
-  return F({key:'RD4'+form+'_'+d, sk:'RD4', t:'rdec', k:'rd', lv:4, form, d, n, q, nr, rp, g,
-    cond:`${rdHTML(nr,rp)}을 기약분수로`, cb:true, eq:[{fr:[String(n/g),'?']}], ans:q/g});
+const rdHTML=(nr,rp,I)=>`${I||0}.${nr}${rdDot(rp)}`;
+const rdNum=(I,nr,rp)=>{ const a=+(String(I)+nr+rp), b=+(String(I)+nr); return [a-b, +('9'.repeat(rp.length)+'0'.repeat(nr.length)), a, b]; };
+function rd(lv,I,nr,rp){
+  const [n,q,A,Bv]=rdNum(I,nr,rp), g=gcd(n,q), dec=rdHTML(nr,rp,I);
+  const o={key:`RD${lv}_${I}_${nr||'-'}_${rp}`, sk:'RD'+lv, t:'rdec', k:'rd', lv, I, nr, rp, n, q, g, A, Bv, cb:true};
+  if(lv<5) return F(Object.assign(o,{cond:`${dec}${josa(rp,'을','를')} 분수로`, eq:[{fr:['?',String(q)]}], ans:n}));
+  return F(Object.assign(o,{cond:`${dec}${josa(rp,'을','를')} 기약분수로`, eq:[{fr:[String(n/g),'?']}], ans:q/g}));
 }
-const RD1_D=()=>range(1,8), RD2_D=()=>range(1,98).filter(d=>d%11!==0), RD3_D=()=>range(10,98).filter(d=>d%10!==0&&Math.floor(d/10)!==d%10);
-const genRD1=()=>rd(1,1,pickOne(RD1_D()));
-const genRD2=()=>rd(2,2,pickOne(RD2_D()));
-const genRD3=()=>rd(3,3,pickOne(RD3_D()));
-function genRD4(){ for(let g=0;g<60;g++){ const form=pickOne([1,2,2,3]), d=pickOne(form===1?RD1_D():form===2?RD2_D():RD3_D()), [n,q]=rdVal(form,d);
-    if(gcd(n,q)>1&&n/gcd(n,q)<=9) return rd(4,form,d); } return rd(4,1,3); }
+/* 1단계 — 분수를 소수로 나타내면 유한소수일까, 순환소수일까? (기약분수로 고친 뒤 분모의 소인수가 2, 5뿐인지) */
+const RD_PICK=['유한소수','순환소수'];
+const only25=n=>{ while(n%2===0) n/=2; while(n%5===0) n/=5; return n===1; };
+const rdF=(a,b)=>F({key:`RD1f_${a}_${b}`, sk:'RD1', t:'rdec', k:'rdf', a, b, g:gcd(a,b),
+  cond:`${a}/${b}${josa(a,'을','를')} 소수로 나타내면`, cb:true, eq:['?'], pick:RD_PICK, ans:only25(b/gcd(a,b))?1:2});
+function genRD1(){ const fin=Math.random()<.5, trap=Math.random()<.5;
+  for(let t=0;t<300;t++){ const b=ri(6,80), a=ri(1,b-1), r=b/gcd(a,b);
+    if(r===1||only25(r)!==fin) continue;
+    if(fin&&trap&&only25(b)) continue;          /* 함정: 분모에 3, 7 … 이 있어도 약분하면 유한소수 */
+    if(!fin&&gcd(a,b)===1&&trap) continue;      /* 함정: 약분해도 2, 5 말고 다른 소인수가 남는 것 */
+    return rdF(a,b); } return rdF(21,84); }
+const rdOK=(nr,rp)=>!/^0+$/.test(rp)&&!/^9+$/.test(rp)&&!(rp.length>1&&/^(\d)\1+$/.test(rp))&&!(nr&&nr.slice(-1)===rp.slice(-1));
+function genRD2(){ return rd(2,pickOne([0,0,0,1,2,3]),'',String(ri(1,8))); }
+function genRD3(){ for(let t=0;t<60;t++){ const rp=Math.random()<.7?String(ri(1,98)).padStart(2,'0'):String(ri(12,987)).padStart(3,'0');
+  if(rdOK('',rp)) return rd(3,Math.random()<.2?ri(1,2):0,'',rp); } return rd(3,0,'','27'); }
+function genRD4(){ for(let t=0;t<60;t++){ const nr=String(ri(0,9)), rp=Math.random()<.65?String(ri(1,8)):String(ri(10,98));
+  if(rdOK(nr,rp)) return rd(4,Math.random()<.25?ri(1,2):0,nr,rp); } return rd(4,0,'1','3'); }
+function genRD5(){ for(let t=0;t<120;t++){ const f=pickOne([genRD2,genRD3,genRD4,genRD4])(), g=f.g;
+  if(g>1&&f.n/g<=60&&f.q/g>=3) return rd(5,f.I,f.nr,f.rp); } return rd(5,0,'','3'); }
 
-/* ════════ 일차함수 ════════ */
+/* ════════ 일차함수 ════════ 교과서 4단원 순서: 함숫값 f(a) → 평행이동·절편 → 기울기 → 일차함수의 식 */
 const lfL=(a,b)=>poly([[a,'x'],[b,'']]);
 const lf1=(a,b,c)=>F({key:'LF1'+a+'_'+b+'_'+c, sk:'LF1', t:'linf', k:'lf1', a, b, c,
-  cond:`y = ${lfL(a,b)} 에서 x = ${MI(c)}일 때`, cb:true, eq:['y','=','?'], ans:a*c+b});
-const lf2=(x1,y1,x2,y2)=>F({key:'LF2'+[x1,y1,x2,y2].join('_'), sk:'LF2', t:'linf', k:'lf2', x1, y1, x2, y2,
+  cond:`f(x) = ${lfL(a,b)} 일 때`, cb:true, eq:[`f(${MI(c)})`,'=','?'], ans:a*c+b});
+const lf3=(w,a,b)=>F({key:'LF3'+w+'_'+a+'_'+b, sk:'LF2', t:'linf', k:'lf3', w, a, b,
+  cond:`일차함수 y = ${lfL(a,b)} 의 그래프의 ${w}절편`, cb:true, eq:['?'], ans:w==='y'?b:-b/a});
+const lfP=(a,b,m)=>F({key:'LF2p'+a+'_'+b+'_'+m, sk:'LF2', t:'linf', k:'lfp', a, b, m,
+  cond:`y = ${lfL(a,b)} 의 그래프를 y축의 방향으로 ${MI(m)}만큼 평행이동한 그래프의 y절편`, cb:true, eq:['?'], ans:b+m});
+const lf2=(x1,y1,x2,y2)=>F({key:'LF2'+[x1,y1,x2,y2].join('_'), sk:'LF3', t:'linf', k:'lf2', x1, y1, x2, y2,
   cond:`두 점 (${MI(x1)}, ${MI(y1)}), (${MI(x2)}, ${MI(y2)})을 지나는 직선의 기울기`, cb:true, eq:['?'], ans:(y2-y1)/(x2-x1)});
-const lf3=(w,a,b)=>F({key:'LF3'+w+'_'+a+'_'+b, sk:'LF3', t:'linf', k:'lf3', w, a, b,
-  cond:`y = ${lfL(a,b)} 의 ${w}절편`, cb:true, eq:['?'], ans:w==='y'?b:-b/a});
+/* 증가량 — q: 기울기와 x의 증가량 → y의 증가량,  r: 두 증가량 → 기울기 */
+const lfD=(w,a,dx,b)=>F({key:'LF3'+w+a+'_'+dx+'_'+b, sk:'LF3', t:'linf', k:'lfd', w, a, dx, b,
+  cond:w==='q'?`일차함수 y = ${lfL(a,b)} 에서 x의 값이 ${dx}만큼 증가할 때 y의 값의 증가량`
+              :`일차함수 y = ax ${b<0?'−':'+'} ${Math.abs(b)} 의 그래프에서 x의 값이 ${dx}만큼 증가할 때 y의 값은 ${Math.abs(a*dx)}만큼 ${a>0?'증가':'감소'}한다. 상수 a의 값`, cb:true,
+  eq:w==='q'?['?']:['a','=','?'], ans:w==='q'?a*dx:a});
 const lf4=(a,p,q)=>F({key:'LF4'+a+'_'+p+'_'+q, sk:'LF4', t:'linf', k:'lf4', a, p, q,
   cond:`기울기가 ${MI(a)}이고 점 (${MI(p)}, ${MI(q)})을 지나는 직선 y = ${lfL(a,0)} + b`, cb:true, eq:['b','=','?'], ans:q-a*p});
+const lfT=(x1,y1,x2,y2)=>F({key:'LF4t'+[x1,y1,x2,y2].join('_'), sk:'LF4', t:'linf', k:'lft', x1, y1, x2, y2, a:(y2-y1)/(x2-x1),
+  cond:`두 점 (${MI(x1)}, ${MI(y1)}), (${MI(x2)}, ${MI(y2)})을 지나는 직선 y = ax + b`, cb:true, eq:['b','=','?'], ans:y1-(y2-y1)/(x2-x1)*x1});
+const lfI=(m,n)=>F({key:'LF4i'+m+'_'+n, sk:'LF4', t:'linf', k:'lfi', m, n,
+  cond:`x절편이 ${MI(m)}, y절편이 ${MI(n)}인 직선의 기울기`, cb:true, eq:['?'], ans:-n/m});
 const nzI=(lo,hi)=>{ let v=0; while(!v) v=ri(lo,hi); return v; };
 const genLF1=()=>{ const a=nzI(-4,5), b=ri(-9,9), c=ri(-3,6); return lf1(a,b,c); };
-function genLF2(){ for(let g=0;g<40;g++){ const a=nzI(-4,5), x1=ri(-3,4), dx=nzI(-3,4), y1=ri(-5,6), x2=x1+dx, y2=y1+a*dx;
-  if(Math.abs(y2)<=20) return lf2(x1,y1,x2,y2); } return lf2(1,3,3,7); }
-function genLF3(){ if(Math.random()<.25) return lf3('y',nzI(-5,5),nzI(-9,9));
+function genLF2(){ if(Math.random()<.3) return lfP(nzI(-4,5),ri(-6,6),nzI(-6,6));
+  if(Math.random()<.3) return lf3('y',nzI(-5,5),nzI(-9,9));
   const a=nzI(-4,5), r=nzI(-6,6); return lf3('x',a,-a*r); }
-const genLF4=()=>{ const a=nzI(-4,5), p=nzI(-3,4), q=ri(-8,10); return lf4(a,p,q); };
+function twoPts(){ for(let g=0;g<40;g++){ const a=nzI(-4,5), x1=ri(-3,4), dx=nzI(-3,4), y1=ri(-5,6), x2=x1+dx, y2=y1+a*dx;
+  if(Math.abs(y2)<=20) return [x1,y1,x2,y2]; } return [1,3,3,7]; }
+function genLF3(){ const r=Math.random();
+  if(r<.5) return lf2(...twoPts());
+  return lfD(r<.75?'q':'r',nzI(-4,5),ri(2,5),nzI(-6,6)); }
+function genLF4(){ const r=Math.random();
+  if(r<.45) return lf4(nzI(-4,5),nzI(-3,4),ri(-8,10));
+  if(r<.8) return lfT(...twoPts());
+  for(let g=0;g<40;g++){ const m=nzI(-6,6), a=nzI(-3,3), n=-a*m; if(Math.abs(n)<=12) return lfI(m,n); } return lfI(3,6); }
 
 /* ════════ 도형의 각 ════════ */
 const ag1=(w,a,b)=>F({key:'AG1'+w+'_'+a+'_'+b, sk:'AG1', t:'angle', k:'ag1', w, a, b, fig:true,
   cond:w==='i'?`삼각형의 두 내각이 ${a}°, ${b}°일 때 나머지 한 내각`:`이웃하지 않는 두 내각이 ${a}°, ${b}°일 때 외각`, cb:true,
   eq:['?',DEG], ans:w==='i'?180-a-b:a+b});
-const ag2=(w,v)=>F({key:'AG2'+w+'_'+v, sk:'AG2', t:'angle', k:'ag2', w, v, fig:true,
-  cond:w==='v'?`꼭지각이 ${v}°인 이등변삼각형의 한 밑각`:`한 밑각이 ${v}°인 이등변삼각형의 꼭지각`, cb:true,
-  eq:['?',DEG], ans:w==='v'?(180-v)/2:180-2*v});
+const ag2=(w,v)=>F({key:'AG2'+w+'_'+v, sk:'AG2', t:'angle', k:'ag2', w, v, fig:w!=='x',
+  cond:w==='v'?`꼭지각이 ${v}°인 이등변삼각형의 한 밑각`:w==='b'?`한 밑각이 ${v}°인 이등변삼각형의 꼭지각`
+    :`AB = AC인 이등변삼각형 ABC에서 ∠A = ${v}°일 때 ∠C의 외각`, cb:true,
+  eq:['?',DEG], ans:w==='v'?(180-v)/2:w==='b'?180-2*v:180-(180-v)/2});
 const KN=n=>{ const U=['','일','이','삼','사','오','육','칠','팔','구'], t=Math.floor(n/10), o=n%10; return (t?(t>1?U[t]:'')+'십':'')+U[o]; };
 const AG_REG=[3,4,5,6,8,9,10,12,15,18,20,24,30,36];
 const ag3=(w,n)=>F({key:'AG3'+w+'_'+n, sk:'AG3', t:'angle', k:'ag3', w, n,
@@ -10161,7 +10196,7 @@ const ag4=(w,n)=>F({key:'AG4'+w+'_'+n, sk:'AG4', t:'angle', k:'ag4', w, n,
   cond:w==='x'?`정${KN(n)}각형의 한 외각의 크기`:w==='n'?`한 외각의 크기가 ${360/n}°인 정다각형`:`한 내각의 크기가 ${180-360/n}°인 정다각형`, cb:true,
   eq:w==='x'?['?',DEG]:['정','?',{u:'각형'}], ans:w==='x'?360/n:n});
 function genAG1(){ for(let g=0;g<40;g++){ const a=ri(3,16)*5, b=ri(3,16)*5; if(a+b<=165) return ag1(Math.random()<.55?'i':'e',a,b); } return ag1('i',50,60); }
-function genAG2(){ if(Math.random()<.5) return ag2('v',ri(2,16)*10); return ag2('b',ri(7,17)*5); }
+function genAG2(){ const r=Math.random(); if(r<.4) return ag2('v',ri(2,16)*10); if(r<.75) return ag2('b',ri(7,17)*5); return ag2('x',ri(2,14)*10); }
 function genAG3(){ const r=Math.random(); if(r<.4) return ag3('s',ri(4,12)); if(r<.8) return ag3('r',pickOne([5,6,8,9,10,12,15,18,20])); return ag3('d',ri(4,12)); }
 function genAG4(){ const r=Math.random(), n=pickOne(AG_REG.filter(n=>n>=4)); return ag4(r<.45?'x':r<.75?'n':'k',n); }
 /* 그림 — 각의 크기에 맞춰 그린 삼각형 */
@@ -10196,9 +10231,11 @@ function agSVG(f){
 /* ════════ 닮음비 ════════ */
 const SR_R=()=>[[1,2],[1,3],[2,3],[3,4],[2,5],[3,5],[4,5],[1,4]];
 const sr1=(m,n,k,w)=>F({key:'SR1'+m+'_'+n+'_'+k+'_'+w, sk:'SR1', t:'simr', k:'sr1', m, n, kk:k, w,
-  cond:w==='b'?`닮음비가 ${m} : ${n}인 두 도형에서 작은 도형의 한 변이 ${m*k} cm일 때 대응하는 큰 도형의 변`
+  cond:w==='r'?`대응변의 길이가 각각 ${m*k} cm, ${n*k} cm인 두 닮은 도형의 닮음비`
+      :w==='p'?`닮음비가 ${m} : ${n}인 두 도형에서 작은 도형의 둘레가 ${m*k*3} cm일 때 큰 도형의 둘레`
+      :w==='b'?`닮음비가 ${m} : ${n}인 두 도형에서 작은 도형의 한 변이 ${m*k} cm일 때 대응하는 큰 도형의 변`
               :`닮음비가 ${m} : ${n}인 두 도형에서 큰 도형의 한 변이 ${n*k} cm일 때 대응하는 작은 도형의 변`, cb:true,
-  eq:['?',{u:'cm'}], ans:w==='b'?n*k:m*k});
+  eq:w==='r'?[m,':','?']:['?',{u:'cm'}], ans:w==='r'?n:w==='p'?n*k*3:w==='b'?n*k:m*k});
 function srP(p,m,n,k){ const P=x=>Math.pow(x,p), nm=p===2?'넓이':'부피', un=p===2?'cm²':'cm³';
   if(k===0) return F({key:'SR'+p+'r_'+m+'_'+n, sk:'SR'+p, t:'simr', k:'srp', p, m, n, kk:0,
     cond:`닮음비가 ${m} : ${n}이면 ${nm}의 비는`, cb:true, eq:[P(m),':','?'], ans:P(n)});
@@ -10206,10 +10243,13 @@ function srP(p,m,n,k){ const P=x=>Math.pow(x,p), nm=p===2?'넓이':'부피', un=
     cond:`닮음비가 ${m} : ${n}이고 작은 도형의 ${nm}가 ${P(m)*k} ${un}일 때 큰 도형의 ${nm}`, cb:true, eq:['?',{u:un}], ans:P(n)*k}); }
 const sr4=(p,m,n)=>F({key:'SR4'+p+'_'+m+'_'+n, sk:'SR4', t:'simr', k:'sr4', p, m, n,
   cond:`${p===2?'넓이':'부피'}의 비가 ${Math.pow(m,p)} : ${Math.pow(n,p)}인 두 닮은 도형의 닮음비`, cb:true, eq:[m,':','?'], ans:n});
-const genSR1=()=>{ const [m,n]=pickOne(SR_R()); return sr1(m,n,ri(2,6),Math.random()<.6?'b':'s'); };
+const genSR1=()=>{ const [m,n]=pickOne(SR_R()), r=Math.random(); return sr1(m,n,ri(2,6),r<.25?'r':r<.55?'b':r<.8?'s':'p'); };
 const genSR2=()=>{ const [m,n]=pickOne(SR_R().filter(([,n])=>n<=5)); return srP(2,m,n,Math.random()<.45?0:ri(2,5)); };
 const genSR3=()=>{ const [m,n]=pickOne(SR_R().filter(([,n])=>n<=4)); return srP(3,m,n,Math.random()<.5?0:ri(1,3)); };
-const genSR4=()=>{ const [m,n]=pickOne(SR_R()); return sr4(n<=4&&Math.random()<.4?3:2,m,n); };
+const sr4e=(m,n,k)=>F({key:'SR4e_'+m+'_'+n+'_'+k, sk:'SR4', t:'simr', k:'sr4e', m, n, kk:k,
+  cond:`부피의 비가 ${m*m*m} : ${n*n*n}인 두 정육면체에서 큰 정육면체의 한 모서리가 ${n*k} cm일 때 작은 정육면체의 한 모서리`, cb:true,
+  eq:['?',{u:'cm'}], ans:m*k});
+const genSR4=()=>{ const [m,n]=pickOne(SR_R()), r=Math.random(); if(n<=4&&r<.3) return sr4e(m,n,ri(2,5)); return sr4(n<=4&&r<.55?3:2,m,n); };
 
 /* ════════ 확률 ════════ */
 const PB_EV=[['짝수의 눈',x=>x%2===0],['홀수의 눈',x=>x%2===1],['3의 배수',x=>x%3===0],['소수',isPrime],
@@ -10234,15 +10274,47 @@ function pb2(w,v){
 }
 const comb_=(n,k)=>{ let r=1; for(let i=0;i<k;i++) r=r*(n-i)/(i+1); return r; };
 function pb3(w,a,b){
+  if(w==='d') return F({key:'PB3d', sk:'PB3', t:'prob', k:'pb3', w, T:36,
+    cond:`서로 다른 두 개의 주사위를 동시에 던질 때 서로 다른 눈이 나올 확률`, cb:true, eq:[{fr:['?','36']}], ans:30});
+  if(w==='n'){ const c=D2().filter(([x,y])=>x+y===a).length;
+    return F({key:'PB3n'+a, sk:'PB3', t:'prob', k:'pb3', w, v:a, c, T:36,
+      cond:`서로 다른 두 개의 주사위를 동시에 던질 때 두 눈의 수의 합이 ${a}${josa(a,'이','가')} 아닐 확률`, cb:true, eq:[{fr:['?','36']}], ans:36-c}); }
   if(w==='a') return F({key:'PB3a'+a, sk:'PB3', t:'prob', k:'pb3', w, n:a, T:Math.pow(2,a),
     cond:`동전 ${a}개를 동시에 던질 때 적어도 한 개는 앞면이 나올 확률`, cb:true, eq:[{fr:['?',String(Math.pow(2,a))]}], ans:Math.pow(2,a)-1});
   return F({key:'PB3p'+a+'_'+b, sk:'PB3', t:'prob', k:'pb3', w, a, b,
     cond:`사건 A가 일어날 확률이 ${a}/${b}일 때 A가 일어나지 않을 확률`, cb:true, eq:[{fr:['?',String(b)]}], ans:b-a});
 }
 const PB_COL=['빨간','파란','노란'];
+/* 기약분수로 답하기 — 약분되면 분자를 보여 주고 분모를, 아니면 분모를 보여 주고 분자를 물어요 */
+const frAsk=(n,d)=>{ const g=gcd(n,d), N=n/g, D=d/g; return g>1?{eq:[{fr:[String(N),'?']}],ans:D}:{eq:[{fr:['?',String(D)]}],ans:N}; };
+/* 4단계 — 확률의 덧셈: 두 사건이 동시에 일어나지 않을 때  p + q */
+const KR_MUL={3:'3의 배수',4:'4의 배수',5:'5의 배수',6:'6의 배수',7:'7의 배수',8:'8의 배수',9:'9의 배수'};
+function pbO(w,a,b,N){
+  if(w==='c'){ const c1=Math.floor(N/a), c2=Math.floor(N/b), x=frAsk(c1+c2,N);
+    return F(Object.assign({key:`PB4c${N}_${a}_${b}`, sk:'PB4', t:'prob', k:'pbo', w, a, b, N, c1, c2,
+      cond:`1부터 ${N}까지의 자연수가 각각 적힌 카드 ${N}장 중 한 장을 뽑을 때 ${KR_MUL[a]} 또는 ${KR_MUL[b]}일 확률 (기약분수)`, cb:true},x)); }
+  const c1=D2().filter(([x,y])=>x+y===a).length, c2=D2().filter(([x,y])=>x+y===b).length, x=frAsk(c1+c2,36);
+  return F(Object.assign({key:`PB4s${a}_${b}`, sk:'PB4', t:'prob', k:'pbo', w, a, b, c1, c2, N:36,
+    cond:`서로 다른 두 개의 주사위를 동시에 던질 때 두 눈의 수의 합이 ${a} 또는 ${b}일 확률 (기약분수)`, cb:true},x));
+}
+function genPB4(){
+  if(Math.random()<.5){ for(let g=0;g<60;g++){ const N=pickOne([10,12,15,20,24,30]), a=ri(3,9), b=ri(3,9);
+      if(a<b&&lcmN(a,b)>N&&Math.floor(N/a)&&Math.floor(N/b)) return pbO('c',a,b,N); } return pbO('c',4,5,12); }
+  const a=ri(2,11); let b=ri(2,12); while(b===a) b=ri(2,12); return pbO('s',Math.min(a,b),Math.max(a,b)); }
+/* 5단계 — 확률의 곱셈: 두 사건이 서로 영향을 끼치지 않을 때  p × q */
+function pbA(w,a,b,c,d){
+  if(w==='c'){ const [nm,fn]=PB_EV[a], k=range(1,6).filter(fn).length, x=frAsk(k,12);
+    return F(Object.assign({key:`PB5c${a}`, sk:'PB5', t:'prob', k:'pba', w, e:a, kk:k,
+      cond:`동전 한 개와 주사위 한 개를 동시에 던질 때 동전은 뒷면, 주사위는 ${nm}${nm.endsWith('눈')?'이':'가'} 나올 확률 (기약분수)`, cb:true},x)); }
+  const x=frAsk(a*c,(a+b)*(c+d));
+  return F(Object.assign({key:`PB5b${a}_${b}_${c}_${d}`, sk:'PB5', t:'prob', k:'pba', w, a, b, c, d,
+    cond:`A 상자(빨간 공 ${a}개, 파란 공 ${b}개)와 B 상자(빨간 공 ${c}개, 파란 공 ${d}개)에서 한 개씩 꺼낼 때 모두 빨간 공일 확률 (기약분수)`, cb:true},x));
+}
+function genPB5(){ if(Math.random()<.4){ let e; do{ e=ri(0,9); }while(e===4||e===5||e===6); return pbA('c',e); }
+  return pbA('b',ri(1,5),ri(1,5),ri(1,5),ri(1,5)); }
 function pb4(r,s,y,c){
   const L=[r,s,y], T=r+s+y, g=gcd(L[c],T);
-  return F({key:'PB4'+r+'_'+s+'_'+y+'_'+c, sk:'PB4', t:'prob', k:'pb4', L, T, c, g,
+  return F({key:'PB4'+r+'_'+s+'_'+y+'_'+c, sk:'PB1', t:'prob', k:'pb4', L, T, c, g,
     cond:`빨간 공 ${r}개, 파란 공 ${s}개${y?`, 노란 공 ${y}개`:''}가 든 주머니에서 한 개를 꺼낼 때 ${PB_COL[c]} 공일 확률 (기약분수)`, cb:true,
     eq:[{fr:[String(L[c]/g),'?']}], ans:T/g});
 }
@@ -10250,9 +10322,9 @@ function genPB1(){ for(let g=0;g<40;g++){ const N=pickOne([6,6,6,10,12,20]), e=r
 function genPB2(){ const r=Math.random();
   if(r<.3) return pb2('c',pickOne(['21','20','31','32','30','33']));
   if(r<.6) return pb2('s',ri(3,11)); if(r<.75) return pb2('d',ri(1,4)); if(r<.9) return pb2('m',pickOne([4,6,12])); return pb2('e',0); }
-function genPB3(){ if(Math.random()<.35) return pb3('a',ri(2,4));
+function genPB3(){ const r=Math.random(); if(r<.25) return pb3('a',ri(2,4)); if(r<.35) return pb3('d'); if(r<.55) return pb3('n',ri(3,11));
   for(let g=0;g<40;g++){ const b=ri(3,12), a=ri(1,b-1); if(gcd(a,b)===1) return pb3('p',a,b); } return pb3('p',2,7); }
-function genPB4(){ for(let g=0;g<60;g++){ const r=ri(1,8), s=ri(1,8), y=Math.random()<.4?ri(1,6):0, c=y?ri(0,2):ri(0,1), L=[r,s,y];
+function genPBbag(){ for(let g=0;g<60;g++){ const r=ri(1,8), s=ri(1,8), y=Math.random()<.4?ri(1,6):0, c=y?ri(0,2):ri(0,1), L=[r,s,y];
   if(L[c]&&gcd(L[c],r+s+y)>1&&r+s+y<=20) return pb4(r,s,y,c); } return pb4(2,4,0,0); }
 
 /* ════════ 열쇠 → 문항 ════════ */
@@ -10262,24 +10334,38 @@ function g2Fact(key){
   if(m=R('PF2(\\d+)_([fn])')) return pf2(+m[1],m[2]);
   if(m=R('PF3(\\d+)_(\\d+)')) return pf3(+m[1],+m[2]);
   if(m=R('PF4(\\d+)_(\\d+)')) return pf4(+m[1],+m[2]);
-  if(m=R('RD([123])_(\\d+)')) return rd(+m[1],+m[1],+m[2]);
-  if(m=R('RD4([123])_(\\d+)')) return rd(4,+m[1],+m[2]);
+  if(m=R('RD1f_(\\d+)_(\\d+)')) return rdF(+m[1],+m[2]);
+  if(m=R('RD(\\d)_(\\d+)_(\\d+|-)_(\\d+)')) return rd(+m[1],+m[2],m[3]==='-'?'':m[3],m[4]);
+  { const old=(lv,f,d)=>{ d=String(d); return f===1?rd(lv,0,'',d):f===2?rd(lv,0,'',d.padStart(2,'0')):rd(lv,0,d[0],d[1]); };   /* 예전 열쇠 */
+    if(m=R('RD([123])_(\\d+)')) return old(+m[1]+1,+m[1],+m[2]);
+    if(m=R('RD4([123])_(\\d+)')) return old(5,+m[1],+m[2]); }
   if(m=R('LF1'+N+'_'+N+'_'+N)) return lf1(+m[1],+m[2],+m[3]);
   if(m=R('LF2'+N+'_'+N+'_'+N+'_'+N)) return lf2(+m[1],+m[2],+m[3],+m[4]);
   if(m=R('LF3([xy])_?'+N+'_'+N)) return lf3(m[1],+m[2],+m[3]);
   if(m=R('LF4'+N+'_'+N+'_'+N)) return lf4(+m[1],+m[2],+m[3]);
+  if(m=R('LF2p'+N+'_'+N+'_'+N)) return lfP(+m[1],+m[2],+m[3]);
+  if(m=R('LF3([qr])'+N+'_'+N+'_'+N)) return lfD(m[1],+m[2],+m[3],+m[4]);
+  if(m=R('LF4t'+N+'_'+N+'_'+N+'_'+N)) return lfT(+m[1],+m[2],+m[3],+m[4]);
+  if(m=R('LF4i'+N+'_'+N)) return lfI(+m[1],+m[2]);
   if(m=R('AG1([ie])_?(\\d+)_(\\d+)')) return ag1(m[1],+m[2],+m[3]);
-  if(m=R('AG2([vb])_?(\\d+)')) return ag2(m[1],+m[2]);
+  if(m=R('AG2([vbx])_?(\\d+)')) return ag2(m[1],+m[2]);
   if(m=R('AG3([srd])_(\\d+)')) return ag3(m[1],+m[2]);
   if(m=R('AG4([xnk])_(\\d+)')) return ag4(m[1],+m[2]);
-  if(m=R('SR1(\\d+)_(\\d+)_(\\d+)_([bs])')) return sr1(+m[1],+m[2],+m[3],m[4]);
+  if(m=R('SR1(\\d+)_(\\d+)_(\\d+)_([bspr])')) return sr1(+m[1],+m[2],+m[3],m[4]);
   if(m=R('SR([23])r_(\\d+)_(\\d+)')) return srP(+m[1],+m[2],+m[3],0);
   if(m=R('SR([23])v_(\\d+)_(\\d+)_(\\d+)')) return srP(+m[1],+m[2],+m[3],+m[4]);
   if(m=R('SR4([23])_(\\d+)_(\\d+)')) return sr4(+m[1],+m[2],+m[3]);
+  if(m=R('SR4e_(\\d+)_(\\d+)_(\\d+)')) return sr4e(+m[1],+m[2],+m[3]);
   if(m=R('PB1(\\d+)_(\\d+)')) return pb1(+m[1],+m[2]);
   if(m=R('PB2c(\\d\\d)')) return pb2('c',m[1]);
   if(m=R('PB2([sdme])(\\d+)')) return pb2(m[1],+m[2]);
   if(m=R('PB3a(\\d+)')) return pb3('a',+m[1]);
+  if(key==='PB3d') return pb3('d');
+  if(m=R('PB3n(\\d+)')) return pb3('n',+m[1]);
+  if(m=R('PB4c(\\d+)_(\\d+)_(\\d+)')) return pbO('c',+m[2],+m[3],+m[1]);
+  if(m=R('PB4s(\\d+)_(\\d+)')) return pbO('s',+m[1],+m[2]);
+  if(m=R('PB5c(\\d+)')) return pbA('c',+m[1]);
+  if(m=R('PB5b(\\d+)_(\\d+)_(\\d+)_(\\d+)')) return pbA('b',+m[1],+m[2],+m[3],+m[4]);
   if(m=R('PB3p(\\d+)_(\\d+)')) return pb3('p',+m[1],+m[2]);
   if(m=R('PB4(\\d+)_(\\d+)_(\\d+)_(\\d+)')) return pb4(+m[1],+m[2],+m[3],+m[4]);
   return null;
@@ -10295,18 +10381,19 @@ Object.assign(TOPICS,{
             {n:4, name:'최소공배수', ex:'12와 18의 최소공배수', gen:genPF4, take:10}],
     cats:[['PF1'],['PF2'],['PF3'],['PF4']]},
   rdec:{k:'rdec', n:'순환소수', sym:'0.3̇', school:'m', col:'#7048e8', soft:'#f0ebff', lit:'#7048e8',
-    desc:'순환소수를 분수로 — 9 · 99 · 90 을 분모로',
-    stages:[{n:1, name:'0.ȧ = a/9', ex:'0.4̇ = □/9', gen:genRD1, take:8},
-            {n:2, name:'0.ȧḃ = ab/99', ex:'0.2̇7̇ = □/99', gen:genRD2, take:10},
-            {n:3, name:'0.aḃ = (ab − a)/90', ex:'0.13̇ = □/90', gen:genRD3, take:10},
-            {n:4, name:'기약분수로', ex:'0.3̇ = 1/□', gen:genRD4, take:10}],
-    cats:[['RD1'],['RD2'],['RD3'],['RD4']]},
+    desc:'유한소수·순환소수 판별 · 순환소수를 분수로 · 기약분수',
+    stages:[{n:1, name:'유한소수? 순환소수?', ex:'7/12 → 순환소수', gen:genRD1, take:10},
+            {n:2, name:'순환마디 한 자리', ex:'0.7̇ = □/9', gen:genRD2, take:8},
+            {n:3, name:'순환마디 두·세 자리', ex:'0.4̇2̇ = □/99', gen:genRD3, take:10},
+            {n:4, name:'순환하지 않는 부분이 있을 때', ex:'0.73̇ = □/90', gen:genRD4, take:10},
+            {n:5, name:'기약분수로', ex:'0.4̇2̇ = 14/□', gen:genRD5, take:10}],
+    cats:[['RD1'],['RD2'],['RD3'],['RD4'],['RD5']]},
   linf:{k:'linf', n:'일차함수', sym:'y=ax+b', school:'m', neg:true, col:'#1971c2', soft:'#e7f1fb', lit:'#1971c2',
-    desc:'함숫값 · 기울기 · 절편 · 직선의 식',
-    stages:[{n:1, name:'함숫값', ex:'y = 2x + 3, x = 4', gen:genLF1, take:12},
-            {n:2, name:'기울기', ex:'(1, 3), (3, 7)', gen:genLF2, take:10},
-            {n:3, name:'x절편 · y절편', ex:'y = 2x − 6 의 x절편', gen:genLF3, take:10},
-            {n:4, name:'직선의 식 구하기', ex:'기울기 2, 점 (1, 5)', gen:genLF4, take:10}],
+    desc:'함숫값 · 평행이동과 절편 · 기울기 · 일차함수의 식',
+    stages:[{n:1, name:'함숫값', ex:'f(x) = 4x − 1, f(2)', gen:genLF1, take:12},
+            {n:2, name:'평행이동 · 절편', ex:'y = 2x − 3 의 y절편', gen:genLF2, take:10},
+            {n:3, name:'기울기 · 증가량', ex:'(1, 3), (3, 7)의 기울기', gen:genLF3, take:10},
+            {n:4, name:'일차함수의 식', ex:'기울기 3, 점 (−1, 2) → b', gen:genLF4, take:10}],
     cats:[['LF1'],['LF2'],['LF3'],['LF4']]},
   angle:{k:'angle', n:'도형의 각', sym:'∠', school:'m', col:'#e8590c', soft:'#fff1e6', lit:'#e8590c',
     desc:'삼각형의 내각·외각 · 이등변삼각형 · 다각형의 내각과 외각',
@@ -10317,18 +10404,19 @@ Object.assign(TOPICS,{
     cats:[['AG1'],['AG2'],['AG3'],['AG4']]},
   simr:{k:'simr', n:'닮음비', sym:'m:n', school:'m', col:'#c2255c', soft:'#fdebf2', lit:'#c2255c',
     desc:'닮음비로 길이 · 넓이의 비 · 부피의 비',
-    stages:[{n:1, name:'대응변의 길이', ex:'2 : 3, 8 cm → □ cm', gen:genSR1, take:10},
+    stages:[{n:1, name:'닮음비 · 대응변 · 둘레', ex:'12 cm, 8 cm → 3 : □', gen:genSR1, take:10},
             {n:2, name:'넓이의 비', ex:'2 : 3 → 4 : □', gen:genSR2, take:10},
             {n:3, name:'부피의 비', ex:'2 : 3 → 8 : □', gen:genSR3, take:10},
-            {n:4, name:'닮음비 거꾸로', ex:'넓이 9 : 16 → 3 : □', gen:genSR4, take:10}],
+            {n:4, name:'닮음비 거꾸로', ex:'부피 27 : 64 → 3 : □', gen:genSR4, take:10}],
     cats:[['SR1'],['SR2'],['SR3'],['SR4']]},
   prob:{k:'prob', n:'확률', sym:'P', school:'m', col:'#2b8a3e', soft:'#ebf7ee', lit:'#2b8a3e',
-    desc:'(사건이 일어나는 경우의 수) ÷ (모든 경우의 수)',
-    stages:[{n:1, name:'한 개 — 주사위·카드', ex:'짝수의 눈 → □/6', gen:genPB1, take:10},
-            {n:2, name:'두 개 — 주사위·동전', ex:'합이 7 → □/36', gen:genPB2, take:10},
-            {n:3, name:'일어나지 않을 확률', ex:'1 − 2/7', gen:genPB3, take:10},
-            {n:4, name:'기약분수로', ex:'빨간 공 → 1/□', gen:genPB4, take:10}],
-    cats:[['PB1'],['PB2'],['PB3'],['PB4']]}
+    desc:'확률의 뜻 · 확률의 성질 · 확률의 덧셈과 곱셈',
+    stages:[{n:1, name:'확률의 뜻', ex:'짝수의 눈 → □/6', gen:genPB1, take:10},
+            {n:2, name:'두 개를 던질 때', ex:'합이 7 → □/36', gen:genPB2, take:10},
+            {n:3, name:'일어나지 않을 확률', ex:'1 − (일어날 확률)', gen:genPB3, take:10},
+            {n:4, name:'확률의 덧셈 (또는)', ex:'p + q', gen:genPB4, take:10},
+            {n:5, name:'확률의 곱셈 (동시에)', ex:'p × q', gen:genPB5, take:10}],
+    cats:[['PB1'],['PB2'],['PB3'],['PB4'],['PB5']]}
 });
 Object.assign(TOPIC_SYMH,{
   pfac:'<span style="font-size:.56em;letter-spacing:-.5px">2³·3</span>',
@@ -10347,14 +10435,23 @@ function g2Hint(f){
     case 'pf3': case 'pf4': { const fa=factorize(f.a), fb=factorize(f.b), g=f.k==='pf3';
       return {t:g?'공통인 소인수를 작은 지수로':'모든 소인수를 큰 지수로', lines:[`${f.a} = ${pfHTML(fa)}`, `${f.b} = ${pfHTML(fb)}`,
         `${g?'최대공약수':'최소공배수'} = ${pfHTML(factorize(f.ans))} = ${B(f.ans)}`, tip(g?'두 수를 동시에 나누는 수로 계속 나눠도 돼요':'최소공배수 = 두 수의 곱 ÷ 최대공약수')]}; }
-    case 'rd': { const x=`x = ${rdHTML(f.nr,f.rp)}`;
-      const L=f.form===1?[x,`10x − x = ${f.n}`,`9x = ${f.n}`,`x = ${f.n}/9`]
-        :f.form===2?[x,`100x − x = ${f.n}`,`99x = ${f.n}`,`x = ${f.n}/99`]
-        :[x,`100x − 10x = ${f.d} − ${f.nr}`,`90x = ${f.n}`,`x = ${f.n}/90`];
-      if(f.lv===4) L.push(`약분: ${f.n}/${f.q} = ${f.n/f.g}/${B(f.q/f.g)}`); else L[L.length-1]=L[L.length-1].replace(/^x = (\d+)/,(m0,n)=>`x = <b>${n}</b>`);
-      return {t:f.form===1?'순환마디가 한 자리 → 분모 9':f.form===2?'순환마디가 두 자리 → 분모 99':'순환하지 않는 숫자 하나 → 분모 90', lines:L,
-        tip:'', svg:''}; }
-    case 'lf1': return {t:'x 자리에 수를 넣어 계산', lines:[`y = ${lfL(f.a,f.b)}`, `y = ${f.a===1?'':f.a===-1?'−':MI(f.a)+' × '}${PV(f.c)}${f.b?(f.b<0?' − '+(-f.b):' + '+f.b):''}`, `y = ${B(f.ans)}`]};
+    case 'rdf': { const a=f.a/f.g, b=f.b/f.g, fs=factorize(b), other=fs.map(x=>x[0]).filter(p=>p!==2&&p!==5);
+      return {t:'기약분수로 고친 뒤 분모를 소인수분해', lines:[f.g>1?`${f.a}/${f.b} = ${a}/${b}`:`${a}/${b} 은 기약분수`, `분모 ${b} = ${pfHTML(fs)}`,
+        other.length?`2, 5 말고 ${other.join(', ')}이 있어요 → <b>순환소수</b>`:`소인수가 2, 5뿐이에요 → <b>유한소수</b>`,
+        tip('분모의 소인수가 2 또는 5뿐이면 유한소수')]}; }
+    case 'rd': { const m=f.nr.length, L=f.rp.length, P=k=>Math.pow(10,k), dec=rdHTML(f.nr,f.rp,f.I);
+      const big=P(m+L), sm=P(m), lines=[`x = ${dec} 이라 하면`,
+        `${big}x − ${sm===1?'':sm}x = ${f.A} − ${f.Bv}`, `${f.q}x = ${f.n}`, `x = ${f.n}/${f.q}`];
+      if(f.lv===5) lines.push(`약분: ${f.n}/${f.q} = ${f.n/f.g}/${B(f.q/f.g)}`);
+      else lines[3]=`x = <b>${f.n}</b>/${f.q}`;
+      return {t:`분모: 순환마디 ${L}자리 → 9 ${L}개${m?`, 순환하지 않는 ${m}자리 → 0 ${m}개`:''}`, lines,
+        svg:''}; }
+    case 'lf1': return {t:'x 자리에 수를 넣어 계산', lines:[`f(x) = ${lfL(f.a,f.b)}`, `f(${MI(f.c)}) = ${f.a===1?'':f.a===-1?'−':MI(f.a)+' × '}${PV(f.c)}${f.b?(f.b<0?' − '+(-f.b):' + '+f.b):''}`, `= ${B(f.ans)}`]};
+    case 'lfp': return {t:'y축 방향으로 평행이동하면 y절편만 바뀌어요', lines:[`y = ${lfL(f.a,f.b)} → y = ${lfL(f.a,f.b)} ${f.m<0?'− '+(-f.m):'+ '+f.m}`, `y = ${lfL(f.a,f.b+f.m)}`, `y절편 = ${B(f.ans)}`]};
+    case 'lfd': return f.w==='q'?{t:'(y의 값의 증가량) = (기울기) × (x의 값의 증가량)', lines:[`${MI(f.a)} × ${f.dx} = ${B(f.ans)}`, tip('감소하면 증가량이 음수예요')]}
+      :{t:'기울기 = (y의 값의 증가량) ÷ (x의 값의 증가량)', lines:[`y의 값의 증가량 = ${MI(f.a*f.dx)}`, `${MI(f.a*f.dx)} ÷ ${f.dx} = ${B(f.ans)}`, tip('“감소한다”는 증가량이 음수라는 뜻')]};
+    case 'lft': return {t:'기울기를 먼저 구하고 한 점을 넣기', lines:[`기울기 = ${MI(f.y2-f.y1)} ÷ ${MI(f.x2-f.x1)} = ${MI(f.a)}`, `${MI(f.y1)} = ${MI(f.a)} × ${PV(f.x1)} + b`, `b = ${B(f.ans)}`]};
+    case 'lfi': return {t:'두 점 (x절편, 0), (0, y절편)을 지나요', lines:[`(${MI(f.m)}, 0), (0, ${MI(f.n)})`, `기울기 = (${MI(f.n)} − 0) ÷ (0 − ${PV(f.m)}) = ${B(f.ans)}`]};
     case 'lf2': return {t:'기울기 = (y의 값의 증가량) ÷ (x의 값의 증가량)', lines:[`(${MI(f.y2)} − ${PV(f.y1)}) ÷ (${MI(f.x2)} − ${PV(f.x1)})`, `= ${MI(f.y2-f.y1)} ÷ ${MI(f.x2-f.x1)} = ${B(f.ans)}`]};
     case 'lf3': return f.w==='y'?{t:'y절편은 x = 0 일 때 y의 값', lines:[`y = ${lfL(f.a,f.b)}`, `x = 0 → y = ${B(f.ans)}`, tip('y = ax + b 에서 b 가 y절편')]}
       :{t:'x절편은 y = 0 일 때 x의 값', lines:[`0 = ${lfL(f.a,f.b)}`, `${lfL(f.a,0)} = ${MI(-f.b)}`, `x = ${B(f.ans)}`]};
@@ -10362,26 +10459,38 @@ function g2Hint(f){
     case 'ag1': return f.w==='i'?{t:'삼각형의 세 내각의 합은 180°', lines:[`180° − ${f.a}° − ${f.b}° = ${B(f.ans)}°`]}
       :{t:'외각 = 이웃하지 않는 두 내각의 합', lines:[`${f.a}° + ${f.b}° = ${B(f.ans)}°`, tip('180°에서 이웃한 내각을 빼도 같아요')]};
     case 'ag2': return f.w==='v'?{t:'두 밑각의 크기가 같아요', lines:[`(180° − ${f.v}°) ÷ 2 = ${B(f.ans)}°`]}
-      :{t:'두 밑각의 크기가 같아요', lines:[`180° − ${f.v}° × 2 = ${B(f.ans)}°`]};
+      :f.w==='b'?{t:'두 밑각의 크기가 같아요', lines:[`180° − ${f.v}° × 2 = ${B(f.ans)}°`]}
+      :{t:'밑각을 먼저, 외각은 180°에서 빼기', lines:[`∠C = (180° − ${f.v}°) ÷ 2 = ${(180-f.v)/2}°`, `외각 = 180° − ${(180-f.v)/2}° = ${B(f.ans)}°`, tip(`이웃하지 않는 두 내각의 합: ${f.v}° + ${(180-f.v)/2}°`)]};
     case 'ag3': return f.w==='s'?{t:'n각형의 내각의 합 = 180° × (n − 2)', lines:[`180° × (${f.n} − 2) = ${B(f.ans)}°`, tip('한 꼭짓점에서 대각선을 그으면 삼각형 n − 2 개')]}
       :f.w==='r'?{t:'내각의 합을 n으로 나누기', lines:[`180° × (${f.n} − 2) ÷ ${f.n}`, `= ${180*(f.n-2)}° ÷ ${f.n} = ${B(f.ans)}°`, tip(`외각으로: 180° − 360° ÷ ${f.n}`)]}
       :{t:'대각선의 개수 = n(n − 3) ÷ 2', lines:[`${f.n} × (${f.n} − 3) ÷ 2 = ${B(f.ans)}`]};
     case 'ag4': return f.w==='x'?{t:'외각의 크기의 합은 항상 360°', lines:[`360° ÷ ${f.n} = ${B(f.ans)}°`]}
       :f.w==='n'?{t:'외각의 합 360° 를 한 외각으로 나누기', lines:[`360° ÷ ${360/f.n}° = ${B(f.n)}`, `정${KN(f.n)}각형`]}
       :{t:'먼저 한 외각을 구하기', lines:[`한 외각 = 180° − ${180-360/f.n}° = ${360/f.n}°`, `360° ÷ ${360/f.n}° = ${B(f.n)}`, `정${KN(f.n)}각형`]};
-    case 'sr1': return {t:'닮음비 = 대응변의 길이의 비', lines:f.w==='b'?[`${f.m} : ${f.n} = ${f.m*f.kk} : □`, `${f.m*f.kk} ÷ ${f.m} × ${f.n} = ${B(f.ans)}`]
+    case 'sr1': if(f.w==='r') return {t:'대응변의 길이의 비를 가장 간단한 자연수의 비로', lines:[`${f.m*f.kk} : ${f.n*f.kk}`, `= ${f.m} : ${B(f.n)} (${f.kk}로 나누기)`]};
+      if(f.w==='p') return {t:'둘레의 비 = 닮음비', lines:[`${f.m} : ${f.n} = ${f.m*f.kk*3} : □`, `${f.m*f.kk*3} ÷ ${f.m} × ${f.n} = ${B(f.ans)}`]};
+      return {t:'닮음비 = 대응변의 길이의 비', lines:f.w==='b'?[`${f.m} : ${f.n} = ${f.m*f.kk} : □`, `${f.m*f.kk} ÷ ${f.m} × ${f.n} = ${B(f.ans)}`]
       :[`${f.m} : ${f.n} = □ : ${f.n*f.kk}`, `${f.n*f.kk} ÷ ${f.n} × ${f.m} = ${B(f.ans)}`]};
     case 'srp': { const e=f.p===2?'²':'³', nm=f.p===2?'넓이':'부피';
       return {t:`${nm}의 비 = 닮음비의 ${f.p===2?'제곱':'세제곱'}`, lines:f.kk?[`${nm}의 비 = ${f.m}${e} : ${f.n}${e} = ${Math.pow(f.m,f.p)} : ${Math.pow(f.n,f.p)}`,
         `${Math.pow(f.m,f.p)*f.kk} ÷ ${Math.pow(f.m,f.p)} × ${Math.pow(f.n,f.p)} = ${B(f.ans)}`]:[`${f.m}${e} : ${f.n}${e} = ${Math.pow(f.m,f.p)} : ${B(f.ans)}`]}; }
+    case 'sr4e': return {t:'부피의 비 → 닮음비 → 모서리', lines:[`${f.m*f.m*f.m} : ${f.n*f.n*f.n} = ${f.m}³ : ${f.n}³ → 닮음비 ${f.m} : ${f.n}`, `${f.n*f.kk} ÷ ${f.n} × ${f.m} = ${B(f.ans)}`]};
     case 'sr4': return {t:`${f.p===2?'제곱':'세제곱'}해서 그 수가 되는 수 찾기`, lines:[`${Math.pow(f.m,f.p)} = ${f.m}${f.p===2?'²':'³'}, ${Math.pow(f.n,f.p)} = ${f.n}${f.p===2?'²':'³'}`, `닮음비 ${f.m} : ${B(f.n)}`]};
     case 'pb1': { const list=range(1,f.N).filter(PB_EV[f.e][1]);
       return {t:'(일어나는 경우의 수) ÷ (모든 경우의 수)', lines:[`모든 경우: ${f.N}가지`, `${list.join(', ')} → ${B(f.c)}가지`, `확률 = ${f.c}/${f.N}`]}; }
     case 'pb2': if(f.w==='c') return {t:'동전 n개의 모든 경우는 2ⁿ가지', lines:[`모든 경우: 2${f.n===2?'²':'³'} = ${f.T}가지`, `앞면 ${f.kk}개: ${B(f.c)}가지`, `확률 = ${f.c}/${f.T}`]};
       { const [,fn]=PB2_EV[f.w](f.v), L=D2().filter(fn).map(([a,b])=>`(${a}, ${b})`);
         return {t:'모든 경우: 6 × 6 = 36가지', lines:[L.join(' '), `→ ${B(f.c)}가지`, `확률 = ${f.c}/36`]}; }
-    case 'pb3': return f.w==='a'?{t:'(적어도 한 번) = 1 − (한 번도 아닐 확률)', lines:[`모두 뒷면일 확률 = 1/${f.T}`, `1 − 1/${f.T} = ${B(f.ans)}/${f.T}`]}
+    case 'pb3': if(f.w==='d') return {t:'1 − (같은 눈이 나올 확률)', lines:['같은 눈: (1, 1) … (6, 6) → 6가지', `1 − 6/36 = ${B(30)}/36`]};
+      if(f.w==='n') return {t:'1 − (합이 '+f.v+'일 확률)', lines:[`합이 ${f.v}: ${f.c}가지`, `1 − ${f.c}/36 = ${B(f.ans)}/36`]};
+      return f.w==='a'?{t:'(적어도 한 번) = 1 − (한 번도 아닐 확률)', lines:[`모두 뒷면일 확률 = 1/${f.T}`, `1 − 1/${f.T} = ${B(f.ans)}/${f.T}`]}
       :{t:'(일어나지 않을 확률) = 1 − (일어날 확률)', lines:[`1 − ${f.a}/${f.b} = ${f.b}/${f.b} − ${f.a}/${f.b} = ${B(f.ans)}/${f.b}`]};
+    case 'pbo': { const N=f.N, s=f.c1+f.c2, g=gcd(s,N);
+      return {t:'동시에 일어나지 않으면 확률을 더해요', lines:f.w==='c'?[`${KR_MUL[f.a]}: ${f.c1}개, ${KR_MUL[f.b]}: ${f.c2}개`, `${f.c1}/${N} + ${f.c2}/${N} = ${s}/${N}${g>1?` = ${s/g}/${N/g}`:''}`]
+        :[`합이 ${f.a}: ${f.c1}가지, 합이 ${f.b}: ${f.c2}가지`, `${f.c1}/36 + ${f.c2}/36 = ${s}/36${g>1?` = ${s/g}/${36/g}`:''}`]}; }
+    case 'pba': if(f.w==='c'){ const g=gcd(f.kk,12); return {t:'서로 영향을 끼치지 않으면 확률을 곱해요', lines:[`뒷면: 1/2, ${PB_EV[f.e][0]}: ${f.kk}/6`, `1/2 × ${f.kk}/6 = ${f.kk}/12${g>1?` = ${f.kk/g}/${12/g}`:''}`]}; }
+      { const T1=f.a+f.b, T2=f.c+f.d, n=f.a*f.c, d=T1*T2, g=gcd(n,d);
+        return {t:'서로 영향을 끼치지 않으면 확률을 곱해요', lines:[`A에서 빨간 공: ${f.a}/${T1}, B에서 빨간 공: ${f.c}/${T2}`, `${f.a}/${T1} × ${f.c}/${T2} = ${n}/${d}${g>1?` = ${n/g}/${d/g}`:''}`]}; }
     case 'pb4': return {t:'확률을 구한 뒤 약분하기', lines:[`모든 경우: ${f.L.filter(Boolean).join(' + ')} = ${f.T}가지`, `${PB_COL[f.c]} 공: ${f.L[f.c]}가지`,
       `${f.L[f.c]}/${f.T} = ${f.L[f.c]/f.g}/${B(f.ans)}`]};
   }
@@ -10395,14 +10504,15 @@ function g2Preview(t,n){
           ()=>H(pf2(12,'f'),'소인수분해한 뒤 각 지수에 1을 더해서 모두 곱해요.'),
           ()=>H(pf3(24,36),'두 수에 공통으로 들어 있는 소인수를 지수가 작은 쪽으로 곱해요.'),
           ()=>H(pf4(12,18),'두 수의 모든 소인수를 지수가 큰 쪽으로 곱해요.')],
-    rdec:[()=>H(rd(1,1,4),'순환마디가 한 자리면 분모는 9, 분자는 순환마디예요.'),
-          ()=>H(rd(2,2,27),'순환마디가 두 자리면 분모는 99, 분자는 순환마디예요.'),
-          ()=>H(rd(3,3,13),'순환하지 않는 숫자가 하나 있으면 분모는 90, 분자는 (전체 수) − (순환하지 않는 부분)이에요.'),
-          ()=>H(rd(4,1,3),'분수로 바꾼 뒤 약분해서 기약분수로 만들어요.')],
-    linf:[()=>H(lf1(2,3,4),'x 자리에 수를 넣어 y의 값을 구해요. 음수는 괄호를 씌워 넣어요.',{body:neg}),
-          ()=>H(lf2(1,3,3,7),'기울기 = (y의 증가량) ÷ (x의 증가량). 빼는 순서를 두 점에서 똑같이 맞춰요.',{body:neg}),
-          ()=>H(lf3('x',2,-6),'x절편은 y = 0 을 넣고, y절편은 x = 0 을 넣어요.',{body:neg}),
-          ()=>H(lf4(2,1,5),'y = ax + b 에 지나는 점의 x, y를 넣으면 b가 나와요.',{body:neg})],
+    rdec:[()=>H(rdF(7,12),'기약분수로 나타낸 뒤 분모를 소인수분해해요. 소인수가 2, 5뿐이면 유한소수, 다른 소인수가 있으면 순환소수예요. 답은 단추로 골라요.'),
+          ()=>H(rd(2,0,'','7'),'x = 0.7̇ 이라 하고 10x − x 를 계산하면 소수점 아래가 사라져요. 순환마디가 한 자리면 분모는 9예요.'),
+          ()=>H(rd(3,0,'','42'),'순환마디가 두 자리면 100x − x, 세 자리면 1000x − x. 분모는 99, 999예요.'),
+          ()=>H(rd(4,0,'7','3'),'순환하지 않는 숫자가 있으면 10의 거듭제곱 두 개를 곱해 빼요. 분모는 90, 990 …'),
+          ()=>H(rd(5,0,'','42'),'분수로 바꾼 뒤 분자와 분모를 최대공약수로 나눠 기약분수로 만들어요.')],
+    linf:[()=>H(lf1(4,-1,2),'f(2)는 x에 2를 넣었을 때의 함숫값이에요. 음수는 괄호를 씌워 넣어요.',{body:neg}),
+          ()=>H(lf3('x',2,-6),'x절편은 y = 0 을, y절편은 x = 0 을 넣어요. y축 방향으로 평행이동하면 y절편만 바뀌어요.',{body:neg}),
+          ()=>H(lf2(1,3,3,7),'기울기 = (y의 값의 증가량) ÷ (x의 값의 증가량). 두 점에서 빼는 순서를 똑같이 맞춰요.',{body:neg}),
+          ()=>H(lfT(1,3,3,7),'기울기를 먼저 구하고, 지나는 점의 x, y를 y = ax + b 에 넣으면 b가 나와요.',{body:neg})],
     angle:[()=>H(ag1('i',50,60),'세 내각의 합은 180°, 한 외각은 이웃하지 않는 두 내각의 합이에요.'),
            ()=>H(ag2('v',40),'이등변삼각형의 두 밑각은 크기가 같아요.'),
            ()=>H(ag3('s',6),'n각형은 삼각형 (n − 2)개로 나눌 수 있어요. 내각의 합 = 180° × (n − 2).'),
@@ -10411,10 +10521,11 @@ function g2Preview(t,n){
           ()=>H(srP(2,2,3,0),'닮음비가 m : n 이면 넓이의 비는 m² : n².'),
           ()=>H(srP(3,2,3,0),'닮음비가 m : n 이면 부피의 비는 m³ : n³.'),
           ()=>H(sr4(2,3,4),'넓이의 비에서 닮음비는 제곱근, 부피의 비에서는 세제곱근을 생각해요.')],
-    prob:[()=>H(pb1(6,0),'확률 = (일어나는 경우의 수) ÷ (모든 경우의 수). 분모는 모든 경우의 수 그대로예요.'),
-          ()=>H(pb2('s',7),'주사위 두 개는 36가지, 동전 n개는 2ⁿ가지. 순서쌍으로 빠짐없이 세요.'),
-          ()=>H(pb3('p',2,7),'일어나지 않을 확률 = 1 − (일어날 확률). "적어도"가 나오면 이 방법이 빨라요.'),
-          ()=>H(pb4(2,4,0,0),'확률을 구한 뒤 분자와 분모를 최대공약수로 나눠 기약분수로 만들어요.')]};
+    prob:[()=>H(pb1(6,0),'확률 = (일어나는 경우의 수) ÷ (모든 경우의 수). 1~3단계는 분모를 모든 경우의 수 그대로 보여 줘요.'),
+          ()=>H(pb2('s',7),'서로 다른 주사위 두 개는 6 × 6 = 36가지, 동전 n개는 2ⁿ가지. 순서쌍으로 빠짐없이 세요.'),
+          ()=>H(pb3('a',2),'일어나지 않을 확률 = 1 − (일어날 확률). “적어도”가 나오면 이 방법이 빨라요.'),
+          ()=>H(pbO('c',4,5,12),'두 사건이 동시에 일어나지 않으면 확률을 더해요. 답은 기약분수로 — 보이는 분자나 분모에 맞춰 □를 채워요.'),
+          ()=>H(pbA('c',3),'두 사건이 서로 영향을 끼치지 않으면 확률을 곱해요. 답은 기약분수로.')]};
   return (P[t]&&P[t][n-1]||P[t][0])();
 }
 function g2Note(t,fromHint){
@@ -10430,20 +10541,27 @@ function g2Note(t,fromHint){
       miss:[{w:'2³ × 3 의 약수는 3 × 1 = 3개', r:'8개', y:'지수에 1을 더해서 곱해요: (3 + 1) × (1 + 1) = 8.'},
             {w:'12 = 3 × 4', r:'2² × 3', y:'4는 소수가 아니에요. 소수만 남을 때까지 나눠요.'},
             {w:'12와 18의 최소공배수 = 216', r:'36', y:'두 수의 곱이 아니에요. 216 ÷ 최대공약수 6 = 36.'}]},
-    rdec:{sub:'순환소수 · 순환마디 · 순환소수를 분수로',
-      memo:[{h:'순환소수', html:`<div class="kcp">소수점 아래 어떤 자리부터 같은 숫자의 배열이 한없이 되풀이되는 무한소수. 되풀이되는 부분을 <b>순환마디</b>라 하고, 처음과 끝 숫자 위에 점을 찍어요.</div>
-          ${chipList([`0.444… = ${rdHTML('','4')}`,`0.272727… = ${rdHTML('','27')}`,`0.1333… = ${rdHTML('1','3')}`])}`},
-        {h:'분수로 바꾸는 규칙', html:tb([`${rdHTML('','a')} = a/9`,`${rdHTML('','ab')} = ab/99`,`${rdHTML('a','b')} = (ab − a)/90`,
-          '<small>분모: 순환마디의 숫자 개수만큼 9, 그 뒤에 순환하지 않는 숫자 개수만큼 0</small>'])}],
-      ways:[fromHint('순환마디 한 자리','0.4̇',rd(1,1,4)),fromHint('순환마디 두 자리','0.2̇7̇',rd(2,2,27)),fromHint('순환하지 않는 숫자가 있을 때','0.13̇',rd(3,3,13))],
-      miss:[{w:'0.1 3̇ = 13/99', r:'12/90', y:'1은 순환하지 않아요. 분모는 90, 분자는 13 − 1 = 12.'},
-            {w:'0.4̇ = 4/10', r:'4/9', y:'4/10 은 0.4(유한소수)예요. 순환마디 한 자리는 분모 9.'}]},
-    linf:{sub:'함숫값 · 기울기 · x절편과 y절편 · 직선의 식',
-      memo:[{h:'y = ax + b', html:tb(['<b>a</b> — 기울기 = (y의 값의 증가량) ÷ (x의 값의 증가량)','<b>b</b> — y절편 (x = 0 일 때 y)','<b>x절편</b> — y = 0 일 때 x의 값 = −b ÷ a',
-        '기울기가 같으면 평행, a > 0 이면 오른쪽 위로, a < 0 이면 오른쪽 아래로'])}],
-      ways:[fromHint('함숫값','y = 2x + 3, x = 4',lf1(2,3,4)),fromHint('두 점을 지나는 직선의 기울기','(1, 3), (3, 7)',lf2(1,3,3,7)),
-            fromHint('x절편','y = 2x − 6',lf3('x',2,-6)),fromHint('직선의 식','기울기 2, 점 (1, 5)',lf4(2,1,5))],
-      miss:[{w:'y = −2x + 1, x = −3 → y = −5', r:'7', y:'−2 × (−3) = +6 이에요. 음수를 넣을 때는 괄호를 씌워요.'},
+    rdec:{sub:'유한소수와 순환소수 · 순환소수를 분수로 · 유리수와 순환소수',
+      memo:[{h:'유한소수? 순환소수?', html:`<div class="kcp">정수가 아닌 유리수를 <b>기약분수</b>로 나타냈을 때 분모의 소인수가 <b>2 또는 5뿐</b>이면 유한소수, 그 밖의 소인수가 있으면 순환소수예요.</div>`},
+        {h:'순환소수', html:`<div class="kcp">소수점 아래 어떤 자리부터 한 숫자 또는 몇 개 숫자의 배열이 끝없이 되풀이되는 무한소수. 되풀이되는 가장 짧은 부분이 <b>순환마디</b>이고, 처음과 끝 숫자 위에 점을 찍어요.</div>
+          ${chipList([`0.777… = ${rdHTML('','7')}`,`0.4242… = ${rdHTML('','42')}`,`0.7333… = ${rdHTML('7','3')}`,`0.264264… = ${rdHTML('','264')}`])}`},
+        {h:'분수로 바꾸는 방법', html:tb(['x = (순환소수)로 놓고 10의 거듭제곱을 곱해 소수점 아래가 같은 두 식을 만든 뒤 빼요',
+          `${rdHTML('','7')} : 10x − x = 7 → <b>7/9</b>`,`${rdHTML('','42')} : 100x − x = 42 → <b>42/99 = 14/33</b>`,`${rdHTML('7','3')} : 100x − 10x = 73 − 7 → <b>66/90 = 11/15</b>`,
+          '<small>분모: 순환마디의 숫자 개수만큼 9, 이어서 순환하지 않는 소수 부분의 숫자 개수만큼 0</small>'])}],
+      ways:[fromHint('유한소수 판별','21/84',rdF(21,84)),fromHint('순환마디 한 자리','0.7̇',rd(2,0,'','7')),fromHint('순환마디 두 자리','0.4̇2̇',rd(3,0,'','42')),
+            fromHint('순환하지 않는 부분이 있을 때','0.73̇',rd(4,0,'7','3')),fromHint('정수 부분이 있을 때','2.3̇',rd(2,2,'','3'))],
+      miss:[{w:'7/14 는 분모에 7이 있으니 순환소수', r:'유한소수', y:'먼저 기약분수로! 7/14 = 1/2 → 분모가 2뿐이라 유한소수.'},
+            {w:'0.73̇ = 73/99', r:'66/90', y:'7은 순환하지 않아요. 100x − 10x = 73 − 7 = 66, 분모 90.'},
+            {w:'0.7̇ = 7/10', r:'7/9', y:'7/10 은 0.7(유한소수)예요. 순환마디 한 자리는 분모 9.'}]},
+    linf:{sub:'함숫값 · 평행이동 · 절편 · 기울기 · 일차함수의 식',
+      memo:[{h:'y = ax + b (a ≠ 0)', html:tb(['<b>f(a)</b> — x = a 일 때의 함숫값','y = ax + b 의 그래프 = y = ax 의 그래프를 <b>y축의 방향으로 b만큼 평행이동</b>한 직선',
+        '<b>x절편</b> — y = 0 일 때 x의 값 · <b>y절편</b> — x = 0 일 때 y의 값 (= b)','<b>기울기</b> = (y의 값의 증가량) ÷ (x의 값의 증가량) = a',
+        'a > 0 이면 오른쪽 위로, a < 0 이면 오른쪽 아래로 향하는 직선 · 기울기가 같으면 평행'])},
+        {h:'일차함수의 식 구하기', html:tb(['기울기와 y절편 → y = ax + b 바로','기울기와 한 점 → y = ax + b 에 점을 넣어 b','두 점 → 기울기를 구한 뒤 한 점을 넣어 b','x절편 m, y절편 n → 두 점 (m, 0), (0, n)'])}],
+      ways:[fromHint('함숫값','f(x) = 4x − 1, f(2)',lf1(4,-1,2)),fromHint('x절편','y = 2x − 6',lf3('x',2,-6)),fromHint('평행이동','y = 2x + 1, −3만큼',lfP(2,1,-3)),
+            fromHint('두 점을 지나는 직선의 기울기','(1, 3), (3, 7)',lf2(1,3,3,7)),fromHint('증가량에서 기울기','x 3 증가, y 9 감소',lfD('r',-3,3,-1)),
+            fromHint('기울기와 한 점','기울기 3, 점 (−1, 2)',lf4(3,-1,2)),fromHint('두 점','(1, 3), (3, 7)',lfT(1,3,3,7))],
+      miss:[{w:'f(x) = −2x + 1, f(−3) = −5', r:'7', y:'−2 × (−3) = +6 이에요. 음수를 넣을 때는 괄호를 씌워요.'},
             {w:'(1, 3), (3, 7) 의 기울기 = 2/4', r:'2', y:'y의 증가량 ÷ x의 증가량 = 4 ÷ 2. 거꾸로 나누지 않아요.'},
             {w:'y = 2x − 6 의 x절편 = −6', r:'3', y:'−6은 y절편이에요. x절편은 y = 0 을 넣어 2x = 6, x = 3.'}]},
     angle:{sub:'삼각형의 내각과 외각 · 이등변삼각형 · 다각형의 내각과 외각',
@@ -10462,14 +10580,15 @@ function g2Note(t,fromHint){
       miss:[{w:'닮음비 2 : 3 → 넓이의 비 2 : 3', r:'4 : 9', y:'넓이는 가로와 세로가 함께 늘어나서 제곱의 비예요.'},
             {w:'닮음비 1 : 2 → 부피 2배', r:'8배', y:'부피는 세 방향으로 늘어나서 2³ = 8배.'},
             {w:'넓이의 비 9 : 16 → 닮음비 9 : 16', r:'3 : 4', y:'넓이의 비는 닮음비의 제곱이에요. 거꾸로 가면 제곱해서 그 수가 되는 수.'}]},
-    prob:{sub:'확률 · 두 개를 던질 때 · 일어나지 않을 확률 · 기약분수',
-      memo:[{h:'확률', html:`<div class="kcp">확률 p = (사건 A가 일어나는 경우의 수) ÷ (모든 경우의 수)</div>`+tb(['0 ≤ p ≤ 1 — 반드시 일어나면 1, 절대 일어나지 않으면 0',
-        '(A가 일어나지 않을 확률) = 1 − p','주사위 두 개: 6 × 6 = 36가지 · 동전 n개: 2ⁿ가지'])}],
-      ways:[fromHint('주사위 한 개','짝수의 눈',pb1(6,0)),fromHint('주사위 두 개','합이 7',pb2('s',7)),fromHint('동전 세 개','앞면 2개',pb2('c','32')),
-            fromHint('적어도 한 번','동전 3개',pb3('a',3)),fromHint('기약분수로','주머니의 공',pb4(2,4,0,0))],
+    prob:{sub:'확률의 뜻 · 확률의 성질 · 확률의 덧셈과 곱셈',
+      memo:[{h:'확률', html:`<div class="kcp">(사건 A가 일어날 확률) = (사건 A가 일어나는 경우의 수) ÷ (모든 경우의 수)</div>`+tb(['0 ≤ p ≤ 1 — 절대로 일어나지 않으면 0, 반드시 일어나면 1',
+        '(A가 일어나지 않을 확률) = 1 − p · “적어도”는 1 − (모두 아닐 확률)','서로 다른 주사위 두 개: 6 × 6 = 36가지 · 동전 n개: 2ⁿ가지'])},
+        {h:'확률의 계산', html:tb(['두 사건이 <b>동시에 일어나지 않을</b> 때 — (A 또는 B) = <b>p + q</b>','두 사건이 <b>서로 영향을 끼치지 않을</b> 때 — (A와 B가 동시에) = <b>p × q</b>'])}],
+      ways:[fromHint('주사위 한 개','짝수의 눈',pb1(6,0)),fromHint('주사위 두 개','합이 7',pb2('s',7)),fromHint('적어도 한 번','동전 2개',pb3('a',2)),
+            fromHint('확률의 덧셈','4의 배수 또는 5의 배수',pbO('c',4,5,12)),fromHint('확률의 곱셈','동전 뒷면, 주사위 소수의 눈',pbA('c',3))],
       miss:[{w:'두 주사위의 합이 7: (1, 6) (2, 5) (3, 4) → 3/36', r:'6/36', y:'(6, 1) (5, 2) (4, 3)도 있어요. 두 주사위는 서로 다른 것으로 세요.'},
-            {w:'동전 2개에서 앞면 1개 = 1/3', r:'2/4', y:'모든 경우는 (앞, 앞) (앞, 뒤) (뒤, 앞) (뒤, 뒤) 4가지예요.'},
-            {w:'적어도 한 개 앞면 = 1/8', r:'7/8', y:'1/8은 모두 뒷면일 확률이에요. 1에서 빼요.'}]}};
+            {w:'적어도 한 번 앞면(동전 2번) = 1/4', r:'3/4', y:'1/4은 두 번 모두 뒷면일 확률이에요. 1에서 빼요.'},
+            {w:'준서가 뽑힐 확률 1/3, 지우가 뽑힐 확률 1/4 → 둘 다 뽑힐 확률 1/3 + 1/4', r:'1/12', y:'서로 영향을 끼치지 않는 두 사건이 함께 일어나면 곱해요.'}]}};
   return N[t];
 }
 { const f0=extFact, v0=extVariant, h0=extHint, p0=extPreview, n0=extNote;
@@ -10481,7 +10600,7 @@ function g2Note(t,fromHint){
 { const q0=qFigOf; qFigOf=f=>f.t==='angle'&&(f.k==='ag1'||f.k==='ag2')?agSVG(f):q0(f); }
 /* 실전 — 꼭대기 단계는 한 유형만 나오지 않게 네 유형을 섞어요 (마지막 유형을 조금 더 자주) */
 G2T.forEach(t=>{ const T=TOPICS[t], g=T.stages.map(s=>s.gen);
-  T.realStages=T.stages.slice(0,3).concat([{n:4, name:'섞어서', ex:'모든 유형', take:10, gen:()=>pickOne([g[0],g[1],g[2],g[3],g[3]])()}]); });
+  const L=T.stages.length; T.realStages=T.stages.slice(0,L-1).concat([{n:L, name:'섞어서', ex:'모든 유형', take:10, gen:()=>pickOne(g.concat([g[L-1]]))()}]); });
 /* 학교 목록에 넣기 — 교육과정 순서 */
 { const M=SCHOOLS.find(s=>s.k==='m');
   M.topics=['int','pfac','power','lineq','rdec','expo','linf','angle','simr','pyth','cnt','prob','root','factor','trig'].filter(t=>TOPICS[t]);
@@ -11724,11 +11843,11 @@ const PREQ={
   'logx:1':[['expo',1],['root',1]], 'logx:2':[['expo',1],['power',2]], 'logx:3':[['logx',2]], 'logx:4':[['logx',2],['expo',2]],
   'tfn:1':[['fmul',3]], 'tfn:2':[['trig',1]], 'tfn:3':[['tfn',2],['trig',2]], 'tfn:4':[['tfn',2]], 'tfn:5':[['trig',4],['root',2]],
   'pfac:2':[['pfac',1]], 'pfac:3':[['gugu',9]], 'pfac:4':[['pfac',3]],
-  'rdec:2':[['rdec',1]], 'rdec:3':[['rdec',2]], 'rdec:4':[['rdec',2],['pfac',3]],
-  'linf:1':[['int',3]], 'linf:2':[['int',2]], 'linf:3':[['lineq',1]], 'linf:4':[['linf',1],['lineq',2]],
+  'rdec:1':[['pfac',1]], 'rdec:3':[['rdec',2]], 'rdec:4':[['rdec',3]], 'rdec:5':[['rdec',3],['pfac',3]],
+  'linf:1':[['int',3]], 'linf:2':[['lineq',1]], 'linf:3':[['int',2]], 'linf:4':[['linf',3],['lineq',2]],
   'angle:2':[['angle',1]], 'angle:3':[['angle',1]], 'angle:4':[['angle',3]],
   'simr:2':[['simr',1],['power',1]], 'simr:3':[['simr',1],['power',2]], 'simr:4':[['simr',2]],
-  'prob:1':[['cnt',1]], 'prob:2':[['cnt',3]], 'prob:3':[['prob',1]], 'prob:4':[['prob',1],['pfac',3]],
+  'prob:1':[['cnt',1]], 'prob:2':[['cnt',3]], 'prob:3':[['prob',1]], 'prob:4':[['prob',1],['cnt',2]], 'prob:5':[['prob',1],['cnt',3]],
   'comb:1':[['cnt',3]], 'comb:2':[['comb',1]], 'comb:3':[['cnt',3],['comb',2]]
 };
 const stName=(t,n)=>{ const s=(TOPICS[t]&&TOPICS[t].stages||[]).find(x=>x.n===n); return s?s.name:''; };
