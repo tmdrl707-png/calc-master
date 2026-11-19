@@ -1204,6 +1204,10 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .tagw.ttop{background:linear-gradient(135deg,#ffd84d,#ff9f1c);color:#2a1d00}
 
 /* 학교 홈 — 학년 묶음 머리글 · 잠긴 주제 접기 */
+.grtabs{grid-column:1/-1;display:flex;gap:8px;margin:2px 0 4px;position:sticky;top:0;z-index:5;background:var(--bg,#f4f4f4);padding:6px 0}
+.grtab{flex:1;min-width:0;border:2px solid var(--line,#e3e3e3);background:#fff;border-radius:14px;padding:11px 6px;font:inherit;font-size:17px;font-weight:800;color:var(--dim);line-height:1.2;cursor:pointer}
+.grtab small{display:block;font-size:11px;font-weight:700;opacity:.8;margin-top:2px}
+.grtab.on{background:var(--ink,#111);border-color:var(--ink,#111);color:#fff}
 .grh{grid-column:1/-1;font-size:13px;font-weight:800;color:var(--dim);margin:6px 2px -2px;letter-spacing:-.2px}
 .shutbox .shuth{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;font:inherit;color:inherit;text-align:left;cursor:pointer;padding:0}
 .shutbox .shuth .shutarr{margin-left:auto;font-style:normal;font-size:12.5px;font-weight:700;color:var(--blue);white-space:nowrap}
@@ -12339,14 +12343,19 @@ function paintHome(){
   const sc=schoolOf(CUR.school);
   el('homeSchool').textContent=sc.n;
   const open=sc.topics.filter(t=>modeOpen(t,'p')||modeOpen(t,'r')), shut=sc.topics.filter(t=>!open.includes(t));
-  /* 학년 묶음(저학년·고학년 / 1·2·3학년) 머리글 — 열린 주제만, 같은 묶음이 이어지면 한 번만 */
-  let lastG='';
-  const cards=open.map(t=>{ const g=topicOf(t).gr||''; const h=g&&g!==lastG?`<div class="grh">${g}</div>`:''; lastG=g; return h+topicCard(t); }).join('');
+  /* 학년 묶음(저학년·고학년 / 1·2·3학년) — 위쪽 탭으로 고르고, 고른 학년의 주제만 보여요 */
+  const grs=[]; open.forEach(t=>{ const g=topicOf(t).gr||''; if(g&&!grs.includes(g)) grs.push(g); });
+  const gk=g=>g.startsWith('저')?0:g.startsWith('고')?1:parseInt(g)||9; grs.sort((x,y)=>gk(x)-gk(y));
+  const pref=LS.get('cmGrTab',{})||{};
+  let gsel=grs.includes(pref[sc.k])?pref[sc.k]:(grs.includes('2학년')?'2학년':grs[0]||'');
+  const tabs=grs.length>1?`<div class="grtabs" role="tablist">${grs.map(g=>`<button class="grtab${g===gsel?' on':''}" role="tab" aria-selected="${g===gsel}" onclick="pickGrade('${sc.k}','${g}')">${g.split(' · ')[0]}${g.includes(' · ')?`<small>${g.split(' · ')[1]}</small>`:''}</button>`).join('')}</div>`:'';
+  const cards=tabs+open.filter(t=>grs.length<2||(topicOf(t).gr||'')===gsel||!topicOf(t).gr).map(topicCard).join('');
   /* 잠긴 주제는 접어 두고, 누르면 펼쳐져요 */
   el('topicList').innerHTML=cards+(shut.length?`<div class="shutbox${HOME_SHUT_OPEN?' open':''}">
       <button class="shuth" onclick="HOME_SHUT_OPEN=!HOME_SHUT_OPEN; paintHome()">${LOCKI}<b>잠긴 주제 ${shut.length}개</b><span>선생님이 열면 위로 올라와요</span><i class="shutarr">${HOME_SHUT_OPEN?'접기 ▴':'펼치기 ▾'}</i></button>
       ${HOME_SHUT_OPEN?`<div class="shutchips">${shut.map(t=>`<button class="shutchip" onclick="topicShut('${t}')">${topicOf(t).gr?`<small>${topicOf(t).gr}</small>`:''}${topicOf(t).n}</button>`).join('')}</div>`:''}</div>`:'');
 }
+function pickGrade(sk,g){ const p=LS.get('cmGrTab',{})||{}; p[sk]=g; LS.set('cmGrTab',p); paintHome(); try{ window.scrollTo(0,0); }catch(e){} }
 function topicCard(t){
   if(!modeOpen(t,'p')&&!modeOpen(t,'r')){ const T=topicOf(t);
     return `<div class="topic tlocked" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}" onclick="topicShut('${t}')">
