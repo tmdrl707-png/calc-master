@@ -1691,6 +1691,32 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
 .bs-hud .bsav .bsdmg:not(.me){left:0;transform:none;font-size:12px}
 .bs-hud .bsav .bsdmg:not(.me){animation-name:bsDmgL}
 @keyframes bsDmgL{0%{opacity:0;transform:translateY(6px) scale(.7)}20%{opacity:1;transform:translateY(-6px) scale(1.1)}100%{opacity:0;transform:translateY(-38px)}}
+/* 레이드 화면 (선생님) */
+.raid{position:relative;border-radius:20px;overflow:hidden;color:#fff;padding:12px 14px 14px;
+  background:radial-gradient(ellipse at 50% 22%,#4c3d9e 0,#241c5c 45%,#0f0b2e 100%);box-shadow:0 8px 28px rgba(20,10,70,.35)}
+.raid.win{background:radial-gradient(ellipse at 50% 22%,#3d9e6a 0,#1c5c3b 45%,#0b2e1d 100%)}
+.raid.fail{background:radial-gradient(ellipse at 50% 22%,#6b3a3a 0,#3a1c1c 45%,#1a0b0b 100%)}
+.raid-top{display:flex;flex-wrap:wrap;gap:6px 16px;justify-content:center;font-size:13px;opacity:.95;align-items:center}
+.raid-top b{color:#ffd43b;font-size:17px}.raid-n b,.raid-t b{font-size:20px}
+.raid-boss{text-align:center;margin-top:6px}
+.raid-boss h3{margin:2px 0 6px;font-size:26px;text-shadow:0 2px 8px rgba(0,0,0,.5)}
+.raid-boss .bshp-big{position:relative;height:30px;border-radius:99px;background:rgba(0,0,0,.4);overflow:hidden;margin:6px auto;max-width:640px;border:2px solid rgba(255,255,255,.4)}
+.raid-boss .bshp-big i{display:block;height:100%;background:linear-gradient(90deg,#ff3d5a,#ff9f43 60%,#ffd43b);transition:width .35s ease}
+.raid-boss .bshp-big em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;font-size:15px;text-shadow:0 1px 3px #000}
+.raid-sub{font-size:14px;opacity:.92}
+.raid-ground{height:3px;margin:12px -14px 10px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent)}
+.raid-party{display:flex;flex-wrap:wrap;gap:8px 10px;justify-content:center;min-height:96px}
+.rp{width:96px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;text-align:center}
+.rp b{font-size:11.5px;word-break:keep-all;color:#fff}.rp b *{color:inherit}
+.rp-av{width:62px;height:62px;transition:transform .15s}
+.rp-av svg{width:100%;height:100%;display:block;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45))}
+.rp-av.atk{animation:rpAtk .42s ease-out}
+@keyframes rpAtk{0%{transform:translateY(0)}35%{transform:translateY(-26px) scale(1.18)}100%{transform:translateY(0)}}
+.rp.top .rp-av{filter:drop-shadow(0 0 8px #ffd43b)}
+.rp-bar{width:100%;height:6px;border-radius:9px;background:rgba(255,255,255,.18);overflow:hidden}
+.rp-bar i{display:block;height:100%;background:linear-gradient(90deg,#6ee7b7,#38bdf8);transition:width .3s}
+.rp em{font-style:normal;font-weight:900;color:#a5f3fc;font-size:12.5px}
+.raid-log{display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:10px;font-size:12.5px;color:#fde68a;min-height:20px}
 </style>
 </head>
 <body>
@@ -11115,7 +11141,7 @@ async function teacherPwOk(pw){
     return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')===TEACHER_PWH; }catch(e){ return false; } }
 /* 000 으로 시작하는 학번(00000 선생님 · 00001 같은 시험용)은 랭킹·학생 수에서 빼요 */
 const isTestSid=sid=>/^000/.test(String(sid));
-let tTest=0;
+let tTest=0, tTestU={};
 let tClasses={};
 let isTeacher=false, tTab='rank', tTopic='gugu', tOpen=null, tUsers={}, tClass='', tHm='g', tCb='all', tRk='best', tSort='best';
 
@@ -11135,7 +11161,7 @@ async function loadTeacher(){
   el('tSub').textContent='불러오는 중…';
   try{ tUsers=(await dbGet('users',{}))||{}; }catch(e){ tUsers={}; }
   try{ tClasses=(await dbGet('classes',{}))||{}; }catch(e){ tClasses={}; }
-  tTest=0; Object.keys(tUsers).forEach(sid=>{ nkOf(sid,tUsers[sid]); if(isTestSid(sid)){ if(sid!==TEACHER_ID) tTest++; delete tUsers[sid]; } });
+  tTest=0; tTestU={}; Object.keys(tUsers).forEach(sid=>{ nkOf(sid,tUsers[sid]); if(isTestSid(sid)){ if(sid!==TEACHER_ID) tTest++; tTestU[sid]=tUsers[sid]; delete tUsers[sid]; } });
   await loadCfg();
   paintTeacher();
 }
@@ -11150,9 +11176,10 @@ function hscShow(root){ root.querySelectorAll('.hsc').forEach(h=>{ const on=h.qu
 const classShort=c=>c.length===3?`${c[0]}-${+c.slice(1)}`:c;
 const tSids=()=>Object.keys(tUsers).filter(sid=>!tClass||classOf(sid)===tClass);
 /* 학생 한 줄 — 학생 화면 랭킹과 같은 지표(userStat)에 이 주제의 그래프·스테이지를 더해요 */
-function teacherRows(t){
-  return tSids().map(sid=>{
-    const st=userStat(sid,tUsers[sid],t,tClasses), r=(st.u.R&&st.u.R[t])||{};
+function teacherRows(t,withTest){
+  const sids=tSids().concat(withTest&&CFG.test.rank?Object.keys(tTestU).filter(sid=>!tClass||classOf(sid)===tClass):[]);
+  return sids.map(sid=>{
+    const st=userStat(sid,tUsers[sid]||tTestU[sid],t,tClasses), r=(st.u.R&&st.u.R[t])||{};
     return Object.assign(st,{hist:Array.isArray(r.hist)?r.hist:Object.values(r.hist||{}), clear:(tPracOf(st.u,t).c||[]).length});
   });
 }
@@ -11160,7 +11187,7 @@ function paintTeacher(){
   const all=Object.keys(tUsers), played=all.filter(sid=>{ const R=tUsers[sid].R||{};
     return Object.values(R).some(r=>r&&r.hist&&r.hist.length); });
   el('tSub').innerHTML=`${online()?'모든 기기에서 함께 보는 자료':'이 기기에 저장된 자료'} ·
-    학생 <b>${all.length}명</b> · 실전 경험 <b>${played.length}명</b>${tTest?` · 시험용 계정 ${tTest}개는 빼고 봐요`:''}
+    학생 <b>${all.length}명</b> · 실전 경험 <b>${played.length}명</b>${tTest?` · 시험용 계정 ${tTest}개는 학생 수·정답률에서 빼요`:''}
     · 오늘 출석 <b>${all.filter(sid=>(tUsers[sid].att||{}).d===todayKey()).length}명</b> · 오늘 미션 다 끝낸 학생 <b>${all.filter(sid=>{ const M=tMsToday(tUsers[sid]); return M&&M.L.every(m=>m.done); }).length}명</b>`;
   if(typeof paintTFreezeBar==='function') paintTFreezeBar();
   /* 보는 것(기록)과 바꾸는 것(설정)을 두 줄로 나눠요 */
@@ -11186,7 +11213,7 @@ function paintTeacher(){
   el('tClassBar').querySelectorAll('.pk').forEach(b=>b.onclick=()=>{ tClass=b.dataset.c; tOpen=null; paintTeacher(); });
   /* 고른 칩이 옆으로 밀려 안 보이면 보이게 */
   hscShow(el('s-teach'));
-  if(tTab==='rank') paintTRank(teacherRows(tTopic));
+  if(tTab==='rank') paintTRank(teacherRows(tTopic,true));
   else if(tTab==='cls') paintTClass();
   else if(tTab==='coop') paintTCoop();
   else if(tTab==='boss') paintTBoss();
@@ -11200,8 +11227,15 @@ function paintTeacher(){
 function paintTRank(rows){
   const kinds=[['best','누적'],['today','오늘'],['effort','노력'],['prac','연습'],['coin','코인'],['battle','대전']];
   const badge=tRk==='best'||tRk==='today'?r=>gBadge(gradeOfRec(tTopic,tRk==='best'?r.best:r.today)):null;
-  el('tBody').innerHTML=`<div class="segs rkkinds">${kinds.map(([k,n])=>`<button class="sg${tRk===k?' on':''}" data-rk="${k}">${n}</button>`).join('')}</div>`+
+  const nT=Object.keys(tTestU).length;
+  el('tBody').innerHTML=`<div class="tfreeze" style="margin:0 0 10px"><div class="tfl">
+      <b>시험용 계정(000으로 시작) 랭킹 표시 · ${CFG.test.rank?'보임':'숨김'}</b>
+      <small>선생님 계정 포함 ${nT}개 · 학생 화면 랭킹과 이 화면 랭킹에 함께 적용돼요 (학급 대항·학생 수에는 늘 안 들어가요)</small></div>
+      <div class="tfr"><button class="btn ${CFG.test.rank?'primary':''}" id="tTestBtn">${CFG.test.rank?'숨기기':'보이기'}</button></div></div>
+    <div class="segs rkkinds">${kinds.map(([k,n])=>`<button class="sg${tRk===k?' on':''}" data-rk="${k}">${n}</button>`).join('')}</div>`+
     rankBoard(tRk,rows,tTopic,{go:1,noMine:1,max:200,badge});
+  el('tTestBtn').onclick=async()=>{ CFG.test={rank:!CFG.test.rank}; await dbSet('config/test',CFG.test);
+    toast(CFG.test.rank?'시험용 계정을 랭킹에 보여요':'시험용 계정을 랭킹에서 숨겨요'); paintTeacher(); };
   el('tBody').querySelectorAll('[data-rk]').forEach(b=>b.onclick=()=>{ tRk=b.dataset.rk; paintTeacher(); });
   el('tBody').querySelectorAll('.rkgo,.rkpod .cbp').forEach(b=>{ b.style.cursor='pointer'; b.onclick=()=>openTStudent(b.dataset.sid); });
 }
@@ -12909,7 +12943,7 @@ function stageGradeP(p,t,n){ const c=GRADE_CUT[t], bt=p&&p.bt&&p.bt['s'+n]; if(!
 const gBadge=g=>g?`<span class="gbadge g-${g}">${g}</span>`:'';
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
-let CFG={shop:{open:false},rk:{today:true,all:true,class:true,coin:true},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()},freeze:{on:false,scope:'all',msg:''},coop:{}};
+let CFG={shop:{open:false},rk:{today:true,all:true,class:true,coin:true},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()},freeze:{on:false,scope:'all',msg:''},coop:{},test:{rank:true}};
 let CFG_OK=false;   /* 설정을 서버에서 한 번이라도 읽었는지 — 미션은 열린 주제를 알아야 고를 수 있어요 */
 async function loadCfg(){
   try{ const c=await dbGet('config',null); CFG_OK=true;
@@ -12920,6 +12954,7 @@ async function loadCfg(){
       CFG.tl=c.tl.open!=null&&c.tl.v==null?{v:2,p:vs(c.tl.open),r:vs(c.tl.open),b:vs(c.tl.open)}:{v:2,p:vs(c.tl.p),r:vs(c.tl.r),b:vs(c.tl.b)}; }
     if(c&&c.freeze) CFG.freeze=Object.assign({on:false,scope:'all',msg:''},c.freeze);
     if(c&&c.coop&&typeof c.coop==='object') CFG.coop=c.coop; else if(c) CFG.coop={};
+    CFG.test={rank:!(c&&c.test&&c.test.rank===false)};
     }catch(e){}
   return CFG;
 }
@@ -13826,8 +13861,8 @@ async function loadRank(){
   el('rkBody').innerHTML='<div class="empty">불러오는 중…</div>';
   try{ RK.users=(await dbGet('users',{}))||{}; }catch(e){ RK.users={}; }
   try{ RK.classes=(await dbGet('classes',{}))||{}; }catch(e){ RK.classes={}; }
-  /* 000 으로 시작하는 계정(00000 선생님 · 00001 같은 시험용)도 랭킹에 보여요 — 학급 대항에서만 빠져요 */
-  Object.keys(RK.users||{}).forEach(sid=>nkOf(sid,RK.users[sid]));
+  /* 000 으로 시작하는 계정(00000 선생님 · 00001 같은 시험용)은 선생님 모드 설정에 따라 랭킹에 보이거나 빠져요 (학급 대항에서는 늘 빠져요) */
+  Object.keys(RK.users||{}).forEach(sid=>{ if(!CFG.test.rank&&isTestSid(sid)) delete RK.users[sid]; else nkOf(sid,RK.users[sid]); });
   paintRank();
 }
 /* ═══ 랭킹 지표 — 학생 화면과 선생님 모드가 함께 써요 ═══
@@ -14942,6 +14977,17 @@ function bossHitFx(box,n,who){
   d.style.left=(30+Math.random()*40)+'%'; box.appendChild(d); setTimeout(()=>d.remove(),1000);
 }
 /* 내 공격 — 문제 카드에서 보스 쪽으로 빛 구슬이 날아가요 */
+function raidAttack(m,d){
+  const from=document.querySelector('#rp_'+CSS.escape(m.sid)+' .rp-av'), to=el('tbBossAv'); if(!from||!to) return;
+  from.classList.add('atk'); setTimeout(()=>from.classList.remove('atk'),420);
+  const a=from.getBoundingClientRect(), b=to.getBoundingClientRect();
+  const o=document.createElement('div'); o.className='bsshot'; o.style.left=(a.left+a.width/2-11)+'px'; o.style.top=(a.top+a.height/2-11)+'px';
+  document.body.appendChild(o);
+  requestAnimationFrame(()=>{ o.style.transform=`translate(${b.left+b.width/2-(a.left+a.width/2)}px,${b.top+b.height/2-(a.top+a.height/2)}px) scale(.6)`; o.style.opacity='.95'; });
+  setTimeout(()=>{ o.remove(); bossHitFx(to,d,'me'); },300);
+  const nm=(m.nk||m.sid||'').toString().slice(0,8); BOSS.log=(BOSS.log||[]).concat(`${esc(nm)} 공격! −${d}`).slice(-6);
+  const lg=el('tbLog'); if(lg) lg.innerHTML=BOSS.log.slice(-3).map(x=>`<span>${x}</span>`).join('');
+}
 function bossShoot(){
   const from=el('card'), to=document.querySelector('#bsHud .bsav'); if(!from||!to) return;
   const a=from.getBoundingClientRect(), b=to.getBoundingClientRect();
@@ -14955,6 +15001,17 @@ function bossShoot(){
 let BOSS_INV=(()=>{ try{ const q=new URLSearchParams(location.search), v=(q.get('boss')||'').replace(/\D/g,'').slice(0,4);
   if(q.has('boss')){ q.delete('boss'); const s=q.toString(); history.replaceState(history.state,'',location.pathname+(s?'?'+s:'')+location.hash); } return v; }catch(e){ return ''; } })();
 let BOSS={code:'',room:null,off:null,tId:null,host:false,rewarded:''};
+/* ═══ 보스 등급 — 선생님은 등급(A·S·SS·SSS)만 골라요. 보스 HP는 (참여 인원 × 1인당 목표), 문제 난이도·보상은 등급을 따라가요 ═══ */
+const BOSS_SEC=180, BOSS_GRS=['A','S','SS','SSS'];
+const BOSS_GR={
+  A  :{ci:3, st:0,   gain:.15, win:30, fail:10, desc:'가볍게 · 쉬운 문제부터'},
+  S  :{ci:2, st:.35, gain:.20, win:45, fail:14, desc:'보통 · 중간 단계부터'},
+  SS :{ci:1, st:.6,  gain:.25, win:60, fail:18, desc:'도전 · 어려운 단계부터'},
+  SSS:{ci:0, st:.85, gain:.30, win:80, fail:22, desc:'최고 난이도 · 거의 끝 단계부터'}};
+const bossGrOf=r=>BOSS_GR[r&&r.grade]?r.grade:'A';
+/* 1인당 목표 : 그 주제 실전 1분 등급 기준 × 3분 × 0.4 (여럿이 힘을 모으니 개인 기록보다 낮게) */
+function bossPer(t,g){ const c=GRADE_CUT[t]||[15,12,9,6]; return Math.max(5,Math.round(c[BOSS_GR[g].ci]*BOSS_SEC/60*.4)); }
+const bossTargetNow=(r,n)=>r.state==='wait'?Math.max(1,n)*(r.per||bossPer(r.t,bossGrOf(r))):r.target;
 function bossSum(room){ return Object.values((room&&room.p)||{}).reduce((a,x)=>a+(+x.n||0),0); }
 function bossMembers(room){
   return Object.entries((room&&room.p)||{}).map(([sid,x])=>Object.assign({sid},x)).sort((a,b)=>(b.n||0)-(a.n||0));
@@ -14972,26 +15029,34 @@ function paintTBoss(){
     <div class="sub" style="margin-bottom:14px">선생님이 방을 열면 반 친구들이 모두 함께 들어와 목표 문제 수(보스 HP)를 협동으로 격파합니다.</div>
     <div class="tcoop-form" style="margin-bottom:12px">
       <label>단원(주제)<select id="tbTopic">${topics.map(k=>`<option value="${k}"${k===tTopic?' selected':''}>${topicOf(k).n}</option>`).join('')}</select></label>
-      <label>목표 문제 수 (보스 HP)<input id="tbTarget" type="number" min="10" max="2000" step="10" value="150"></label>
-      <label>제한 시간<select id="tbSec"><option value="120">2분</option><option value="180" selected>3분</option><option value="300">5분</option><option value="420">7분</option></select></label>
       <label>보스 이름 (선택)<input id="tbName" maxlength="24" placeholder="비우면 보스 이름 그대로"></label>
     </div>
+    <div style="font-size:12.5px;font-weight:800;color:var(--dim);margin-bottom:6px">보스 등급 — 학생이 모이면 인원수에 맞춰 HP가 정해져요</div>
+    <div class="segs" id="tbGr" style="margin-bottom:6px">${BOSS_GRS.map(g=>`<button class="sg${g==='S'?' on':''}" data-g="${g}">${g}</button>`).join('')}</div>
+    <div id="tbGrInfo" class="hint" style="margin-bottom:12px"></div>
     <div class="bs-preview" id="tbPrev"></div>
     <button class="btn primary" id="tbOpen" style="width:100%">⚔ 반 보스전 방 만들기</button>
   </div>`;
-  const pv=()=>{ const t=el('tbTopic').value; el('tbPrev').innerHTML=`<div class="bsav big">${bossAv(t)}</div><b>${esc(bossLookOf(t).n)}</b><small>${esc(topicOf(t).n)} 보스</small>`; };
-  el('tbTopic').onchange=pv; pv();
-  el('tbOpen').onclick=hostBossRoom;
+  let gr='S';
+  const pv=()=>{ const t=el('tbTopic').value, per=bossPer(t,gr), G_=BOSS_GR[gr];
+    el('tbPrev').innerHTML=`<div class="bsav big">${bossAv(t)}</div><b>${esc(bossLookOf(t).n)}</b><small>${esc(topicOf(t).n)} 보스 · ${gr}등급</small>`;
+    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>1인당 <b>${per}문제</b> × 참여 인원 = 보스 HP · 제한 시간 <b>${clock(BOSS_SEC)}</b><br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
+    el('tbGr').querySelectorAll('.sg').forEach(b=>b.classList.toggle('on',b.dataset.g===gr)); };
+  el('tbTopic').onchange=pv;
+  el('tbGr').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ gr=b.dataset.g; pv(); });
+  pv();
+  el('tbOpen').onclick=()=>hostBossRoom(gr);
 }
-async function hostBossRoom(){
-  const t=el('tbTopic').value||tTopic, target=Math.max(10,+el('tbTarget').value||150), sec=Math.max(60,+el('tbSec').value||180);
+async function hostBossRoom(grade){
+  grade=BOSS_GR[grade]?grade:'S';
+  const t=el('tbTopic').value||tTopic, per=bossPer(t,grade), target=per, sec=BOSS_SEC;
   const T=topicOf(t), bossName=(el('tbName').value||'').trim()||bossLookOf(t).n;
   let code='';
   for(let i=0;i<8;i++){ const c=String(1000+Math.floor(Math.random()*9000)), ex=await dbGet('bosses/'+c,null); if(!ex||ex.state==='win'||ex.state==='fail'){ code=c; break; } }
   if(!code) return toast('방 번호를 만들지 못했어요 — 다시 눌러 주세요');
-  const room={code, host:TEACHER_ID, t, bossName, target, sec, state:'wait', p:{}, createdAt:Date.now()};
+  const room={code, host:TEACHER_ID, t, bossName, grade, per, target, sec, state:'wait', p:{}, createdAt:Date.now()};
   if(!(await dbSet('bosses/'+code,room))) toast('서버에 방을 저장하지 못했어요 — 이 기기에서만 보여요. 인터넷 연결이나 Firebase 규칙(bosses)을 확인해 주세요');
-  BOSS.code=code; BOSS.room=room; BOSS.host=true; BOSS.tSeen=null;
+  BOSS.code=code; BOSS.room=room; BOSS.host=true; BOSS.tSeen=null; BOSS.tN={}; BOSS.log=[];
   bossStopWatch();
   BOSS.off=await dbOn('bosses/'+code,r=>{
     if(!r){ BOSS.code=''; BOSS.room=null; bossStopWatch(); if(isTeacher&&tTab==='boss') paintTBoss(); return; }
@@ -15012,34 +15077,45 @@ async function hostBossRoom(){
 }
 function paintTBossLive(box){
   const r=BOSS.room; if(!r||!box) return;
-  const mem=bossMembers(r), sum=bossSum(r), rem=Math.max(0,r.target-sum), hpPct=Math.max(0,Math.round(rem/Math.max(1,r.target)*100));
+  const mem=bossMembers(r), sum=bossSum(r), tg=bossTargetNow(r,mem.length), rem=Math.max(0,tg-sum), hpPct=Math.max(0,Math.round(rem/Math.max(1,tg)*100)), gr=bossGrOf(r);
   const left=r.state==='play'?Math.max(0,(r.endAt-serverNow())/1000):r.sec;
   const url=location.origin+location.pathname+'?boss='+r.code;
-  box.innerHTML=`<div class="bs-board">
-    <div class="bs-hero">
-      <div style="font-size:12.5px;opacity:.85;margin-bottom:4px">방 번호 <b style="font-size:20px;letter-spacing:2px;color:#ffd43b">${r.code}</b> · ${esc(topicOf(r.t).n)} · 참여 ${mem.length}명</div>
-      <div class="bsav huge${r.state==='win'?' dead':r.state==='fail'?' laugh':''}" id="tbBossAv">${bossAv(r.t)}</div>
+  const party=mem.slice().sort((x,y)=>x.sid<y.sid?-1:1), rankOf={}; mem.forEach((m,i)=>{ if(m.n>0) rankOf[m.sid]=i; });
+  const maxN=Math.max(1,...mem.map(m=>m.n||0));
+  box.innerHTML=`<div class="bs-board"><div class="raid ${r.state}">
+    <div class="raid-top"><span>방 번호 <b>${r.code}</b></span><span>${esc(topicOf(r.t).n)} · ${gBadge(gr)}</span>
+      <span class="raid-n">⚔ 참여 <b>${mem.length}</b>명</span><span class="raid-t">⏱ <b id="tbClock">${clock(r.state==='wait'?r.sec:left)}</b></span></div>
+    <div class="raid-boss">
+      <div class="bsav huge${r.state==='win'?' dead':r.state==='fail'?' laugh':r.state==='wait'?' idle':''}" id="tbBossAv">${bossAv(r.t)}</div>
       <h3>${r.state==='win'?'🎉 보스 격파 성공!':r.state==='fail'?'⏰ 시간 종료 · 아쉽지만 잘 싸웠어요!':esc(r.bossName)}</h3>
-      <div class="bshp-big"><i style="width:${hpPct}%"></i></div>
-      <div style="font-size:15px;font-weight:900">남은 보스 HP <b>${rem}</b> / ${r.target} (풀이 ${sum}문제) · 남은 시간 <b id="tbClock">${clock(left)}</b></div>
+      <div class="bshp-big"><i style="width:${hpPct}%"></i><em>${r.state==='wait'?`HP ${tg}`:`${rem} / ${r.target}`}</em></div>
+      <div class="raid-sub">${r.state==='wait'?`${mem.length}명 × 1인당 ${r.per||bossPer(r.t,gr)}문제 = 보스 HP <b>${tg}</b> · 학생이 더 들어오면 HP가 늘어나요`:`풀이 ${sum}문제 · 남은 HP <b>${rem}</b>`}</div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px">
+    <div class="raid-ground"></div>
+    <div class="raid-party">${party.length?party.map(m=>{ const k=rankOf[m.sid];
+      return `<div class="rp${k===0?' top':''}" id="rp_${esc(m.sid)}">
+        <div class="rp-av">${avatarSVG(m.ch||{},{tight:true,mood:r.state==='win'?'ok':'idle'})}</div>
+        <b>${k!=null&&k<3?['🥇','🥈','🥉'][k]+' ':''}${whoHTML(m.sid,m)}</b>
+        <div class="rp-bar"><i style="width:${Math.round((m.n||0)/maxN*100)}%"></i></div><em>${m.n||0}문제</em></div>`; }).join('')
+      :`<div class="empty" style="color:#c7d2fe;padding:16px 0;width:100%">학생들이 방 번호 <b>${r.code}</b> 또는 QR로 들어오기를 기다리는 중…</div>`}</div>
+    <div class="raid-log" id="tbLog">${(BOSS.log||[]).slice(-3).map(x=>`<span>${x}</span>`).join('')}</div>
+  </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0">
       ${r.state==='wait'?`<button class="btn primary" id="tbStart">⚔ 보스전 시작! (${mem.length}명)</button>`:''}
       <button class="btn" id="tbQr">QR 크게 보기</button>
       ${r.state==='play'?`<button class="btn danger" id="tbStop">⏹ 강제 종료</button>`:''}
       <button class="btn" id="tbClose">방 닫기</button>
     </div>
-    <div style="font-size:13px;font-weight:800;color:var(--dim)">참여 학생 실시간 기여도 (${mem.length}명)</div>
-    <div class="bs-roster">${mem.length?mem.map((m,i)=>`<div class="bs-mem">
-      <div class="av">${avatarSVG(m.ch||{},{tight:true})}</div>
-      <b>${i<3&&m.n>0?['🥇','🥈','🥉'][i]+' ':''}${whoHTML(m.sid,m)}</b>
-      <em>${m.n||0}문제</em></div>`).join(''):'<div class="empty" style="grid-column:1/-1;padding:20px 0">학생들이 방 번호 <b>'+r.code+'</b> 또는 QR로 들어오기를 기다리는 중…</div>'}</div>
   </div>`;
-  if(r.state==='play'&&BOSS.tSeen!=null&&sum>BOSS.tSeen) bossHitFx(el('tbBossAv'),sum-BOSS.tSeen,'team');
+  /* 학생이 한 문제를 풀 때마다 그 학생 캐릭터가 보스를 공격해요 */
+  BOSS.tN=BOSS.tN||{};
+  mem.forEach(m=>{ const prev=BOSS.tN[m.sid], now=m.n||0;
+    if(r.state==='play'&&prev!=null&&now>prev) raidAttack(m,now-prev);
+    BOSS.tN[m.sid]=now; });
   BOSS.tSeen=sum;
   if(el('tbStart')) el('tbStart').onclick=async()=>{
-    const now=serverNow();
-    await dbUpdate('bosses/'+r.code,{state:'play',startedAt:now,endAt:now+r.sec*1000});
+    const now=serverNow(), n=Math.max(1,bossMembers(BOSS.room||r).length);
+    await dbUpdate('bosses/'+r.code,{state:'play',startedAt:now,endAt:now+r.sec*1000,target:n*(r.per||bossPer(r.t,bossGrOf(r))),n0:n});
   };
   el('tbQr').onclick=()=>{
     el('bqCode').textContent=r.code;
@@ -15100,7 +15176,7 @@ function paintBossLobby(r){
       <div style="font-size:13px;opacity:.85">방 번호 <b>${r.code}</b> · ${esc(topicOf(r.t).n)}</div>
       <div class="bsav huge idle">${bossAv(r.t)}</div>
       <h3>${esc(r.bossName)}</h3>
-      <div style="font-size:14px;opacity:.92">반 전체 목표 <b>${r.target}문제</b> · 제한 시간 <b>${clock(r.sec)}</b></div>
+      <div style="font-size:14px;opacity:.92">${gBadge(bossGrOf(r))} · 1인당 <b>${r.per||bossPer(r.t,bossGrOf(r))}문제</b> × 참여 인원 = 반 전체 목표 <b>${bossTargetNow(r,mem.length)}문제</b> · 제한 시간 <b>${clock(r.sec)}</b></div>
     </div>
     <div style="text-align:center;font-size:14.5px;font-weight:800;color:var(--blue);margin-bottom:10px">선생님이 시작 버튼을 누르면 다 함께 출발해요! (지금 ${mem.length}명 대기 중)</div>
     <div class="bs-roster">${mem.map(m=>`<div class="bs-mem"><div class="av">${avatarSVG(m.ch||{},{tight:true})}</div><b>${whoHTML(m.sid,m)}</b></div>`).join('')}</div>
@@ -15114,6 +15190,7 @@ function startBossPlay(r){
   G={mode:'boss', code:r.code, t:r.t, qi:0, score:prevN, combo:0, best:0, solved:0, right:0,
      sec:r.sec, endAt:r.endAt||(serverNow()+r.sec*1000), L:1, qLv:1, recent:[], badPicks:new Set(),
      phase:'q', typed:'', clean:true, locked:false};
+  { const S=realStagesOf(r.t), g=BOSS_GR[bossGrOf(r)]; G.L=1+(S.length-1)*g.st; G.Ltop=S.length+1; G.gain=g.gain; }
   setupHUD(); show('s-play');
   paintBossHud(r);
   G.tId=setInterval(()=>{
@@ -15133,7 +15210,7 @@ function paintBossHud(r){
   box.style.display='';
   if(!box.querySelector('.bsav')||box.dataset.code!==r.code){ box.dataset.code=r.code; BOSS.seen=sum;
     box.innerHTML=`<div class="bsav" aria-hidden="true">${bossAv(r.t,{tight:true})}</div>
-      <div class="bs-hud-r"><div class="bs-hud-top"><span>${esc(r.bossName)}</span><span id="bsHpT"></span></div>
+      <div class="bs-hud-r"><div class="bs-hud-top"><span>${gBadge(bossGrOf(r))} ${esc(r.bossName)}</span><span id="bsHpT"></span></div>
       <div class="bs-hpbar"><i id="bsHpI"></i></div></div>`; }
   /* 친구들이 깎은 만큼 — 내 공격은 이미 보여 줬으니 뺀 나머지만 */
   if(sum>(BOSS.seen||0)){ bossHitFx(box.querySelector('.bsav'),sum-(BOSS.seen||0),'team'); BOSS.seen=sum; }
@@ -15146,7 +15223,7 @@ function bossHpPaint(r,sum){
 }
 function bossAnswer(ok,f){
   if(ok){
-    G.L=Math.min(4,(G.L||1)+0.18);
+    G.L=Math.min(G.Ltop||4,(G.L||1)+(G.gain||.18));
     G.qi++; G.score++; G.right++; G.combo++; G.best=Math.max(G.best,G.combo);
     flashOk(); updHUD();
     BOSS.seen=(BOSS.seen||0)+1; bossShoot(); if(BOSS.room) bossHpPaint(BOSS.room,BOSS.seen);
@@ -15179,7 +15256,8 @@ async function finishBossPlay(r){
   const rk='b'+r.code+'_'+(r.createdAt||0); ME.coopC=ME.coopC||{};
   if(BOSS.rewarded!==r.code&&!ME.coopC[rk]&&myN>0){
     BOSS.rewarded=r.code; ME.coopC[rk]=1;
-    reward=win?(30+Math.min(30,myN)):Math.min(20,myN);
+    const gg=BOSS_GR[bossGrOf(r)];
+    reward=win?(gg.win+Math.min(25,myN)):Math.min(gg.fail,myN);
     ME.coin+=reward;
     if(win) ME.bossW=(ME.bossW||0)+1;
     checkAch();
@@ -15189,7 +15267,7 @@ async function finishBossPlay(r){
   el('bsBody').innerHTML=`<div class="bs-board">
     <div class="bs-hero">
       <div class="bsav huge${win?' dead':' laugh'}">${bossAv(r.t)}</div>
-      <h3>${win?'🎉 반 전체 보스 격파 성공!':'⏰ 시간 종료 · 멋진 협동이었어요!'}</h3>
+      <h3>${win?'🎉 반 전체 보스 격파 성공!':'⏰ 시간 종료 · 멋진 협동이었어요!'} ${gBadge(bossGrOf(r))}</h3>
       <div style="font-size:15px">우리 반 총 <b>${sum}</b> / ${r.target}문제 · 내가 기여한 문제 <b>${myN}개</b>${reward?` · 보상 <b>+${reward}코인</b>`:''}</div>
     </div>
     <div class="bs-roster">${mem.map((m,i)=>`<div class="bs-mem">
