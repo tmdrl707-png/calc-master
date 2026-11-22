@@ -15074,6 +15074,9 @@ const BOSS_GR={
   S  :{ci:2, st:.1,  cap:.45, gain:.15, def:.7,  aw:13, gap:30, win:45, fail:14, desc:'보통 · 반격이 조금 더 잦아요'},
   SS :{ci:1, st:.2,  cap:.55, gain:.18, def:.85, aw:11, gap:26, win:60, fail:18, desc:'도전 · 방어 문제가 어렵고 시간이 짧아요'},
   SSS:{ci:0, st:.3,  cap:.65, gain:.2,  def:1,   aw:10, gap:22, win:80, fail:22, desc:'최고 난이도 · 가장 어려운 방어 문제를 10초 안에!'}};
+const BOSS_ATK_AT=30;   /* 남은 시간이 이 초 이하일 때부터 보스가 반격 */
+/* 보스 HP 비율에 따른 분노 — gap: 반격과 반격 사이 쉬는 초(등급 기준 30초 분), k: 노리는 인원 비율 */
+const bossRage=ratio=>ratio>.6?{gap:6,k:.3}:ratio>.3?{gap:4,k:.45}:ratio>.15?{gap:2,k:.65}:{gap:.5,k:.9};
 const BOSS_HPX=4, BOSS_HURT=1e13;   /* 1문제 평균 대미지 4 · 부상은 끝까지(사실상 영구) */
 /* 참여자 전원이 부상이면 그 판은 패배 */
 function bossAllDown(r){ const m=Object.values((r&&r.p)||{}); const now=serverNow(); return m.length>0&&m.every(x=>+x.hurtUntil>now); }
@@ -15118,7 +15121,7 @@ function paintTBoss(){
   let gr='S';
   const pv=()=>{ const t=el('tbTopic').value, per=bossPer(t,gr)*BOSS_HPX, G_=BOSS_GR[gr];
     el('tbPrev').innerHTML=`<div class="bsav big">${bossAv(t)}</div><b>${esc(bossLookOf(t).n)}</b><small>${esc(topicOf(t).n)} 보스 · ${gr}등급</small>`;
-    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>보스 HP = 참여 인원 × 1인당 HP <b>${per}</b> (실전 1분 ${gr} 기준 ${(GRADE_CUT[t]||[15,12,9,6])[BOSS_GR[gr].ci]}개 × ${BOSS_MIN}분 × 평균 대미지 ${BOSS_HPX}) · 제한 시간 <b>${clock(BOSS_SEC)}</b> (격파하면 걸린 시간도 기록돼요)<br>보스 반격 : 약 ${G_.gap}초마다 몇 명을 노려요 → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 <b>끝까지 부상(대미지 절반)</b> · 전원이 부상이면 패배<br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
+    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>보스 HP = 참여 인원 × 1인당 HP <b>${per}</b> (실전 1분 ${gr} 기준 ${(GRADE_CUT[t]||[15,12,9,6])[BOSS_GR[gr].ci]}개 × ${BOSS_MIN}분 × 평균 대미지 ${BOSS_HPX}) · 제한 시간 <b>${clock(BOSS_SEC)}</b> (격파하면 걸린 시간도 기록돼요)<br>보스 반격 : 남은 시간 <b>${BOSS_ATK_AT}초</b>부터 시작! 보스 HP가 적을수록 더 자주·더 많은 학생을 노려요 → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 <b>끝까지 부상(대미지 절반)</b> · 전원이 부상이면 패배<br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
     el('tbGr').querySelectorAll('.sg').forEach(b=>b.classList.toggle('on',b.dataset.g===gr)); };
   el('tbTopic').onchange=pv;
   el('tbGr').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ gr=b.dataset.g; pv(); });
@@ -15167,13 +15170,16 @@ function bossAtkTick(r){
       dbUpdate(`bosses/${r.code}/p/${sid}`,{hit:a.id,hurtUntil:a.until+BOSS_HURT}); });
     if(el('tbAtk')) paintTBossLive(el('tBody')); return; }
   if(CFG.freeze&&CFG.freeze.on) return;
-  if(BOSS.atkFor!==r.startedAt){ BOSS.atkFor=r.startedAt; BOSS.nextAtk=Math.max(now,r.startedAt)+20000; }
-  if(now<BOSS.nextAtk||r.endAt-now<(g.aw+5)*1000) return;
+  /* 보스는 제한 시간이 BOSS_ATK_AT 초 남았을 때부터 반격해요 — 보스 HP가 적을수록 더 자주, 더 많은 학생을 노려요 */
+  if(r.endAt-now>BOSS_ATK_AT*1000||r.endAt-now<4000) return;
+  if(BOSS.atkFor!==r.startedAt){ BOSS.atkFor=r.startedAt; BOSS.nextAtk=0; }
+  if(now<BOSS.nextAtk) return;
   const mem=bossMembers(r).map(m=>m.sid); if(!mem.length) return;
   const fresh=mem.filter(sid=>!(+((r.p[sid]||{}).hurtUntil)>now)), pool=fresh.sort(()=>Math.random()-.5); if(!pool.length) return;
-  const k=Math.min(5,Math.max(1,Math.round(mem.length*.3))), t={};
+  const ratio=Math.max(0,r.target-bossSum(r))/Math.max(1,r.target), rage=bossRage(ratio);
+  const k=Math.min(mem.length,Math.max(1,Math.round(mem.length*rage.k))), t={};
   pool.slice(0,k).forEach(sid=>t[sid]=1);
-  BOSS.nextAtk=now+(g.aw+g.gap)*1000;
+  BOSS.nextAtk=now+(g.aw+rage.gap*g.gap/30)*1000;
   dbUpdate('bosses/'+r.code,{atk:{id:'a'+now,at:now,until:now+g.aw*1000,t}});
 }
 /* 같은 방 번호 그대로 다음 보스 — 참여 학생은 남기고 기록만 새로 */
