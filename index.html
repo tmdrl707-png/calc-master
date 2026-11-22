@@ -1565,6 +1565,97 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
 .mebar .mhome{margin-right:auto}
 .sronly{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 @media(max-width:430px){.mebar .mhome{padding:7px 10px}.mebar .mhome .hmx{display:none}}
+
+/* ═══ 차분한 시각 리액션 (무음 · 표정 · 콤보 팝 · 은은한 글로우 · 모바일 HUD) ═══ */
+@keyframes comboPop{0%{transform:scale(1)}45%{transform:scale(1.22)}100%{transform:scale(1)}}
+#hCombo.pop b{display:inline-block;animation:comboPop .24s ease-out}
+.card.scr{transition:box-shadow .28s ease,border-color .28s ease}
+.card.scr.glow1{box-shadow:0 0 0 3px color-mix(in srgb,var(--tc,#2f5bea) 24%,transparent),var(--sh)}
+.card.scr.glow2{box-shadow:0 0 0 4px color-mix(in srgb,var(--tc,#2f5bea) 42%,transparent),0 8px 28px color-mix(in srgb,var(--tc,#2f5bea) 18%,transparent)}
+@keyframes qShake{0%,100%{transform:translateX(0)}22%{transform:translateX(-6px)}46%{transform:translateX(6px)}72%{transform:translateX(-4px)}}
+.card.shake{animation:qShake .32s ease}
+#keypad.pickpad .pk2.badpick{opacity:.32;pointer-events:none;text-decoration:line-through;background:var(--paper)}
+@media (max-width:520px){
+  #s-play.realmode #hCombo{display:inline-flex!important;padding:5px 9px;font-size:12.5px}
+  #s-play.realmode #hMe{padding:2px 8px 2px 3px!important;gap:5px!important}
+  #s-play.realmode #hMe b{display:none}
+  #s-play.realmode #hTime,#s-play.realmode #hAcc{padding:5px 9px;font-size:12.5px}
+}
+
+/* ═══ 정리 노트 2.0 (시각화 · 원리 카드 · 바로 열기 모달) ═══ */
+.nbwhy-list{display:flex;flex-direction:column;gap:12px}
+.nbwhy{background:#fff;border:1px solid var(--line);border-left:4px solid var(--tc,#2f5bea);border-radius:16px;padding:15px 16px;box-shadow:var(--sh1)}
+.nbwhy h4{margin:0 0 8px;font-size:15px;font-weight:900;color:var(--ink);display:flex;align-items:center;gap:7px}
+.nbwhy .wbadge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:var(--ts,#eef2fe);color:var(--tc,#2f5bea)}
+.nbwhy .nbw-svg{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0 10px;display:flex;justify-content:center;overflow-x:auto}
+.nbwhy .nbw-svg svg{max-width:100%;height:auto;display:block}
+.nbwhy p{margin:0;font-size:13.5px;line-height:1.6;color:var(--ink2)}
+.nbwhy p b{color:var(--ink)}
+.nbpeek-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--blue);font-size:12.5px;font-weight:800;cursor:pointer;margin-top:8px}
+.nbpeek-btn:hover{background:var(--soft);border-color:var(--blue)}
+#ovBook .modal{max-width:740px;width:min(94vw,740px);max-height:86vh;overflow-y:auto;text-align:left;padding:18px}
+#ovBook .bkhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;position:sticky;top:-18px;background:#fff;padding:6px 0 10px;border-bottom:1px solid var(--line);z-index:2}
+#ovBook .bkhead b{font-size:16px}
+
+/* ═══ 업적 · 프로필 칭호 ═══ */
+.ttltag{display:inline-block;font-size:10.5px;font-weight:800;padding:1.5px 6px;border-radius:99px;background:#eef2fe;color:#2f5bea;border:1px solid #d5e0fc;margin-right:4px;vertical-align:1px;line-height:1.35}
+.achgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:9px;margin-top:8px}
+.achcard{border:1px solid var(--line);border-radius:14px;padding:11px 12px;background:#fff;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px;transition:border-color .15s,background .15s}
+.achcard.lock{opacity:.52;background:var(--paper);cursor:default}
+.achcard.on{border-color:var(--blue);background:#f3f6ff;box-shadow:0 0 0 2px rgba(47,91,234,.14)}
+.achcard .at{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13.5px;font-weight:900;color:var(--ink)}
+.achcard .ad{font-size:11.5px;color:var(--dim);line-height:1.4}
+.achcard .as{font-size:11px;font-weight:800;color:var(--blue);margin-top:2px}
+
+/* ═══ 교사용 전체 집중 일시정지 (Freeze) ═══ */
+.tfreeze{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:#fff;margin:10px 0 12px;box-shadow:var(--sh1)}
+.tfreeze.on{background:#fff4f5;border-color:#f8b4be}
+.tfreeze .tfl{display:flex;flex-direction:column;gap:2px}
+.tfreeze .tfl b{font-size:14.5px;color:var(--ink)}
+.tfreeze.on .tfl b{color:#c92a2a}
+.tfreeze .tfl small{font-size:12px;color:var(--dim)}
+.tfreeze .tfr{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.tfreeze select,.tfreeze input{font-size:13px;padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.tfreeze input{min-width:190px}
+#ovFreeze{z-index:9999;background:rgba(15,23,42,.82);backdrop-filter:blur(6px)}
+#ovFreeze .modal{max-width:420px;text-align:center;padding:28px 22px}
+#ovFreeze .frz-av{width:116px;height:116px;margin:0 auto 10px}
+#ovFreeze .frz-av svg{width:100%;height:100%;display:block}
+#ovFreeze .frz-badge{display:inline-block;padding:4px 12px;border-radius:99px;background:#fff0f2;color:#d6336c;font-size:12px;font-weight:900;margin-bottom:8px}
+#ovFreeze .frz-cd{font-size:44px;font-weight:900;color:var(--blue);margin:8px 0 0;line-height:1.1}
+
+/* ═══ 학급 협동 주간 목표 (Coop Goal) ═══ */
+.coopbox{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px;margin:0 auto 14px;max-width:680px;box-shadow:var(--sh1)}
+.coopbox.done{border-color:#8ce99a;background:#f4fce3}
+.coop-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.coop-hd b{font-size:14.5px;color:var(--ink)}
+.coop-hd small{font-size:12px;color:var(--dim);font-weight:700}
+.coop-bar{height:11px;border-radius:99px;background:var(--soft);overflow:hidden;margin:6px 0}
+.coop-bar i{display:block;height:100%;background:linear-gradient(90deg,#2f5bea,#12b886);border-radius:99px;transition:width .35s ease}
+.coop-ft{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--dim)}
+.tcoop-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:14px}
+.tcoop-form label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:800;color:var(--dim)}
+.tcoop-form input,.tcoop-form select{padding:8px 10px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;color:var(--ink)}
+
+/* ═══ 반 전체 협동 「단원 마스터 보스전」 ═══ */
+.btwrap{display:flex;flex-direction:column;gap:9px}
+.btbar.bossbtn{border-color:#d8ccf8;background:linear-gradient(180deg,#fff,#faf7ff)}
+.btbar.bossbtn .bti{background:#f3edff;color:#6741d9}
+.bs-hud{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px 14px;margin-bottom:10px;box-shadow:var(--sh1)}
+.bs-hud-top{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13.5px;font-weight:800;margin-bottom:6px}
+.bs-hpbar{height:16px;border-radius:99px;background:#ffe3e3;overflow:hidden;border:1px solid #ffc9c9}
+.bs-hpbar i{display:block;height:100%;background:linear-gradient(90deg,#fa5252,#fd7e14);transition:width .25s ease}
+.bs-board{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:var(--sh)}
+.bs-hero{text-align:center;padding:14px 10px;background:linear-gradient(135deg,#1e1b4b,#312e81);color:#fff;border-radius:16px;margin-bottom:14px}
+.bs-hero h3{margin:0 0 6px;font-size:22px}
+.bs-hero .bshp-big{height:24px;border-radius:99px;background:rgba(255,255,255,.18);overflow:hidden;margin:10px auto 8px;max-width:560px;border:1px solid rgba(255,255,255,.28)}
+.bs-hero .bshp-big i{display:block;height:100%;background:linear-gradient(90deg,#ff6b6b,#ffd43b);transition:width .25s ease}
+.bs-roster{display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:8px;margin-top:12px}
+.bs-mem{border:1px solid var(--line);border-radius:14px;padding:9px 8px;background:var(--paper);text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px}
+.bs-mem .av{width:54px;height:54px}
+.bs-mem .av svg{width:100%;height:100%;display:block}
+.bs-mem b{font-size:12.5px;word-break:keep-all}
+.bs-mem em{font-style:normal;font-size:13px;font-weight:900;color:var(--blue)}
 </style>
 </head>
 <body>
@@ -1639,9 +1730,12 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
   <div class="mebar" id="meBar5"></div>
   <div class="title"><h1>계산 마스터</h1><p class="lead" id="schoolHi">어디서부터 시작할까요?</p></div>
   <div class="msbox" id="msBox"></div>
+  <div id="coopBox"></div>
   <div class="schools" id="schoolList"></div>
   <div class="btwrap"><button class="btbar" onclick="openBattle()"><span class="bti" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M2.8 19c.6-3.4 3.1-5.4 6.2-5.4s5.6 2 6.2 5.4z" fill="currentColor"/><circle cx="16.6" cy="9" r="2.6" fill="currentColor" opacity=".55"/><path d="M14.6 14.2c.6-.2 1.3-.3 2-.3 2.6 0 4.4 1.7 4.9 4.6h-4.6c-.3-1.7-1.1-3.2-2.3-4.3z" fill="currentColor" opacity=".55"/></svg></span>
-        <span class="btt"><b>친구와 대전</b><small>열려 있는 주제 어디서든 · 방 번호로 친구들과 빨리 맞히기</small></span><span class="go" aria-hidden="true">→</span></button></div>
+        <span class="btt"><b>친구와 대전</b><small>열려 있는 주제 어디서든 · 방 번호로 친구들과 빨리 맞히기</small></span><span class="go" aria-hidden="true">→</span></button>
+      <button class="btbar bossbtn" onclick="openBossJoin()"><span class="bti" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5 4 6v6c0 5 3.4 9.2 8 10.5 4.6-1.3 8-5.5 8-10.5V6l-8-3.5z" fill="currentColor" opacity=".2"/><path d="M12 3.6 5.2 6.6V12c0 4.3 2.9 7.9 6.8 9.1 3.9-1.2 6.8-4.8 6.8-9.1V6.6L12 3.6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12.2 11.2 14.4 15.5 9.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="btt"><b>반 전체 보스전 참가</b><small>선생님이 연 방에 반 친구들과 함께 들어가 목표 문제 수 격파하기</small></span><span class="go" aria-hidden="true">→</span></button></div>
   <div class="homebar">
     <button class="link" onclick="logout()">다른 학번으로 들어가기</button>
   </div>
@@ -1707,6 +1801,7 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
     <button class="btn" onclick="quitPlay()">그만하기</button>
   </div>
   <div class="timerbar" id="tbar"><i></i></div>
+  <div class="bs-hud" id="bsHud" style="display:none"></div>
   <div class="blive" id="bLive" style="display:none"></div>
   <div class="playgrid">
     <div class="playmain">
@@ -1758,6 +1853,11 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
   <div class="battle" id="btBody"></div>
 </section>
 
+<!-- ═══════════ 반 전체 협동 보스전 ═══════════ -->
+<section id="s-boss" class="screen">
+  <div class="battle" id="bsBody"></div>
+</section>
+
 <!-- ═══════════ 마이페이지 ═══════════ -->
 <section id="s-mine" class="screen">
   <div class="mebar" id="meBar3"></div>
@@ -1799,6 +1899,11 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
     <div class="mpbox">
       <h3>연습 스테이지</h3>
       <div class="mpstage" id="mpStage"></div>
+    </div>
+    <div class="mpbox" id="mpAchBox">
+      <h3>업적 · 내 칭호 <span class="mpown-n" id="mpAchN"></span></h3>
+      <div class="chartlab" style="margin:-2px 0 8px">달성한 업적을 누르면 랭킹과 대전에 보일 칭호로 달아요</div>
+      <div id="mpAch"></div>
     </div>
     <div class="mpbox">
       <h3>내가 가진 꾸미기 <span class="mpown-n" id="mpOwnN"></span></h3>
@@ -1867,6 +1972,7 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
       <span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn primary" onclick="teacherPlay()">▶ 선생님으로 플레이</button><button class="btn" onclick="leaveTeacher()">나가기</button></span>
     </div>
     <div class="sub" id="tSub"></div>
+    <div id="tFreezeBar" class="tfreeze"></div>
     <div class="tnav" id="tTabs"></div>
     <div class="tfilt"><div id="tTopicBar"></div><div id="tClassBar"></div></div>
     <div id="tBody"></div>
@@ -1961,6 +2067,33 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
     <div class="qrbig" id="bqBig"></div>
     <div class="qrurl" id="bqUrl"></div>
     <div class="row"><button class="btn primary" onclick="close_('ovBQr')">닫기</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="ovBook" onclick="if(event.target===this)close_('ovBook')">
+  <div class="modal">
+    <div class="bkhead"><b id="ovBookTitle">정리 노트</b><button class="btn" onclick="close_('ovBook')">닫기 ✕</button></div>
+    <div id="ovBookBody" class="book nb2"></div>
+  </div>
+</div>
+
+<div class="overlay" id="ovFreeze">
+  <div class="modal">
+    <div class="frz-badge" id="frzBadge">⏸ 수업 집중 모드</div>
+    <div class="frz-av" id="frzAv"></div>
+    <h3 id="frzTitle">잠시 화면을 멈췄어요</h3>
+    <div class="sub" id="frzMsg">잠시 화면을 멈추고 선생님을 보세요!</div>
+    <div class="frz-cd" id="frzCd" style="display:none">3</div>
+  </div>
+</div>
+
+<div class="overlay" id="ovBossJoin" onclick="if(event.target===this)close_('ovBossJoin')">
+  <div class="modal">
+    <h3>반 전체 보스전 참가</h3>
+    <div class="sub">선생님이 알려 준 방 번호 4자리를 입력하세요.</div>
+    <input id="bsCodeIn" class="nkin" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="예) 1234" onkeydown="if(event.key==='Enter') joinBossByInput()">
+    <div class="err" id="bsJoinErr" style="margin-top:6px;text-align:center"></div>
+    <div class="row"><button class="btn" onclick="close_('ovBossJoin')">닫기</button><button class="btn primary" onclick="joinBossByInput()">들어가기</button></div>
   </div>
 </div>
 
@@ -2254,8 +2387,28 @@ function mouthSmile(b,w){ const k=b.er/5.5; w=(w||9)*k;
 function googly(b){ let g='';
   [b.fx-b.ew,b.fx+b.ew].forEach((x,i)=>{ g+=C(x,b.eyeY,15,'#fff',INK,2.4)+C(x+(i?-4:4),b.eyeY+2,6.5,INK)+C(x+(i?-2:6),b.eyeY,2.2,'#fff'); });
   return g; }
-function faceSVG(b){
-  if(b.k==='inf') return googly(b)+P(`M${b.fx-8},${b.mouthY-2} q8,8 16,0`,'none',b.ink,3);
+function faceSVG(b,mood){
+  if(b.k==='inf'){
+    const m=mood==='miss'?P(`M${b.fx-6},${b.mouthY+1} h12`,'none',b.ink,2.8):P(`M${b.fx-8},${b.mouthY-2} q8,8 16,0`,'none',b.ink,3);
+    const sw=mood==='miss'?P(`M${b.fx+b.ew+16},${b.eyeY-14} q6,8 0,13 q-6,-5 0,-13 Z`,'#74c0fc','#1c7ed6',1.4):'';
+    return googly(b)+m+sw;
+  }
+  const k=b.er/5.5;
+  if(mood==='ok'){
+    const e1=P(`M${b.fx-b.ew-5.5*k},${b.eyeY+1*k} q${5.5*k},${-7*k} ${11*k},0`,'none',b.ink,2.8*k);
+    const e2=P(`M${b.fx+b.ew-5.5*k},${b.eyeY+1*k} q${5.5*k},${-7*k} ${11*k},0`,'none',b.ink,2.8*k);
+    return e1+e2+cheekSVG(b)+mouthSmile(b,11);
+  }
+  if(mood==='streak'){
+    const st=(x,y)=>eyeDot(x,y,b.er*1.05,b.ink)+C(x-b.er*.3,y+b.er*.35,b.er*.24,'#fff');
+    const ch=E(b.fx-b.ew-10*k,b.mouthY-3,8.5*k,5.2*k,'#ff6b9d',0,0,.62)+E(b.fx+b.ew+10*k,b.mouthY-3,8.5*k,5.2*k,'#ff6b9d',0,0,.62);
+    return st(b.fx-b.ew,b.eyeY)+st(b.fx+b.ew,b.eyeY)+ch+mouthSmile(b,12);
+  }
+  if(mood==='miss'){
+    const m=P(`M${b.fx-6*k},${b.mouthY+1*k} q${6*k},${-3.5*k} ${12*k},0`,'none',b.ink,2.6*k);
+    const sw=P(`M${b.fx+b.ew+11*k},${b.eyeY-10*k} q${5*k},${7*k} 0,${11*k} q${-5*k},${-4*k} 0,${-11*k} Z`,'#74c0fc','#1c7ed6',1.3*k);
+    return eyeDot(b.fx-b.ew,b.eyeY,b.er*.95,b.ink)+eyeDot(b.fx+b.ew,b.eyeY,b.er*.95,b.ink)+m+sw;
+  }
   return eyeDot(b.fx-b.ew,b.eyeY,b.er,b.ink)+eyeDot(b.fx+b.ew,b.eyeY,b.er,b.ink)+cheekSVG(b)+mouthSmile(b);
 }
 
@@ -3093,8 +3246,9 @@ function avatarSVG(ch,opt){
     return `<g transform="translate(${x} ${y}) scale(${sc[0]}) translate(${-x} ${-y})">${g}</g>`; };
   const L=cats=>worn.filter(id=>cats.includes(ITEM(id).cat)).map(one).join('');
   const vb=opt.tight?'-18 -30 256 252':'-44 -52 308 300';
+  const moodFx=has('face')&&opt.mood==='miss'?P(`M${b.fx+b.ew+14},${b.eyeY-12} q5,7 0,11 q-5,-4 0,-11 Z`,'#74c0fc','#1c7ed6',1.4):'';
   return `<svg viewBox="${vb}" xmlns="http://www.w3.org/2000/svg"${opt.cls?` class="${opt.cls}"`:''}>${defs}${L(['stage'])}${worn.filter(id=>ITEM(id).under).map(one).join('')}${L(['back'])}${L(['frame'])}${
-    bodySVG(k,fill,col.l)}${has('face')?'':faceSVG(b)}${L(['face','neck','foot','eye','hat','hand','pet','fx'])}${worn.filter(id=>ITEM(id).cat==='class'&&!ITEM(id).under).map(one).join('')}</svg>`;
+    bodySVG(k,fill,col.l)}${has('face')?'':faceSVG(b,opt.mood)}${L(['face','neck','foot','eye','hat','hand','pet','fx'])}${moodFx}${worn.filter(id=>ITEM(id).cat==='class'&&!ITEM(id).under).map(one).join('')}</svg>`;
 }
 const avatarWith=(ch,id)=>avatarSVG({s:ch.s,c:ch.c,cl:ch.cl,cc:ch.cc,ct:ch.ct,items:[id]});
 
@@ -7277,7 +7431,7 @@ Object.assign(TOPICS,{
     ],
     cats:[['거듭제곱근',sk=>/^lR/.test(sk)],['유리수 지수',sk=>/^lQ/.test(sk)],['로그의 값',sk=>/^lL/.test(sk)],
           ['로그의 성질',sk=>/^lP/.test(sk)],['지수·로그 방정식',sk=>/^lE/.test(sk)]]},
-  comb:{k:'comb', n:'경우의 수', sym:'ₙCᵣ', school:'h', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
+  comb:{k:'comb', n:'순열과 조합', sym:'ₙCᵣ', school:'h', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'팩토리얼 · 순열 · 조합 · 상황 속 경우의 수',
     stages:[
       {n:1, name:'팩토리얼과 순열',    ex:'₆P₃ = □',          facts:()=>CF_ALL().concat(CP_ALL()), take:12, old:[1,2],
@@ -10879,11 +11033,13 @@ let isTeacher=false, tTab='rank', tTopic='gugu', tOpen=null, tUsers={}, tClass='
 
 async function enterTeacher(){
   isTeacher=true; ME=null; G=null;
+  if(typeof stopFreezeWatch==='function') stopFreezeWatch();
   LS.del(MEKEY);   /* 선생님 모드는 이 기기에 저장하지 않아요 */
   tTab='rank'; tOpen=null;
   show('s-teach'); await loadTeacher();
 }
 function leaveTeacher(){ isTeacher=false; LS.del(MEKEY);
+  if(typeof bossStopWatch==='function') bossStopWatch();
   el('gLogin').style.display=''; el('gNew').style.display='none';
   el('inSid').value=''; el('inPw').value=''; gateErr('gErr',''); show('s-gate'); }
 
@@ -10918,13 +11074,14 @@ function paintTeacher(){
   el('tSub').innerHTML=`${online()?'모든 기기에서 함께 보는 자료':'이 기기에 저장된 자료'} ·
     학생 <b>${all.length}명</b> · 실전 경험 <b>${played.length}명</b>${tTest?` · 시험용 계정 ${tTest}개는 빼고 봐요`:''}
     · 오늘 출석 <b>${all.filter(sid=>(tUsers[sid].att||{}).d===todayKey()).length}명</b> · 오늘 미션 다 끝낸 학생 <b>${all.filter(sid=>{ const M=tMsToday(tUsers[sid]); return M&&M.L.every(m=>m.done); }).length}명</b>`;
+  if(typeof paintTFreezeBar==='function') paintTFreezeBar();
   /* 보는 것(기록)과 바꾸는 것(설정)을 두 줄로 나눠요 */
   const seg=(lab,arr)=>`<div class="tseg"><span class="tlab">${lab}</span><div class="segs">${arr.map(([k,n])=>
     `<button class="sg${tTab===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div></div>`;
   el('tTabs').innerHTML=seg('기록',[['rank','랭킹'],['cls','학급 대항'],['fact','정답률'],['stu','학생 정보']])
-    +seg('설정',[['hs','고등 열쇠'],['tl','모드 잠금']]);
+    +seg('수업 · 설정',[['coop','협동 목표'],['boss','반 보스전'],['hs','고등 열쇠'],['tl','모드 잠금']]);
   el('tTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ tTab=b.dataset.k; tOpen=null; paintTeacher(); });
-  const showT=!(tTab==='hs'||tTab==='tl'||tTab==='cls'||(tTab==='rank'&&!RKK[tRk].topic)), showC=!(tTab==='hs'||tTab==='tl'||tTab==='cls');
+  const showT=!(tTab==='hs'||tTab==='tl'||tTab==='cls'||tTab==='coop'||tTab==='boss'||(tTab==='rank'&&!RKK[tRk].topic)), showC=!(tTab==='hs'||tTab==='tl'||tTab==='cls'||tTab==='coop'||tTab==='boss');
   el('tTopicBar').style.display=showT?'':'none';
   el('tClassBar').style.display=showC?'':'none';
   el('tTopicBar').parentNode.style.display=(showT||showC)?'':'none';
@@ -10943,6 +11100,8 @@ function paintTeacher(){
   hscShow(el('s-teach'));
   if(tTab==='rank') paintTRank(teacherRows(tTopic));
   else if(tTab==='cls') paintTClass();
+  else if(tTab==='coop') paintTCoop();
+  else if(tTab==='boss') paintTBoss();
   else if(tTab==='hs') paintTHs();
   else if(tTab==='tl') paintTTl();
   else if(tTab==='fact') paintTFact();
@@ -12008,7 +12167,9 @@ function checkAttendance(){
   if(a.d===d) return;
   const keep=a.d&&(a.d===prevSchoolDay(d)||(a.d>prevSchoolDay(d)&&a.d<d));   /* 주말에 들어왔어도 이어지게 */
   const s=keep?(a.s||0)+1:1, bonus=ATT_BONUS[attPos(s)]||0, coin=ATT_COIN+bonus;
-  ME.att={d,s,n:(a.n||0)+1}; ME.coin+=coin; saveMe(); paintMe();
+  ME.att={d,s,n:(a.n||0)+1}; ME.coin+=coin;
+  if(typeof checkAch==='function') checkAch();
+  saveMe(); paintMe();
   el('attStamp').textContent=`출석 ${s}일째`;
   el('attTitle').textContent=s>1?`${s}일 연속으로 왔어요!`:'오늘도 왔어요!';
   el('attSub').innerHTML=s>1?'하루도 빠지지 않고 오고 있어요. 주말은 쉬어도 이어져요.':(a.d?'다시 시작이에요. 내일도 오면 연속 출석이 이어져요.':'처음 출석이에요. 매일 오면 연속 출석 보너스가 있어요.');
@@ -12239,7 +12400,7 @@ function missionText(m){
   if(m.k==='multi') return {h:`연습 스테이지 3개 클리어${m.p&&!m.done?` (${m.p}/3)`:''}`, w:'주제·단계는 마음대로 — 오늘 세 번 클리어'};
   if(m.k==='speed') return {h:`${T.n} · ${stName(m.t,m.n)} 기록 깨기`, w:`내 최고 기록 ${m.s}초보다 빨리 클리어`};
   if(m.k==='battle') return {h:'친구 대전 한 판', w:'친구와 대전을 끝까지 한 판 (2명 이상)'};
-  return {h:`${T.n} 실전`, w:'1분 무실수 실전에 한 번 도전 (1개 이상 맞히기)'};
+  return {h:`${T.n} 실전`, w:'1분 실전에 한 번 도전 (1개 이상 맞히기)'};
 }
 function missionGo(i){ const m=ME&&ME.ms&&ME.ms.L[i]; if(!m) return; close_('ovMs'); ME.ms.x=1;
   if(m.k==='real'||m.k==='realN'||m.k==='firstR') return tryReal(m.t);
@@ -12389,11 +12550,13 @@ const isGuest=sid=>/^g[0-9a-z]{6}$/.test(String(sid));   /* 대전 QR로 들어�
 const shortCls=sid=>{ if(isGuest(sid)) return ''; if(String(sid)===TEACHER_ID) return '쌤'; const c=String(sid).slice(0,3); return `${c[0]}-${+c.slice(1)}`; };
 /* ═══ 닉네임 · 선생님 표시 ═══
    랭킹·대전에는 닉네임(있으면)과 작은 학번을 함께 보여요. 선생님 플레이 계정(00000)은 '선생님'으로.         */
-const NICK_P=2000, NKS={};
-function nkOf(sid,u){ if(u&&typeof u.nk==='string') NKS[sid]=u.nk; return NKS[sid]||''; }
+const NICK_P=2000, NKS={}, TTLS={};
+function nkOf(sid,u){ if(u&&typeof u.nk==='string') NKS[sid]=u.nk; if(u&&typeof u.ttl==='string') TTLS[sid]=u.ttl; return NKS[sid]||''; }
+function ttlOf(sid,u){ if(u&&typeof u.ttl==='string') TTLS[sid]=u.ttl; const id=TTLS[sid]||''; return typeof achTitle==='function'?achTitle(id):''; }
 function whoPlain(sid,u){ if(String(sid)===TEACHER_ID) return '선생님'; return nkOf(sid,u)||(isGuest(sid)?'손님':String(sid)); }
 function whoHTML(sid,u){ if(String(sid)===TEACHER_ID) return '<span class="tchn">선생님</span>';
-  const n=nkOf(sid,u); if(isGuest(sid)) return `${esc(n||'손님')}<small class="nsid">비회원</small>`; return n?`${esc(n)}<small class="nsid">${esc(sid)}</small>`:esc(sid); }
+  const n=nkOf(sid,u), tl=ttlOf(sid,u), tg=tl?`<span class="ttltag">${esc(tl)}</span>`:'';
+  if(isGuest(sid)) return `${esc(n||'손님')}<small class="nsid">비회원</small>`; return n?`${tg}${esc(n)}<small class="nsid">${esc(sid)}</small>`:`${tg}${esc(sid)}`; }
 const NICK_BAD=['시발','씨발','ㅅㅂ','병신','ㅂㅅ','개새','좆','존나','지랄','미친','썅','엿먹','닥쳐','fuck','shit','bitch','sex','섹스','선생','쌤','teacher','관리자','운영자'];
 function nickErr(s){ s=String(s||'').trim();
   if(s.length<2||s.length>8) return '닉네임은 2~8글자로 지어 주세요.';
@@ -12408,7 +12571,9 @@ function meFrom(sid,u){
           ownS:ownS.length?ownS:null, ownC:ownC.length?ownC:null,
           sc:u.sc||'', boxN:u.boxN||0, R:u.R||{}, P:u.P||{}, pc:u.pc||null, W:u.W||{}, fs:u.fs||{},
           hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, bh:arr(u.bh), h:u.h||'', cu:Object.assign({},u.cu||{}),
-          att:u.att||null, ms:u.ms||null, gw:u.gw||null, wk:u.wk||{}, pq:u.pq||{}, nk:nkOf(sid,u), nkt:u.nkt||0};
+          att:u.att||null, ms:u.ms||null, gw:u.gw||null, wk:u.wk||{}, pq:u.pq||{}, nk:nkOf(sid,u), nkt:u.nkt||0,
+          ach:Object.assign({},u.ach||{}), ttl:u.ttl||'', coopC:Object.assign({},u.coopC||{}),
+          nbSeen:arr(u.nbSeen), noteN:u.noteN||0, nmN:u.nmN||0, bossW:u.bossW||0, gwN:u.gwN||0};
 }
 function rec(t){ const R=ME.R||(ME.R={}); const r=R[t]||(R[t]={best:0,hist:[]});
   if(!Array.isArray(r.hist)) r.hist=[]; return r; }
@@ -12451,7 +12616,10 @@ function mergeFrom(u){
   if(u.P&&typeof u.P==='object') Object.keys(u.P).forEach(t=>{ const b=u.P[t]; if(!b) return; const P=ME.P||(ME.P={}), a=P[t];
     if(!a){ P[t]=b; return; } if(a.v!==b.v) return;
     a.c=uniq(a.c,b.c).sort((x,y)=>x-y); a.bt=a.bt||{};
-    Object.keys(b.bt||{}).forEach(k=>{ if(!(a.bt[k]<=b.bt[k])) a.bt[k]=b.bt[k]; }); });
+    Object.keys(b.bt||{}).forEach(k=>{ if(!(a.bt[k]<=b.bt[k])) a.bt[k]=b.bt[k]; });
+    if(b.bg&&typeof b.bg==='object'){ a.bg=a.bg||{}; const ord={B:1,A:2,S:3,SS:4,SSS:5};
+      Object.keys(b.bg).forEach(k=>{ if((ord[b.bg[k]]||0)>(ord[a.bg[k]]||0)) a.bg[k]=b.bg[k]; }); }
+    if(b.nm&&typeof b.nm==='object'){ a.nm=a.nm||{}; Object.keys(b.nm).forEach(k=>{ if(b.nm[k]) a.nm[k]=1; }); } });
   if(u.bh){ const key=h=>`${h.d}|${h.r}`, seen=new Set(arr(ME.bh).map(key));
     ME.bh=arr(ME.bh).concat(arr(u.bh).filter(h=>h&&!seen.has(key(h)))).sort((x,y)=>(x.d||0)-(y.d||0)).slice(-30); }
   /* 출석 · 미션 · 주간 성장 · 주별 풀이 — 늦은 날짜가 이기고, 같은 날이면 더 많이 한 쪽으로 */
@@ -12463,6 +12631,12 @@ function mergeFrom(u){
     W[k]=[0,1,2].map(i=>Math.max(+a[i]||0,+b[i]||0)); }); }
   if(u.pq&&typeof u.pq==='object'){ const P=ME.pq||(ME.pq={}); Object.keys(u.pq).forEach(k=>{ P[k]=Math.max(+P[k]||0,+u.pq[k]||0); }); }
   if((u.nkt||0)>(ME.nkt||0)){ ME.nk=u.nk||''; ME.nkt=u.nkt; NKS[ME.sid]=ME.nk; }
+  if(u.ach&&typeof u.ach==='object'){ ME.ach=Object.assign({},u.ach,ME.ach||{}); }
+  if(u.coopC&&typeof u.coopC==='object'){ ME.coopC=Object.assign({},u.coopC,ME.coopC||{}); }
+  ME.nbSeen=uniq(ME.nbSeen,u.nbSeen);
+  ME.noteN=Math.max(ME.noteN||0,u.noteN||0); ME.nmN=Math.max(ME.nmN||0,u.nmN||0);
+  ME.bossW=Math.max(ME.bossW||0,u.bossW||0); ME.gwN=Math.max(ME.gwN||0,u.gwN||0);
+  if(!ME.ttl&&u.ttl){ ME.ttl=u.ttl; TTLS[ME.sid]=ME.ttl; }
   giftNote(u);
 }
 let SAVEQ=Promise.resolve();
@@ -12480,6 +12654,7 @@ function saveMe(){
       pc:ME.pc||null,W:ME.W||{},fs:ME.fs||{},boxN:ME.boxN||0,
       hu:ME.hu||0,bt:ME.bt||null,bw:ME.bw||0,bp:ME.bp||0,bh:(ME.bh||[]).slice(-30),cu:ME.cu||{},
       att:ME.att||null,ms:ME.ms||null,gw:ME.gw||null,wk:ME.wk||{},pq:ME.pq||{},nk:ME.nk||'',nkt:ME.nkt||0,
+      ach:ME.ach||{},ttl:ME.ttl||'',coopC:ME.coopC||{},nbSeen:ME.nbSeen||[],noteN:ME.noteN||0,nmN:ME.nmN||0,bossW:ME.bossW||0,gwN:ME.gwN||0,
       h:ME.h||((LS.get(MEKEY,{})||{}).h)||''})));
   });
   return SAVEQ;
@@ -12572,7 +12747,8 @@ async function tryLogin(){
     if(u.h!==hash4(sid,pw)) return gateErr('gErr','비밀번호가 맞지 않습니다.');
     ME=meFrom(sid,u); ME._c0=up?null:ME.coin; giftNote(u);
     LS.set(MEKEY,{sid,h:u.h});
-    openSchool(); if(BT_INV) btInviteGo(); else btResume();
+    if(typeof startFreezeWatch==='function') startFreezeWatch();
+    openSchool(); if(typeof BOSS_INV!=='undefined'&&BOSS_INV){ const c=BOSS_INV; BOSS_INV=''; joinBossRoom(c); } else if(BT_INV) btInviteGo(); else btResume();
     if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요'));
   }else{
     newCh=Object.assign({},DEF_CH);
@@ -12595,12 +12771,15 @@ async function makeAccount(){
   el('gMake').disabled=false; el('gMake').textContent='이 친구로 시작하기';
   ME=meFrom(sid,rec0); ME._c0=0;
   LS.set(MEKEY,{sid,h:rec0.h});
+  if(typeof startFreezeWatch==='function') startFreezeWatch();
   openSchool();
-  if(BT_INV) btInviteGo(); else toast('반가워요! 연습 모드부터 시작해 보세요');
+  if(typeof BOSS_INV!=='undefined'&&BOSS_INV){ const c=BOSS_INV; BOSS_INV=''; joinBossRoom(c); } else if(BT_INV) btInviteGo(); else toast('반가워요! 연습 모드부터 시작해 보세요');
 }
 function logout(){
   if(!confirm('다른 학번으로 들어갈까요?\n지금 기록은 그대로 저장되어 있습니다.')) return;
   stopTimer();
+  if(typeof stopFreezeWatch==='function') stopFreezeWatch();
+  if(typeof bossStopWatch==='function') bossStopWatch();
   LS.del(MEKEY); ME=null; G=null; isTeacher=false; RK.users=null;
   document.querySelectorAll('.overlay.on').forEach(o=>o.classList.remove('on'));
   el('gLogin').style.display=''; el('gNew').style.display='none';
@@ -12642,7 +12821,7 @@ function stageGradeP(p,t,n){ const c=GRADE_CUT[t], bt=p&&p.bt&&p.bt['s'+n]; if(!
 const gBadge=g=>g?`<span class="gbadge g-${g}">${g}</span>`:'';
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
-let CFG={shop:{open:false},rk:{today:true,all:true,class:true,coin:true},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()}};
+let CFG={shop:{open:false},rk:{today:true,all:true,class:true,coin:true},lock:{on:true,goal:{}},tl:{v:2,p:TL_DEF.slice(),r:TL_DEF.slice(),b:TL_DEF.slice()},freeze:{on:false,scope:'all',msg:''},coop:{}};
 let CFG_OK=false;   /* 설정을 서버에서 한 번이라도 읽었는지 — 미션은 열린 주제를 알아야 고를 수 있어요 */
 async function loadCfg(){
   try{ const c=await dbGet('config',null); CFG_OK=true;
@@ -12651,6 +12830,8 @@ async function loadCfg(){
     if(c&&c.lock) CFG.lock={on:c.lock.on!==false, goal:Object.assign({},c.lock.goal||{})};
     if(c&&c.tl){ const vs=x=>Object.values(x||{}).filter(v=>typeof v==='string');
       CFG.tl=c.tl.open!=null&&c.tl.v==null?{v:2,p:vs(c.tl.open),r:vs(c.tl.open),b:vs(c.tl.open)}:{v:2,p:vs(c.tl.p),r:vs(c.tl.r),b:vs(c.tl.b)}; }
+    if(c&&c.freeze) CFG.freeze=Object.assign({on:false,scope:'all',msg:''},c.freeze);
+    if(c&&c.coop&&typeof c.coop==='object') CFG.coop=c.coop; else if(c) CFG.coop={};
     }catch(e){}
   return CFG;
 }
@@ -12665,7 +12846,7 @@ const LOCKI='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" widt
 function openHsLock(){
   const K=hsKeys(), got=K.filter(x=>x.ok).length;
   el('hsTitle').textContent='고등학교는 아직 잠겨 있어요';
-  el('hsSub').innerHTML=`중학교 ${K.length}개 주제의 <b>실전 모드</b>(${REAL_SEC/60}분 무실수)에서 목표 개수를 넘으면 열쇠를 하나씩 얻어요.
+  el('hsSub').innerHTML=`중학교 ${K.length}개 주제의 <b>실전 모드</b>(${REAL_SEC/60}분)에서 목표 개수를 넘으면 열쇠를 하나씩 얻어요.
     열쇠 <b>${K.length}개</b>를 모두 모으면 고등학교가 열려요. 지금 <b>${got} / ${K.length}</b>.`;
   el('hsList').innerHTML=K.map(x=>`<div class="hsrow${x.ok?' ok':''}">
       <span class="hsk">${x.ok?'✓':LOCKI}</span>
@@ -12686,7 +12867,8 @@ function openSchool(){
   show('s-school');
   el('schoolHi').innerHTML=`<b>${esc(whoPlain(ME.sid))}</b>${ME.sid===TEACHER_ID?'':' 님'}, 오늘은 어디서 시작할까요?`;
   paintSchools(); paintMissionBox(false);
-  loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')){ paintSchools(); checkAttendance(); paintMissionBox(); } });
+  if(typeof paintCoopStudent==='function') paintCoopStudent();
+  loadCfg().then(()=>{ paintMe(); if(el('s-school').classList.contains('on')){ paintSchools(); checkAttendance(); paintMissionBox(); if(typeof paintCoopStudent==='function') paintCoopStudent(); } });
   /* 우리 반 색이 바뀌었으면 내 캐릭터에도 반영 (학급 아이템이 그 색으로 그려져요) */
   loadClass().catch(()=>{});
 }
@@ -12774,11 +12956,24 @@ function meBarHTML(){
     <button class="mnbtn" onclick="openMine()">마이페이지</button>
     <button class="mnbtn" onclick="openRank()">랭킹</button>`;
 }
+let PLAY_MOOD='', PLAY_MOOD_T=null, LAST_COMBO=-1;
+function setPlayMood(m,ms){
+  clearTimeout(PLAY_MOOD_T); PLAY_MOOD=m||'';
+  paintPlayAv();
+  if(ms>0) PLAY_MOOD_T=setTimeout(()=>{ PLAY_MOOD=(G&&G.combo>=5)?'streak':''; paintPlayAv(); },ms);
+}
+function curMood(){ return PLAY_MOOD||((G&&G.combo>=5)?'streak':''); }
+function paintPlayAv(){
+  if(!ME) return;
+  const m=curMood();
+  const hm=el('hMe'); if(hm){ const av=hm.querySelector('.hmav'); if(av) av.innerHTML=avatarSVG(ME.ch,{tight:true,mood:m}); }
+  const ps=el('pSide'); if(ps){ const sav=ps.querySelector('.sav'); if(sav) sav.innerHTML=avatarSVG(ME.ch,{mood:m}); }
+}
 function paintMe(){
   const h=meBarHTML();
   ['meBar','meBar2','meBar3','meBar4','meBar5','meBar6','meBar7'].forEach(id=>{ const n=el(id); if(n) n.innerHTML=h; });
   if(!ME) return;
-  el('hMe').innerHTML=`<span style="width:28px;height:28px;display:block">${avatarSVG(ME.ch,{tight:true})}</span>
+  el('hMe').innerHTML=`<span class="hmav" style="width:28px;height:28px;display:block">${avatarSVG(ME.ch,{tight:true,mood:curMood()})}</span>
     <b style="font-size:13px;font-variant-numeric:tabular-nums">${esc(whoPlain(ME.sid))}</b>`;
   paintSide();
 }
@@ -12787,10 +12982,11 @@ function paintSide(){
   let fig='';
   if(G&&G.mode==='real') fig=`<div class="sfig"><b>${rec(G.t).best||0}</b><span>내 최고 기록</span></div>`;
   else if(G&&G.mode==='battle') fig=`<div class="sfig"><b>${G.rank||1}위</b><span>${G.nP||1}명 가운데 지금 순위</span></div>`;
+  else if(G&&G.mode==='boss') fig=`<div class="sfig"><b>${G.score||0}</b><span>내가 격파에 기여한 문제</span></div>`;
   else if(G&&G.mode==='note') fig=`<div class="sfig"><b>${Math.max(0,G.need-G.done)}</b><span>남은 오답</span></div>`;
   else if(G&&G.mode==='practice'){ const bt=prog(G.t).bt['s'+G.st];
     fig=`<div class="sfig"><b>${bt?bt.toFixed(1):'—'}</b><span>이 스테이지 최고 시간(초)</span></div>`; }
-  p.innerHTML=`<div class="sav">${avatarSVG(ME.ch)}</div>
+  p.innerHTML=`<div class="sav">${avatarSVG(ME.ch,{mood:curMood()})}</div>
     <div class="ssid">${esc(whoPlain(ME.sid))}</div>
     <div class="scoin"><span class="coin"><i></i>${ME.coin}</span></div>${fig}`;
 }
@@ -12805,7 +13001,7 @@ function renderStages(){
   el('stNote').onclick=()=>openBook(t);
   el('stTitle').textContent=`${T.n} · 연습 스테이지`;
   el('stSub').innerHTML=`스테이지의 문항을 <b>모두 맞히면 클리어</b>예요. 답을 쓰고 <b>[확인]</b>을 눌러야 채점해요. 틀린 문항은 풀이를 보고 조금 뒤에 다시 나와요.<br>
-    아직 클리어하지 않은 스테이지는 <b>맞힌 문제마다 ${PRAC_Q}코인</b>, 클리어하면 <b>보너스 ${CLEAR_FIRST}코인</b>. 이미 클리어한 스테이지는 코인이 없어요.`;
+    미클리어 스테이지는 <b>맞힌 문제마다 ${PRAC_Q}코인 + 클리어 ${CLEAR_FIRST}코인</b> · 클리어 후에도 <b>등급 승급(A~SSS)</b>·<b>첫 100% 달성</b> 시 추가 보너스가 있어요.`;
   el('stBar').innerHTML=T.stages.map(s=>`<i class="${p.c.includes(s.n)?'done':''}"></i>`).join('');
   el('stageList').innerHTML=T.stages.map(s=>{
     const done=p.c.includes(s.n), td=today.includes(t+s.n), bt=p.bt['s'+s.n];
@@ -12872,22 +13068,25 @@ function tryReal(t){
   }
   const T=topicOf(t);
   el('startTitle').textContent=`${T.n} · 실전 모드`;
-  el('startSub').innerHTML=`<b>${REAL_SEC/60}분</b> 동안 <b>한 문제도 틀리지 않고</b> 몇 문제까지 갈 수 있는지 겨룹니다.
-    한 문제라도 틀리면 거기서 끝나고, 그때까지 맞힌 개수가 기록이 됩니다.<br><br>
-    코인 : <b>맞힌 문항마다 ${COIN_PER}코인</b>, 내 최고 기록을 깨면 넘어선 문항은 <b>2배</b>.`+
+  el('startSub').innerHTML=`<b>${REAL_SEC/60}분</b> 동안 최대한 많은 문제를 풀어 보세요.
+    틀린 답을 넣으면 <b>잠깐(0.9초) 멈춘 뒤 지우고 다시 풀 수 있어요</b>. 보기에서 고르는 문제는 틀리면 다음 문제로 넘어가요. 빠르고 정확할수록 높은 기록이 됩니다.<br><br>
+    · <b>오답노트</b> : 실전 중 틀린 문제는 판당 최대 3문항까지 오답노트로 옮겨져요.<br>
+    · <b>코인</b> : 맞힌 문항마다 <b>${COIN_PER}코인</b>, 최고 기록 초과분 <b>2배</b>, <b>무실수 완주 +${REAL_FULL}코인</b>.`+
     ((t in HS_GOAL_DEF)&&CFG.lock.on&&!ME.hu?`<br><br>고등학교 열쇠 : <b>${hsGoal(t)}개</b> 이상 맞히면 얻어요 (지금 최고 ${rec(t).best||0}개).`:'');
   el('startGo').onclick=()=>{ close_('ovStart'); startReal(t); };
   openM('ovStart');
 }
 function startReal(t){
   stopTimer();
+  PLAY_MOOD=''; LAST_COMBO=-1;
   G={mode:'real', t, qi:0, score:0, combo:0, best:0, solved:0, right:0, tLeft:REAL_SEC, L:1, qLv:1,
-     tId:null, recent:[], phase:'q', typed:'', clean:true, locked:false};
+     tId:null, recent:[], misses:[], missCount:0, badPicks:new Set(), phase:'q', typed:'', clean:true, locked:false};
   setupHUD(); show('s-play');
   G.last=performance.now(); G.tId=setInterval(tick,100); next();
 }
 function tick(){
   if(!G||G.mode!=='real'||G.over) return;
+  if(G.frozen){ G.last=performance.now(); return; }
   const now=performance.now(); G.tLeft-=(now-G.last)/1000; G.last=now;
   const f=Math.max(0,G.tLeft/REAL_SEC);
   el('tbar').querySelector('i').style.width=(f*100)+'%';
@@ -12904,15 +13103,17 @@ function setTopicVars(t){ const T=topicOf(t), w=document.querySelector('.wrap');
 const cardScr=on=>el('card').classList.toggle('scr',!!on);
 /* ═══ HUD ═══ */
 function setupHUD(){
-  const real=G.mode==='real'||G.mode==='battle';
+  const real=G.mode==='real'||G.mode==='battle'||G.mode==='boss';
   el('s-play').classList.toggle('realmode',real);
   el('hTime').style.display=real?'':'none';
-  if(real) el('hTime').innerHTML=`남은 시간 <b>${clock(G.mode==='battle'?G.sec:REAL_SEC)}</b>`;
+  if(real) el('hTime').innerHTML=`남은 시간 <b>${clock(G.mode==='battle'||G.mode==='boss'?G.sec:REAL_SEC)}</b>`;
+  if(el('bsHud')) el('bsHud').style.display=G.mode==='boss'?'':'none';
   if(typeof paintBLive==='function') paintBLive();
   el('tbar').classList.toggle('prog',!real); el('tbar').classList.remove('warn');
   el('tbar').querySelector('i').style.width=real?'100%':'0%';
   setTopicVars(G.t);
   buildKeypad(kpMode(G.t));
+  LAST_COMBO=-1; PLAY_MOOD='';
   updHUD();
 }
 function updHUD(){
@@ -12924,6 +13125,9 @@ function updHUD(){
   }else if(G.mode==='battle'){
     el('hLv').textContent=`${T.n} · 친구 대전`;
     el('hAcc').textContent=`${G.score}개${G.nP>1?` · ${G.nP}명 중 ${G.rank}위`:''}`;
+  }else if(G.mode==='boss'){
+    el('hLv').textContent=`${T.n} · 반 보스전`;
+    el('hAcc').textContent=`내 기여 ${G.score}개`;
   }else if(G.mode==='note'){
     el('hLv').textContent=`${T.n} · 오답노트`;
     el('hAcc').textContent=`${G.done} / ${G.need} 완료`;
@@ -12933,8 +13137,13 @@ function updHUD(){
     el('hAcc').textContent=`${G.mastered.size} / ${G.need} 완료`;
     bar.style.width=(G.mastered.size/Math.max(1,G.need)*100)+'%';
   }
-  el('hCombo').innerHTML=`연속 <b>${G.combo}</b>`;
-  paintSide();
+  const hc=el('hCombo');
+  hc.innerHTML=`연속 <b>${G.combo}</b>`;
+  if(G.combo>0&&G.combo!==LAST_COMBO){ hc.classList.remove('pop'); void hc.offsetWidth; hc.classList.add('pop'); }
+  LAST_COMBO=G.combo;
+  const cd=el('card');
+  if(cd){ cd.classList.toggle('glow1',G.combo>=5&&G.combo<10); cd.classList.toggle('glow2',G.combo>=10); }
+  paintSide(); paintPlayAv();
 }
 
 /* ═══════════════════ 문항 진행 ═══════════════════ */
@@ -12950,11 +13159,17 @@ function next(){
     askQ(f);
   }else if(G.mode==='battle'){
     return;   /* 친구 대전은 btTick 이 모두 함께 다음 문제로 넘깁니다 */
+  }else if(G.mode==='boss'){
+    const f=realPick(G.t,G.qi+1,G.recent,G.L); G.qLv=f._rl||1;
+    G.recent.push(f.key); if(G.recent.length>12) G.recent.shift();
+    askQ(f);
   }
 }
 function qLabel(){
   if(G.mode==='real'){ const RS=realStagesOf(G.t), S=RS.length, lv=Math.min(S,G.qLv||1);
     return `난이도 ${lv} / ${S} · ${RS[lv-1].name}`; }
+  if(G.mode==='boss'){ const RS=realStagesOf(G.t), S=RS.length, lv=Math.min(S,G.qLv||1);
+    return `반 보스전 · ${RS[lv-1].name}`; }
   if(G.mode==='battle') return btQLabel();
   if(G.mode==='note') return G.step===2?'확인 문제 — 같은 계산을 다른 모양으로 한 번 더!':'다시 풀기 — 방금 본 풀이대로';
   return `${G.st}단계 · ${stageOf(G.t,G.st).name}`;
@@ -12986,7 +13201,7 @@ function pickPad(L){
   kp.innerHTML=L.map((x,i)=>`<button class="kb pk2" data-i="${i+1}">${x}</button>`).join('');
   kp.querySelectorAll('.pk2').forEach(b=>b.addEventListener('pointerdown',e=>{ if(e.button>0) return; e.preventDefault(); KP_AT=performance.now();
     if(G&&G.phase==='hint'&&G.onNext&&performance.now()-(G.hintAt||0)>300) return G.onNext();
-    if(!G||G.phase!=='q'||G.locked) return; G.typed=b.dataset.i; paintTyped(); submit(); }));
+    if(!G||G.phase!=='q'||G.locked||G.frozen||b.classList.contains('badpick')) return; G.typed=b.dataset.i; paintTyped(); submit(); }));
 }
 /* 숫자판 */
 /* 정수 주제에서는 − 단추가 붙은 네 줄 숫자판 */
@@ -13015,7 +13230,7 @@ function buildKeypad(mode){
     b.classList.add('down'); setTimeout(()=>b.classList.remove('down'),110); }));
 }
 function press(k){
-  if(!G||G.over) return;
+  if(!G||G.over||G.frozen) return;
   if(G.phase==='hint'){ if(k==='ok'&&G.onNext&&performance.now()-(G.hintAt||0)>300) G.onNext(); return; }
   if(G.phase==='preview'){ if(k==='ok') beginStage(); return; }
   if(G.phase!=='q'||G.locked) return;
@@ -13037,11 +13252,13 @@ function submit(){
   logFact(f,ok,sec);
   if(G.mode==='real') return realAnswer(ok,f,sec);
   if(G.mode==='battle') return btAnswer(ok,f);
+  if(G.mode==='boss') return bossAnswer(ok,f);
   if(G.mode==='note') return noteAnswer(ok,f);
   practiceAnswer(ok,f);
 }
 function flashOk(){
   paintTyped('ok');
+  setPlayMood(G&&G.combo>=5?'streak':'ok',460);
   const m=el('qmsg'); if(m){ m.className='qmsg good'; m.textContent=G.combo>=5?`정답! ${G.combo}연속`:'정답!'; }
 }
 function practiceAnswer(ok,f){
@@ -13050,11 +13267,12 @@ function practiceAnswer(ok,f){
     /* 아직 클리어 못 한 스테이지만 — 맞힌 문제마다 코인, 그 스테이지 문항 수까지(그만두고 다시 해도 더 늘지 않아요) */
     if(!prog(G.t).c.includes(G.st)){ const P=ME.pq||(ME.pq={}), k=G.t+G.st;
       if((P[k]||0)<stageCount(G.t,G.st)){ P[k]=(P[k]||0)+PRAC_Q; ME.coin+=PRAC_Q; G.qc=(G.qc||0)+PRAC_Q; paintMe(); } }
-    flashOk(); updHUD(); setTimeout(()=>{ if(G&&G.mode==='practice') next(); },330);
+    flashOk(); updHUD(); setTimeout(()=>{ if(G&&G.mode==='practice'&&!G.frozen) next(); },330);
     return;
   }
   G.combo=0; G.wrongOnce.set(f.key,f); G.mastered.delete(f.key);
   G.queue.splice(Math.min(2,G.queue.length),0,f);          /* 두 문제 뒤에 다시 */
+  setPlayMood('miss',950);
   updHUD();
   showHint(f,G.typed,'이 문제는 조금 뒤에 다시 나와요',()=>next());
 }
@@ -13062,13 +13280,30 @@ function realAnswer(ok,f,sec){
   if(ok){
     G.L=(G.L||1)+realGain(G.t,sec);
     G.qi++; G.score++; G.right++; G.combo++; G.best=Math.max(G.best,G.combo);
+    if(G.badPicks) G.badPicks.clear();
     flashOk(); updHUD();
-    setTimeout(()=>{ if(G&&G.mode==='real'&&!G.over) next(); },160);
+    setTimeout(()=>{ if(G&&G.mode==='real'&&!G.over&&!G.frozen) next(); },160);
     return;
   }
-  G.miss={key:f.key, typed:G.typed};
-  paintTyped('no');
-  finish(false);
+  /* 재입력 허용형(0.9초 페널티) — 60초 완주, 틀린 문제는 판당 최대 3문항 오답노트에 누적 */
+  G.missCount=(G.missCount||0)+1; G.combo=0;
+  if(!G.misses) G.misses=[];
+  if(G.misses.length<3&&!G.misses.some(x=>x.key===f.key)) G.misses.push({key:f.key,typed:G.typed});
+  /* 보기 단추 문항(2~3개 중 고르기)은 다시 고르게 하면 찍는 편이 더 빨라져요 — 틀리면 0.9초 뒤 다음 문제로 */
+  const skip=!!f.pick;
+  paintTyped('no'); setPlayMood('miss',900);
+  const cd=el('card'); if(cd){ cd.classList.remove('shake'); void cd.offsetWidth; cd.classList.add('shake'); }
+  document.body.classList.add('btpen');
+  const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.textContent=skip?'아쉬워요 — 다음 문제로 넘어가요':'아쉬워요 — 잠깐 뒤 다시 풀어 봐요'; }
+  updHUD();
+  const qRef=G.ask;
+  setTimeout(()=>{
+    document.body.classList.remove('btpen');
+    if(!G||G.mode!=='real'||G.over||G.ask!==qRef) return;
+    if(skip){ if(!G.frozen) next(); return; }
+    G.typed=''; G.clean=true; G.locked=false; paintTyped('');
+    const m2=el('qmsg'); if(m2){ m2.className='qmsg'; m2.textContent=''; }
+  },900);
 }
 
 /* 풀이 보기 — 틀렸을 때 · 오답노트에서 다시 볼 때 */
@@ -13084,7 +13319,10 @@ function showHint(f,typed,note,onNext,opt){
       <div class="eq small">${eqHTML(f,String(f.ans),'ok')}</div>
       ${hintBox(h)}
       <div class="nextrow"><span class="hnote">${note||''}</span>
-        <button class="btn next" id="nextBtn">${opt.next||'다음 →'}</button></div>
+        <span style="display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end">
+          <button class="btn" type="button" onclick="openBookModal('${G.t}')">📖 정리 노트</button>
+          <button class="btn next" id="nextBtn">${opt.next||'다음 →'}</button>
+        </span></div>
     </div>`;
   el('nextBtn').onclick=()=>G&&G.onNext&&G.onNext();
 }
@@ -13104,6 +13342,8 @@ function quitPlay(){
     if(!G||G.over) return; G.quit=true; finish(false); return; }
   if(G.mode==='battle'){ if(G.over) return;
     if(G.phase==='cd'||confirm('대전을 그만둘까요?\n지금까지 얻은 점수로 결과에 남아요.')) btFinish(true); return; }
+  if(G.mode==='boss'){ if(G.over) return;
+    if(confirm('보스전에서 나갈까요?\n지금까지 기여한 문제는 반 기록에 그대로 남아요.')) bossLeave(); return; }
   if(G.mode==='practice'&&G.solved>0&&!G.over&&!confirm('연습을 그만둘까요?\n이 단계는 처음부터 다시 풀어야 해요.')) return;
   if(!G) return;
   const t=G.t, mode=G.mode;
@@ -13135,22 +13375,42 @@ async function stageClear(){
   if(first&&ME.pq) delete ME.pq[tk];
   const prevBt=p.bt['s'+n], newBt=!prevBt||sec<prevBt;
   if(newBt) p.bt['s'+n]=+sec.toFixed(1);
-  ME.coin+=coin;
-  const ms=markMission('stage',t,n,{perfect:G.wrongOnce.size===0,sec:+sec.toFixed(1)});
+  /* 상위 등급 최초 승급 보너스 (A:+10 · S:+15 · SS:+20 · SSS:+25) + 최초 100%(노미스) 보너스(+10) */
+  const GR_ORD=['B','A','S','SS','SSS'], GR_PAY={A:10,S:15,SS:20,SSS:25};
+  p.bg=p.bg||{}; p.nm=p.nm||{};
+  const nowGr=stageGrade(t,n), prevGr=p.bg['s'+n]||(prevBt?'B':'');
+  let upCoin=0, upLabel='', nmCoin=0;
+  if(nowGr&&GR_ORD.indexOf(nowGr)>GR_ORD.indexOf(prevGr)){
+    const from=Math.max(1,GR_ORD.indexOf(prevGr)+1), to=GR_ORD.indexOf(nowGr);
+    for(let i=from;i<=to;i++) upCoin+=(GR_PAY[GR_ORD[i]]||0);
+    p.bg['s'+n]=nowGr;
+    if(upCoin) upLabel=`${nowGr} 등급 첫 달성 +${upCoin}`;
+  }
+  const isNoMiss=G.wrongOnce.size===0;
+  if(isNoMiss&&!p.nm['s'+n]){ p.nm['s'+n]=1; nmCoin=10; ME.nmN=(ME.nmN||0)+1; }
+  const extraClear=upCoin+nmCoin;
+  ME.coin+=coin+extraClear;
+  const ms=markMission('stage',t,n,{perfect:isNoMiss,sec:+sec.toFixed(1)});
   const retry=G.wrongOnce.size, need=G.need, wrongs=[...G.wrongOnce.values()];
   G.over=true;
+  if(typeof checkAch==='function') checkAch();
   saveMe();
 
   el('clStamp').textContent='STAGE CLEAR';
-  el('clTitle').innerHTML=`${n}단계 클리어!${gBadge(stageGrade(t,n))}`;
+  el('clTitle').innerHTML=`${n}단계 클리어!${gBadge(nowGr)}`;
   el('clName').textContent=`${T.n} · ${s.name}`;
-  el('clChars').innerHTML=`<div class="clav">${avatarSVG(ME.ch)}</div>`;
+  el('clChars').innerHTML=`<div class="clav">${avatarSVG(ME.ch,{mood:'ok'})}</div>`;
   el('clQ').textContent=need; el('clQl').textContent='문항 수';
   el('clFirst').textContent=Math.round((need-retry)/need*100)+'%';
+  el('clFirst').nextElementSibling.textContent='한 번에 맞힌 비율';
   el('clTime').textContent=secTxt(sec);
   el('clTimeL').textContent=newBt?(prevBt?'최고 시간 갱신!':'첫 기록'):`걸린 시간 · 최고 ${prevBt.toFixed(1)}초`;
-  el('clProg').textContent=`+${coin+qc}`;
-  el('clStat4').textContent=first?`문제 ${qc} + 클리어 보너스 ${coin}`:'다시 한 스테이지는 코인 없음';
+  el('clProg').textContent=`+${coin+qc+extraClear}`;
+  const s4=[];
+  if(first) s4.push(`문제 ${qc} + 클리어 ${coin}`);
+  if(upCoin) s4.push(upLabel);
+  if(nmCoin) s4.push(`첫 100% +${nmCoin}`);
+  el('clStat4').textContent=s4.length?s4.join(' · '):'최고 기록이나 상위 등급에 도전해 보세요';
   el('clMiss').innerHTML=wrongs.length
     ? `<h3>한 번 더 볼 계산 ${wrongs.length}개</h3>`+wrongs.map(f=>
         { const q=eqText(f,true), H=hintOf(f)||{}, L=H.lines||[], bare=x=>String(x||'').replace(/<[^>]*>/g,'').replace(/[\s\u2009]/g,'');
@@ -13165,20 +13425,22 @@ async function stageClear(){
   el('clBtns').innerHTML=btns.join('');
   if(ms) el('clMiss').insertAdjacentHTML('afterbegin',`<div class="gainbox good msgain">${ms.msg}</div>`);
   show('s-clear');
-  if(coin||ms){ const pt=[]; if(coin) pt.push(`클리어 +${coin}`); if(ms) pt.push(`미션 +${ms.coin}`);
-    toast(pt.length>1?`${pt.join(' · ')} = +${coin+(ms?ms.coin:0)}코인!`:`${pt[0]}코인!`); }
+  if(coin||extraClear||ms){ const pt=[]; if(coin) pt.push(`클리어 +${coin}`); if(upCoin) pt.push(`승급 +${upCoin}`); if(nmCoin) pt.push(`첫 100% +${nmCoin}`); if(ms) pt.push(`미션 +${ms.coin}`);
+    const tot=coin+extraClear+(ms?ms.coin:0);
+    toast(pt.length>1?`${pt.join(' · ')} = +${tot}코인!`:`${pt[0]}코인!`); }
 }
 
 /* ═══ 실전 끝 ═══ */
 async function finish(timeUp){
   if(!G||G.over||G.mode!=='real') return;
-  G.over=true; stopTimer();
+  G.over=true; stopTimer(); document.body.classList.remove('btpen');
   const t=G.t, T=topicOf(t), r=rec(t), score=G.score, prevBest=r.best||0, day=todayKey();
   const tb=(r.tb&&r.tb.d===day)?(r.tb.n||0):0;
   const beat=score>prevBest&&score>0, over=beat?score-prevBest:0;
-  const full=!!timeUp&&!G.quit&&score>0, coin=(score+over)*COIN_PER+(full?REAL_FULL:0);
+  const missList=(G.misses||[]).slice(0,3).map(x=>({f:factFromKey(x.key),typed:x.typed})).filter(x=>x.f);
+  const flawless=(G.missCount||0)===0;
+  const full=!!timeUp&&!G.quit&&score>0&&flawless, coin=(score+over)*COIN_PER+(full?REAL_FULL:0);
   const used=Math.min(REAL_SEC,REAL_SEC-Math.max(0,G.tLeft));
-  const miss=G.miss?factFromKey(G.miss.key):null;
   const hsWas=hsOpen(), keyNew=(t in HS_GOAL_DEF)&&CFG.lock.on&&!ME.hu&&prevBest<hsGoal(t)&&score>=hsGoal(t);
 
   r.best=Math.max(prevBest,score);
@@ -13186,14 +13448,17 @@ async function finish(timeUp){
   if(hsNow) ME.hu=1;
   r.tb={d:day,n:Math.max(tb,score)};
   r.hist=(r.hist||[]).concat([{d:day,n:score,ts:Date.now()}]).slice(-120);
-  if(miss){ const w=wrongOf(t); if(!w.includes(miss.key)) w.push(miss.key); }
+  if(missList.length){ const w=wrongOf(t); missList.forEach(x=>{ if(!w.includes(x.f.key)) w.push(x.f.key); }); }
   ME.coin+=coin;
-  const grow=weeklyGrowth(t,score), ms=markMission('real',t,null,{score});
+  const grow=weeklyGrowth(t,score);
+  if(grow) ME.gwN=(ME.gwN||0)+1;
+  const ms=markMission('real',t,null,{score});
   RK.users=null;
+  if(typeof checkAch==='function') checkAch({flawlessFull:full});
 
   el('endTitle').textContent = G.quit?`${T.n} · 중간에 그만두었어요 · 맞힌 문항`
-    : timeUp?`${T.n} · ${REAL_SEC/60}분을 모두 채웠어요! · 맞힌 문항`
-    : `${T.n} · 한 문제를 틀려 여기서 끝 · 맞힌 문항`;
+    : full?`${T.n} · ${REAL_SEC/60}분 무실수 완주! · 맞힌 문항`
+    : `${T.n} · ${REAL_SEC/60}분 도전 완료 · 맞힌 문항`;
   el('endScore').innerHTML=score+'개'+(gradeCuts(t)&&gradeOfRec(t,score)?gBadge(gradeOfRec(t,score)):'');
   el('endScore').style.color=beat?'var(--o)':'';
   el('statBox').innerHTML=`
@@ -13203,19 +13468,20 @@ async function finish(timeUp){
     <div class="stat"><b>+${coin+(grow?grow.coin:0)+(ms?ms.coin:0)}</b><span>받은 코인</span></div>`;
   el('byLv').innerHTML = (beat
     ? `<div class="gainbox good">최고 기록 갱신! 넘어선 ${over}문항은 코인 <b>2배</b></div>`
-    : '')+(full?`<div class="gainbox good">1분을 틀리지 않고 다 채웠어요! 클리어 보너스 <b>+${REAL_FULL}코인</b></div>`:'');
+    : '')+(full?`<div class="gainbox good">1분을 실수 없이 완주했어요! 무실수 보너스 <b>+${REAL_FULL}코인</b></div>`:'');
   if(grow) el('byLv').innerHTML+=`<div class="gainbox good">지난주 최고 ${grow.last}개보다 성장했어요! <b>+${grow.coin}코인</b> <small>(주제마다 한 주에 한 번)</small></div>`;
   if(ms) el('byLv').innerHTML+=`<div class="gainbox good msgain">${ms.msg}</div>`;
   if(hsNow) el('byLv').innerHTML+=`<div class="gainbox hsopen"><b>고등학교가 열렸어요!</b> 중학교 열쇠 ${hsKeys().length}개를 모두 모았어요. 처음 화면에서 고등학교를 골라 보세요.</div>`;
   else if(keyNew){ const K=hsKeys(); el('byLv').innerHTML+=`<div class="gainbox hskeybox">${LOCKI}<span><b>고등학교 열쇠</b>를 얻었어요 — ${K.filter(x=>x.ok).length} / ${K.length}</span></div>`; }
-  el('endMiss').innerHTML = miss
-    ? `<div class="endmiss"><div class="emhead"><span class="mark bad">틀린 문제</span>
-        <span class="mine">내가 쓴 답 <s>${esc(miss.pick?(miss.pick[+G.miss.typed-1]||G.miss.typed):G.miss.typed)}</s></span>
+  el('endMiss').innerHTML = missList.length
+    ? missList.map(x=>`<div class="endmiss"><div class="emhead"><span class="mark bad">틀린 문제</span>
+        <span class="mine">내가 쓴 답 <s>${esc(x.f.pick?(x.f.pick[+x.typed-1]||x.typed):x.typed)}</s></span>
         <span class="emnote">→ 오답노트로 옮겼어요</span></div>
-        <div class="eq small">${eqHTML(miss,String(miss.ans),'ok')}</div>${hintBox(hintOf(miss))}</div>`
+        <div class="eq small">${eqHTML(x.f,String(x.f.ans),'ok')}</div>${hintBox(hintOf(x.f))}</div>`).join('')
+      +`<div style="text-align:right;margin-top:6px"><button class="nbpeek-btn" type="button" onclick="openBookModal('${t}')">📖 ${esc(T.n)} 정리 노트 보기</button></div>`
     : '';
-  el('againBtn').textContent=miss?'오답노트 풀기 →':'다시 도전';
-  el('againBtn').onclick=miss?()=>startNote(t):()=>startReal(t);
+  el('againBtn').textContent=missList.length?`오답노트 풀기 (${missList.length}) →`:'다시 도전';
+  el('againBtn').onclick=missList.length?()=>startNote(t):()=>startReal(t);
   el('homeBtn').textContent='처음으로';
   el('homeBtn').onclick=goHome;
   show('s-end');
@@ -13274,13 +13540,16 @@ function noteAnswer(ok,f){
 function noteDone(){
   const t=G.t, T=topicOf(t), need=G.need, coin=G.coin, solved=G.solved, right=G.right;
   G.over=true;
+  ME.noteN=(ME.noteN||0)+1;
+  if(typeof checkAch==='function') checkAch();
   saveMe(); paintMe();
   el('clStamp').textContent='오답노트 완료';
   el('clTitle').textContent='다 풀었어요!';
   el('clName').textContent=`${T.n} 실전 모드가 다시 열렸어요`;
-  el('clChars').innerHTML=`<div class="clav">${avatarSVG(ME.ch)}</div>`;
+  el('clChars').innerHTML=`<div class="clav">${avatarSVG(ME.ch,{mood:'ok'})}</div>`;
   el('clQ').textContent=need; el('clQl').textContent='다시 푼 계산';
   el('clFirst').textContent=solved?Math.round(right/solved*100)+'%':'—';
+  el('clFirst').nextElementSibling.textContent='정답률';
   el('clTime').textContent=solved; el('clTimeL').textContent='푼 횟수';
   el('clProg').textContent=`+${coin}`; el('clStat4').textContent='받은 코인';
   el('clMiss').innerHTML='';
@@ -13352,13 +13621,15 @@ function openMine(){
 }
 function openMineRepaint(){
   el('mpAv').innerHTML=avatarSVG(ME.ch);
-  el('mpSid').textContent=ME.sid;
+  const myTtl=typeof achTitle==='function'?achTitle(ME.ttl):'';
+  el('mpSid').innerHTML=(myTtl?`<span class="ttltag">${esc(myTtl)}</span>`:'')+esc(ME.nk||ME.sid)+(ME.nk?`<small class="nsid">${esc(ME.sid)}</small>`:'');
   el('mpChips').innerHTML=`
     <span class="mpchip coinchip"><span class="coin"><i></i>${ME.coin}</span></span>
     <span class="mpchip">${classLabel(classOf(ME.sid))}</span>
     <span class="mpchip">가진 것 ${ownItems().length+ownShapes().length+ownColors().length}개</span>
     <span class="mpchip">친구 대전 ${ME.bw||0}승 ${Math.max(0,(ME.bp||0)-(ME.bw||0))}패</span>`;
   paintMine(); paintMineBattle(); paintMineOwn(); paintMineGrowth();
+  if(typeof paintMineAch==='function') paintMineAch();
 }
 function paintMineOwn(){
   const ids=ownItems().filter(id=>ITEM(id)), w=ME.ch.items||[];
@@ -13390,10 +13661,11 @@ function paintMine(){
   MP.mode = h.length>20 ? 'day' : MP.mode;
   paintMineChart();
   const wk=weakList(ME.fs,t,8);
-  el('mpWeak').innerHTML=wk.length
+  el('mpWeak').innerHTML=(wk.length
     ? `<div class="weak">${wk.map(x=>`<span class="wchip"><b>${skLabel(x.sk)}</b><i>${x.ok}/${x.n} · ${x.sec.toFixed(1)}초</i></span>`).join('')}</div>
        <div class="chartlab">두 번 이상 풀어 본 계산 가운데 정답률이 낮은 순 · 맞힌 횟수/푼 횟수 · 한 문항에 걸린 평균 시간</div>`
-    : `<div class="empty" style="padding:18px 0">아직 자주 틀린 계산이 없어요.</div>`;
+    : `<div class="empty" style="padding:18px 0">아직 자주 틀린 계산이 없어요.</div>`)
+    +`<div style="margin-top:8px"><button class="nbpeek-btn" type="button" onclick="openBookModal('${t}')">📖 ${esc(T.n)} 정리 노트 보기</button></div>`;
   el('mpStage').innerHTML=T.stages.map(s=>{
     const done=p.c.includes(s.n), bt=p.bt['s'+s.n];
     return `<button class="mprow" onclick="startStage('${t}',${s.n})">
@@ -13435,7 +13707,7 @@ function paintMineChart(){
    cu : {s 상점, b 상자(겹쳐서 돌려받은 코인은 뺀 값), bn 셈한 상자 수, g 모금} — 2026.10.31 부터 정확히 셉니다.
    그 전에 쓴 코인은 가진 물건의 값(상점 정가)과 상자 횟수(일반 상자 값)로 어림합니다.
    모금은 학급 자료(classes/반/gv)에 학생마다 남아 있어 그 값을 씁니다.                     */
-function spendLog(k,v){ if(!ME||!(v>0)) return; const cu=ME.cu||(ME.cu={}); cu[k]=(cu[k]||0)+v; if(k==='b') cu.bn=(cu.bn||0)+1; }
+function spendLog(k,v){ if(!ME||!(v>0)) return; const cu=ME.cu||(ME.cu={}); cu[k]=(cu[k]||0)+v; if(k==='b') cu.bn=(cu.bn||0)+1; if(k==='g'&&typeof checkAch==='function') checkAch(); }
 function coinUse(u,sid,classes){
   const cu=u.cu||{};
   const goods=arr(u.own).map(ITEM).filter(it=>it&&!it.box&&it.cat!=='class')
@@ -13567,7 +13839,7 @@ function paintRank(){
     if(!(cur&&cur[1]>0)){ const best=C.slice().sort((a,b)=>b[1]-a[1])[0]; if(best&&best[1]>0) RK.topic=best[0]; } }
   if(!all.includes(RK.topic)) RK.topic=all[0];
   const t=RK.topic; RK.school=(SCHOOLS.find(x=>x.topics.includes(t))||SCHOOLS[0]).k;
-  el('rkSub').innerHTML=`${live} · <b>실전 모드</b>(${REAL_SEC/60}분 무실수)에서 맞힌 개수로 매겨요`;
+  el('rkSub').innerHTML=`${live} · <b>실전 모드</b>(${REAL_SEC/60}분)에서 맞힌 개수로 매겨요`;
   el('rkTopics').innerHTML=open.map(x=>`<div class="tpick">${open.length>1?`<span class="tlab">${SN[x.k]||x.n}</span>`:''}<div class="hsc">${rkTopicsOf(x.k).map(k=>
     `<button class="pk${k===t?' on':''}" data-t="${k}">${topicOf(k).n}</button>`).join('')}</div></div>`).join('');
   el('rkTopics').querySelectorAll('.pk').forEach(b=>b.onclick=()=>{ RK.topic=b.dataset.t; paintRank(); });
@@ -13613,41 +13885,11 @@ function openBook(t){
   if(!ME) return;
   if(t) CUR.topic=t; t=CUR.topic;
   stopTimer(); G=null;
-  const T=topicOf(t), N=noteOf(t), p=prog(t);
-  const nx=(T.stages.find(s=>!p.c.includes(s.n))||T.stages[0]).n;
   setTopicVars(t);
-  const way=(w,i)=>{ const tips=[], steps=[];
-    (w.lines||[]).forEach(l=>{ const m=String(l).match(BK_TIP); if(m) tips.push(m[1]); else steps.push(l); });
-    return `<article class="nbway">
-      <header><span class="nbn">${i+1}</span><h4>${mfmt(w.t)}</h4></header>
-      <div class="nbex${(x=>/[가-힣]/.test(x)&&x.length>18)(String(w.ex||'').replace(/<[^>]+>/g,''))?' long':''}">${mfmt(w.ex)}</div>
-      ${w.svg?`<div class="nbvis">${w.svg}</div>`:''}
-      ${steps.length?`<ol class="nbsteps">${steps.map((l,j)=>`<li${j===steps.length-1?' class="last"':''}>${mfmt(l)}</li>`).join('')}</ol>`:''}
-      ${tips.map(x=>`<div class="nbtip">${BK_IC.ways}<span>${mfmt(x)}</span></div>`).join('')}
-    </article>`; };
   const bk=el('book'); bk.className='book nb2';
-  bk.innerHTML=`
-    <div class="nbhero">
-      <div class="nbtop"><span class="tsym sm">${symHTML(T)}</span>
-        <div class="nbtt"><span class="nbkind">정리 노트${T.gr?` · ${T.gr}`:''}</span><h2>${T.n}</h2></div></div>
-      <p class="nbsub">${N.sub}</p>
-      <div class="nbtoc">${[['memo','외워 둘 것',N.memo.length],['ways','생각하는 방법',N.ways.length],['miss','자주 하는 실수',N.miss.length]]
-        .map(([k,n,c])=>`<button data-go="${k}">${BK_IC[k]}<b>${c}</b><span>${n}</span></button>`).join('')}</div>
-    </div>
-    <section class="nbsec" id="nb-memo"><h3>${BK_IC.memo}외워 둘 것</h3>
-      ${N.memo.map(m=>`<div class="nbmemo"><h4>${mfmt(m.h)}</h4><div class="nbmc">${mfmt(m.html)}</div></div>`).join('')}</section>
-    <section class="nbsec" id="nb-ways"><h3>${BK_IC.ways}생각하는 방법</h3>
-      <div class="nbways">${N.ways.map(way).join('')}</div></section>
-    <section class="nbsec" id="nb-miss"><h3>${BK_IC.miss}자주 하는 실수</h3>
-      ${N.miss.map(m=>`<div class="nbmiss">
-        <div class="nbmw"><i>✕</i><span>${mfmt(m.w)}</span></div>
-        <div class="nbmr"><i>✓</i><span>${mfmt(bookRight(m.w,m.r))}</span></div>
-        <p><b>왜?</b>${mfmt(m.y)}</p></div>`).join('')}</section>
-    <div class="nbfoot">
-      <button class="btn" onclick="openStages('${t}')">← 스테이지 고르기</button>
-      <button class="btn primary" style="flex:0 0 auto" onclick="startStage('${t}',${nx})">${nx}단계 연습하기 →</button>
-    </div>`;
-  bk.querySelectorAll('.nbtoc button').forEach(b=>b.onclick=()=>{ const s=el('nb-'+b.dataset.go); if(s) s.scrollIntoView({behavior:'smooth',block:'start'}); });
+  bk.innerHTML=buildBookHTML(t,false);
+  bindBookToc(bk);
+  if(typeof markBookSeen==='function') markBookSeen(t);
   show('s-book');
 }
 
@@ -14065,12 +14307,13 @@ async function voteClassText(k){
 let BACK_ARM=0;
 const backGuard=()=>{ try{ history.pushState({cm:1},''); }catch(e){} };
 function onBack(){
+  if(el('ovFreeze')&&el('ovFreeze').classList.contains('on')){ backGuard(); return; }
   const on=document.querySelector('.screen.on'), id=on?on.id:'';
   if(id==='s-gate'){ history.back(); return; }
-  const ov=[...document.querySelectorAll('.overlay.on')];
+  const ov=[...document.querySelectorAll('.overlay.on')].filter(o=>o.id!=='ovFreeze');
   if(ov.length){ ov.forEach(o=>o.classList.remove('on')); backGuard(); return; }
-  const inBattle=(G&&G.mode==='battle'&&!G.over)||(typeof BT!=='undefined'&&BT.code&&id==='s-battle');
-  if(inBattle){ backGuard(); toast(G&&G.mode==='battle'&&!G.over?'대전 중이에요 — 나가려면 위의 [그만하기]를 눌러요':'대기실이에요 — 나가려면 [나가기]를 눌러요'); return; }
+  const inBattle=(G&&(G.mode==='battle'||G.mode==='boss')&&!G.over)||(typeof BT!=='undefined'&&BT.code&&id==='s-battle')||(typeof BOSS!=='undefined'&&BOSS.code&&id==='s-boss');
+  if(inBattle){ backGuard(); toast(G&&(G.mode==='battle'||G.mode==='boss')&&!G.over?'진행 중이에요 — 나가려면 위의 [그만하기]를 눌러요':'대기실이에요 — 나가려면 [나가기]를 눌러요'); return; }
   const main=isTeacher?'s-teach':'s-school';
   if(id===main){ if(Date.now()-BACK_ARM<2500){ history.back(); return; } BACK_ARM=Date.now(); backGuard(); toast('한 번 더 누르면 나가요'); return; }
   backGuard();
@@ -14078,6 +14321,733 @@ function onBack(){
   if(ME) openSchool(); else show('s-gate');
 }
 window.addEventListener('popstate',onBack);
+
+/* ═══════════════════ 확장 모듈 (정리 노트 2.0 · 업적/칭호 · 집중 멈춤 · 협동 목표 · 반 전체 보스전) ═══════════════════ */
+
+/* ── 1. 정리 노트 2.0 (시각화 SVG + "왜 그럴까?" 원리 + 교실 최다 오개념 + 바로 열기 모달) ── */
+const NOTE_PLUS={
+  fadd:{
+    why:[
+      {h:'왜 분모가 같아야 더하고 뺄 수 있을까?', tag:'그림으로 이해하기',
+       svg:`<svg viewBox="0 0 360 112" width="360" height="112" aria-label="분수 통분 막대 모델">
+         <rect x="10" y="10" width="120" height="26" rx="6" fill="#eef2fe" stroke="#2f5bea" stroke-width="1.6"/>
+         <rect x="10" y="10" width="60" height="26" rx="5" fill="#748ffc" opacity=".75"/>
+         <line x1="70" y1="10" x2="70" y2="36" stroke="#2f5bea" stroke-width="1.4"/>
+         <text x="142" y="28" font-size="14" font-weight="800" fill="#111">1/2 = 3/6</text>
+         <rect x="220" y="10" width="120" height="26" rx="6" fill="#eef2fe" stroke="#2f5bea" stroke-width="1.6"/>
+         <rect x="220" y="10" width="60" height="26" rx="5" fill="#748ffc" opacity=".75"/>
+         <path d="M240 10v26M260 10v26M280 10v26M300 10v26M320 10v26" stroke="#2f5bea" stroke-width="1.2"/>
+         <rect x="10" y="48" width="120" height="26" rx="6" fill="#ebfbee" stroke="#12a05c" stroke-width="1.6"/>
+         <rect x="10" y="48" width="40" height="26" rx="5" fill="#63e6be" opacity=".8"/>
+         <path d="M50 48v26M90 48v26" stroke="#12a05c" stroke-width="1.4"/>
+         <text x="142" y="66" font-size="14" font-weight="800" fill="#111">1/3 = 2/6</text>
+         <rect x="220" y="48" width="120" height="26" rx="6" fill="#ebfbee" stroke="#12a05c" stroke-width="1.6"/>
+         <rect x="220" y="48" width="40" height="26" rx="5" fill="#63e6be" opacity=".8"/>
+         <path d="M240 48v26M260 48v26M280 48v26M300 48v26M320 48v26" stroke="#12a05c" stroke-width="1.2"/>
+         <text x="180" y="100" text-anchor="middle" font-size="13.5" font-weight="800" fill="#2f5bea">같은 크기(1/6)로 쪼개면 → 3칸 + 2칸 = 5/6!</text>
+       </svg>`,
+       p:'<b>분모</b>는 한 조각의 크기를 뜻해요. 크기가 다른 피자 조각(1/2과 1/3)은 그대로 셀 수 없어서, <b>같은 크기(통분)로 나눈 뒤 조각 수(분자)만</b> 더하거나 빼요.'}
+    ],
+    miss:[{w:'1/2 + 1/3 = 2/5', r:'5/6', y:'분모끼리 더하면 조각 크기가 엉뚱하게 작아져요. 3/6 + 2/6 = 5/6처럼 통분 후 분자만 더해요.'}]
+  },
+  fmul:{
+    why:[
+      {h:'왜 분수 곱셈은 분모×분모, 분자×분자일까?', tag:'넓이 모델',
+       svg:`<svg viewBox="0 0 340 120" width="340" height="120" aria-label="분수 곱셈 넓이 모델">
+         <rect x="20" y="14" width="120" height="90" rx="6" fill="#f8f9fa" stroke="#333" stroke-width="1.8"/>
+         <rect x="20" y="14" width="80" height="90" fill="#a5d8ff" opacity=".55"/>
+         <rect x="20" y="14" width="120" height="45" fill="#b2f2bb" opacity=".45"/>
+         <rect x="20" y="14" width="80" height="45" fill="#4c6ef5" opacity=".42"/>
+         <path d="M60 14v90M100 14v90M20 59h120" stroke="#333" stroke-width="1.2" stroke-dasharray="3 2"/>
+         <text x="80" y="116" text-anchor="middle" font-size="12" font-weight="800" fill="#1971c2">가로 2/3</text>
+         <text x="155" y="42" font-size="13" font-weight="800" fill="#111">전체 3 × 2 = 6칸 중</text>
+         <text x="155" y="64" font-size="13" font-weight="800" fill="#2f5bea">겹친 부분 2 × 1 = 2칸</text>
+         <text x="155" y="90" font-size="14" font-weight="900" fill="#111">2/3 × 1/2 = 2/6 = 1/3</text>
+       </svg>`,
+       p:'가로 3등분 중 2칸과 세로 2등분 중 1칸이 겹치면, 전체는 <b>3×2=6칸</b>이 되고 색칠된 칸은 <b>2×1=2칸</b>이 돼요. 나눗셈은 <b>"몇 번 들어가는지"</b>를 세는 것이라 역수를 곱한 값과 같아요.'}
+    ],
+    miss:[{w:'2/3 ÷ 4/5 = 3/2 × 4/5', r:'2/3 × 5/4 = 5/6', y:'앞의 분수는 그대로 두고, 뒤의 나누는 분수만 분자·분모를 뒤집어 곱해요.'}]
+  },
+  dadd:{
+    why:[
+      {h:'왜 소수점을 세로로 꼭 맞춰야 할까?', tag:'자릿값 표',
+       svg:`<svg viewBox="0 0 340 108" width="340" height="108" aria-label="소수점 자릿값 정렬">
+         <rect x="18" y="10" width="144" height="88" rx="10" fill="#f8f9fa" stroke="#dee2e6"/>
+         <line x1="88" y1="12" x2="88" y2="96" stroke="#2f5bea" stroke-width="2" stroke-dasharray="4 3"/>
+         <text x="52" y="34" font-size="16" font-weight="800" fill="#111">2</text><text x="84" y="34" font-size="16" font-weight="900" fill="#2f5bea">.</text><text x="98" y="34" font-size="16" font-weight="800" fill="#111">4</text><text x="122" y="34" font-size="16" font-weight="800" fill="#adb5bd">0</text>
+         <text x="30" y="58" font-size="15" font-weight="800" fill="#2f5bea">+</text><text x="52" y="58" font-size="16" font-weight="800" fill="#111">0</text><text x="84" y="58" font-size="16" font-weight="900" fill="#2f5bea">.</text><text x="98" y="58" font-size="16" font-weight="800" fill="#111">3</text><text x="122" y="58" font-size="16" font-weight="800" fill="#111">5</text>
+         <line x1="28" y1="67" x2="146" y2="67" stroke="#333" stroke-width="1.6"/>
+         <text x="52" y="88" font-size="16" font-weight="900" fill="#2f5bea">2</text><text x="84" y="88" font-size="16" font-weight="900" fill="#2f5bea">.</text><text x="98" y="88" font-size="16" font-weight="900" fill="#2f5bea">7</text><text x="122" y="88" font-size="16" font-weight="900" fill="#2f5bea">5</text>
+         <text x="178" y="40" font-size="13" font-weight="800" fill="#111">2.4 = 2.40</text>
+         <text x="178" y="62" font-size="12.5" font-weight="700" fill="#495057">빈 소수 자리는 0이</text>
+         <text x="178" y="80" font-size="12.5" font-weight="700" fill="#495057">숨어 있다고 생각해요</text>
+       </svg>`,
+       p:'소수점을 맞추면 <b>일의 자리끼리, 0.1 자리끼리, 0.01 자리끼리</b> 자동으로 줄이 맞아요. 자연수(예: 3)는 뒤에 <b>3.00</b>처럼 소수점이 숨어 있어요.'}
+    ],
+    miss:[{w:'2.4 + 0.35 = 0.59', r:'2.75', y:'오른쪽 끝을 맞추면 24 + 35처럼 더해 0.59가 돼요. 소수점(.)을 세로로 맞춰 2.40 + 0.35로 계산해요.'}]
+  },
+  dmul:{
+    why:[
+      {h:'소수점 위치는 왜 소수 자리 수의 합만큼 이동할까?', tag:'10배 · 1/10 원리',
+       svg:`<svg viewBox="0 0 360 100" width="360" height="100" aria-label="소수 곱셈 소수점 이동">
+         <rect x="12" y="14" width="150" height="32" rx="8" fill="#eef2fe" stroke="#2f5bea"/>
+         <text x="87" y="35" text-anchor="middle" font-size="14" font-weight="800" fill="#111">0.3 × 0.4</text>
+         <text x="180" y="35" text-anchor="middle" font-size="14" font-weight="900" fill="#2f5bea">→</text>
+         <rect x="198" y="14" width="150" height="32" rx="8" fill="#ebfbee" stroke="#12a05c"/>
+         <text x="273" y="35" text-anchor="middle" font-size="14" font-weight="800" fill="#111">(3/10) × (4/10) = 12/100</text>
+         <text x="180" y="74" text-anchor="middle" font-size="14" font-weight="900" fill="#2f5bea">자연수 곱 12 에서 왼쪽으로 1 + 1 = 2칸 → 0.12</text>
+       </svg>`,
+       p:'0.3은 3을 10으로 나눈 수, 0.4는 4를 10으로 나눈 수예요. 둘을 곱하면 분모가 <b>10×10=100</b>이 되므로 자연수처럼 곱한 뒤 <b>총 소수 자리 수만큼 왼쪽</b>으로 찍어요.'}
+    ],
+    miss:[{w:'0.3 × 0.4 = 1.2', r:'0.12', y:'소수 한 자리 × 소수 한 자리는 소수 두 자리예요. 12에서 왼쪽으로 두 칸 이동하면 0.12가 돼요.'}]
+  },
+  int:{
+    why:[
+      {h:'왜 음수를 빼면 더하기가 되고, (−)×(−)는 (+)일까?', tag:'수직선 방향 원리',
+       svg:`<svg viewBox="0 0 360 106" width="360" height="106" aria-label="정수 수직선 이동">
+         <line x1="20" y1="62" x2="340" y2="62" stroke="#333" stroke-width="2"/>
+         <path d="M50 56v12M100 56v12M150 56v12M200 56v12M250 56v12M300 56v12" stroke="#333" stroke-width="1.6"/>
+         <text x="50" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#555">−2</text>
+         <text x="100" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#555">−1</text>
+         <text x="150" y="84" text-anchor="middle" font-size="12" font-weight="900" fill="#111">0</text>
+         <text x="200" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#555">+1</text>
+         <text x="250" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#555">+2</text>
+         <text x="300" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#555">+3</text>
+         <path d="M100 54 Q 200 10 300 54" fill="none" stroke="#2f5bea" stroke-width="2.6"/>
+         <polygon points="300,54 290,46 294,56" fill="#2f5bea"/>
+         <circle cx="100" cy="62" r="5" fill="#e8394f"/><circle cx="300" cy="62" r="5" fill="#2f5bea"/>
+         <text x="200" y="24" text-anchor="middle" font-size="13" font-weight="900" fill="#2f5bea">(−1) − (−4) = (−1) + (+4) = +3</text>
+       </svg>`,
+       p:'<b>−(음수)</b>는 "반대 방향의 반대"이므로 <b>오른쪽(+)</b>으로 가는 것과 같아요. 빚(−4)을 없애 주면(−) 오히려 재산이 +4 늘어나는 원리예요.'}
+    ],
+    miss:[{w:'(−3) × (−4) = −12', r:'+12', y:'같은 부호끼리 곱하거나 나누면 항상 양수(+)예요. 음수가 짝수 개 곱해지면 +가 돼요.'}]
+  },
+  lineq:{
+    why:[
+      {h:'왜 항을 넘기면(이항) 부호가 바뀔까?', tag:'양팔 저울 원리',
+       svg:`<svg viewBox="0 0 360 112" width="360" height="112" aria-label="일차방정식 양팔 저울">
+         <line x1="60" y1="62" x2="300" y2="62" stroke="#333" stroke-width="3"/>
+         <polygon points="180,62 162,96 198,96" fill="#dee2e6" stroke="#495057" stroke-width="1.6"/>
+         <rect x="66" y="30" width="96" height="30" rx="8" fill="#eef2fe" stroke="#2f5bea" stroke-width="1.6"/>
+         <text x="114" y="50" text-anchor="middle" font-size="14" font-weight="900" fill="#2f5bea">x + 3</text>
+         <rect x="198" y="30" width="96" height="30" rx="8" fill="#ebfbee" stroke="#12a05c" stroke-width="1.6"/>
+         <text x="246" y="50" text-anchor="middle" font-size="14" font-weight="900" fill="#12a05c">10</text>
+         <text x="114" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="#e8394f">− 3</text>
+         <text x="246" y="20" text-anchor="middle" font-size="12" font-weight="800" fill="#e8394f">− 3</text>
+         <text x="180" y="108" text-anchor="middle" font-size="12.5" font-weight="800" fill="#111">양쪽에서 똑같이 3을 빼면 → x = 10 − 3 = 7</text>
+       </svg>`,
+       p:'등호(=)는 양팔 저울이에요. 왼쪽의 <b>+3</b>을 없애려면 양쪽에서 똑같이 <b>3을 빼야</b> 수평이 유지돼요. 그 결과가 마치 +3이 오른쪽으로 넘어가 −3이 된 것처럼 보이는 것이 <b>이항</b>이에요.'}
+    ],
+    miss:[{w:'2x − 5 = 9 → 2x = 9 − 5', r:'2x = 9 + 5 → x = 7', y:'−5가 등호를 건너가면 부호가 반대로 바뀌어 +5가 돼요.'}]
+  },
+  linf:{
+    why:[
+      {h:'기울기 a와 y절편 b는 그래프에서 무엇을 뜻할까?', tag:'좌표평면 시각화',
+       svg:`<svg viewBox="0 0 350 132" width="350" height="132" aria-label="일차함수 좌표평면">
+         <path d="M40 20v92M70 20v92M100 20v92M130 20v92M24 30h124M24 60h124M24 90h124" stroke="#e9ecef" stroke-width="1"/>
+         <line x1="20" y1="90" x2="154" y2="90" stroke="#333" stroke-width="1.6"/>
+         <line x1="70" y1="16" x2="70" y2="118" stroke="#333" stroke-width="1.6"/>
+         <line x1="34" y1="114" x2="142" y2="24" stroke="#1971c2" stroke-width="2.6"/>
+         <path d="M70 84 H100 V59" fill="none" stroke="#e8590c" stroke-width="2" stroke-dasharray="3 2"/>
+         <circle cx="70" cy="84" r="4.5" fill="#e8394f"/><circle cx="100" cy="59" r="4.5" fill="#1971c2"/>
+         <text x="85" y="102" text-anchor="middle" font-size="11" font-weight="800" fill="#e8590c">+1</text>
+         <text x="114" y="75" font-size="11" font-weight="800" fill="#e8590c">+a</text>
+         <text x="172" y="42" font-size="14" font-weight="900" fill="#1971c2">y = ax + b</text>
+         <text x="172" y="66" font-size="12.5" font-weight="700" fill="#e8590c">a(기울기): x가 1 늘 때 y 변화</text>
+         <text x="172" y="88" font-size="12.5" font-weight="700" fill="#e8394f">b(y절편): y축과 만나는 높이</text>
+         <text x="172" y="110" font-size="12" font-weight="700" fill="#495057">기울기 a가 같으면 두 직선은 평행!</text>
+       </svg>`,
+       p:'<b>y절편 b</b>는 그래프가 y축에서 출발하는 높이이고, <b>기울기 a</b>는 오른쪽으로 1칸 갈 때 위(+)나 아래(−)로 몇 칸 움직이는지 결정해요.'}
+    ],
+    miss:[{w:'y = 2x − 6 의 x절편은 −6', r:'3', y:'−6은 y절편이에요. x절편은 y = 0을 넣어 2x − 6 = 0 → x = 3으로 구해요.'}]
+  },
+  expo:{
+    why:[
+      {h:'왜 a³ × a²은 지수를 더하고, (a²)³은 지수를 곱할까?', tag:'묶음 전개 시각화',
+       svg:`<svg viewBox="0 0 360 108" width="360" height="108" aria-label="지수법칙 묶음 전개">
+         <rect x="12" y="12" width="336" height="38" rx="10" fill="#eef2fe" stroke="#2f5bea"/>
+         <text x="24" y="36" font-size="13.5" font-weight="900" fill="#2f5bea">a³ × a²</text>
+         <text x="94" y="36" font-size="13" font-weight="700" fill="#111">= (a·a·a) × (a·a) = a가 3+2개 = </text>
+         <text x="314" y="36" font-size="15" font-weight="900" fill="#2f5bea">a⁵</text>
+         <rect x="12" y="58" width="336" height="38" rx="10" fill="#ebfbee" stroke="#12a05c"/>
+         <text x="24" y="82" font-size="13.5" font-weight="900" fill="#12a05c">(a²)³</text>
+         <text x="94" y="82" font-size="13" font-weight="700" fill="#111">= (a·a) × (a·a) × (a·a) = 2개씩 3묶음 = </text>
+         <text x="314" y="82" font-size="15" font-weight="900" fill="#12a05c">a⁶</text>
+       </svg>`,
+       p:'지수는 <b>"밑을 몇 번 곱했는지"</b> 세는 숫자예요. 공식을 헷갈릴 땐 머릿속에서 <code>a</code>를 직접 펼쳐 세어 보면 절대 틀리지 않아요.'}
+    ],
+    miss:[{w:'a³ × a² = a⁶', r:'a⁵', y:'곱셈에서는 지수끼리 더해요(3 + 2 = 5). 지수를 곱하는 것은 (a³)² = a⁶처럼 거듭제곱의 거듭제곱일 때예요.'}]
+  },
+  root:{
+    why:[
+      {h:'√n 의 정체와 왜 √4 + √9 ≠ √13 일까?', tag:'정사각형 넓이 모델',
+       svg:`<svg viewBox="0 0 360 112" width="360" height="112" aria-label="제곱근 넓이 모델">
+         <rect x="18" y="36" width="44" height="44" rx="4" fill="#eef2fe" stroke="#2f5bea" stroke-width="2"/>
+         <text x="40" y="63" text-anchor="middle" font-size="13" font-weight="900" fill="#2f5bea">넓이 4</text>
+         <text x="40" y="96" text-anchor="middle" font-size="12" font-weight="800" fill="#111">변 √4 = 2</text>
+         <text x="80" y="64" font-size="18" font-weight="900" fill="#555">+</text>
+         <rect x="100" y="18" width="62" height="62" rx="4" fill="#ebfbee" stroke="#12a05c" stroke-width="2"/>
+         <text x="131" y="54" text-anchor="middle" font-size="13" font-weight="900" fill="#12a05c">넓이 9</text>
+         <text x="131" y="96" text-anchor="middle" font-size="12" font-weight="800" fill="#111">변 √9 = 3</text>
+         <text x="180" y="64" font-size="16" font-weight="900" fill="#111">=</text>
+         <text x="200" y="46" font-size="14" font-weight="900" fill="#2f5bea">변의 합 = 2 + 3 = 5 (= √25)</text>
+         <text x="200" y="70" font-size="12.5" font-weight="800" fill="#e8394f">√4 + √9 ≠ √13 (약 3.6)</text>
+         <text x="200" y="92" font-size="12" font-weight="700" fill="#495057">근호 안 덧셈은 동류항끼리만!</text>
+       </svg>`,
+       p:'<b>√n</b>은 <b>넓이가 n인 정사각형의 한 변 길이</b>예요. 곱셈(√a × √b = √ab)은 근호 안끼리 합칠 수 있지만, 덧셈·뺄셈은 <b>근호 안의 수가 똑같을 때만</b> 계수끼리 더해요.'}
+    ],
+    miss:[{w:'√2 + √3 = √5', r:'그대로 √2 + √3 (더 합칠 수 없음)', y:'근호 안의 수가 다르면 더하거나 뺄 수 없어요. 2√3 + 5√3 = 7√3처럼 근호 안이 같을 때만 계산해요.'}]
+  }
+};
+
+function buildBookHTML(t,isModal){
+  const T=topicOf(t), N=noteOf(t), p=prog(t), plus=NOTE_PLUS[t]||null;
+  const nx=(T.stages.find(s=>!p.c.includes(s.n))||T.stages[0]).n;
+  const whyList=(plus&&plus.why)||[];
+  const extraMiss=(plus&&plus.miss)||[];
+  const allMiss=(N.miss||[]).concat(extraMiss.filter(em=>!(N.miss||[]).some(m=>m.w===em.w)));
+  const way=(w,i)=>{ const tips=[], steps=[];
+    (w.lines||[]).forEach(l=>{ const m=String(l).match(BK_TIP); if(m) tips.push(m[1]); else steps.push(l); });
+    return `<article class="nbway">
+      <header><span class="nbn">${i+1}</span><h4>${mfmt(w.t)}</h4></header>
+      <div class="nbex${(x=>/[가-힣]/.test(x)&&x.length>18)(String(w.ex||'').replace(/<[^>]+>/g,''))?' long':''}">${mfmt(w.ex)}</div>
+      ${w.svg?`<div class="nbvis">${w.svg}</div>`:''}
+      ${steps.length?`<ol class="nbsteps">${steps.map((l,j)=>`<li${j===steps.length-1?' class="last"':''}>${mfmt(l)}</li>`).join('')}</ol>`:''}
+      ${tips.map(x=>`<div class="nbtip">${BK_IC.ways}<span>${mfmt(x)}</span></div>`).join('')}
+    </article>`; };
+  const toc=(whyList.length?[['why','그림 · 원리',whyList.length]]:[]).concat([['memo','외워 둘 것',N.memo.length],['ways','생각하는 방법',N.ways.length],['miss','자주 하는 실수',allMiss.length]]);
+  return `
+    <div class="nbhero">
+      <div class="nbtop"><span class="tsym sm">${symHTML(T)}</span>
+        <div class="nbtt"><span class="nbkind">정리 노트${T.gr?` · ${T.gr}`:''}</span><h2>${T.n}</h2></div></div>
+      <p class="nbsub">${N.sub}</p>
+      <div class="nbtoc">${toc.map(([k,n,c])=>`<button data-go="${k}">${BK_IC[k==='why'?'ways':k]}<b>${c}</b><span>${n}</span></button>`).join('')}</div>
+    </div>
+    ${whyList.length?`<section class="nbsec" data-sec="why" id="${isModal?'mb':'nb'}-why"><h3>${BK_IC.ways}그림으로 이해하기 · 왜 그럴까?</h3>
+      <div class="nbwhy-list">${whyList.map(w=>`<div class="nbwhy"><h4><span class="wbadge">${esc(w.tag||'원리')}</span>${mfmt(w.h)}</h4>
+        ${w.svg?`<div class="nbw-svg">${w.svg}</div>`:''}<p>${mfmt(w.p)}</p></div>`).join('')}</div></section>`:''}
+    <section class="nbsec" data-sec="memo" id="${isModal?'mb':'nb'}-memo"><h3>${BK_IC.memo}외워 둘 것</h3>
+      ${N.memo.map(m=>`<div class="nbmemo"><h4>${mfmt(m.h)}</h4><div class="nbmc">${mfmt(m.html)}</div></div>`).join('')}</section>
+    <section class="nbsec" data-sec="ways" id="${isModal?'mb':'nb'}-ways"><h3>${BK_IC.ways}생각하는 방법</h3>
+      <div class="nbways">${N.ways.map(way).join('')}</div></section>
+    <section class="nbsec" data-sec="miss" id="${isModal?'mb':'nb'}-miss"><h3>${BK_IC.miss}자주 하는 실수</h3>
+      ${allMiss.map(m=>`<div class="nbmiss">
+        <div class="nbmw"><i>✕</i><span>${mfmt(m.w)}</span></div>
+        <div class="nbmr"><i>✓</i><span>${mfmt(bookRight(m.w,m.r))}</span></div>
+        <p><b>왜?</b>${mfmt(m.y)}</p></div>`).join('')}</section>
+    ${isModal?'':`<div class="nbfoot">
+      <button class="btn" onclick="openStages('${t}')">← 스테이지 고르기</button>
+      <button class="btn primary" style="flex:0 0 auto" onclick="startStage('${t}',${nx})">${nx}단계 연습하기 →</button>
+    </div>`}`;
+}
+function bindBookToc(root){
+  root.querySelectorAll('.nbtoc button').forEach(b=>b.onclick=()=>{
+    const s=root.querySelector(`[data-sec="${b.dataset.go}"]`);
+    if(s) s.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+}
+function markBookSeen(t){
+  if(!ME||ME.guest||!t||arr(ME.nbSeen).includes(t)) return;
+  ME.nbSeen=uniq(ME.nbSeen,[t]);
+  checkAch();
+  saveMe();
+}
+function openBookModal(t){
+  if(!ME||!t) return;
+  const T=topicOf(t);
+  el('ovBookTitle').textContent=`📖 ${T.n} 정리 노트`;
+  const bd=el('ovBookBody');
+  bd.innerHTML=buildBookHTML(t,true);
+  bindBookToc(bd);
+  markBookSeen(t);
+  openM('ovBook');
+}
+
+/* ── 2. 업적(뱃지) 12종 & 프로필 칭호 ── */
+const ACHS=[
+  {id:'first_st',  n:'첫 발걸음',       d:'연습 스테이지 1개 클리어',                 ok:u=>Object.values(u.P||{}).some(p=>p&&arr(p.c).length>0)},
+  {id:'att3',      n:'작심삼일 돌파',   d:'3일 연속 출석 달성',                       ok:u=>((u.att&&u.att.s)||0)>=3},
+  {id:'att7',      n:'꾸준함의 정석',   d:'7일 연속 출석 달성',                       ok:u=>((u.att&&u.att.s)||0)>=7},
+  {id:'note5',     n:'오답 정복자',     d:'오답노트 5회 완료',                        ok:u=>(u.noteN||0)>=5},
+  {id:'nomiss5',   n:'완벽주의자',      d:'연습 스테이지 100% 노미스 5개 달성',       ok:u=>(u.nmN||0)>=5},
+  {id:'note_read', n:'정리 노트 독서가',d:'정리 노트 5개 이상 주제 살펴보기',         ok:u=>arr(u.nbSeen).length>=5},
+  {id:'grade_s',   n:'계산 실력자',     d:'실전 또는 연습에서 S등급 이상 첫 달성',    ok:u=>hasAnyGrade(u,['S','SS','SSS'])},
+  {id:'grade_sss', n:'계산의 달인',     d:'실전 또는 연습에서 SSS등급 첫 달성',       ok:u=>hasAnyGrade(u,['SSS'])},
+  {id:'grow2',     n:'어제의 나를 넘어',d:'주간 성장 보너스 2회 달성',                ok:u=>(u.gwN||0)>=2},
+  {id:'flawless',  n:'흔들림 없는 1분', d:'실전 모드 60초 무실수 완주',               ok:(u,ex)=>!!(ex&&ex.flawlessFull)},
+  {id:'cls_hero',  n:'우리 반 기둥',    d:'우리 반 모금함에 코인 기부',               ok:u=>((u.cu&&u.cu.g)||0)>0},
+  {id:'boss_win',  n:'보스 격파단',     d:'반 전체 협동 보스전 승리',                 ok:u=>(u.bossW||0)>=1}
+];
+function hasAnyGrade(u,gs){
+  for(const t of Object.keys(u.R||{})){ const g=gradeOfRec(t,(u.R[t]&&u.R[t].best)||0); if(g&&gs.includes(g)) return true; }
+  for(const t of Object.keys(u.P||{})){ const p=u.P[t]; if(!p||!p.bt) continue;
+    for(const k of Object.keys(p.bt)){ const g=stageGradeP(p,t,+k.slice(1)); if(g&&gs.includes(g)) return true; } }
+  return false;
+}
+function achTitle(id){ const a=ACHS.find(x=>x.id===id); return a?a.n:''; }
+function checkAch(ex){
+  if(!ME||ME.guest) return;
+  ME.ach=ME.ach||{};
+  const newly=[];
+  ACHS.forEach(a=>{ if(!ME.ach[a.id]&&a.ok(ME,ex)){ ME.ach[a.id]=Date.now(); newly.push(a); } });
+  if(newly.length){
+    if(!ME.ttl){ ME.ttl=newly[0].id; TTLS[ME.sid]=ME.ttl; }
+    toast(`🏅 업적 달성! [${newly.map(x=>x.n).join(', ')}]`);
+  }
+}
+function paintMineAch(){
+  const box=el('mpAch'), cnt=el('mpAchN'); if(!box||!ME) return;
+  ME.ach=ME.ach||{};
+  const got=ACHS.filter(a=>!!ME.ach[a.id]).length;
+  if(cnt) cnt.textContent=`${got} / ${ACHS.length}`;
+  box.innerHTML=`<div class="achgrid">${ACHS.map(a=>{
+    const has=!!ME.ach[a.id], on=has&&ME.ttl===a.id;
+    return `<button class="achcard${has?'':' lock'}${on?' on':''}" data-a="${a.id}" ${has?'':'disabled'}>
+      <div class="at"><span>${has?'🏅':'🔒'} ${esc(a.n)}</span></div>
+      <div class="ad">${esc(a.d)}</div>
+      <div class="as">${on?'장착 중인 칭호 (누르면 해제)':has?'눌러서 칭호 달기':'아직 잠겨 있어요'}</div>
+    </button>`;
+  }).join('')}</div>`;
+  box.querySelectorAll('.achcard:not(.lock)').forEach(b=>b.onclick=()=>equipTitle(b.dataset.a));
+}
+async function equipTitle(id){
+  if(!ME||!ME.ach||!ME.ach[id]) return;
+  ME.ttl=(ME.ttl===id)?'':id; TTLS[ME.sid]=ME.ttl;
+  await saveMe(); openMineRepaint(); paintMe();
+  toast(ME.ttl?`'${achTitle(ME.ttl)}' 칭호를 달았어요`:'칭호를 내렸어요');
+}
+
+/* ── 3. 교사용 전체 집중 일시정지 (config/freeze) ── */
+let FREEZE_OFF=null, FREEZE_CD=null, FREEZE_CUR=false;
+function freezeTargetsMe(f){
+  if(!f||!f.on||!ME||isTeacher) return false;
+  return !f.scope||f.scope==='all'||f.scope===classOf(ME.sid);
+}
+function applyFreeze(f){
+  CFG.freeze=Object.assign({on:false,scope:'all',msg:''},f||{});
+  if(isTeacher){ paintTFreezeBar(); return; }
+  const hit=freezeTargetsMe(CFG.freeze);
+  if(hit&&!FREEZE_CUR){
+    FREEZE_CUR=true; clearInterval(FREEZE_CD);
+    if(G&&!G.over){ G.frozen=true; G._frzAt=performance.now(); }
+    el('frzBadge').textContent='⏸ 수업 집중 모드';
+    el('frzTitle').textContent='잠시 화면을 멈췄어요';
+    el('frzMsg').textContent=CFG.freeze.msg||'잠시 화면을 멈추고 선생님을 보세요!';
+    el('frzAv').innerHTML=ME?avatarSVG(ME.ch,{mood:'idle'}):'';
+    el('frzCd').style.display='none';
+    el('ovFreeze').classList.add('on');
+  }else if(hit&&FREEZE_CUR){
+    el('frzMsg').textContent=CFG.freeze.msg||'잠시 화면을 멈추고 선생님을 보세요!';
+  }else if(!hit&&FREEZE_CUR){
+    FREEZE_CUR=false; clearInterval(FREEZE_CD);
+    const inGame=!!(G&&!G.over&&el('s-play').classList.contains('on'));
+    if(!inGame){
+      if(G){ G.frozen=false; if(G._frzAt){ if(G.t0) G.t0+=performance.now()-G._frzAt; G._frzAt=0; } G.last=performance.now(); }
+      el('ovFreeze').classList.remove('on');
+      return;
+    }
+    let n=3;
+    el('frzBadge').textContent='▶ 곧 다시 시작해요';
+    el('frzTitle').textContent='준비하세요!';
+    el('frzMsg').textContent='멈췄던 자리에서 그대로 이어집니다.';
+    el('frzCd').style.display=''; el('frzCd').textContent=n;
+    FREEZE_CD=setInterval(()=>{
+      n--;
+      if(n<=0){
+        clearInterval(FREEZE_CD);
+        el('ovFreeze').classList.remove('on');
+        if(G){
+          const dt=G._frzAt?performance.now()-G._frzAt:0;
+          if(G.t0) G.t0+=dt;
+          G._frzAt=0; G.last=performance.now(); G.frozen=false;
+          if(G.mode==='practice'&&G.phase==='q'&&G.locked) next();
+        }
+        return;
+      }
+      el('frzCd').textContent=n;
+    },900);
+  }
+}
+async function startFreezeWatch(){
+  stopFreezeWatch();
+  if(isTeacher) return;
+  try{ FREEZE_OFF=await dbOn('config/freeze',v=>applyFreeze(v)); }catch(e){}
+}
+function stopFreezeWatch(){
+  if(FREEZE_OFF){ try{ FREEZE_OFF(); }catch(e){} FREEZE_OFF=null; }
+  clearInterval(FREEZE_CD); FREEZE_CUR=false;
+  if(el('ovFreeze')) el('ovFreeze').classList.remove('on');
+}
+function paintTFreezeBar(){
+  const box=el('tFreezeBar'); if(!box||!isTeacher) return;
+  const f=CFG.freeze||{on:false,scope:'all',msg:''}, cls=classList();
+  box.className='tfreeze'+(f.on?' on':'');
+  box.innerHTML=`<div class="tfl">
+      <b>${f.on?'⏸ 현재 학생 화면이 멈춰 있어요 (수업 집중 모드 ON)':'수업 집중 모드 — 연습·실전 전체 일시정지'}</b>
+      <small>${f.on?`대상: ${f.scope==='all'?'전체 반':classLabel(f.scope)} · 해제하면 학생 화면이 3초 카운트다운 후 그대로 이어져요`:'수업 중 집중이 필요할 때 학생들의 풀이 화면과 타이머를 즉시 멈춥니다.'}</small>
+    </div>
+    <div class="tfr">
+      <select id="tFrzScope"><option value="all"${f.scope==='all'?' selected':''}>전체 반</option>
+        ${cls.map(x=>`<option value="${x.c}"${f.scope===x.c?' selected':''}>${classShort(x.c)}</option>`).join('')}</select>
+      <input id="tFrzMsg" value="${esc(f.msg||'잠시 화면을 멈추고 선생님을 보세요!')}" maxlength="40" placeholder="학생 안내 문구">
+      <button class="btn ${f.on?'primary':'danger'}" id="tFrzBtn">${f.on?'▶ 멈춤 해제':'⏸ 전체 멈추기'}</button>
+    </div>`;
+  el('tFrzBtn').onclick=async()=>{
+    const on=!((CFG.freeze&&CFG.freeze.on)||false);
+    const scope=el('tFrzScope').value||'all';
+    const msg=(el('tFrzMsg').value||'').trim()||'잠시 화면을 멈추고 선생님을 보세요!';
+    const was=CFG.freeze||{};
+    CFG.freeze={on,scope,msg,at:Date.now()};
+    await dbSet('config/freeze',CFG.freeze);
+    /* 보스전 중에 멈췄다가 풀면, 멈춘 시간만큼 반 전체 마감 시간을 늦춰요 (+ 3초 준비) */
+    if(!on&&was.on&&was.at&&BOSS.code&&BOSS.room&&BOSS.room.state==='play'&&BOSS.room.endAt)
+      await dbUpdate('bosses/'+BOSS.code,{endAt:BOSS.room.endAt+(Date.now()-was.at)+2700});
+    paintTFreezeBar();
+    toast(on?'학생 화면을 즉시 멈췄어요':'멈춤을 해제했어요 · 3초 뒤 재개됩니다');
+  };
+}
+
+/* ── 4. 교사 부여·수정 학급 협동 주간 목표 (config/coop) ── */
+const COOP_METRICS={solved:'이번 주 풀이 문항 합계', real:'실전 모드 참여 학생 수', att:'오늘 출석 학생 수'};
+function coopWeekKey(){
+  const d=new Date(), day=(d.getDay()+6)%7;
+  d.setDate(d.getDate()-day);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function calcCoopProgress(goal,users){
+  const U=users||{}, scope=goal.scope||'all', wk=coopWeekKey(), td=todayKey();
+  const sids=Object.keys(U).filter(sid=>!isTestSid(sid)&&(scope==='all'||classOf(sid)===scope));
+  if(goal.metric==='real') return sids.filter(sid=>Object.values(U[sid].R||{}).some(r=>r&&arr(r.hist).some(h=>h&&h.d>=wk))).length;
+  if(goal.metric==='att') return sids.filter(sid=>(U[sid].att||{}).d===td).length;
+  return sids.reduce((sum,sid)=>{ const w=(U[sid].wk||{})[wk]; return sum+(w?(+w[0]||0):0); },0);
+}
+async function paintCoopStudent(){
+  const box=el('coopBox'); if(!box||!ME||ME.guest) return;
+  const allGoals=Object.values(CFG.coop||{}).filter(g=>g&&g.active);
+  const mine=classOf(ME.sid);
+  const goals=allGoals.filter(g=>g.scope==='all'||g.scope===mine);
+  if(!goals.length){ box.innerHTML=''; return; }
+  let U=RK.users;
+  if(!U){ try{ U=(await dbGet('users',{}))||{}; }catch(e){ U={}; } }
+  box.innerHTML=goals.map(g=>{
+    const cur=calcCoopProgress(g,U), tgt=Math.max(1,+g.target||100), pct=Math.min(100,Math.round(cur/tgt*100));
+    const done=cur>=tgt, claimed=!!(ME.coopC&&ME.coopC[g.id]);
+    const unit=g.metric==='solved'?'문항':'명';
+    return `<div class="coopbox${done?' done':''}">
+      <div class="coop-hd"><b>🤝 ${esc(g.title||'우리 반 협동 목표')}</b>
+        <small>${g.scope==='all'?'전체 반':classLabel(g.scope)}${g.due?` · ~${esc(g.due)}`:''}</small></div>
+      <div class="coop-bar"><i style="width:${pct}%"></i></div>
+      <div class="coop-ft">
+        <span>${esc(COOP_METRICS[g.metric]||COOP_METRICS.solved)} <b>${cur} / ${tgt}${unit}</b> (${pct}%)</span>
+        ${done?(claimed?'<span style="color:var(--o);font-weight:800">✓ 보상 수령 완료</span>'
+          :`<button class="btn primary" style="padding:5px 11px;font-size:12.5px" onclick="claimCoop('${esc(g.id)}')">🎉 +${+g.reward||0}코인 받기</button>`)
+          :`<span>달성 보상 전원 <b>+${+g.reward||0}코인</b></span>`}
+      </div></div>`;
+  }).join('');
+}
+async function claimCoop(id){
+  if(!ME||ME.guest) return;
+  const g=Object.values(CFG.coop||{}).find(x=>x&&x.id===id); if(!g) return;
+  ME.coopC=ME.coopC||{}; if(ME.coopC[id]) return toast('이미 받은 보상이에요');
+  const rw=Math.max(0,+g.reward||0);
+  ME.coopC[id]=1; ME.coin+=rw;
+  await saveMe(); paintMe(); paintCoopStudent();
+  toast(`🎉 학급 협동 목표 달성! +${rw}코인`);
+}
+let COOP_EDIT=null;
+function paintTCoop(){
+  const cls=classList(), goals=Object.values(CFG.coop||{}).filter(Boolean).sort((a,b)=>(b.at||0)-(a.at||0));
+  const ed=COOP_EDIT||(goals[0]?null:null);
+  const g=ed||{id:'',scope:'all',title:'',metric:'solved',target:500,reward:50,due:''};
+  el('tBody').innerHTML=`
+    <div class="tcoop-form">
+      <label>대상 반<select id="tcScope"><option value="all"${g.scope==='all'?' selected':''}>전체 반</option>
+        ${cls.map(x=>`<option value="${x.c}"${g.scope===x.c?' selected':''}>${classShort(x.c)}</option>`).join('')}</select></label>
+      <label>목표 지표<select id="tcMetric">${Object.entries(COOP_METRICS).map(([k,n])=>`<option value="${k}"${g.metric===k?' selected':''}>${n}</option>`).join('')}</select></label>
+      <label>목표 수치<input id="tcTarget" type="number" min="1" value="${g.target||500}"></label>
+      <label>전원 보상 코인<input id="tcReward" type="number" min="0" step="10" value="${g.reward||50}"></label>
+      <label>마감일 (선택)<input id="tcDue" type="date" value="${esc(g.due||'')}"></label>
+      <label style="grid-column:1/-1">목표 이름 (비우면 자동)<input id="tcTitle" maxlength="40" value="${esc(g.title||'')}" placeholder="예) 이번 주 우리 반 500문제 함께 풀기!"></label>
+      <div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn primary" id="tcSave">${ed?'목표 수정 저장':'+ 새 협동 목표 등록'}</button>
+        ${ed?'<button class="btn" id="tcCancel">새로 만들기</button>':''}
+      </div>
+    </div>
+    <div class="list-col" style="display:flex;flex-direction:column;gap:10px">
+      ${goals.length?goals.map(x=>{
+        const cur=calcCoopProgress(x,tUsers), tgt=Math.max(1,+x.target||1), pct=Math.min(100,Math.round(cur/tgt*100));
+        const unit=x.metric==='solved'?'문항':'명';
+        return `<div class="coopbox${cur>=tgt?' done':''}" style="max-width:none;margin:0">
+          <div class="coop-hd"><b>${x.active?'🟢':'⚪'} ${esc(x.title)}</b>
+            <small>${x.scope==='all'?'전체 반':classLabel(x.scope)} · 보상 +${x.reward}코인${x.due?` · ~${esc(x.due)}`:''}</small></div>
+          <div class="coop-bar"><i style="width:${pct}%"></i></div>
+          <div class="coop-ft">
+            <span>${esc(COOP_METRICS[x.metric]||'')} <b>${cur} / ${tgt}${unit}</b> (${pct}%)</span>
+            <span style="display:flex;gap:6px">
+              <button class="btn" style="padding:5px 10px;font-size:12px" data-ce="${esc(x.id)}">수정</button>
+              <button class="btn" style="padding:5px 10px;font-size:12px" data-ct="${esc(x.id)}">${x.active?'숨기기':'다시 켜기'}</button>
+              <button class="btn danger" style="padding:5px 10px;font-size:12px" data-cd="${esc(x.id)}">삭제</button>
+            </span>
+          </div></div>`;
+      }).join(''):'<div class="empty">아직 등록된 학급 협동 목표가 없어요. 위에서 새 목표를 만들어 보세요!</div>'}
+    </div>`;
+  el('tcSave').onclick=async()=>{
+    const id=ed?ed.id:('c'+Date.now().toString(36));
+    const recC={id, scope:el('tcScope').value||'all', metric:el('tcMetric').value||'solved',
+      target:Math.max(1,+el('tcTarget').value||100), reward:Math.max(0,+el('tcReward').value||0),
+      due:(el('tcDue').value||'').trim(), title:(el('tcTitle').value||'').trim()||(m=>m==='solved'?`이번 주 우리 반 ${Math.max(1,+el('tcTarget').value||100)}문제 함께 풀기!`:m==='real'?`이번 주 ${Math.max(1,+el('tcTarget').value||100)}명 실전 도전!`:`오늘 ${Math.max(1,+el('tcTarget').value||100)}명 출석!`)(el('tcMetric').value||'solved'),
+      active:ed?ed.active:true, at:Date.now()};
+    CFG.coop=CFG.coop||{}; CFG.coop[id]=recC; COOP_EDIT=null;
+    await dbSet('config/coop/'+id,recC);
+    paintTCoop(); toast('학급 협동 목표를 저장했어요');
+  };
+  if(el('tcCancel')) el('tcCancel').onclick=()=>{ COOP_EDIT=null; paintTCoop(); };
+  el('tBody').querySelectorAll('[data-ce]').forEach(b=>b.onclick=()=>{ COOP_EDIT=CFG.coop[b.dataset.ce]; paintTCoop(); });
+  el('tBody').querySelectorAll('[data-ct]').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.ct, g2=CFG.coop[id]; if(!g2) return;
+    g2.active=!g2.active; await dbSet('config/coop/'+id,g2); paintTCoop();
+  });
+  el('tBody').querySelectorAll('[data-cd]').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.cd; if(!confirm('이 협동 목표를 삭제할까요?')) return;
+    delete CFG.coop[id]; await dbSet('config/coop/'+id,null); paintTCoop(); toast('삭제했어요');
+  });
+}
+
+/* ── 5. 교사 개설 반 전체 협동 「단원 마스터 보스전」 (bosses/{code}) ── */
+let BOSS_INV=(()=>{ try{ const q=new URLSearchParams(location.search), v=(q.get('boss')||'').replace(/\D/g,'').slice(0,4);
+  if(q.has('boss')){ q.delete('boss'); const s=q.toString(); history.replaceState(history.state,'',location.pathname+(s?'?'+s:'')+location.hash); } return v; }catch(e){ return ''; } })();
+let BOSS={code:'',room:null,off:null,tId:null,host:false,rewarded:''};
+function bossSum(room){ return Object.values((room&&room.p)||{}).reduce((a,x)=>a+(+x.n||0),0); }
+function bossMembers(room){
+  return Object.entries((room&&room.p)||{}).map(([sid,x])=>Object.assign({sid},x)).sort((a,b)=>(b.n||0)-(a.n||0));
+}
+function bossStopWatch(){
+  if(BOSS.off){ try{ BOSS.off(); }catch(e){} BOSS.off=null; }
+  if(BOSS.tId){ clearInterval(BOSS.tId); BOSS.tId=null; }
+}
+function paintTBoss(){
+  const box=el('tBody'); if(!box) return;
+  if(BOSS.code&&BOSS.room){ paintTBossLive(box); return; }
+  const topics=SCHOOLS.flatMap(s=>s.topics);
+  box.innerHTML=`<div class="bs-board">
+    <h3 style="margin:0 0 6px">🛡 반 전체 협동 「단원 마스터 보스전」 열기</h3>
+    <div class="sub" style="margin-bottom:14px">선생님이 방을 열면 반 친구들이 모두 함께 들어와 목표 문제 수(보스 HP)를 협동으로 격파합니다.</div>
+    <div class="tcoop-form" style="margin-bottom:12px">
+      <label>단원(주제)<select id="tbTopic">${topics.map(k=>`<option value="${k}"${k===tTopic?' selected':''}>${topicOf(k).n}</option>`).join('')}</select></label>
+      <label>목표 문제 수 (보스 HP)<input id="tbTarget" type="number" min="10" max="2000" step="10" value="150"></label>
+      <label>제한 시간<select id="tbSec"><option value="120">2분</option><option value="180" selected>3분</option><option value="300">5분</option><option value="420">7분</option></select></label>
+      <label>보스 이름 (선택)<input id="tbName" maxlength="24" placeholder="자동 입력"></label>
+    </div>
+    <button class="btn primary" id="tbOpen" style="width:100%">⚔ 반 보스전 방 만들기</button>
+  </div>`;
+  el('tbOpen').onclick=hostBossRoom;
+}
+async function hostBossRoom(){
+  const t=el('tbTopic').value||tTopic, target=Math.max(10,+el('tbTarget').value||150), sec=Math.max(60,+el('tbSec').value||180);
+  const T=topicOf(t), bossName=(el('tbName').value||'').trim()||`${T.n} 마스터 보스`;
+  let code='';
+  for(let i=0;i<8;i++){ const c=String(1000+Math.floor(Math.random()*9000)), ex=await dbGet('bosses/'+c,null); if(!ex||ex.state==='win'||ex.state==='fail'){ code=c; break; } }
+  if(!code) return toast('방 번호를 만들지 못했어요 — 다시 눌러 주세요');
+  const room={code, host:TEACHER_ID, t, bossName, target, sec, state:'wait', p:{}, createdAt:Date.now()};
+  if(!(await dbSet('bosses/'+code,room))) toast('서버에 방을 저장하지 못했어요 — 이 기기에서만 보여요. 인터넷 연결이나 Firebase 규칙(bosses)을 확인해 주세요');
+  BOSS.code=code; BOSS.room=room; BOSS.host=true;
+  bossStopWatch();
+  BOSS.off=await dbOn('bosses/'+code,r=>{
+    if(!r){ BOSS.code=''; BOSS.room=null; bossStopWatch(); if(isTeacher&&tTab==='boss') paintTBoss(); return; }
+    BOSS.room=r;
+    if(r.state==='play'){
+      const sum=bossSum(r);
+      if(sum>=r.target) dbUpdate('bosses/'+code,{state:'win',endedAt:serverNow()});
+    }
+    if(isTeacher&&tTab==='boss') paintTBossLive(el('tBody'));
+  });
+  BOSS.tId=setInterval(()=>{
+    if(!BOSS.host||!BOSS.room||BOSS.room.state!=='play') return;
+    const left=Math.max(0,(BOSS.room.endAt-serverNow())/1000);
+    const clk=el('tbClock'); if(clk) clk.textContent=clock(left);
+    if(left<=0) dbUpdate('bosses/'+BOSS.code,{state:'fail',endedAt:serverNow()});
+  },250);
+  paintTBossLive(el('tBody'));
+}
+function paintTBossLive(box){
+  const r=BOSS.room; if(!r||!box) return;
+  const mem=bossMembers(r), sum=bossSum(r), rem=Math.max(0,r.target-sum), hpPct=Math.max(0,Math.round(rem/Math.max(1,r.target)*100));
+  const left=r.state==='play'?Math.max(0,(r.endAt-serverNow())/1000):r.sec;
+  const url=location.origin+location.pathname+'?boss='+r.code;
+  box.innerHTML=`<div class="bs-board">
+    <div class="bs-hero">
+      <div style="font-size:12.5px;opacity:.85;margin-bottom:4px">방 번호 <b style="font-size:20px;letter-spacing:2px;color:#ffd43b">${r.code}</b> · ${esc(topicOf(r.t).n)} · 참여 ${mem.length}명</div>
+      <h3>${r.state==='win'?'🎉 보스 격파 성공!':r.state==='fail'?'⏰ 시간 종료 · 아쉽지만 잘 싸웠어요!':'🛡 '+esc(r.bossName)}</h3>
+      <div class="bshp-big"><i style="width:${hpPct}%"></i></div>
+      <div style="font-size:15px;font-weight:900">남은 보스 HP <b>${rem}</b> / ${r.target} (풀이 ${sum}문제) · 남은 시간 <b id="tbClock">${clock(left)}</b></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:14px">
+      ${r.state==='wait'?`<button class="btn primary" id="tbStart">⚔ 보스전 시작! (${mem.length}명)</button>`:''}
+      <button class="btn" id="tbQr">QR 크게 보기</button>
+      ${r.state==='play'?`<button class="btn danger" id="tbStop">⏹ 강제 종료</button>`:''}
+      <button class="btn" id="tbClose">방 닫기</button>
+    </div>
+    <div style="font-size:13px;font-weight:800;color:var(--dim)">참여 학생 실시간 기여도 (${mem.length}명)</div>
+    <div class="bs-roster">${mem.length?mem.map((m,i)=>`<div class="bs-mem">
+      <div class="av">${avatarSVG(m.ch||{},{tight:true})}</div>
+      <b>${i<3&&m.n>0?['🥇','🥈','🥉'][i]+' ':''}${whoHTML(m.sid,m)}</b>
+      <em>${m.n||0}문제</em></div>`).join(''):'<div class="empty" style="grid-column:1/-1;padding:20px 0">학생들이 방 번호 <b>'+r.code+'</b> 또는 QR로 들어오기를 기다리는 중…</div>'}</div>
+  </div>`;
+  if(el('tbStart')) el('tbStart').onclick=async()=>{
+    const now=serverNow();
+    await dbUpdate('bosses/'+r.code,{state:'play',startedAt:now,endAt:now+r.sec*1000});
+  };
+  el('tbQr').onclick=()=>{
+    el('bqCode').textContent=r.code;
+    el('bqBig').innerHTML=qrSVG(url);
+    el('bqUrl').textContent=url;
+    openM('ovBQr');
+  };
+  if(el('tbStop')) el('tbStop').onclick=async()=>{ if(confirm('보스전을 지금 종료할까요?')) await dbUpdate('bosses/'+r.code,{state:sum>=r.target?'win':'fail',endedAt:serverNow()}); };
+  el('tbClose').onclick=async()=>{
+    if(r.state==='play'&&!confirm('진행 중인 보스전 방을 닫을까요?')) return;
+    const c=r.code; bossStopWatch(); BOSS.code=''; BOSS.room=null; BOSS.host=false;
+    await dbSet('bosses/'+c,null); paintTBoss();
+  };
+}
+function openBossJoin(){
+  if(!ME) return;
+  el('bsCodeIn').value=''; el('bsJoinErr').textContent='';
+  openM('ovBossJoin');
+  setTimeout(()=>{ try{ el('bsCodeIn').focus(); }catch(e){} },80);
+}
+function joinBossByInput(){
+  const c=(el('bsCodeIn').value||'').replace(/\D/g,'');
+  if(c.length!==4){ el('bsJoinErr').textContent='방 번호 숫자 4자리를 입력해 주세요.'; return; }
+  close_('ovBossJoin');
+  joinBossRoom(c);
+}
+async function joinBossRoom(code){
+  if(!ME) return;
+  code=String(code||'').replace(/\D/g,'');
+  const room=await dbGet('bosses/'+code,null);
+  if(!room){ toast('보스전 방을 찾을 수 없어요 — 방 번호를 확인해 주세요'); return; }
+  BOSS.code=code; BOSS.room=room; BOSS.host=false;
+  const mine={nk:ME.nk||'', ttl:ME.ttl||'', ch:cleanCh(ME.ch), n:(room.p&&room.p[ME.sid]&&room.p[ME.sid].n)||0, combo:0, at:Date.now()};
+  await dbUpdate('bosses/'+code+'/p/'+ME.sid,mine);
+  bossStopWatch();
+  BOSS.off=await dbOn('bosses/'+code,r=>{
+    if(!r){ toast('선생님이 보스전 방을 닫았어요'); bossLeave(); return; }
+    BOSS.room=r;
+    if(r.state==='play'){
+      if(!G||G.mode!=='boss'||G.code!==code) startBossPlay(r);
+      else paintBossHud(r);
+      if(bossSum(r)>=r.target) dbUpdate('bosses/'+code,{state:'win',endedAt:serverNow()});
+    }else if(r.state==='win'||r.state==='fail'){
+      finishBossPlay(r);
+    }else{
+      paintBossLobby(r);
+    }
+  });
+  if(room.state==='play') startBossPlay(room);
+  else if(room.state==='win'||room.state==='fail') finishBossPlay(room);
+  else paintBossLobby(room);
+}
+function paintBossLobby(r){
+  stopTimer(); G=null;
+  const mem=bossMembers(r);
+  el('bsBody').innerHTML=`<div class="bs-board">
+    <div class="bs-hero">
+      <div style="font-size:13px;opacity:.85">방 번호 <b>${r.code}</b> · ${esc(topicOf(r.t).n)}</div>
+      <h3>🛡 ${esc(r.bossName)}</h3>
+      <div style="font-size:14px;opacity:.92">반 전체 목표 <b>${r.target}문제</b> · 제한 시간 <b>${clock(r.sec)}</b></div>
+    </div>
+    <div style="text-align:center;font-size:14.5px;font-weight:800;color:var(--blue);margin-bottom:10px">선생님이 시작 버튼을 누르면 다 함께 출발해요! (지금 ${mem.length}명 대기 중)</div>
+    <div class="bs-roster">${mem.map(m=>`<div class="bs-mem"><div class="av">${avatarSVG(m.ch||{},{tight:true})}</div><b>${whoHTML(m.sid,m)}</b></div>`).join('')}</div>
+    <div style="text-align:center;margin-top:16px"><button class="btn" onclick="bossLeave()">나가기</button></div>
+  </div>`;
+  show('s-boss');
+}
+function startBossPlay(r){
+  stopTimer();
+  const prevN=(r.p&&r.p[ME.sid]&&r.p[ME.sid].n)||0;
+  G={mode:'boss', code:r.code, t:r.t, qi:0, score:prevN, combo:0, best:0, solved:0, right:0,
+     sec:r.sec, endAt:r.endAt||(serverNow()+r.sec*1000), L:1, qLv:1, recent:[], badPicks:new Set(),
+     phase:'q', typed:'', clean:true, locked:false};
+  setupHUD(); show('s-play');
+  paintBossHud(r);
+  G.tId=setInterval(()=>{
+    if(!G||G.mode!=='boss'||G.over||G.frozen) return;
+    const left=Math.max(0,(G.endAt-serverNow())/1000);
+    el('hTime').innerHTML=`남은 시간 <b>${clock(left)}</b>`;
+    if(left<=0&&!G.endSent&&BOSS.room&&BOSS.room.state==='play'){ G.endSent=true;
+      dbUpdate('bosses/'+G.code,{state:bossSum(BOSS.room)>=BOSS.room.target?'win':'fail',endedAt:serverNow()}); }
+    el('tbar').querySelector('i').style.width=(Math.max(0,left/Math.max(1,G.sec))*100)+'%';
+    el('tbar').classList.toggle('warn',left<=20);
+  },200);
+  next();
+}
+function paintBossHud(r){
+  const box=el('bsHud'); if(!box||!r) return;
+  const sum=bossSum(r), rem=Math.max(0,r.target-sum), pct=Math.max(0,Math.round(rem/Math.max(1,r.target)*100));
+  box.style.display='';
+  box.innerHTML=`<div class="bs-hud-top"><span>🛡 ${esc(r.bossName)}</span><span>남은 HP <b>${rem}</b> / ${r.target} (우리 반 ${sum}문제)</span></div>
+    <div class="bs-hpbar"><i style="width:${pct}%"></i></div>`;
+}
+function bossAnswer(ok,f){
+  if(ok){
+    G.L=Math.min(4,(G.L||1)+0.18);
+    G.qi++; G.score++; G.right++; G.combo++; G.best=Math.max(G.best,G.combo);
+    flashOk(); updHUD();
+    dbUpdate(`bosses/${G.code}/p/${ME.sid}`,{n:G.score,combo:G.best,at:Date.now()});
+    setTimeout(()=>{ if(G&&G.mode==='boss'&&!G.over&&!G.frozen) next(); },180);
+    return;
+  }
+  G.combo=0;
+  const skip=!!f.pick;   /* 보기 문항은 다시 고르게 하지 않고 다음 문제로 — 찍기 방지 */
+  paintTyped('no'); setPlayMood('miss',900);
+  const cd=el('card'); if(cd){ cd.classList.remove('shake'); void cd.offsetWidth; cd.classList.add('shake'); }
+  document.body.classList.add('btpen');
+  const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.textContent=skip?'아쉬워요 — 다음 문제로 넘어가요':'아쉬워요 — 잠깐 뒤 다시 풀어 봐요'; }
+  updHUD();
+  const qRef=G.ask;
+  setTimeout(()=>{
+    document.body.classList.remove('btpen');
+    if(!G||G.mode!=='boss'||G.over||G.ask!==qRef) return;
+    if(skip){ if(!G.frozen) next(); return; }
+    G.typed=''; G.clean=true; G.locked=false; paintTyped('');
+    const m2=el('qmsg'); if(m2){ m2.className='qmsg'; m2.textContent=''; }
+  },900);
+}
+async function finishBossPlay(r){
+  stopTimer(); document.body.classList.remove('btpen');
+  const myN=(r.p&&r.p[ME.sid]&&r.p[ME.sid].n)||(G&&G.score)||0;
+  if(G&&G.mode==='boss') G.over=true;
+  const sum=bossSum(r), mem=bossMembers(r), win=r.state==='win';
+  let reward=0;
+  const rk='b'+r.code+'_'+(r.createdAt||0); ME.coopC=ME.coopC||{};
+  if(BOSS.rewarded!==r.code&&!ME.coopC[rk]&&myN>0){
+    BOSS.rewarded=r.code; ME.coopC[rk]=1;
+    reward=win?(30+Math.min(30,myN)):Math.min(20,myN);
+    ME.coin+=reward;
+    if(win) ME.bossW=(ME.bossW||0)+1;
+    checkAch();
+    await saveMe(); paintMe();
+    if(reward) toast(win?`🎉 보스 격파! +${reward}코인`:`보스전 참여 보상 +${reward}코인`);
+  }
+  el('bsBody').innerHTML=`<div class="bs-board">
+    <div class="bs-hero">
+      <h3>${win?'🎉 반 전체 보스 격파 성공!':'⏰ 시간 종료 · 멋진 협동이었어요!'}</h3>
+      <div style="font-size:15px">우리 반 총 <b>${sum}</b> / ${r.target}문제 · 내가 기여한 문제 <b>${myN}개</b>${reward?` · 보상 <b>+${reward}코인</b>`:''}</div>
+    </div>
+    <div class="bs-roster">${mem.map((m,i)=>`<div class="bs-mem">
+      <div class="av">${avatarSVG(m.ch||{},{tight:true,mood:win?'ok':'idle'})}</div>
+      <b>${i<3&&m.n>0?['🥇','🥈','🥉'][i]+' ':''}${whoHTML(m.sid,m)}</b>
+      <em>${m.n||0}문제</em></div>`).join('')}</div>
+    <div style="text-align:center;margin-top:16px"><button class="btn primary" onclick="bossLeave()">처음으로</button></div>
+  </div>`;
+  show('s-boss');
+}
+function bossLeave(){
+  stopTimer(); bossStopWatch(); document.body.classList.remove('btpen');
+  BOSS.code=''; BOSS.room=null; BOSS.host=false;
+  G=null; openSchool();
+}
 
 /* ═══════════════════ 시작 ═══════════════════ */
 async function boot(){
@@ -14103,7 +15073,7 @@ async function boot(){
     try{
       let u=await dbGet('users/'+saved.sid,null), up=false;
       if(!(u&&u.h)&&online()){ const lu=lget('users/'+saved.sid,null); if(lu&&lu.h===saved.h){ u=lu; up=true; } }
-      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); ME._c0=up?null:ME.coin; giftNote(u); openSchool(); if(BT_INV) btInviteGo(); else btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
+      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); ME._c0=up?null:ME.coin; giftNote(u); startFreezeWatch(); openSchool(); if(BOSS_INV) joinBossRoom(BOSS_INV); else if(BT_INV) btInviteGo(); else btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
     }catch(e){}
   }
   el('s-gate').classList.remove('restoring');
