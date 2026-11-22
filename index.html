@@ -15080,20 +15080,12 @@ function bossDmg(t,sec,hurt){ const c=GRADE_CUT[t]||[15,12,9,6], Tf=60/c[0];
   const d=sec<=Tf?6:sec<=Tf*2?4:2; return hurt?d/2:d; }
 const bossGrOf=r=>BOSS_GR[r&&r.grade]?r.grade:'A';
 /* 1인당 목표 : 그 주제 실전 1분 등급 기준 × 3분 × 0.4 (여럿이 힘을 모으니 개인 기록보다 낮게) */
-/* 1인당 HP — 기본 문제는 실전보다 쉬우니, 실전 1분 기록을 2.5분(반격에 쓰는 시간을 뺀 몫)으로 늘려 잡아요.
-   학생 자신의 실전 최고 기록 × 등급 비율과 등급 기준 개수 중 큰 쪽 × 2.5 × 평균 대미지 4  */
-const BOSS_GF={A:.55,S:.75,SS:.9,SSS:1.1}, BOSS_MIN=2.5;
+/* 1인당 HP — 학생 개인 기록과 상관없이, 실전 모드의 고정 등급 기준(GRADE_CUT : 1분에 SSS·SS·S·A 개수)을 따라요.
+   기준 개수 × 2.5분(반격에 쓰는 시간을 뺀 몫) × 평균 대미지 4 */
+const BOSS_MIN=2.5;
 function bossPer(t,g){ const c=GRADE_CUT[t]||[15,12,9,6]; return Math.max(5,Math.round(c[BOSS_GR[g].ci]*BOSS_MIN)); }
-function bossBestOf(sid,t){ const u=(typeof tUsers!=='undefined'&&(tUsers[sid]||(typeof tTestU!=='undefined'&&tTestU[sid])))||null;
-  return +(u&&u.R&&u.R[t]&&u.R[t].best)||0; }
-function bossHPq(t,g,best){ const c=GRADE_CUT[t]||[15,12,9,6], q=Math.max(c[BOSS_GR[g].ci],Math.round((best||0)*BOSS_GF[g]));
-  return Math.max(20,Math.round(q*BOSS_MIN)*BOSS_HPX); }
-const bossPersonHP=(t,g,sid)=>bossHPq(t,g,bossBestOf(sid,t));
 const bossPerHP=r=>bossPer(r.t,bossGrOf(r))*BOSS_HPX;
-/* 대기 중 HP — 선생님 화면은 학생 기록을 알아서 정확히, 학생 화면은 r.est(선생님이 적어 둔 값) */
-function bossTargetNow(r,n){ if(r.state!=='wait') return r.target;
-  if(typeof isTeacher!=='undefined'&&isTeacher){ const g=bossGrOf(r); return bossMembers(r).reduce((a,m)=>a+bossPersonHP(r.t,g,m.sid),0)||bossPerHP(r); }
-  return r.est||Math.max(1,n)*bossPerHP(r); }
+const bossTargetNow=(r,n)=>r.state!=='wait'?r.target:Math.max(1,n)*bossPerHP(r);
 const bossClear=r=>r&&r.startedAt&&r.endedAt?clock(Math.max(0,(r.endedAt-r.startedAt)/1000)):'';
 const bossD=x=>+(x&&(x.d!=null?x.d:x.n))||0;
 function bossSum(room){ return Object.values((room&&room.p)||{}).reduce((a,x)=>a+bossD(x),0); }
@@ -15124,8 +15116,7 @@ function paintTBoss(){
   let gr='S';
   const pv=()=>{ const t=el('tbTopic').value, per=bossPer(t,gr)*BOSS_HPX, G_=BOSS_GR[gr];
     el('tbPrev').innerHTML=`<div class="bsav big">${bossAv(t)}</div><b>${esc(bossLookOf(t).n)}</b><small>${esc(topicOf(t).n)} 보스 · ${gr}등급</small>`;
-    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>보스 HP = 참여 학생마다 (그 학생의 이 단원 실전 1분 최고 기록 × ${BOSS_GF[gr]}, 최소 ${bossPer(t,gr)/BOSS_MIN|0}개) × ${BOSS_MIN}분 × 평균 대미지 ${BOSS_HPX}<br>
-      기록이 없는 학생 1명 = HP <b>${per}</b> · 실전 1분 ${(GRADE_CUT[t]||[15])[0]}개(SSS) 학생 1명 = HP <b>${bossHPq(t,gr,(GRADE_CUT[t]||[15])[0])}</b></b> · 제한 시간 <b>${clock(BOSS_SEC)}</b> (격파하면 걸린 시간도 기록돼요)<br>보스 반격 : 약 ${G_.gap}초마다 몇 명을 노려요 → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 30초 동안 대미지 절반<br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
+    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>보스 HP = 참여 인원 × 1인당 HP <b>${per}</b> (실전 1분 ${gr} 기준 ${(GRADE_CUT[t]||[15,12,9,6])[BOSS_GR[gr].ci]}개 × ${BOSS_MIN}분 × 평균 대미지 ${BOSS_HPX}) · 제한 시간 <b>${clock(BOSS_SEC)}</b> (격파하면 걸린 시간도 기록돼요)<br>보스 반격 : 약 ${G_.gap}초마다 몇 명을 노려요 → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 30초 동안 대미지 절반<br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
     el('tbGr').querySelectorAll('.sg').forEach(b=>b.classList.toggle('on',b.dataset.g===gr)); };
   el('tbTopic').onchange=pv;
   el('tbGr').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ gr=b.dataset.g; pv(); });
@@ -15220,7 +15211,7 @@ function paintTBossLive(box){
       <div class="bsav huge${A?' cast':''}${r.state==='win'?' dead':r.state==='fail'?' laugh':r.state==='wait'?' idle':''}" id="tbBossAv">${bossAv(r.t)}</div>
       <h3>${r.state==='win'?`🎉 보스 격파 성공! <small class="raid-clr">⏱ ${bossClear(r)}</small>`:r.state==='fail'?'⏰ 시간 종료 · 아쉽지만 잘 싸웠어요!':esc(r.bossName)}</h3>
       <div class="bshp-big"><i style="width:${hpPct}%"></i><em>${r.state==='wait'?`HP ${tg}`:`${rem} / ${r.target}`}</em></div>
-      <div class="raid-sub">${r.state==='wait'?`${mem.length}명의 실전 기록으로 정한 보스 HP <b>${tg}</b> · 학생이 더 들어오면 HP가 늘어나요 · 제한 시간 ${clock(r.sec)}`:`풀이 ${mem.reduce((a,m)=>a+(m.n||0),0)}문제 · 남은 HP <b>${rem}</b>`}</div>
+      <div class="raid-sub">${r.state==='wait'?`${mem.length}명 × 1인당 HP ${bossPerHP(r)} = 보스 HP <b>${tg}</b> · 학생이 더 들어오면 HP가 늘어나요 · 제한 시간 ${clock(r.sec)}`:`풀이 ${mem.reduce((a,m)=>a+(m.n||0),0)}문제 · 남은 HP <b>${rem}</b>`}</div>
     </div>
     <div class="raid-ground"></div>
     <div class="raid-party">${party.length?party.map(m=>{ const k=rankOf[m.sid];
@@ -15262,10 +15253,9 @@ function paintTBossLive(box){
     BOSS.tK[m.sid]=key; });
   { const lg=el('tbLog'); if(lg) lg.innerHTML=(BOSS.log||[]).slice(-3).map(x=>`<span>${x}</span>`).join(''); }
   BOSS.tSeen=sum;
-  if(r.state==='wait'&&r.est!==tg) dbUpdate('bosses/'+r.code,{est:tg});
   if(el('tbStart')) el('tbStart').onclick=async()=>{
     const now=serverNow(), n=Math.max(1,bossMembers(BOSS.room||r).length);
-    await dbUpdate('bosses/'+r.code,{state:'play',startedAt:now,endAt:now+r.sec*1000,target:Math.max(20,bossTargetNow(BOSS.room||r,n)),n0:n,atk:null});
+    await dbUpdate('bosses/'+r.code,{state:'play',startedAt:now,endAt:now+r.sec*1000,target:n*bossPerHP(r),n0:n,atk:null});
   };
   el('tbFs').onclick=()=>{ const tb=el('tBody');
     if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
@@ -15337,7 +15327,7 @@ function paintBossLobby(r){
       <div style="font-size:13px;opacity:.85">방 번호 <b>${r.code}</b> · ${esc(topicOf(r.t).n)}</div>
       <div class="bsav huge idle">${bossAv(r.t)}</div>
       <h3>${esc(r.bossName)}</h3>
-      <div style="font-size:14px;opacity:.92">${gBadge(bossGrOf(r))} · 보스 HP <b>${bossTargetNow(r,mem.length)}</b> (참여한 친구들의 실전 기록으로 정해져요)<br><small>빨리 풀수록 큰 대미지! 보스가 나를 노리면 방어 문제를 시간 안에 풀어요</small> · 제한 시간 <b>${clock(r.sec)}</b></div>
+      <div style="font-size:14px;opacity:.92">${gBadge(bossGrOf(r))} · 보스 HP <b>${bossTargetNow(r,mem.length)}</b> (참여 인원 × 1인당 HP ${bossPerHP(r)})<br><small>빨리 풀수록 큰 대미지! 보스가 나를 노리면 방어 문제를 시간 안에 풀어요</small> · 제한 시간 <b>${clock(r.sec)}</b></div>
     </div>
     <div style="text-align:center;font-size:14.5px;font-weight:800;color:var(--blue);margin-bottom:10px">선생님이 시작 버튼을 누르면 다 함께 출발해요! (지금 ${mem.length}명 대기 중)</div>
     <div class="bs-roster">${mem.map(m=>`<div class="bs-mem"><div class="av">${avatarSVG(m.ch||{},{tight:true})}</div><b>${whoHTML(m.sid,m)}</b></div>`).join('')}</div>
