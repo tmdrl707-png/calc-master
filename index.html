@@ -2249,7 +2249,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.22 21:43';
+const APP_VER='11.22 21:51';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -11671,43 +11671,33 @@ async function teacherWipe(){
   toast('실전 기록을 모두 지웠습니다'); await loadTeacher();
 }
 
-/* ── 등급 기준 — 실제 학생들의 실전 최고 기록으로 등급 기준을 점검하고 고쳐요 (config/gcut) ──
-   추천 : B = 기록 있는 학생 중 하위 35% 지점(기초) · A = 상위 40% · S = 상위 15%(반의 에이스) · SS = 상위 5% · SSS = SS × 1.12 (SS 실력 + 운) */
-const GQ={B:.35,A:.60,S:.85,SS:.95};
+/* ── 등급 기준 — 등급은 절대평가(기본값)예요. 학생 기록은 참고로만 보여 주고, 바꾸고 싶으면 직접 입력해요 (config/gcut) ── */
 function pctl(a,q){ if(!a.length) return 0; const s=a.slice().sort((x,y)=>x-y), i=(s.length-1)*q, lo=Math.floor(i), hi=Math.ceil(i); return s[lo]+(s[hi]-s[lo])*(i-lo); }
-function gradeRec(v){ if(v.length<8) return null;
-  let B=Math.round(pctl(v,GQ.B)), A=Math.round(pctl(v,GQ.A)), S=Math.round(pctl(v,GQ.S)), SS=Math.round(pctl(v,GQ.SS));
-  B=Math.max(2,B); A=Math.max(B+1,A); S=Math.max(A+1,S); SS=Math.max(S+1,SS);
-  return [Math.max(SS+1,Math.round(SS*1.12)),SS,S,A,B]; }
 function paintTGrade(){
   const box=el('tBody'), topics=TOPIC_ORDER.filter(t=>GRADE_DEF[t]);
   const rows=topics.map(t=>{ const v=Object.keys(tUsers).map(sid=>+((((tUsers[sid].R||{})[t])||{}).best)||0).filter(x=>x>0);
-    const cur=GRADE_CUT[t].slice(), rec=gradeRec(v), cnt={SSS:0,SS:0,S:0,A:0,B:0,'-':0};
-    v.forEach(x=>cnt[gradeOfRec(t,x)||'-']++);
-    return {t,v,cur,rec,cnt,own:!!(CFG.gcut||{})[t],open:topicOpen(t)}; }).sort((a,b)=>(b.open-a.open)||(b.v.length-a.v.length));
-  const fmt=c=>c.map((x,i)=>`<b>${x}</b>`).join(' · ');
+    const cnt={SSS:0,SS:0,S:0,A:0,B:0,'-':0}; v.forEach(x=>cnt[gradeOfRec(t,x)||'-']++);
+    return {t,v,cur:GRADE_CUT[t].slice(),def:GRADE_DEF[t],cnt,own:!!(CFG.gcut||{})[t],open:topicOpen(t)}; }).sort((a,b)=>(b.open-a.open)||(b.v.length-a.v.length));
+  const fmt=c=>c.map(x=>`<b>${x}</b>`).join(' · ');
   box.innerHTML=`<div class="tgrade">
-    <h3 style="margin:0 0 4px">실전 등급 기준 점검</h3>
-    <div class="sub" style="margin-bottom:10px">기준 개수는 <b>SSS · SS · S · A · B</b> 순서(1분에 맞힌 개수)예요. B에 못 미치면 등급이 없어요.<br>
-      <b>추천</b>은 이 주제 실전 기록이 있는 학생(시험용 계정 제외)의 최고 기록으로 계산해요 — B: 하위 35% 지점(기초를 갖춤) · A: 상위 40%(잘한다) · S: 상위 15%(반의 에이스) · SS: 상위 5%(아주 잘함) · SSS: SS × 1.12(SS 실력 + 운). 기록이 8명 이상일 때만 추천해요.<br>
-      보스전 HP도 이 기준을 따라 바뀌어요.</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button class="btn primary" id="tgAll">추천 기준 한꺼번에 적용 (${rows.filter(r=>r.rec).length}개 주제)</button><button class="btn" id="tgReset">모두 기본값으로</button></div>
+    <h3 style="margin:0 0 4px">실전 등급 기준 (절대평가)</h3>
+    <div class="sub" style="margin-bottom:10px">기준 개수는 <b>SSS · SS · S · A · B</b> 순서(실전 1분에 맞힌 개수)예요. B에 못 미치면 등급이 없어요.<br>
+      B 기초를 갖춤 · A 계산을 잘함 · S 계산 에이스 · SS 아주 잘함 · SSS SS 실력에 운까지.<br>
+      학생 기록은 <b>참고용</b>이에요 — 몇 명이 어느 등급인지 보고, 기준이 이상하면 '직접 입력'으로 고쳐요. 보스전 HP도 이 기준을 따라요.</div>
+    <div style="margin-bottom:10px"><button class="btn" id="tgReset">모두 기본값으로</button></div>
     <div class="tg-list">${rows.map(r=>`<div class="tg-row${r.open?'':' off'}">
-      <div class="tg-h"><b>${esc(topicOf(r.t).n)}</b>${r.open?'':'<small>잠김</small>'}${r.own?'<small class="own">직접 맞춘 기준</small>':''}<em>기록 ${r.v.length}명${r.v.length?` · 최고 ${Math.max(...r.v)}개 · 중간 ${Math.round(pctl(r.v,.5))}개`:''}</em></div>
-      <div class="tg-c">지금 ${fmt(r.cur)}</div>
+      <div class="tg-h"><b>${esc(topicOf(r.t).n)}</b>${r.open?'':'<small>잠김</small>'}${r.own?'<small class="own">직접 고친 기준</small>':''}<em>기록 ${r.v.length}명${r.v.length?` · 최고 ${Math.max(...r.v)}개 · 중간 ${Math.round(pctl(r.v,.5))}개`:''}</em></div>
+      <div class="tg-c">기준 ${fmt(r.cur)}${r.own?` <span class="dim">(기본 ${r.def.join('·')})</span>`:''}</div>
       ${r.v.length?`<div class="tg-d">${['SSS','SS','S','A','B','-'].map(g=>`<span>${g==='-'?'등급 없음':gBadge(g)} ${r.cnt[g]}명</span>`).join('')}</div>`:''}
-      <div class="tg-c">${r.rec?`추천 ${fmt(r.rec)} <button class="btn sm" data-ap="${r.t}">적용</button>`:'<span class="dim">기록이 8명 이상 모이면 추천이 나와요</span>'}
-        ${r.own?`<button class="btn sm" data-df="${r.t}">기본값</button>`:''}<button class="btn sm" data-ed="${r.t}">직접 입력</button></div>
+      <div class="tg-c">${r.own?`<button class="btn sm" data-df="${r.t}">기본값</button>`:''}<button class="btn sm" data-ed="${r.t}">직접 입력</button></div>
     </div>`).join('')}</div></div>`;
   const save=async(o,msg)=>{ CFG.gcut=o; await dbSet('config/gcut',o); applyGcut(o); toast(msg); paintTGrade(); };
   const cp=()=>Object.assign({},CFG.gcut||{});
-  box.querySelectorAll('[data-ap]').forEach(b=>b.onclick=()=>{ const r=rows.find(x=>x.t===b.dataset.ap); const o=cp(); o[r.t]=r.rec; save(o,`${topicOf(r.t).n} 등급 기준을 바꿨어요`); });
   box.querySelectorAll('[data-df]').forEach(b=>b.onclick=()=>{ const o=cp(); delete o[b.dataset.df]; save(o,'기본값으로 돌렸어요'); });
   box.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const t=b.dataset.ed, v=prompt(`${topicOf(t).n} 기준을 SSS,SS,S,A,B 순서로 (큰 수부터)`,GRADE_CUT[t].join(','));
     if(v==null) return; const a=v.split(/[,\s]+/).map(Number).filter(x=>x>0);
     if(a.length!==5||a.some((x,i)=>i&&x>=a[i-1])) return toast('다섯 개를 큰 수부터 차례로 넣어 주세요');
     const o=cp(); o[t]=a; save(o,'기준을 바꿨어요'); });
-  el('tgAll').onclick=()=>{ if(!confirm('기록이 충분한 주제의 등급 기준을 모두 추천값으로 바꿀까요?')) return; const o=cp(); rows.forEach(r=>{ if(r.rec) o[r.t]=r.rec; }); save(o,'추천 기준을 적용했어요'); };
   el('tgReset').onclick=()=>{ if(confirm('모든 주제를 기본 기준으로 돌릴까요?')) save({},'모두 기본값으로 돌렸어요'); };
 }
 
@@ -13040,9 +13030,9 @@ const HS_GOAL_DEF={int:20, expo:18, power:25, root:16, pyth:15, trig:15};   /* 1
 /* 실전 1분 등급 기준 [SSS, SS, S, A, B]
    B : 이 정도면 기초를 갖췄다 · A : 계산을 잘한다고 할 만하다 · S : 반의 계산 에이스
    SS : 계산을 아주 잘하는 친구 · SSS : SS 실력에 운까지 더해져야 닿는 기록(SS × 1.12)
-   기본값은 실제 구구단 상위 기록(1분 59~65개)에 맞춘 풀이 시간 모의실험으로 정했어요(주제·단계별 생각 시간 + 휴대폰 입력 시간 + 문장은 숫자 위주로 훑어 읽는 시간).
-   B 기준에 못 미치면 등급이 없어요. 선생님 모드 '등급 기준' 탭에서 실제 학생 기록으로 다시 맞출 수 있어요(config/gcut). */
-const GRADE_CUT={addsub:[29,26,22,17,11], gugu:[62,55,46,36,23], fadd:[16,14,12,10,8], fmul:[22,20,16,12,8], ratio:[18,16,13,10,7], cnt:[13,12,11,9,6], factor:[17,15,14,12,8], power:[29,26,20,15,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[17,15,12,9,5], rdec:[12,11,9,6,4], linf:[20,18,15,12,7], angle:[26,23,18,12,8], simr:[19,17,12,9,6], prob:[16,14,11,8,5], dadd:[24,21,17,13,8], dmul:[24,21,16,11,8], int:[32,29,24,16,9], expo:[37,33,27,20,12], root:[28,25,20,15,11], trig:[29,26,19,12,8], logx:[25,22,17,11,7], tfn:[15,13,12,10,7], comb:[19,17,14,11,7], bond:[24,19,14,9,5], mixc:[16,13,10,6,4], divm:[16,13,10,6,4], frac:[15,12,9,6,4]};
+   절대평가 — 학생 기록에 맞추지 않고, 등급별 실력(생각 속도)을 정해 둔 풀이 시간 모의실험으로 정했어요(주제·단계별 생각 시간 + 휴대폰 입력 시간 + 문장은 숫자 위주로 훑어 읽는 시간).
+   B 기준에 못 미치면 등급이 없어요. 선생님 모드 '등급 기준' 탭에서 학생 기록을 참고로 보고 직접 고칠 수 있어요(config/gcut). */
+const GRADE_CUT={addsub:[28,25,21,17,11], gugu:[54,48,42,33,22], fadd:[16,14,12,10,8], fmul:[21,19,16,12,7], ratio:[17,15,12,9,7], cnt:[13,12,11,9,6], factor:[17,15,14,12,7], power:[27,24,20,14,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[16,14,12,9,5], rdec:[12,11,9,6,4], linf:[20,18,15,12,7], angle:[25,22,17,11,7], simr:[18,16,12,9,6], prob:[16,14,11,8,5], dadd:[22,20,16,12,8], dmul:[22,20,15,11,7], int:[30,27,22,16,9], expo:[35,31,25,19,12], root:[26,23,19,15,10], trig:[28,25,18,12,8], logx:[24,21,16,11,6], tfn:[15,13,11,9,7], comb:[19,17,14,11,7], bond:[24,19,14,9,5], mixc:[16,13,10,6,4], divm:[16,13,10,6,4], frac:[15,12,9,6,4]};
 const GRADE_DEF=JSON.parse(JSON.stringify(GRADE_CUT));
 function applyGcut(o){ Object.keys(GRADE_DEF).forEach(t=>{ const v=o&&o[t], ok=Array.isArray(v)&&v.length===5&&v.every((x,i)=>x>0&&(i===0||x<v[i-1]));
   GRADE_CUT[t].splice(0,5,...(ok?v.map(Number):GRADE_DEF[t])); }); }
