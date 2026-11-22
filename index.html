@@ -13375,19 +13375,19 @@ async function stageClear(){
   if(first&&ME.pq) delete ME.pq[tk];
   const prevBt=p.bt['s'+n], newBt=!prevBt||sec<prevBt;
   if(newBt) p.bt['s'+n]=+sec.toFixed(1);
-  /* 상위 등급 최초 승급 보너스 (A:+10 · S:+15 · SS:+20 · SSS:+25) + 최초 100%(노미스) 보너스(+10) */
-  const GR_ORD=['B','A','S','SS','SSS'], GR_PAY={A:10,S:15,SS:20,SSS:25};
+  /* 등급이 처음 오를 때 — 오른 그 등급 보너스 하나만 (A:+5 · S:+8 · SS:+10 · SSS:+12), 한 번에 SSS가 나와도 SSS 보너스만.
+     처음 100%(노미스) +5. (2026-11 선생님 결정: 총량 절반, 단계를 건너뛰어도 합산하지 않음) */
+  const GR_ORD=['B','A','S','SS','SSS'], GR_PAY={A:5,S:8,SS:10,SSS:12};
   p.bg=p.bg||{}; p.nm=p.nm||{};
   const nowGr=stageGrade(t,n), prevGr=p.bg['s'+n]||(prevBt?'B':'');
   let upCoin=0, upLabel='', nmCoin=0;
   if(nowGr&&GR_ORD.indexOf(nowGr)>GR_ORD.indexOf(prevGr)){
-    const from=Math.max(1,GR_ORD.indexOf(prevGr)+1), to=GR_ORD.indexOf(nowGr);
-    for(let i=from;i<=to;i++) upCoin+=(GR_PAY[GR_ORD[i]]||0);
+    upCoin=GR_PAY[nowGr]||0;
     p.bg['s'+n]=nowGr;
     if(upCoin) upLabel=`${nowGr} 등급 첫 달성 +${upCoin}`;
   }
   const isNoMiss=G.wrongOnce.size===0;
-  if(isNoMiss&&!p.nm['s'+n]){ p.nm['s'+n]=1; nmCoin=10; ME.nmN=(ME.nmN||0)+1; }
+  if(isNoMiss&&!p.nm['s'+n]){ p.nm['s'+n]=1; nmCoin=5; ME.nmN=(ME.nmN||0)+1; }
   const extraClear=upCoin+nmCoin;
   ME.coin+=coin+extraClear;
   const ms=markMission('stage',t,n,{perfect:isNoMiss,sec:+sec.toFixed(1)});
