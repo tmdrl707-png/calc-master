@@ -1717,6 +1717,64 @@ body.btpen #keypad{opacity:.4;pointer-events:none;transition:opacity .15s}
 .rp-bar i{display:block;height:100%;background:linear-gradient(90deg,#6ee7b7,#38bdf8);transition:width .3s}
 .rp em{font-style:normal;font-weight:900;color:#a5f3fc;font-size:12.5px}
 .raid-log{display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:10px;font-size:12.5px;color:#fde68a;min-height:20px}
+/* 보스 반격 · 부상 · 방어 */
+.bsav.cast{animation:bsCast .9s ease-in-out 2;filter:drop-shadow(0 0 18px #ff3d5a)}
+@keyframes bsCast{0%,100%{transform:scale(1)}40%{transform:scale(1.12) translateY(-6px)}70%{transform:scale(.96) translateY(4px)}}
+.bsshot.crit{width:30px;height:30px;background:radial-gradient(circle,#fff 0,#ffd43b 40%,#ff6b00 75%,transparent 76%)!important;box-shadow:0 0 18px #ffb300}
+.bsshot.boss{width:28px;height:28px;background:radial-gradient(circle,#fff 0,#ff3d5a 45%,#7a0020 75%,transparent 76%)!important;box-shadow:0 0 20px #ff3d5a;transition:transform .42s cubic-bezier(.5,0,.8,.6),opacity .2s;z-index:99999}
+.bsdmg.crit{color:#ffb300;font-size:19px}
+.bsst{font-size:12px;font-weight:900;border-radius:99px;padding:0 8px;white-space:nowrap}
+.bsst:empty{display:none}
+.bsst.def{background:#ff3d5a;color:#fff;animation:bsBlink .6s infinite}
+.bsst.hurt{background:#fde2e2;color:#b4232f}
+@keyframes bsBlink{50%{opacity:.55}}
+body.bsdef #card{box-shadow:0 0 0 3px #ff3d5a,0 0 26px rgba(255,61,90,.55);animation:bsDefC 1s infinite}
+@keyframes bsDefC{50%{box-shadow:0 0 0 3px #ff3d5a,0 0 8px rgba(255,61,90,.3)}}
+body.bsdef .qlab{color:#e11d48;font-weight:900}
+.bsflash{position:fixed;inset:0;pointer-events:none;z-index:9997;animation:bsFl .9s ease-out forwards}
+.bsflash.def{background:radial-gradient(circle,transparent 40%,rgba(255,61,90,.45))}
+.bsflash.hurt{background:rgba(255,30,60,.4)}
+@keyframes bsFl{to{opacity:0}}
+.raid-atk{min-height:0;text-align:center;font-weight:900;font-size:15px;color:#fff}
+.raid-atk:not(:empty){margin:8px auto 0;padding:7px 14px;border-radius:99px;background:rgba(225,29,72,.85);display:table;animation:bsBlink .8s infinite}
+.raid-atk b{color:#ffd43b}
+.raid.atk{box-shadow:inset 0 0 60px rgba(255,40,70,.45),0 8px 28px rgba(20,10,70,.35)}
+.raid-round{display:inline-block;font-size:12px;font-weight:900;background:rgba(255,255,255,.16);border-radius:99px;padding:2px 10px;margin-top:6px}
+.rp{position:relative;border-radius:14px;padding:4px 2px;transition:background .2s}
+.rp-mk{position:absolute;top:-4px;right:6px;font-style:normal;font-size:20px;z-index:2}
+.rp-band{display:none;position:absolute;top:30px;left:50%;transform:translateX(-50%) rotate(-18deg);font-style:normal;font-size:24px;z-index:2}
+.rp.tg{background:rgba(255,40,70,.28);box-shadow:0 0 0 2px #ff3d5a,0 0 18px rgba(255,61,90,.7);animation:bsBlink .7s infinite}
+.rp.blk{background:rgba(56,189,248,.25);box-shadow:0 0 0 2px #38bdf8}
+.rp.hurt .rp-av{filter:grayscale(.85) brightness(.75)}
+.rp.hurt .rp-band{display:block}
+.rp.hurt em::after{content:' · ½';color:#fca5a5}
+.rp-av.struck{animation:rpHit .5s ease-out}
+@keyframes rpHit{0%,100%{transform:none}20%{transform:translateX(-7px) rotate(-8deg)}40%{transform:translateX(7px) rotate(6deg)}60%{transform:translateX(-4px)}}
+.raid-log .lg-boss{color:#fda4af;font-style:normal;font-weight:900}
+.raid-log .lg-blk{color:#7dd3fc;font-style:normal;font-weight:900}
+.raid-log .lg-hit{color:#fca5a5;font-style:normal;font-weight:900}
+.raid-next{margin:4px 0 8px;padding:12px;border:1px dashed var(--line);border-radius:14px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+.raid-next small{color:var(--dim);font-size:12px}
+.rn-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.rn-row select{padding:8px 10px;border-radius:10px;border:1px solid var(--line);font:inherit}
+/* 전체 화면 중계 */
+#tBody:fullscreen{background:#0f0b2e;padding:2vh 2vw;overflow:auto;display:flex;flex-direction:column;justify-content:center}
+#tBody:fullscreen .bs-board{max-width:none}
+#tBody:fullscreen .raid{min-height:84vh;display:flex;flex-direction:column;justify-content:space-between;padding:2vh 3vw}
+#tBody:fullscreen .raid-top{font-size:2vh}
+#tBody:fullscreen .raid-top b{font-size:3vh}
+#tBody:fullscreen .bsav.huge{width:min(34vh,40vw);height:min(34vh,40vw)}
+#tBody:fullscreen .raid-boss h3{font-size:4vh}
+#tBody:fullscreen .raid-boss .bshp-big{height:4.2vh;max-width:70vw}
+#tBody:fullscreen .raid-boss .bshp-big em{font-size:2.4vh}
+#tBody:fullscreen .raid-atk{font-size:2.8vh}
+#tBody:fullscreen .rp{width:min(130px,11vw)}
+#tBody:fullscreen .rp-av{width:min(90px,8vw);height:min(90px,8vw)}
+#tBody:fullscreen .rp b{font-size:1.6vh}
+#tBody:fullscreen .raid-log{font-size:2vh}
+#tBody:fullscreen .raid-next,#tBody:fullscreen #tbQr,#tBody:fullscreen #tbClose{display:none}
+#tBody:fullscreen > .bs-board > div:not(.raid){margin:1vh 0}
+.bs-hud-top{flex-wrap:wrap;row-gap:2px}
 </style>
 </head>
 <body>
@@ -13292,7 +13350,7 @@ function qLabel(){
   if(G.mode==='real'){ const RS=realStagesOf(G.t), S=RS.length, lv=Math.min(S,G.qLv||1);
     return `난이도 ${lv} / ${S} · ${RS[lv-1].name}`; }
   if(G.mode==='boss'){ const RS=realStagesOf(G.t), S=RS.length, lv=Math.min(S,G.qLv||1);
-    return `반 보스전 · ${RS[lv-1].name}`; }
+    return G.def?`⚠ 보스의 반격! 시간 안에 풀어서 막아요 · ${RS[lv-1].name}`:`반 보스전 · ${RS[lv-1].name}`; }
   if(G.mode==='battle') return btQLabel();
   if(G.mode==='note') return G.step===2?'확인 문제 — 같은 계산을 다른 모양으로 한 번 더!':'다시 풀기 — 방금 본 풀이대로';
   return `${G.st}단계 · ${stageOf(G.t,G.st).name}`;
@@ -14969,11 +15027,12 @@ const BOSS_LOOK={
 const bossLookOf=t=>BOSS_LOOK[t]||{n:`${topicOf(t).n} 마왕`,s:'times',c:'night',i:['hDemon','fBoss','bkDragon','nArmor','fxAura']};
 const bossAv=(t,opt)=>avatarSVG({s:bossLookOf(t).s,c:bossLookOf(t).c,items:bossLookOf(t).i},opt||{});
 /* 보스가 맞는 연출 — 데미지 숫자가 떠오르고 보스가 흔들려요 (n: 깎인 HP, who: 'me' 내 공격 · 'team' 친구들) */
-function bossHitFx(box,n,who){
+function bossHitFx(box,n,who,lab){
   if(!box||!(n>0)) return;
   box.classList.remove('hit'); void box.offsetWidth; box.classList.add('hit');
   const d=document.createElement('span'); d.className='bsdmg'+(who==='me'?' me':'');
-  d.textContent=who==='me'?`−${n}`:`−${n} 친구들 공격!`;
+  d.textContent=who==='me'?(lab?`${lab} −${n}`:`−${n}`):`−${n} 친구들 공격!`;
+  if(lab) d.classList.add('crit');
   d.style.left=(30+Math.random()*40)+'%'; box.appendChild(d); setTimeout(()=>d.remove(),1000);
 }
 /* 내 공격 — 문제 카드에서 보스 쪽으로 빛 구슬이 날아가요 */
@@ -14982,20 +15041,22 @@ function raidAttack(m,d){
   from.classList.add('atk'); setTimeout(()=>from.classList.remove('atk'),420);
   const a=from.getBoundingClientRect(), b=to.getBoundingClientRect();
   const o=document.createElement('div'); o.className='bsshot'; o.style.left=(a.left+a.width/2-11)+'px'; o.style.top=(a.top+a.height/2-11)+'px';
-  document.body.appendChild(o);
+  (document.fullscreenElement||document.body).appendChild(o);
   requestAnimationFrame(()=>{ o.style.transform=`translate(${b.left+b.width/2-(a.left+a.width/2)}px,${b.top+b.height/2-(a.top+a.height/2)}px) scale(.6)`; o.style.opacity='.95'; });
-  setTimeout(()=>{ o.remove(); bossHitFx(to,d,'me'); },300);
-  const nm=(m.nk||m.sid||'').toString().slice(0,8); BOSS.log=(BOSS.log||[]).concat(`${esc(nm)} 공격! −${d}`).slice(-6);
+  if(d>=6) o.classList.add('crit');
+  setTimeout(()=>{ o.remove(); bossHitFx(to,d,'me',d>=6?'치명타!':''); },300);
+  const nm=(m.nk||m.sid||'').toString().slice(0,8); BOSS.log=(BOSS.log||[]).concat(`${esc(nm)} 공격! −${d}${d>=6?' 💥':''}`).slice(-6);
   const lg=el('tbLog'); if(lg) lg.innerHTML=BOSS.log.slice(-3).map(x=>`<span>${x}</span>`).join('');
 }
-function bossShoot(){
+function bossShoot(dm,lab){
   const from=el('card'), to=document.querySelector('#bsHud .bsav'); if(!from||!to) return;
   const a=from.getBoundingClientRect(), b=to.getBoundingClientRect();
   const o=document.createElement('div'); o.className='bsshot';
   o.style.left=(a.left+a.width/2-11)+'px'; o.style.top=(a.top+a.height*.35-11)+'px';
   document.body.appendChild(o);
   requestAnimationFrame(()=>{ o.style.transform=`translate(${b.left+b.width/2-(a.left+a.width/2)}px,${b.top+b.height/2-(a.top+a.height*.35)}px) scale(.6)`; o.style.opacity='.95'; });
-  setTimeout(()=>{ o.remove(); bossHitFx(to,1,'me'); },300);
+  if(dm>=6||lab) o.classList.add('crit');
+  setTimeout(()=>{ o.remove(); bossHitFx(to,dm||1,'me',lab||(dm>=6?'치명타!':'')); },300);
 }
 
 let BOSS_INV=(()=>{ try{ const q=new URLSearchParams(location.search), v=(q.get('boss')||'').replace(/\D/g,'').slice(0,4);
@@ -15003,18 +15064,25 @@ let BOSS_INV=(()=>{ try{ const q=new URLSearchParams(location.search), v=(q.get(
 let BOSS={code:'',room:null,off:null,tId:null,host:false,rewarded:''};
 /* ═══ 보스 등급 — 선생님은 등급(A·S·SS·SSS)만 골라요. 보스 HP는 (참여 인원 × 1인당 목표), 문제 난이도·보상은 등급을 따라가요 ═══ */
 const BOSS_SEC=180, BOSS_GRS=['A','S','SS','SSS'];
+/* 기본 공격 = 쉬운 문제(cap 까지만) · 보스 반격 = 어려운 방어 문제(def) — aw 초 안에 못 막으면 부상(30초 동안 대미지 절반), gap 초마다 반격 */
 const BOSS_GR={
-  A  :{ci:3, st:0,   gain:.15, win:30, fail:10, desc:'가볍게 · 쉬운 문제부터'},
-  S  :{ci:2, st:.35, gain:.20, win:45, fail:14, desc:'보통 · 중간 단계부터'},
-  SS :{ci:1, st:.6,  gain:.25, win:60, fail:18, desc:'도전 · 어려운 단계부터'},
-  SSS:{ci:0, st:.85, gain:.30, win:80, fail:22, desc:'최고 난이도 · 거의 끝 단계부터'}};
+  A  :{ci:3, st:0,   cap:.35, gain:.12, def:.55, aw:15, gap:34, win:30, fail:10, desc:'가볍게 · 반격이 느리고 방어 문제도 무난해요'},
+  S  :{ci:2, st:.1,  cap:.45, gain:.15, def:.7,  aw:13, gap:30, win:45, fail:14, desc:'보통 · 반격이 조금 더 잦아요'},
+  SS :{ci:1, st:.2,  cap:.55, gain:.18, def:.85, aw:11, gap:26, win:60, fail:18, desc:'도전 · 방어 문제가 어렵고 시간이 짧아요'},
+  SSS:{ci:0, st:.3,  cap:.65, gain:.2,  def:1,   aw:10, gap:22, win:80, fail:22, desc:'최고 난이도 · 가장 어려운 방어 문제를 10초 안에!'}};
+const BOSS_HPX=4, BOSS_HURT=30000;   /* 1문제 평균 대미지 4 · 부상 30초 */
+/* 대미지 — 그 주제 SSS 속도(60초/SSS 기준 개수)보다 빠르면 6, 두 배 안이면 4, 그보다 느리면 2 · 부상이면 절반 */
+function bossDmg(t,sec,hurt){ const c=GRADE_CUT[t]||[15,12,9,6], Tf=60/c[0];
+  const d=sec<=Tf?6:sec<=Tf*2?4:2; return hurt?d/2:d; }
 const bossGrOf=r=>BOSS_GR[r&&r.grade]?r.grade:'A';
 /* 1인당 목표 : 그 주제 실전 1분 등급 기준 × 3분 × 0.4 (여럿이 힘을 모으니 개인 기록보다 낮게) */
 function bossPer(t,g){ const c=GRADE_CUT[t]||[15,12,9,6]; return Math.max(5,Math.round(c[BOSS_GR[g].ci]*BOSS_SEC/60*.4)); }
-const bossTargetNow=(r,n)=>r.state==='wait'?Math.max(1,n)*(r.per||bossPer(r.t,bossGrOf(r))):r.target;
-function bossSum(room){ return Object.values((room&&room.p)||{}).reduce((a,x)=>a+(+x.n||0),0); }
+const bossPerHP=r=>r.per||bossPer(r.t,bossGrOf(r))*BOSS_HPX;
+const bossTargetNow=(r,n)=>r.state==='wait'?Math.max(1,n)*bossPerHP(r):r.target;
+const bossD=x=>+(x&&(x.d!=null?x.d:x.n))||0;
+function bossSum(room){ return Object.values((room&&room.p)||{}).reduce((a,x)=>a+bossD(x),0); }
 function bossMembers(room){
-  return Object.entries((room&&room.p)||{}).map(([sid,x])=>Object.assign({sid},x)).sort((a,b)=>(b.n||0)-(a.n||0));
+  return Object.entries((room&&room.p)||{}).map(([sid,x])=>Object.assign({sid},x)).sort((a,b)=>bossD(b)-bossD(a));
 }
 function bossStopWatch(){
   if(BOSS.off){ try{ BOSS.off(); }catch(e){} BOSS.off=null; }
@@ -15038,9 +15106,9 @@ function paintTBoss(){
     <button class="btn primary" id="tbOpen" style="width:100%">⚔ 반 보스전 방 만들기</button>
   </div>`;
   let gr='S';
-  const pv=()=>{ const t=el('tbTopic').value, per=bossPer(t,gr), G_=BOSS_GR[gr];
+  const pv=()=>{ const t=el('tbTopic').value, per=bossPer(t,gr)*BOSS_HPX, G_=BOSS_GR[gr];
     el('tbPrev').innerHTML=`<div class="bsav big">${bossAv(t)}</div><b>${esc(bossLookOf(t).n)}</b><small>${esc(topicOf(t).n)} 보스 · ${gr}등급</small>`;
-    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>1인당 <b>${per}문제</b> × 참여 인원 = 보스 HP · 제한 시간 <b>${clock(BOSS_SEC)}</b><br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
+    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>1인당 HP <b>${per}</b> × 참여 인원 = 보스 HP · 제한 시간 <b>${clock(BOSS_SEC)}</b><br>보스 반격 : 약 ${G_.gap}초마다 몇 명을 노려요 → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 30초 동안 대미지 절반<br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
     el('tbGr').querySelectorAll('.sg').forEach(b=>b.classList.toggle('on',b.dataset.g===gr)); };
   el('tbTopic').onchange=pv;
   el('tbGr').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ gr=b.dataset.g; pv(); });
@@ -15049,14 +15117,14 @@ function paintTBoss(){
 }
 async function hostBossRoom(grade){
   grade=BOSS_GR[grade]?grade:'S';
-  const t=el('tbTopic').value||tTopic, per=bossPer(t,grade), target=per, sec=BOSS_SEC;
+  const t=el('tbTopic').value||tTopic, per=bossPer(t,grade)*BOSS_HPX, target=per, sec=BOSS_SEC;
   const T=topicOf(t), bossName=(el('tbName').value||'').trim()||bossLookOf(t).n;
   let code='';
   for(let i=0;i<8;i++){ const c=String(1000+Math.floor(Math.random()*9000)), ex=await dbGet('bosses/'+c,null); if(!ex||ex.state==='win'||ex.state==='fail'){ code=c; break; } }
   if(!code) return toast('방 번호를 만들지 못했어요 — 다시 눌러 주세요');
   const room={code, host:TEACHER_ID, t, bossName, grade, per, target, sec, state:'wait', p:{}, createdAt:Date.now()};
   if(!(await dbSet('bosses/'+code,room))) toast('서버에 방을 저장하지 못했어요 — 이 기기에서만 보여요. 인터넷 연결이나 Firebase 규칙(bosses)을 확인해 주세요');
-  BOSS.code=code; BOSS.room=room; BOSS.host=true; BOSS.tSeen=null; BOSS.tN={}; BOSS.log=[];
+  BOSS.code=code; BOSS.room=room; BOSS.host=true; BOSS.tSeen=null; BOSS.tN={}; BOSS.tK={}; BOSS.log=[]; BOSS.atkFor=null; BOSS.atkRes=''; BOSS.tAtk='';
   bossStopWatch();
   BOSS.off=await dbOn('bosses/'+code,r=>{
     if(!r){ BOSS.code=''; BOSS.room=null; bossStopWatch(); if(isTeacher&&tTab==='boss') paintTBoss(); return; }
@@ -15072,8 +15140,50 @@ async function hostBossRoom(grade){
     const left=Math.max(0,(BOSS.room.endAt-serverNow())/1000);
     const clk=el('tbClock'); if(clk) clk.textContent=clock(left);
     if(left<=0) dbUpdate('bosses/'+BOSS.code,{state:'fail',endedAt:serverNow()});
+    else bossAtkTick(BOSS.room);
   },250);
   paintTBossLive(el('tBody'));
+}
+/* ── 보스 반격 (선생님 화면이 정해요) — 몇 명을 골라 aw초 안에 방어 문제를 풀게 하고, 못 막으면 부상 ── */
+document.addEventListener('fullscreenchange',()=>{ if(isTeacher&&tTab==='boss'&&BOSS.room) paintTBossLive(el('tBody')); });
+function bossAtkTick(r){
+  const now=serverNow(), g=BOSS_GR[bossGrOf(r)], a=r.atk;
+  document.querySelectorAll('.raid-party .rp').forEach(e=>e.classList.toggle('hurt',now<+e.dataset.hu));
+  if(a&&now<a.until+1800){ const t=el('tbAtkT'); if(t) t.textContent=Math.max(0,Math.ceil((a.until-now)/1000));
+    return; }
+  if(a&&BOSS.atkRes!==a.id){ BOSS.atkRes=a.id;   /* 화면을 닫았거나 답하지 않은 학생도 부상 처리 */
+    Object.keys(a.t||{}).forEach(sid=>{ const m=(r.p||{})[sid]; if(m&&m.blk!==a.id&&m.hit!==a.id)
+      dbUpdate(`bosses/${r.code}/p/${sid}`,{hit:a.id,hurtUntil:a.until+BOSS_HURT}); });
+    if(el('tbAtk')) paintTBossLive(el('tBody')); return; }
+  if(CFG.freeze&&CFG.freeze.on) return;
+  if(BOSS.atkFor!==r.startedAt){ BOSS.atkFor=r.startedAt; BOSS.nextAtk=Math.max(now,r.startedAt)+20000; }
+  if(now<BOSS.nextAtk||r.endAt-now<(g.aw+5)*1000) return;
+  const mem=bossMembers(r).map(m=>m.sid); if(!mem.length) return;
+  const fresh=mem.filter(sid=>!(+((r.p[sid]||{}).hurtUntil)>now)), pool=(fresh.length?fresh:mem).sort(()=>Math.random()-.5);
+  const k=Math.min(5,Math.max(1,Math.round(mem.length*.3))), t={};
+  pool.slice(0,k).forEach(sid=>t[sid]=1);
+  BOSS.nextAtk=now+(g.aw+g.gap)*1000;
+  dbUpdate('bosses/'+r.code,{atk:{id:'a'+now,at:now,until:now+g.aw*1000,t}});
+}
+/* 같은 방 번호 그대로 다음 보스 — 참여 학생은 남기고 기록만 새로 */
+async function bossNextRoom(r,t,g){
+  const p={}; Object.entries(r.p||{}).forEach(([sid,x])=>{ p[sid]={nk:x.nk||'',ttl:x.ttl||'',ch:x.ch||{},n:0,d:0,combo:0,at:Date.now()}; });
+  const per=bossPer(t,g)*BOSS_HPX;
+  const room={code:r.code, host:TEACHER_ID, t, bossName:bossLookOf(t).n, grade:g, per, target:per, sec:BOSS_SEC, state:'wait', p, createdAt:Date.now(), round:(r.round||1)+1};
+  Object.assign(BOSS,{tN:{},tK:{},log:[],atkFor:null,atkRes:'',tAtk:'',tBeam:'',tSeen:null,nx:null});
+  BOSS.room=room;
+  if(!(await dbSet('bosses/'+r.code,room))) toast('서버에 저장하지 못했어요 — 인터넷 연결을 확인해 주세요');
+  paintTBossLive(el('tBody')); toast(`${bossLookOf(t).n} 소환! 시작 버튼을 누르면 출발해요`);
+}
+/* 보스가 반격할 때 — 노리는 학생 캐릭터에게 붉은 탄이 날아가요 */
+function bossBeams(sids){
+  const from=el('tbBossAv'); if(!from) return; const a=from.getBoundingClientRect();
+  sids.forEach((sid,i)=>{ const to=document.querySelector('#rp_'+CSS.escape(sid)+' .rp-av'); if(!to) return;
+    const b=to.getBoundingClientRect(), o=document.createElement('div'); o.className='bsshot boss';
+    o.style.left=(a.left+a.width/2-14)+'px'; o.style.top=(a.top+a.height/2-14)+'px';
+    (document.fullscreenElement||document.body).appendChild(o);
+    setTimeout(()=>{ o.style.transform=`translate(${b.left+b.width/2-(a.left+a.width/2)}px,${b.top+b.height/2-(a.top+a.height/2)}px)`; o.style.opacity='1'; },30+i*90);
+    setTimeout(()=>{ o.remove(); to.classList.remove('struck'); void to.offsetWidth; to.classList.add('struck'); },480+i*90); });
 }
 function paintTBossLive(box){
   const r=BOSS.room; if(!r||!box) return;
@@ -15081,42 +15191,72 @@ function paintTBossLive(box){
   const left=r.state==='play'?Math.max(0,(r.endAt-serverNow())/1000):r.sec;
   const url=location.origin+location.pathname+'?boss='+r.code;
   const party=mem.slice().sort((x,y)=>x.sid<y.sid?-1:1), rankOf={}; mem.forEach((m,i)=>{ if(m.n>0) rankOf[m.sid]=i; });
-  const maxN=Math.max(1,...mem.map(m=>m.n||0));
-  box.innerHTML=`<div class="bs-board"><div class="raid ${r.state}">
+  const maxN=Math.max(1,...mem.map(m=>bossD(m)));
+  const now0=serverNow(), A=r.state==='play'&&r.atk&&now0<r.atk.until+1800?r.atk:null, aT=(A&&A.t)||{};
+  box.innerHTML=`<div class="bs-board"><div class="raid ${r.state}${A?' atk':''}">
     <div class="raid-top"><span>방 번호 <b>${r.code}</b></span><span>${esc(topicOf(r.t).n)} · ${gBadge(gr)}</span>
       <span class="raid-n">⚔ 참여 <b>${mem.length}</b>명</span><span class="raid-t">⏱ <b id="tbClock">${clock(r.state==='wait'?r.sec:left)}</b></span></div>
+    <div class="raid-atk" id="tbAtk">${A?`⚠ 보스의 반격! 🎯 <b>${mem.filter(m=>aT[m.sid]).map(m=>esc(String(m.nk||m.sid).slice(0,8))).join(' · ')}</b> · <b id="tbAtkT">${Math.max(0,Math.ceil((A.until-now0)/1000))}</b>초 안에 막아라!`:''}</div>
     <div class="raid-boss">
-      <div class="bsav huge${r.state==='win'?' dead':r.state==='fail'?' laugh':r.state==='wait'?' idle':''}" id="tbBossAv">${bossAv(r.t)}</div>
+      ${r.round>1?`<div class="raid-round">${r.round}번째 보스</div>`:''}
+      <div class="bsav huge${A?' cast':''}${r.state==='win'?' dead':r.state==='fail'?' laugh':r.state==='wait'?' idle':''}" id="tbBossAv">${bossAv(r.t)}</div>
       <h3>${r.state==='win'?'🎉 보스 격파 성공!':r.state==='fail'?'⏰ 시간 종료 · 아쉽지만 잘 싸웠어요!':esc(r.bossName)}</h3>
       <div class="bshp-big"><i style="width:${hpPct}%"></i><em>${r.state==='wait'?`HP ${tg}`:`${rem} / ${r.target}`}</em></div>
-      <div class="raid-sub">${r.state==='wait'?`${mem.length}명 × 1인당 ${r.per||bossPer(r.t,gr)}문제 = 보스 HP <b>${tg}</b> · 학생이 더 들어오면 HP가 늘어나요`:`풀이 ${sum}문제 · 남은 HP <b>${rem}</b>`}</div>
+      <div class="raid-sub">${r.state==='wait'?`${mem.length}명 × 1인당 HP ${bossPerHP(r)} = 보스 HP <b>${tg}</b> · 학생이 더 들어오면 HP가 늘어나요`:`풀이 ${mem.reduce((a,m)=>a+(m.n||0),0)}문제 · 남은 HP <b>${rem}</b>`}</div>
     </div>
     <div class="raid-ground"></div>
     <div class="raid-party">${party.length?party.map(m=>{ const k=rankOf[m.sid];
-      return `<div class="rp${k===0?' top':''}" id="rp_${esc(m.sid)}">
+      const tgd=A&&aT[m.sid], blk=tgd&&m.blk===A.id, hit=tgd&&m.hit===A.id, hu=+m.hurtUntil||0;
+      return `<div class="rp${k===0?' top':''}${tgd&&!blk&&!hit?' tg':''}${blk?' blk':''}${now0<hu?' hurt':''}" id="rp_${esc(m.sid)}" data-hu="${hu}">
+        <i class="rp-mk">${blk?'🛡':tgd&&!hit?'🎯':''}</i><i class="rp-band">🩹</i>
         <div class="rp-av">${avatarSVG(m.ch||{},{tight:true,mood:r.state==='win'?'ok':'idle'})}</div>
         <b>${k!=null&&k<3?['🥇','🥈','🥉'][k]+' ':''}${whoHTML(m.sid,m)}</b>
-        <div class="rp-bar"><i style="width:${Math.round((m.n||0)/maxN*100)}%"></i></div><em>${m.n||0}문제</em></div>`; }).join('')
+        <div class="rp-bar"><i style="width:${Math.round(bossD(m)/maxN*100)}%"></i></div><em>${m.n||0}문제 · ${bossD(m)}</em></div>`; }).join('')
       :`<div class="empty" style="color:#c7d2fe;padding:16px 0;width:100%">학생들이 방 번호 <b>${r.code}</b> 또는 QR로 들어오기를 기다리는 중…</div>`}</div>
     <div class="raid-log" id="tbLog">${(BOSS.log||[]).slice(-3).map(x=>`<span>${x}</span>`).join('')}</div>
   </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0">
       ${r.state==='wait'?`<button class="btn primary" id="tbStart">⚔ 보스전 시작! (${mem.length}명)</button>`:''}
+      <button class="btn" id="tbFs">${document.fullscreenElement?'⤢ 전체 화면 끄기':'⛶ 전체 화면 중계'}</button>
       <button class="btn" id="tbQr">QR 크게 보기</button>
       ${r.state==='play'?`<button class="btn danger" id="tbStop">⏹ 강제 종료</button>`:''}
       <button class="btn" id="tbClose">방 닫기</button>
     </div>
+    ${r.state==='win'||r.state==='fail'?`<div class="raid-next">
+      <b>같은 방에서 바로 다음 보스</b><small>학생들은 그대로 남아 대기실로 돌아가요 (결과 화면에 있는 학생만 · '처음으로'를 누른 학생은 방 번호로 다시 들어와요)</small>
+      <div class="rn-row"><select id="tbNxT">${SCHOOLS.flatMap(x=>x.topics).map(k=>`<option value="${k}"${k===(BOSS.nx&&BOSS.nx.t||r.t)?' selected':''}>${topicOf(k).n}</option>`).join('')}</select>
+      <div class="segs" id="tbNxG">${BOSS_GRS.map(g=>`<button class="sg${g===(BOSS.nx&&BOSS.nx.g||gr)?' on':''}" data-g="${g}">${g}</button>`).join('')}</div>
+      <button class="btn primary" id="tbNext">▶ 다음 보스 소환</button></div></div>`:''}
   </div>`;
   /* 학생이 한 문제를 풀 때마다 그 학생 캐릭터가 보스를 공격해요 */
   BOSS.tN=BOSS.tN||{};
-  mem.forEach(m=>{ const prev=BOSS.tN[m.sid], now=m.n||0;
+  BOSS.tK=BOSS.tK||{};
+  const nmOf=m=>esc(String(m.nk||m.sid||'').slice(0,8));
+  if(A&&BOSS.tAtk!==A.id){ BOSS.tAtk=A.id; BOSS.log=(BOSS.log||[]).concat(`<em class="lg-boss">👿 보스의 반격 → ${mem.filter(m=>aT[m.sid]).map(nmOf).join(' · ')}</em>`).slice(-6); }
+  mem.forEach(m=>{ const prev=BOSS.tN[m.sid], now=bossD(m);
     if(r.state==='play'&&prev!=null&&now>prev) raidAttack(m,now-prev);
-    BOSS.tN[m.sid]=now; });
+    BOSS.tN[m.sid]=now;
+    const key=(m.blk||'')+'|'+(m.hit||''), was=BOSS.tK[m.sid];
+    if(was!=null&&was!==key){ if(m.blk&&!String(was).startsWith(m.blk+'|')) BOSS.log=BOSS.log.concat(`<em class="lg-blk">🛡 ${nmOf(m)} 방어 성공! 반격</em>`).slice(-6);
+      else if(m.hit) BOSS.log=BOSS.log.concat(`<em class="lg-hit">🩹 ${nmOf(m)} 부상 — 30초 대미지 절반</em>`).slice(-6); }
+    BOSS.tK[m.sid]=key; });
+  { const lg=el('tbLog'); if(lg) lg.innerHTML=(BOSS.log||[]).slice(-3).map(x=>`<span>${x}</span>`).join(''); }
   BOSS.tSeen=sum;
   if(el('tbStart')) el('tbStart').onclick=async()=>{
     const now=serverNow(), n=Math.max(1,bossMembers(BOSS.room||r).length);
-    await dbUpdate('bosses/'+r.code,{state:'play',startedAt:now,endAt:now+r.sec*1000,target:n*(r.per||bossPer(r.t,bossGrOf(r))),n0:n});
+    await dbUpdate('bosses/'+r.code,{state:'play',startedAt:now,endAt:now+r.sec*1000,target:n*bossPerHP(r),n0:n,atk:null});
   };
+  el('tbFs').onclick=()=>{ const tb=el('tBody');
+    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+    else if(tb.requestFullscreen) tb.requestFullscreen().catch(()=>toast('이 브라우저는 전체 화면을 지원하지 않아요'));
+    else toast('이 브라우저는 전체 화면을 지원하지 않아요'); };
+  if(el('tbNext')){
+    BOSS.nx=BOSS.nx||{t:r.t,g:gr};
+    el('tbNxT').onchange=e=>{ BOSS.nx.t=e.target.value; };
+    el('tbNxG').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ BOSS.nx.g=b.dataset.g; el('tbNxG').querySelectorAll('.sg').forEach(x=>x.classList.toggle('on',x===b)); });
+    el('tbNext').onclick=()=>bossNextRoom(r,BOSS.nx.t||r.t,BOSS.nx.g||gr);
+  }
+  if(A&&BOSS.tBeam!==A.id){ BOSS.tBeam=A.id; setTimeout(()=>bossBeams(Object.keys(aT)),60); }
   el('tbQr').onclick=()=>{
     el('bqCode').textContent=r.code;
     el('bqBig').innerHTML=qrSVG(url);
@@ -15156,7 +15296,7 @@ async function joinBossRoom(code){
     BOSS.room=r;
     if(r.state==='play'){
       if(!G||G.mode!=='boss'||G.code!==code) startBossPlay(r);
-      else paintBossHud(r);
+      else{ paintBossHud(r); const my=(r.p||{})[ME.sid]||{}; if(+my.hurtUntil>G.hurtUntil) G.hurtUntil=+my.hurtUntil; bossCheckAtk(r); }
       if(bossSum(r)>=r.target) dbUpdate('bosses/'+code,{state:'win',endedAt:serverNow()});
     }else if(r.state==='win'||r.state==='fail'){
       finishBossPlay(r);
@@ -15176,7 +15316,7 @@ function paintBossLobby(r){
       <div style="font-size:13px;opacity:.85">방 번호 <b>${r.code}</b> · ${esc(topicOf(r.t).n)}</div>
       <div class="bsav huge idle">${bossAv(r.t)}</div>
       <h3>${esc(r.bossName)}</h3>
-      <div style="font-size:14px;opacity:.92">${gBadge(bossGrOf(r))} · 1인당 <b>${r.per||bossPer(r.t,bossGrOf(r))}문제</b> × 참여 인원 = 반 전체 목표 <b>${bossTargetNow(r,mem.length)}문제</b> · 제한 시간 <b>${clock(r.sec)}</b></div>
+      <div style="font-size:14px;opacity:.92">${gBadge(bossGrOf(r))} · 1인당 HP <b>${bossPerHP(r)}</b> × 참여 인원 = 보스 HP <b>${bossTargetNow(r,mem.length)}</b><br><small>빨리 풀수록 큰 대미지! 보스가 나를 노리면 방어 문제를 시간 안에 풀어요</small> · 제한 시간 <b>${clock(r.sec)}</b></div>
     </div>
     <div style="text-align:center;font-size:14.5px;font-weight:800;color:var(--blue);margin-bottom:10px">선생님이 시작 버튼을 누르면 다 함께 출발해요! (지금 ${mem.length}명 대기 중)</div>
     <div class="bs-roster">${mem.map(m=>`<div class="bs-mem"><div class="av">${avatarSVG(m.ch||{},{tight:true})}</div><b>${whoHTML(m.sid,m)}</b></div>`).join('')}</div>
@@ -15186,11 +15326,12 @@ function paintBossLobby(r){
 }
 function startBossPlay(r){
   stopTimer();
-  const prevN=(r.p&&r.p[ME.sid]&&r.p[ME.sid].n)||0;
+  const my=(r.p&&r.p[ME.sid])||{}, prevN=my.n||0;
   G={mode:'boss', code:r.code, t:r.t, qi:0, score:prevN, combo:0, best:0, solved:0, right:0,
      sec:r.sec, endAt:r.endAt||(serverNow()+r.sec*1000), L:1, qLv:1, recent:[], badPicks:new Set(),
      phase:'q', typed:'', clean:true, locked:false};
-  { const S=realStagesOf(r.t), g=BOSS_GR[bossGrOf(r)]; G.L=1+(S.length-1)*g.st; G.Ltop=S.length+1; G.gain=g.gain; }
+  { const S=realStagesOf(r.t).length, g=BOSS_GR[bossGrOf(r)]; G.L=1+(S-1)*g.st; G.Ltop=Math.max(1.5,1+(S-1)*g.cap+.5); G.gain=g.gain; G.defL=1+(S-1)*g.def+.6; }
+  G.dmg=+my.d||0; G.hurtUntil=+my.hurtUntil||0; G.defDone=my.blk||my.hit||'';
   setupHUD(); show('s-play');
   paintBossHud(r);
   G.tId=setInterval(()=>{
@@ -15201,16 +15342,59 @@ function startBossPlay(r){
       dbUpdate('bosses/'+G.code,{state:bossSum(BOSS.room)>=BOSS.room.target?'win':'fail',endedAt:serverNow()}); }
     el('tbar').querySelector('i').style.width=(Math.max(0,left/Math.max(1,G.sec))*100)+'%';
     el('tbar').classList.toggle('warn',left<=20);
+    bossStTick();
   },200);
   next();
+  bossCheckAtk(r);
+}
+/* ── 보스 반격 (학생) ── */
+function bossCheckAtk(r){
+  const a=r&&r.atk; if(!a||!a.t||!a.t[ME.sid]||!G||G.mode!=='boss'||G.over) return;
+  if(G.def||G.defDone===a.id||serverNow()>a.until-600) return;
+  G.def={id:a.id,until:a.until}; G.defDone=a.id;
+  document.body.classList.remove('btpen'); document.body.classList.add('bsdef');
+  const hb=document.querySelector('#bsHud .bsav'); if(hb){ hb.classList.remove('cast'); void hb.offsetWidth; hb.classList.add('cast'); }
+  bossFlash('def');
+  const f=realPick(G.t,G.qi+1,G.recent,G.defL); G.qLv=f._rl||1;
+  G.recent.push(f.key); if(G.recent.length>12) G.recent.shift();
+  askQ(f);
+}
+function bossDefEnd(ok){
+  const d=G.def; if(!d) return; G.def=null;
+  document.body.classList.remove('bsdef','btpen');
+  const p=`bosses/${G.code}/p/${ME.sid}`;
+  if(ok){
+    const dm=bossDmg(G.t,0,serverNow()<G.hurtUntil);   /* 막으면 반격 — 가장 큰 대미지 */
+    G.dmg+=dm; BOSS.seen=(BOSS.seen||0)+dm;
+    dbUpdate(p,{blk:d.id,d:G.dmg,n:G.score,at:Date.now()});
+    bossShoot(dm,'🛡 방어 성공! 반격'); if(BOSS.room) bossHpPaint(BOSS.room,BOSS.seen);
+    toast('🛡 방어 성공! 반격으로 −'+dm);
+  }else{
+    G.hurtUntil=serverNow()+BOSS_HURT; G.combo=0;
+    dbUpdate(p,{hit:d.id,hurtUntil:G.hurtUntil,at:Date.now()});
+    bossFlash('hurt'); setPlayMood('miss',1200);
+    const cd=el('card'); if(cd){ cd.classList.remove('shake'); void cd.offsetWidth; cd.classList.add('shake'); }
+    toast('🩹 보스에게 당했어요! 30초 동안 대미지가 절반이에요');
+  }
+  updHUD();
+  setTimeout(()=>{ if(G&&G.mode==='boss'&&!G.over&&!G.frozen) next(); },ok?250:700);
+}
+function bossFlash(k){ const o=document.createElement('div'); o.className='bsflash '+k; document.body.appendChild(o); setTimeout(()=>o.remove(),900); }
+function bossStTick(){
+  const st=el('bsSt'); if(!st||!G) return; const now=serverNow();
+  if(G.def){ const l=Math.max(0,(G.def.until-now)/1000);
+    st.className='bsst def'; st.innerHTML=`⚠ 방어 <b>${Math.ceil(l)}</b>초`;
+    if(l<=0) bossDefEnd(false); return; }
+  if(now<G.hurtUntil){ st.className='bsst hurt'; st.innerHTML=`🩹 부상 · 대미지 ½ <b>${Math.ceil((G.hurtUntil-now)/1000)}</b>초`; return; }
+  st.className='bsst'; st.innerHTML='';
 }
 function paintBossHud(r){
   const box=el('bsHud'); if(!box||!r) return;
   const sum=bossSum(r), rem=Math.max(0,r.target-sum), pct=Math.max(0,Math.round(rem/Math.max(1,r.target)*100));
   box.style.display='';
-  if(!box.querySelector('.bsav')||box.dataset.code!==r.code){ box.dataset.code=r.code; BOSS.seen=sum;
+  if(!box.querySelector('.bsav')||box.dataset.code!==r.code+'_'+r.createdAt){ box.dataset.code=r.code+'_'+r.createdAt; BOSS.seen=sum;
     box.innerHTML=`<div class="bsav" aria-hidden="true">${bossAv(r.t,{tight:true})}</div>
-      <div class="bs-hud-r"><div class="bs-hud-top"><span>${gBadge(bossGrOf(r))} ${esc(r.bossName)}</span><span id="bsHpT"></span></div>
+      <div class="bs-hud-r"><div class="bs-hud-top"><span>${gBadge(bossGrOf(r))} ${esc(r.bossName)}</span><span id="bsSt" class="bsst"></span><span id="bsHpT"></span></div>
       <div class="bs-hpbar"><i id="bsHpI"></i></div></div>`; }
   /* 친구들이 깎은 만큼 — 내 공격은 이미 보여 줬으니 뺀 나머지만 */
   if(sum>(BOSS.seen||0)){ bossHitFx(box.querySelector('.bsav'),sum-(BOSS.seen||0),'team'); BOSS.seen=sum; }
@@ -15223,14 +15407,19 @@ function bossHpPaint(r,sum){
 }
 function bossAnswer(ok,f){
   if(ok){
-    G.L=Math.min(G.Ltop||4,(G.L||1)+(G.gain||.18));
+    const sec=(performance.now()-(G.qStart||performance.now()))/1000;
     G.qi++; G.score++; G.right++; G.combo++; G.best=Math.max(G.best,G.combo);
-    flashOk(); updHUD();
-    BOSS.seen=(BOSS.seen||0)+1; bossShoot(); if(BOSS.room) bossHpPaint(BOSS.room,BOSS.seen);
-    dbUpdate(`bosses/${G.code}/p/${ME.sid}`,{n:G.score,combo:G.best,at:Date.now()});
-    setTimeout(()=>{ if(G&&G.mode==='boss'&&!G.over&&!G.frozen) next(); },180);
+    flashOk();
+    if(G.def){ bossDefEnd(true); return; }
+    G.L=Math.min(G.Ltop||4,(G.L||1)+(G.gain||.15));
+    const dm=bossDmg(G.t,sec,serverNow()<G.hurtUntil); G.dmg+=dm;
+    updHUD();
+    BOSS.seen=(BOSS.seen||0)+dm; bossShoot(dm); if(BOSS.room) bossHpPaint(BOSS.room,BOSS.seen);
+    dbUpdate(`bosses/${G.code}/p/${ME.sid}`,{n:G.score,d:G.dmg,combo:G.best,at:Date.now()});
+    setTimeout(()=>{ if(G&&G.mode==='boss'&&!G.over&&!G.frozen&&!G.def) next(); },180);
     return;
   }
+  if(G.def&&f.pick){ bossDefEnd(false); return; }   /* 방어 문제의 보기는 한 번에 */
   G.combo=0;
   const skip=!!f.pick;   /* 보기 문항은 다시 고르게 하지 않고 다음 문제로 — 찍기 방지 */
   paintTyped('no'); setPlayMood('miss',900);
@@ -15248,14 +15437,14 @@ function bossAnswer(ok,f){
   },900);
 }
 async function finishBossPlay(r){
-  stopTimer(); document.body.classList.remove('btpen');
+  stopTimer(); document.body.classList.remove('btpen','bsdef'); if(G&&G.mode==='boss') G.def=null;
   const myN=(r.p&&r.p[ME.sid]&&r.p[ME.sid].n)||(G&&G.score)||0;
   if(G&&G.mode==='boss') G.over=true;
   const sum=bossSum(r), mem=bossMembers(r), win=r.state==='win';
   let reward=0;
   const rk='b'+r.code+'_'+(r.createdAt||0); ME.coopC=ME.coopC||{};
-  if(BOSS.rewarded!==r.code&&!ME.coopC[rk]&&myN>0){
-    BOSS.rewarded=r.code; ME.coopC[rk]=1;
+  if(BOSS.rewarded!==rk&&!ME.coopC[rk]&&myN>0){
+    BOSS.rewarded=rk; ME.coopC[rk]=1;
     const gg=BOSS_GR[bossGrOf(r)];
     reward=win?(gg.win+Math.min(25,myN)):Math.min(gg.fail,myN);
     ME.coin+=reward;
@@ -15268,18 +15457,19 @@ async function finishBossPlay(r){
     <div class="bs-hero">
       <div class="bsav huge${win?' dead':' laugh'}">${bossAv(r.t)}</div>
       <h3>${win?'🎉 반 전체 보스 격파 성공!':'⏰ 시간 종료 · 멋진 협동이었어요!'} ${gBadge(bossGrOf(r))}</h3>
-      <div style="font-size:15px">우리 반 총 <b>${sum}</b> / ${r.target}문제 · 내가 기여한 문제 <b>${myN}개</b>${reward?` · 보상 <b>+${reward}코인</b>`:''}</div>
+      <div style="font-size:15px">보스 HP <b>${Math.min(sum,r.target)}</b> / ${r.target} 깎음 · 내 풀이 <b>${myN}문제</b> · 내 대미지 <b>${bossD((r.p||{})[ME.sid])}</b>${reward?` · 보상 <b>+${reward}코인</b>`:''}</div>
     </div>
     <div class="bs-roster">${mem.map((m,i)=>`<div class="bs-mem">
       <div class="av">${avatarSVG(m.ch||{},{tight:true,mood:win?'ok':'idle'})}</div>
       <b>${i<3&&m.n>0?['🥇','🥈','🥉'][i]+' ':''}${whoHTML(m.sid,m)}</b>
-      <em>${m.n||0}문제</em></div>`).join('')}</div>
-    <div style="text-align:center;margin-top:16px"><button class="btn primary" onclick="bossLeave()">처음으로</button></div>
+      <em>${m.n||0}문제 · 대미지 ${bossD(m)}</em></div>`).join('')}</div>
+    <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--dim)">이 화면에 있으면 선생님이 다음 보스를 열 때 바로 이어져요</div>
+    <div style="text-align:center;margin-top:10px"><button class="btn primary" onclick="bossLeave()">처음으로</button></div>
   </div>`;
   show('s-boss');
 }
 function bossLeave(){
-  stopTimer(); bossStopWatch(); document.body.classList.remove('btpen');
+  stopTimer(); bossStopWatch(); document.body.classList.remove('btpen','bsdef');
   BOSS.code=''; BOSS.room=null; BOSS.host=false;
   G=null; openSchool();
 }
