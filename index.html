@@ -2207,17 +2207,6 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
     <div class="row"><button class="btn primary" onclick="close_('ovAtt'); paintMissionBox()">좋아요</button></div>
   </div>
 </div>
-<div class="overlay" id="ovHs" onclick="if(event.target===this)close_('ovHs')">
-  <div class="modal">
-    <h3 id="hsTitle">고등학교는 아직 잠겨 있어요</h3>
-    <div class="sub" id="hsSub"></div>
-    <div class="hslist" id="hsList"></div>
-    <div class="row">
-      <button class="btn" onclick="close_('ovHs')">닫기</button>
-      <button class="btn primary" id="hsGo">중학교로 가기</button>
-    </div>
-  </div>
-</div>
 
 <div class="overlay" id="ovQr" onclick="close_('ovQr')">
   <div class="modal qrmodal">
@@ -2281,7 +2270,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 17:58';
+const APP_VER='11.23 19:43';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -12055,9 +12044,9 @@ function paintTeacher(){
   const seg=(lab,arr)=>`<div class="tseg"><span class="tlab">${lab}</span><div class="segs">${arr.map(([k,n])=>
     `<button class="sg${tTab===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div></div>`;
   el('tTabs').innerHTML=seg('기록',[['rank','랭킹'],['cls','학급 대항'],['fact','정답률'],['stu','학생 정보']])
-    +seg('수업 · 설정',[['coop','협동 목표'],['boss','반 보스전'],['grade','등급 기준'],['hs','고등 열쇠'],['tl','모드 잠금']]);
+    +seg('수업 · 설정',[['coop','협동 목표'],['boss','반 보스전'],['grade','등급 기준'],['tl','모드 잠금']]);
   el('tTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ tTab=b.dataset.k; tOpen=null; paintTeacher(); });
-  const showT=!(tTab==='hs'||tTab==='tl'||tTab==='cls'||tTab==='coop'||tTab==='boss'||tTab==='grade'||(tTab==='rank'&&!RKK[tRk].topic)), showC=!(tTab==='hs'||tTab==='tl'||tTab==='cls'||tTab==='coop'||tTab==='boss'||tTab==='grade');
+  const showT=!(tTab==='tl'||tTab==='cls'||tTab==='coop'||tTab==='boss'||tTab==='grade'||(tTab==='rank'&&!RKK[tRk].topic)), showC=!(tTab==='tl'||tTab==='cls'||tTab==='coop'||tTab==='boss'||tTab==='grade');
   el('tTopicBar').style.display=showT?'':'none';
   el('tClassBar').style.display=showC?'':'none';
   el('tTopicBar').parentNode.style.display=(showT||showC)?'':'none';
@@ -12079,7 +12068,6 @@ function paintTeacher(){
   else if(tTab==='coop') paintTCoop();
   else if(tTab==='boss') paintTBoss();
   else if(tTab==='grade') paintTGrade();
-  else if(tTab==='hs') paintTHs();
   else if(tTab==='tl') paintTTl();
   else if(tTab==='fact') paintTFact();
   else paintTStu(teacherRows(tTopic));
@@ -12229,40 +12217,6 @@ function paintTTl(){
   el('tBody').querySelectorAll('.tsw[data-t]').forEach(b=>b.onclick=()=>{ setM(b.dataset.t,b.dataset.m,!has(b.dataset.t,b.dataset.m)); save(); });
   el('tBody').querySelectorAll('.tsw[data-all]').forEach(b=>b.onclick=()=>{ const [k,m,on]=b.dataset.all.split(':');
     schoolOf(k).topics.forEach(t=>setM(t,m,on==='1')); save(); });
-}
-
-/* ── 고등 열쇠 — 고등학교를 여는 기준 ── */
-function paintTHs(){
-  const L=CFG.lock, mids=schoolOf('m').topics.filter(t=>t in HS_GOAL_DEF), sids=Object.keys(tUsers);
-  const best=(sid,t)=>((((tUsers[sid]||{}).R||{})[t]||{}).best)||0;
-  const rows=mids.map(t=>{ const vals=sids.map(sid=>best(sid,t)).filter(v=>v>0).sort((a,b)=>b-a), g=hsGoal(t);
-    return {t, goal:g, n:vals.length, top:vals[0]||0, p90:vals.length?vals[Math.max(0,Math.ceil(vals.length*.1)-1)]:0, pass:vals.filter(v=>v>=g).length}; });
-  const opened=sids.filter(sid=>(tUsers[sid]||{}).hu||mids.every(t=>best(sid,t)>=hsGoal(t))).length;
-  el('tBody').innerHTML=`<div class="tbox">
-      <h3>고등학교 잠금 <span>중학교 주제마다 실전 목표를 넘으면 열쇠 하나 · ${mids.length}개를 모두 모으면 열림</span></h3>
-      <label class="tgl"><input type="checkbox" id="hsOn" ${L.on?'checked':''}> 고등학교 잠금 사용 (끄면 모든 학생에게 바로 열림)</label>
-      <div class="hint">지금 고등학교가 열린 학생 <b>${opened}명</b> / ${sids.length}명 · 한 번 열린 학생은 기준을 올려도 계속 열려 있어요.</div>
-    </div>
-    <div class="hstab">
-      <div class="hsth"><span>중학교 주제</span><span>목표</span><span>기록 있는 학생</span><span>최고</span><span>상위 10%</span><span>달성</span></div>
-      ${rows.map(r=>`<div class="hstr"><span class="cn">${topicOf(r.t).n}</span>
-        <span><input type="tel" maxlength="3" inputmode="numeric" class="hsin" data-t="${r.t}" data-p="${r.p90}" data-n="${r.n}" value="${r.goal}"></span>
-        <span>${r.n}명</span><span>${r.top||'—'}</span><span>${r.p90||'—'}</span><span>${r.pass}명</span></div>`).join('')}
-    </div>
-    <div class="hsbtns"><button class="btn" id="hsP90">상위 10% 기록으로 맞추기</button><button class="btn" id="hsDef">처음 기준으로</button>
-      <button class="btn primary" id="hsSave">저장</button></div>
-    <div class="hint">처음 기준은 최상위권 학생이 ${REAL_SEC/60}분 동안 틀리지 않고 풀 수 있는 개수로 잡았어요 —
-      ${mids.map(t=>topicOf(t).n+' '+HS_GOAL_DEF[t]).join(' · ')}. 기록이 쌓이면 '상위 10% 기록으로 맞추기'로 우리 학교 학생들에게 맞춰 보세요 (기록 있는 학생이 10명 넘는 주제만 바뀌어요).</div>`;
-  const ins=[...el('tBody').querySelectorAll('.hsin')];
-  ins.forEach(i=>i.addEventListener('input',()=>{ i.value=i.value.replace(/\D/g,''); }));
-  el('hsP90').onclick=()=>{ let k=0; ins.forEach(i=>{ if(+i.dataset.n>10&&+i.dataset.p>0){ i.value=i.dataset.p; k++; } });
-    toast(k?`${k}개 주제를 상위 10% 기록으로 맞췄어요. 저장을 눌러 주세요`:'기록 있는 학생이 10명 넘는 주제가 아직 없어요'); };
-  el('hsDef').onclick=()=>{ ins.forEach(i=>{ i.value=HS_GOAL_DEF[i.dataset.t]; }); toast('처음 기준으로 돌렸어요. 저장을 눌러 주세요'); };
-  el('hsSave').onclick=async()=>{
-    const goal={}; ins.forEach(i=>{ const v=+i.value; goal[i.dataset.t]=v>0?Math.min(999,v):HS_GOAL_DEF[i.dataset.t]; });
-    CFG.lock={on:el('hsOn').checked, goal};
-    await dbSet('config/lock',CFG.lock);
-    toast('고등학교 열쇠 기준을 저장했어요'); paintTeacher(); };
 }
 
 /* ── ② 계산별 정답률 — 학생들의 fs 를 모두 더합니다 (학급을 고르면 그 반만) ── */
@@ -12776,13 +12730,13 @@ function btGuard(id){ if(BT.code&&id!=='s-battle'&&id!=='s-play') btLeave(); }
 
 /* 주제 고르기 — 초등·중등·고등 묶음으로 */
 function btTopicsHTML(cur,allowCur){
-  return SCHOOLS.map(sc=>`<div class="btsch"><span>${sc.n}</span><div class="chips">${sc.topics.map(t=>modeOpen(t,'b')||(allowCur&&t===cur)
+  return SCHOOLS.map(sc=>`<div class="btsch"><span>${sc.n}</span><div class="chips">${sc.topics.filter(topicSeen).map(t=>modeOpen(t,'b')||(allowCur&&t===cur)
     ?`<button class="chip${t===cur?' on':''}" data-t="${t}">${topicOf(t).n}</button>`
     :`<button class="chip chlock" data-lk="${sc.k}" aria-disabled="true">${LOCKI}${topicOf(t).n}</button>`).join('')}</div></div>`).join('');
 }
 /* 잠긴 주제를 누르면 왜 잠겼는지 알려 줘요 */
 document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('.chip.chlock[data-lk]'); if(!b) return;
-  toast(b.dataset.lk==='h'&&typeof hsOpen==='function'&&!hsOpen()?'중학교 실전 열쇠 6개를 모으면 고등 주제가 열려요':'아직 잠겨 있어요 · 선생님이 열어 주면 고를 수 있어요'); });
+  toast('아직 잠겨 있어요 · 선생님이 열어 주면 고를 수 있어요'); });
 /* 방식과 길이 — 길이는 옆으로 밀어서 고르는 바퀴 */
 const BT_WW=74;
 function btLenHTML(kind,v,team){
@@ -13528,13 +13482,13 @@ function topicLevel(t){
   if(!c&&!cl&&!(r.best>0)) return {lv:0,acc,c,cl};
   let lv=c>=10&&acc<.7?1:2;
   if((all||cl>=Math.ceil(T.stages.length*.6))&&(c<10||acc>=.85)) lv=3;
-  const top=gradeCuts(t)?['S','SS','SSS'].includes(g):(t in HS_GOAL_DEF?(r.best||0)>=hsGoal(t):(r.best||0)>=12);
+  const top=gradeCuts(t)?['S','SS','SSS'].includes(g):(r.best||0)>=12;
   if(lv===3&&all&&top) lv=4;
   return {lv,acc,c,cl,g};
 }
 function skillMapHTML(){
   const sch=SCHOOLS.filter(s=>s.k!=='h'||hsOpen());
-  return sch.map(s=>{ const L=s.topics.filter(t=>topicOpen(t)||topicLevel(t).lv);
+  return sch.map(s=>{ const L=s.topics.filter(t=>topicSeen(t)&&(topicOpen(t)||topicLevel(t).lv));
     if(!L.length) return '';
     return `<div class="smrow"><span class="tlab">${({e:'초등',m:'중등',h:'고등'})[s.k]||s.n}</span><div class="smgrid">${L.map(t=>{ const x=topicLevel(t), T=TOPICS[t];
       return `<button class="smt lv${x.lv}${MP.topic===t?' on':''}" data-t="${t}" title="${LV_NAME[x.lv]}"><b>${T.n}</b>
@@ -13888,12 +13842,6 @@ function logout(){
   el('inSid').value=''; el('inPw').value=''; gateErr('gErr',''); show('s-gate');
 }
 
-/* ═══════════════════ 고등학교 열쇠 ═══════════════════
-   중학교 주제마다 실전 모드(1분 무실수)에서 아래 개수 이상을 맞히면 열쇠 하나.
-   여섯 개를 모두 모으면 고등학교가 열립니다. 한 번 열리면 계속 열려 있습니다(ME.hu).
-   기준은 최상위권 학생이 1분 동안 틀리지 않고 풀 수 있는 정도로 잡았고,
-   선생님 모드 '고등 열쇠' 탭에서 바꾸거나 학생 기록의 상위 10%로 맞출 수 있습니다. */
-const HS_GOAL_DEF={int:20, expo:18, power:25, root:16, pyth:15, trig:15};   /* 1분 실전 기준 */
 /* ═══ 실전 등급 B · A · S · SS · SSS (1분 무실수에서 맞힌 개수) ═══
    A   : 내용을 충분히 알고 있다          — 1단계를 넘어 2단계 문제까지 안정적으로
    S   : 내용을 매우 충분히 알고 있다      — 2단계를 넘어 마지막 단계에 닿음
@@ -13942,30 +13890,24 @@ async function loadCfg(){
     }catch(e){}
   return CFG;
 }
-const hsGoal=t=>{ const g=+((CFG.lock.goal||{})[t]); return g>0?g:(HS_GOAL_DEF[t]||25); };
-const hsKeys=()=>schoolOf('m').topics.filter(t=>t in HS_GOAL_DEF).map(t=>{ const best=rec(t).best||0, goal=hsGoal(t); return {t,best,goal,ok:best>=goal}; });
-const hsOpen=()=>!CFG.lock.on||!!(ME&&ME.hu)||hsKeys().every(x=>x.ok);
+/* ═══ 학년별 보이는 범위 ═══
+   중학생은 학번 첫 자리(학년) 이하의 주제만 보이고, 고등학교는 보이지 않아요.
+   시험용 계정(000…)과 선생님은 고등까지 모두 보여요. */
+const canSeeAll=()=>isTeacher||!ME||!!(ME.sid&&(isTestSid(ME.sid)||String(ME.sid)===TEACHER_ID));
+const myGradeNo=()=>{ const c=+String((ME&&ME.sid)||'')[0]; return c>=1&&c<=3?c:3; };
+function topicSeen(t){
+  if(canSeeAll()) return true;
+  const sc=SCHOOLS.find(s=>s.topics.includes(t)); if(!sc) return true;
+  if(sc.k==='h') return false;
+  if(sc.k==='m'){ const g=parseInt(topicOf(t).gr); return !(g>0)||g<=myGradeNo(); }
+  return true;
+}
+const hsOpen=()=>canSeeAll();   /* 고등 전용 · 고등학교는 시험용 계정과 선생님에게만 */
 const shopOpenNow=()=>CFG.shop&&CFG.shop.open===true;   /* 상점은 처음에 잠겨 있고 선생님이 열어 줄 때까지 코인만 모입니다 */
-const modeOpen=(t,m)=>(CFG.tl[m]||[]).includes(t);
+const modeOpen=(t,m)=>(CFG.tl[m]||[]).includes(t)&&topicSeen(t);
 const topicOpen=t=>modeOpen(t,'p')||modeOpen(t,'r')||modeOpen(t,'b');
 function topicShut(t){ toast('아직 잠겨 있어요 — 선생님이 열어 주면 할 수 있어요'); }
 const LOCKI='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>';
-function openHsLock(){
-  const K=hsKeys(), got=K.filter(x=>x.ok).length;
-  el('hsTitle').textContent='고등학교는 아직 잠겨 있어요';
-  el('hsSub').innerHTML=`중학교 ${K.length}개 주제의 <b>실전 모드</b>(${REAL_SEC/60}분)에서 목표 개수를 넘으면 열쇠를 하나씩 얻어요.
-    열쇠 <b>${K.length}개</b>를 모두 모으면 고등학교가 열려요. 지금 <b>${got} / ${K.length}</b>.`;
-  el('hsList').innerHTML=K.map(x=>`<div class="hsrow${x.ok?' ok':''}">
-      <span class="hsk">${x.ok?'✓':LOCKI}</span>
-      <span class="hsn"><b>${topicOf(x.t).n}</b><i><em style="width:${Math.min(100,x.best/x.goal*100)}%"></em></i></span>
-      <span class="hsv">${x.best} <small>/ ${x.goal}</small></span>
-      ${x.ok?'<span class="hsgo done">열쇠</span>':`<button class="btn hsgo" data-t="${x.t}">도전</button>`}
-    </div>`).join('');
-  el('hsList').querySelectorAll('.hsgo[data-t]').forEach(b=>b.onclick=()=>{ close_('ovHs'); CUR.school='m'; tryReal(b.dataset.t); });
-  el('hsGo').onclick=()=>{ close_('ovHs'); pickSchool('m'); };
-  openM('ovHs');
-}
-
 /* ═══════════════════ 학교 고르기 ═══════════════════ */
 function openSchool(){
   if(!ME) return;
@@ -13982,23 +13924,17 @@ function openSchool(){
 function paintSchools(){
   el('schoolList').innerHTML=SCHOOLS.map(s=>{
     if(s.k==='h'&&!s.topics.some(topicOpen)) return '';   /* 고등은 선생님이 주제를 하나라도 열어야 보여요 */
-    const last=ME.sc===s.k, lock=s.k==='h'&&!hsOpen();
-    if(lock){ const K=hsKeys(), got=K.filter(x=>x.ok).length;
-      return `<button class="school sc-h locked" onclick="openHsLock()">
-        <h2>${s.n}</h2><p>중학교 실전 열쇠 <b>${got} / ${K.length}</b>개를 모으면 열려요</p>
-        <span class="skeys">${K.map(x=>`<i class="${x.ok?'on':''}"></i>`).join('')}</span>
-        <span class="sgo slock" aria-label="잠김">${LOCKI}</span>
-      </button>`; }
+    const last=ME.sc===s.k, seenN=s.topics.filter(topicSeen).length;
     const nOpen=s.topics.filter(topicOpen).length;
     return `<button class="school sc-${s.k}${last?' last':''}${nOpen?'':' alllock'}" onclick="pickSchool('${s.k}')">
       ${last?'<em class="lasttag">지난번에 여기서</em>':''}
-      <h2>${s.n}</h2><p>${nOpen?`계산 주제 ${s.topics.length}개 · 열린 주제 <b>${nOpen}개</b>`:`계산 주제 ${s.topics.length}개 · <b>모두 잠겨 있어요</b>`}</p>
+      <h2>${s.n}</h2><p>${nOpen?`계산 주제 ${seenN}개 · 열린 주제 <b>${nOpen}개</b>`:`계산 주제 ${seenN}개 · <b>모두 잠겨 있어요</b>`}</p>
       ${nOpen?'<span class="sgo" aria-hidden="true">→</span>':`<span class="sgo slock" aria-label="잠김">${LOCKI}</span>`}
     </button>`;
   }).join('');
 }
 function pickSchool(k){
-  if(k==='h'&&!hsOpen()) return openHsLock();
+  if(k==='h'&&!hsOpen()) return;
   CUR.school=k;
   if(!schoolOf(k).topics.includes(CUR.topic)) CUR.topic=schoolOf(k).topics[0];
   if(ME.sc!==k){ ME.sc=k; saveMe(); }
@@ -14016,7 +13952,7 @@ let HOME_SHUT_OPEN=false;
 function paintHome(){
   const sc=schoolOf(CUR.school);
   el('homeSchool').textContent=sc.n;
-  const open=sc.topics.filter(t=>modeOpen(t,'p')||modeOpen(t,'r')), shut=sc.topics.filter(t=>!open.includes(t));
+  const open=sc.topics.filter(t=>modeOpen(t,'p')||modeOpen(t,'r')), shut=sc.topics.filter(t=>topicSeen(t)&&!open.includes(t));
   /* 학년 묶음(저학년·고학년 / 1·2·3학년) — 위쪽 탭으로 고르고, 고른 학년의 주제만 보여요 */
   const grs=[]; open.forEach(t=>{ const g=topicOf(t).gr||''; if(g&&!grs.includes(g)) grs.push(g); });
   const gk=g=>g.startsWith('저')?0:g.startsWith('고')?1:parseInt(g)||9; grs.sort((x,y)=>gk(x)-gk(y));
@@ -14038,11 +13974,9 @@ function topicCard(t){
         <span class="tlk" aria-label="잠김">${LOCKI}</span></div>
       <div class="tlnote">${LOCKI}<span>잠겨 있어요 · 선생님이 열어 주면 시작할 수 있어요</span></div></div>`; }
   const T=topicOf(t), p=prog(t), r=rec(t), w=wrongOf(t).length, S=T.stages.length, cl=p.c.length;
-  const key=(t in HS_GOAL_DEF)&&CFG.lock.on&&!(ME&&ME.hu), kok=(r.best||0)>=hsGoal(t);
   return `<div class="topic tc2" style="--tc:${T.col};--ts:${T.soft};--tl:${T.lit}">
     <div class="ttop"><span class="tsym">${symHTML(T)}</span>
-      <div class="tinfo"><h2>${T.n}${gradeBadge(t)}</h2>
-        ${key?`<p class="tkey${kok?' ok':''}">${kok?'✓ 고등학교 열쇠 얻음':`${LOCKI} 고등학교 열쇠 · 실전 ${hsGoal(t)}개`}</p>`:''}</div></div>
+      <div class="tinfo"><h2>${T.n}${gradeBadge(t)}</h2></div></div>
     <div class="tbtns">
       ${modeOpen(t,'p')?`<button class="tbtn prac" onclick="openStages('${t}')"><b>연습</b><small>${cl} / ${S} 클리어</small></button>`
         :`<button class="tbtn prac mlock" onclick="topicShut('${t}')"><b>${LOCKI}연습</b><small>잠겨 있어요</small></button>`}
@@ -14180,8 +14114,7 @@ function tryReal(t){
   el('startSub').innerHTML=`<b>${REAL_SEC/60}분</b> 동안 최대한 많은 문제를 풀어 보세요.
     틀린 답을 넣으면 <b>잠깐(0.9초) 멈춘 뒤 지우고 다시 풀 수 있어요</b>. 보기에서 고르는 문제는 틀리면 다음 문제로 넘어가요. 빠르고 정확할수록 높은 기록이 됩니다.<br><br>
     · <b>오답노트</b> : 실전 중 틀린 문제는 판당 최대 3문항까지 오답노트로 옮겨져요.<br>
-    · <b>코인</b> : 맞힌 문항마다 <b>${COIN_PER}코인</b>, 최고 기록 초과분 <b>2배</b>, <b>무실수 완주 +${REAL_FULL}코인</b>.`+
-    ((t in HS_GOAL_DEF)&&CFG.lock.on&&!ME.hu?`<br><br>고등학교 열쇠 : <b>${hsGoal(t)}개</b> 이상 맞히면 얻어요 (지금 최고 ${rec(t).best||0}개).`:'');
+    · <b>코인</b> : 맞힌 문항마다 <b>${COIN_PER}코인</b>, 최고 기록 초과분 <b>2배</b>, <b>무실수 완주 +${REAL_FULL}코인</b>.`;
   el('startGo').onclick=()=>{ close_('ovStart'); startReal(t); };
   openM('ovStart');
 }
@@ -14576,11 +14509,8 @@ async function finish(timeUp){
   const flawless=(G.missCount||0)===0;
   const full=!!timeUp&&!G.quit&&score>0&&flawless, coin=(score+over)*COIN_PER+(full?REAL_FULL:0);
   const used=Math.min(REAL_SEC,REAL_SEC-Math.max(0,G.tLeft));
-  const hsWas=hsOpen(), keyNew=(t in HS_GOAL_DEF)&&CFG.lock.on&&!ME.hu&&prevBest<hsGoal(t)&&score>=hsGoal(t);
 
   r.best=Math.max(prevBest,score);
-  const hsNow=!hsWas&&hsOpen();
-  if(hsNow) ME.hu=1;
   r.tb={d:day,n:Math.max(tb,score)};
   r.hist=(r.hist||[]).concat([{d:day,n:score,ts:Date.now()}]).slice(-120);
   if(missList.length){ const w=wrongOf(t); missList.forEach(x=>{ if(!w.includes(x.f.key)) w.push(x.f.key); }); }
@@ -14606,8 +14536,6 @@ async function finish(timeUp){
     : '')+(full?`<div class="gainbox good">1분을 실수 없이 완주했어요! 무실수 보너스 <b>+${REAL_FULL}코인</b></div>`:'');
   if(grow) el('byLv').innerHTML+=`<div class="gainbox good">지난주 최고 ${grow.last}개보다 성장했어요! <b>+${grow.coin}코인</b> <small>(주제마다 한 주에 한 번)</small></div>`;
   if(ms) el('byLv').innerHTML+=`<div class="gainbox good msgain">${ms.msg}</div>`;
-  if(hsNow) el('byLv').innerHTML+=`<div class="gainbox hsopen"><b>고등학교가 열렸어요!</b> 중학교 열쇠 ${hsKeys().length}개를 모두 모았어요. 처음 화면에서 고등학교를 골라 보세요.</div>`;
-  else if(keyNew){ const K=hsKeys(); el('byLv').innerHTML+=`<div class="gainbox hskeybox">${LOCKI}<span><b>고등학교 열쇠</b>를 얻었어요 — ${K.filter(x=>x.ok).length} / ${K.length}</span></div>`; }
   el('endMiss').innerHTML = missList.length
     ? missList.map(x=>`<div class="endmiss"><div class="emhead"><span class="mark bad">틀린 문제</span>
         <span class="mine">내가 쓴 답 <s>${esc(x.f.pick?(x.f.pick[+x.typed-1]||x.typed):x.typed)}</s></span>
@@ -14779,12 +14707,12 @@ function paintMineOwn(){
 function paintMine(){
   const t=MP.topic, T=topicOf(t), r=rec(t), p=prog(t), h=r.hist, day=todayKey();
   const msc=(SCHOOLS.find(x=>x.topics.includes(t))||schoolOf(CUR.school));
-  const scTabs=`<div class="mp-sc">${SCHOOLS.filter(s=>s.k!=='h'||hsOpen()||s.topics.some(k=>((ME.R||{})[k]||{}).best>0)).map(s=>
+  const scTabs=`<div class="mp-sc">${SCHOOLS.filter(s=>s.k!=='h'||hsOpen()).map(s=>
     `<button class="pk${s.k===msc.k?' on':''}" data-sc="${s.k}">${s.n}</button>`).join('')}</div>`;
-  el('mpTopics').innerHTML=scTabs+msc.topics.map(k=>
+  el('mpTopics').innerHTML=scTabs+msc.topics.filter(topicSeen).map(k=>
     `<button class="tab${k===t?' on':''}" data-k="${k}">${topicOf(k).n}</button>`).join('');
   el('mpTopics').querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{
-    const sc=schoolOf(b.dataset.sc); if(sc&&sc.topics.length){ MP.topic=sc.topics[0]; paintMine(); paintMineGrowth(); }
+    const sc=schoolOf(b.dataset.sc), ts=sc.topics.filter(topicSeen); if(ts.length){ MP.topic=ts[0]; paintMine(); paintMineGrowth(); }
   });
   el('mpTopics').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ MP.topic=b.dataset.k; paintMine(); paintMineGrowth(); });
   const td=h.filter(x=>x&&x.d===day);
@@ -15041,7 +14969,7 @@ function openBook(t){
 let shopCat='new', TRY=null;
 /* 갈래는 두 줄로 모두 보이게 — 둘러보기(새로 나옴·고등 전용·몸·색·상자·우리 반) / 꾸미기(부위별) */
 const SHOP_TOP=[{k:'new',n:'새로 나옴'},{k:'hs',n:'고등 전용'},{k:'shape',n:'몸'},{k:'color',n:'색'},{k:'box',n:'🎁 랜덤 상자'},{k:'class',n:'🏫 우리 반'}];
-/* 고등 전용 — 고등학교가 열려야(중학교 실전 열쇠 6개) 살 수 있습니다. 이미 가진 것은 그대로 */
+/* 고등 전용 — 시험용 계정과 선생님만 살 수 있어요. 이미 가진 것은 그대로 */
 const hsLocked=g=>!!g.hs&&!g.has&&!hsOpen();
 function ownItems(){ return ME.own||(ME.own=[]); }
 function ownShapes(){
@@ -15129,8 +15057,7 @@ function paintShop(){
   const list=goodsList(shopCat), grouped=shopCat==='new'||shopCat==='hs';
   let lastGrp='';
   const intro= shopCat==='new'?`<div class="shopnote"><span>새로 들어온 꾸미기 <b>${list.length}가지</b> — <b>우리 반 시리즈</b>(배지·깃발·망토·날개·왕관·무대 … 내 반 이름과 반 색으로 그려져요), 동물 친구, 빛의 검, 불사조 날개, 벚꽃 비까지. 랜덤 상자에서도 나와요.</span></div>`
-    : shopCat==='hs'?`<div class="shopnote">${hsOpen()?'고등학교가 열려 있어요. 고등 전용 물건을 모두 살 수 있어요.'
-        :`${LOCKI}<span><b>고등학교가 열리면</b> 살 수 있어요 — 중학교 주제마다 실전 모드 목표를 넘어 열쇠 ${hsKeys().length}개를 모으면 열려요. 지금 ${hsKeys().filter(x=>x.ok).length}개. 입어 보기는 지금도 할 수 있어요.</span>`}</div>`:'';
+    : shopCat==='hs'?`<div class="shopnote">고등 전용 물건이에요.</div>`:'';
   el('shopItems').innerHTML=intro+list.map(g=>{
     const lock=hsLocked(g), trying=TRY&&TRY.kind===g.kind&&TRY.k===g.k, poor=!g.has&&!g.box&&!lock&&ME.coin<g.p;
     const icon= g.kind==='shape' ? avatarSVG({s:g.k,c:ME.ch.c,items:[]})
