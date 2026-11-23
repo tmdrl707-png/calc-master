@@ -2270,7 +2270,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 19:43';
+const APP_VER='11.23 20:13';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -14049,7 +14049,7 @@ function renderStages(){
     const cnt=stageCount(t,s.n);
     return `<button class="st ${done?'done':''}" onclick="startStage('${t}',${s.n})">
       <div class="stamp">✓</div><div class="no">${s.n}</div>
-      <div class="ex${(n=>n>13?' exs':n>9?' exm':'')(s.ex.replace(/(\d+|□)\/(\d+|□)/g,'F').length)}">${mfmt(esc(s.ex))}</div>
+      <div class="ex${(n=>n>13?' exs':n>9?' exm':'')(s.ex.replace(/(\d+|□)\/(\d+|□)/g,'F').length)}">${mfmt(/<sup>□<\/sup>/.test(s.ex)?s.ex:esc(s.ex))}</div>
       <div class="nm">${s.name}${gBadge(stageGrade(t,s.n))}</div>
       <div class="cn">${cnt}문항${bt?` · 최고 ${bt.toFixed(1)}초`:''}${td?' · 오늘 ✓':''}</div></button>`;
   }).join('');
