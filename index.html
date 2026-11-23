@@ -2281,7 +2281,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 11:51';
+const APP_VER='11.23 12:36';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -6686,16 +6686,17 @@ const IPOW_N=[[2,[1,2,3,4,5,6,7,8,9,10]],[3,[1,2,3,4,5]],[4,[1,2,3]],[5,[1,2]]];
 const IPOW=()=>IPOW_N.flatMap(([n,as])=>as.flatMap(a=>[iP(-a,n),iN(a,n)]));
 
 const PY_BASE=[[3,4,5],[5,12,13],[8,15,17],[7,24,25]];
-/* 빗변·다른 한 변 단계의 피타고라스 수 — 1 기본 넷 · 2 기본의 배수 · 3 조금 큰 피타고라스 수 (빗변 65 이하) */
+/* 빗변·다른 한 변 단계의 피타고라스 수 — 1 기본 넷 · 2 기본의 배수 */
 const PY_L2=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[30,40,50],[10,24,26],[16,30,34],[14,48,50]];
-const PY_L3=[[20,21,29],[9,40,41],[12,35,37],[11,60,61]];
+/* 큰 피타고라스 수((20,21,29)·(12,35,37) 등)는 암산하기 어려워 뺐어요 */
+const PY_L3=[];
 const PY_LV=t=>PY_BASE.some(x=>x[2]===t[2]&&x[0]===t[0])?1:PY_L2.some(x=>x[2]===t[2]&&x[0]===t[0])?2:3;
 const pyLv=f=>{ const t=[f.a,f.b,f.c].sort((x,y)=>x-y); return PY_LV(t); };
 const PY_HS=T=>T.flatMap(([a,b])=>[yH(a,b),yH(b,a)]);
 const PY_LS=T=>T.flatMap(([a,b,c])=>[yL(c,a),yL(c,b)]);
-const PY_ALL=PY_BASE.concat(PY_L2,PY_L3);
-/* 연습 한 판 8문항 : 기본 4 · 배수 3 · 큰 수 1 */
-const pyPick=l=>sampleN(l.filter(f=>pyLv(f)===1),4).concat(sampleN(l.filter(f=>pyLv(f)===2),3),sampleN(l.filter(f=>pyLv(f)===3),1));
+const PY_ALL=PY_BASE.concat(PY_L2);
+/* 연습 한 판 8문항 : 기본 4 · 배수 4 */
+const pyPick=l=>sampleN(l.filter(f=>pyLv(f)===1),4).concat(sampleN(l.filter(f=>pyLv(f)!==1),4));
 const PY_MULT=[[6,8,10],[9,12,15],[12,16,20],[15,20,25],[30,40,50],[10,24,26],[15,36,39],[16,30,34],[14,48,50]];
 /* 연습용 배수: (3,4,5)는 2~5배, 나머지는 2배까지 */
 /* 연습 — 몇 배인지 바로 보이는 것만: (3, 4, 5)의 2·3·4·5·10배와 (5, 12, 13)의 2배 */
@@ -6959,7 +6960,7 @@ function extPreview(t,n){
       lines:hintOf(iN(3,2)).lines};
   }
   /* pyth */
-  const pyMore='<div class="hl" style="font-size:14px;margin-top:8px;color:var(--dim)">기본 넷을 먼저 외우고, 배수와 조금 큰 피타고라스 수로 넓혀요.</div>';
+  const pyMore='<div class="hl" style="font-size:14px;margin-top:8px;color:var(--dim)">기본 넷을 먼저 외우고, 그 배수로 넓혀요.</div>';
   if(n===1) return Object.assign(H(yH(3,4),'직각삼각형에서 (빗변)² = (직각변)² + (직각변)². 먼저 기본 네 가지를 외워 두세요.'),
       {body:chipList(PY_BASE.map(([a,b,c])=>`(${a}, ${b}, <b>${c}</b>)`))+pyMore+chipList(PY_L2.concat(PY_L3).map(([a,b,c])=>`(${a}, ${b}, <b>${c}</b>)`))});
   if(n===2) return Object.assign(H(yL(13,12),'빗변이 주어졌으면, 빗변의 제곱에서 아는 변의 제곱을 빼요.'),
@@ -7047,8 +7048,8 @@ function extNote(t,fromHint){
         <tr><td>5, 12, 13</td><td>25 + 144 = 169 = 13²</td><td><b>○</b></td></tr>
         <tr><td>2, 3, 4</td><td>4 + 9 = 13, 4² = 16</td><td><b>×</b></td></tr></tbody></table>`},
       {h:'자주 나오는 피타고라스 수', html:`${chipList(PY_BASE.map(t=>`(${t.join(', ')})`))}
-        <div class="kcp" style="margin-top:8px">조금 큰 피타고라스 수 (20, 21, 29) · (12, 35, 37) · (9, 40, 41) · (11, 60, 61)<br>
-        <small>(3, 4, 5) · (5, 12, 13) · (7, 24, 25) · (9, 40, 41) · (11, 60, 61) — 홀수 a 에서 나머지 두 수는 a² 을 반으로 나눈 이웃한 두 수예요.</small></div>
+        <div class="kcp" style="margin-top:8px">
+        <small>(3, 4, 5) · (5, 12, 13) · (7, 24, 25) — 홀수 a 에서 나머지 두 수는 a² 을 반으로 나눈 이웃한 두 수예요.</small></div>
         <div class="kcp" style="margin-top:8px">세 수에 같은 수를 곱하거나 나누어도 직각삼각형의 세 변이 돼요(닮은 직각삼각형).<br>(6, 8, 10) · (9, 12, 15) · (10, 24, 26) · (0.6, 0.8, 1)</div>`}
     ],
     ways:[
