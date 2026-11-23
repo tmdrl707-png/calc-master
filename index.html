@@ -2316,7 +2316,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 22:46';
+const APP_VER='11.23 22:53';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -12558,8 +12558,8 @@ function hscShow(root){ root.querySelectorAll('.hsc').forEach(h=>{ const on=h.qu
 const classShort=c=>c.length===3?`${c[0]}-${+c.slice(1)}`:c;
 const tSids=()=>Object.keys(tUsers).filter(sid=>!tClass||classOf(sid)===tClass);
 /* 학생 한 줄 — 학생 화면 랭킹과 같은 지표(userStat)에 이 주제의 그래프·스테이지를 더해요 */
-function teacherRows(t,withTest){
-  const sids=tSids().concat(withTest&&CFG.test.rank?Object.keys(tTestU).filter(sid=>!tClass||classOf(sid)===tClass):[]);
+function teacherRows(t,withTest,force){
+  const sids=tSids().concat(withTest&&(force||CFG.test.rank)?Object.keys(tTestU).filter(sid=>!tClass||classOf(sid)===tClass):[]);
   return sids.map(sid=>{
     const st=userStat(sid,tUsers[sid]||tTestU[sid],t,tClasses), r=(st.u.R&&st.u.R[t])||{};
     return Object.assign(st,{hist:Array.isArray(r.hist)?r.hist:Object.values(r.hist||{}), clear:(tPracOf(st.u,t).c||[]).length});
@@ -12602,7 +12602,7 @@ function paintTeacher(){
   else if(tTab==='grade') paintTGrade();
   else if(tTab==='tl') paintTTl();
   else if(tTab==='fact') paintTFact();
-  else paintTStu(teacherRows(tTopic));
+  else paintTStu(teacherRows(tTopic,true,true));
 }
 
 /* ── ① 랭킹 — 학생 화면과 같은 랭킹판(오늘·누적·노력왕·연습왕·코인·대전) ── */
@@ -12716,7 +12716,7 @@ async function tGiveCoins(sids,v,who){
   const ts=Date.now();
   for(const sid of sids){
     try{ await dbTx(`users/${sid}/coin`,cur=>(+cur||0)+v); await dbSet(`users/${sid}/gf/${ts}`,{v,m:'선생님이 주신 코인'});
-      if(tUsers[sid]) tUsers[sid].coin=(+tUsers[sid].coin||0)+v; }catch(e){}
+      { const uu=tUsers[sid]||tTestU[sid]; if(uu) uu.coin=(+uu.coin||0)+v; } }catch(e){}
   }
   toast(`${sids.length}명에게 ${v}코인씩 주었어요`); paintTeacher();
 }
@@ -12856,7 +12856,7 @@ function paintTStu(rows){
   const T=topicOf(tTopic);
   const tools=`<div class="ttools">
     <input type="text" class="tsrch" id="tSrch" value="${esc(tQuery)}" placeholder="학번 또는 닉네임 검색…">
-    <button class="btn sm" id="tCsvBtn">📥 CSV 내보내기 (${filt.length}명)</button>
+    <button class="btn sm" id="tCsvBtn">📥 CSV 내보내기 (${filt.filter(r=>!isTestSid(r.sid)).length}명)</button>
     <input type="tel" maxlength="4" inputmode="numeric" class="tbulk" id="tBulkCoin" placeholder="코인">
     <button class="btn sm" id="tBulkBtn">${tClass?classShort(tClass):'표시 학생'} 일괄 지급</button>
   </div>`;
@@ -12871,7 +12871,7 @@ function paintTStu(rows){
     return `<div class="stu${open?' open':''}">
       <button class="stuhead" data-sid="${esc(r.sid)}">
         <span class="av2">${avatarSVG(r.ch,{tight:true})}</span>
-        <span class="who"><b>${esc(r.sid)}${u.nk?` <small class="nsid">${esc(u.nk)}</small>`:''}</b>
+        <span class="who"><b>${esc(r.sid)}${isTestSid(r.sid)?' <small class="nsid" style="color:#7a4cf0">시험용</small>':''}${u.nk?` <small class="nsid">${esc(u.nk)}</small>`:''}</b>
           <span>${tSort==='sid'?'':`<i class="tno">${ri+1}</i>`}${val(r)} · 기록 있는 주제 ${nRec}개</span>
           <span>코인 ${cn(r.have)} · 쓴 코인 ${cu.exact?'':'약 '}${cn(cu.spent)}${r.wrong?` · 오답노트 ${r.wrong}`:''}${tMsLine(u)}</span></span>
         <span class="arw">${open?'▲':'▼'}</span>
@@ -12919,18 +12919,18 @@ function paintTStu(rows){
   }).join(''):`<div class="empty">${qNorm?'검색 결과가 없습니다.':'아직 등록된 학생이 없습니다.'}</div>`);
   const sr=el('tSrch');
   if(sr){
-    sr.oninput=()=>{ tQuery=sr.value; const pos=sr.selectionStart; paintTStu(teacherRows(tTopic)); const sr2=el('tSrch'); if(sr2){ sr2.focus(); try{ sr2.setSelectionRange(pos,pos); }catch(e){} } };
+    sr.oninput=()=>{ tQuery=sr.value; const pos=sr.selectionStart; paintTStu(teacherRows(tTopic,true,true)); const sr2=el('tSrch'); if(sr2){ sr2.focus(); try{ sr2.setSelectionRange(pos,pos); }catch(e){} } };
   }
-  if(el('tCsvBtn')) el('tCsvBtn').onclick=()=>exportTeacherCSV(filt);
+  if(el('tCsvBtn')) el('tCsvBtn').onclick=()=>exportTeacherCSV(filt.filter(r=>!isTestSid(r.sid)));
   if(el('tBulkBtn')) el('tBulkBtn').onclick=()=>{
     const v=+((el('tBulkCoin')||{}).value||'').replace(/\D/g,'');
     if(!filt.length) return toast('대상 학생이 없어요');
-    tGiveCoins(filt.map(r=>r.sid),v,`${tClass?classLabel(tClass):'표시된 학생'} ${filt.length}명에게`);
+    { const L=filt.filter(r=>!isTestSid(r.sid)); tGiveCoins(L.map(r=>r.sid),v,`${tClass?classLabel(tClass):'표시된 학생'} ${L.length}명에게`); }
   };
-  el('tBody').querySelectorAll('[data-so]').forEach(b=>b.onclick=()=>{ tSort=b.dataset.so; tOpen=null; paintTStu(teacherRows(tTopic)); });
+  el('tBody').querySelectorAll('[data-so]').forEach(b=>b.onclick=()=>{ tSort=b.dataset.so; tOpen=null; paintTStu(teacherRows(tTopic,true,true)); });
   hscShow(el('tBody'));
   el('tBody').querySelectorAll('.stuhead').forEach(b=>b.onclick=()=>{
-    tOpen=(tOpen===b.dataset.sid)?null:b.dataset.sid; paintTStu(teacherRows(tTopic)); });
+    tOpen=(tOpen===b.dataset.sid)?null:b.dataset.sid; paintTStu(teacherRows(tTopic,true,true)); });
   el('tBody').querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>resetPw(b.dataset.reset));
   el('tBody').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteStudent(b.dataset.del));
   el('tBody').querySelectorAll('[data-nkdel]').forEach(b=>b.onclick=()=>clearNick(b.dataset.nkdel));
