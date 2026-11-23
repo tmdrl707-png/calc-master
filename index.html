@@ -1826,6 +1826,14 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
   .tfreeze input{flex:1 1 100%;min-width:0;width:100%}
   .tfreeze select{flex:none}
 }
+
+/* 살 수 없는 물건은 회색 */
+.item.dis{background:#e4e4e7!important;border-color:#d4d4d8!important;box-shadow:none}
+.item.dis .ic{filter:grayscale(1);opacity:.55}
+.item.dis .nm2,.item.dis .price,.item.dis .state{color:#8e8e93!important;background:transparent}
+.item.dis .tagw{color:#6b6b70!important;background:#d4d4d8!important}
+.item.dis.try{background:#fff!important;border-color:var(--ink)!important;box-shadow:0 0 0 2px var(--soft2)}
+.item.dis.try .ic{filter:grayscale(1)}
 </style>
 </head>
 <body>
@@ -1881,11 +1889,11 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
       <div class="sub" id="gNewSub">앞으로 이 친구가 나를 대신합니다.</div>
       <div class="pickprev" id="pickPrev"></div>
       <div class="pick">
-        <h3>몸 고르기 — 어떤 계산 기호가 될까요?</h3>
+        <h3>캐릭터 고르기 — 어떤 계산 기호가 될까요?</h3>
         <div class="shapes" id="pickShape"></div>
         <h3>색 고르기</h3>
         <div class="swatches" id="pickColor"></div>
-        <div class="hint" id="pickHint">코인을 모으면 상점에서 다른 몸(= π ∞)과 색, 모자·안경·친구 같은 꾸미기를 살 수 있어요.</div>
+        <div class="hint" id="pickHint">코인을 모으면 상점에서 다른 캐릭터(= π ∞)와 색, 모자·안경·친구 같은 꾸미기를 살 수 있어요.</div>
       </div>
       <div class="err" id="gErr2"></div>
       <div class="row">
@@ -2274,7 +2282,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 22:35';
+const APP_VER='11.23 22:37';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -15457,8 +15465,8 @@ function openBook(t){
    아래 띠에서 [사기]를 눌러야 코인이 나갑니다. 가진 것은 누르면 입기/벗기.
    기본 몸 넷(+ − × ÷)과 기본 색 넷은 처음부터 가지고 시작합니다.          */
 let shopCat='new', TRY=null;
-/* 갈래는 두 줄로 모두 보이게 — 둘러보기(새로 나옴·고등 전용·몸·색·상자·우리 반) / 꾸미기(부위별) */
-const SHOP_TOP=[{k:'new',n:'새로 나옴'},{k:'hs',n:'고등 전용'},{k:'shape',n:'몸'},{k:'color',n:'색'},{k:'box',n:'🎁 랜덤 상자'},{k:'class',n:'🏫 우리 반'}];
+/* 갈래는 두 줄로 모두 보이게 — 둘러보기(새로 나옴·캐릭터·색·상자·우리 반) / 꾸미기(부위별) */
+const SHOP_TOP=[{k:'new',n:'새로 나옴'},{k:'shape',n:'캐릭터'},{k:'color',n:'색'},{k:'box',n:'🎁 랜덤 상자'},{k:'class',n:'🏫 우리 반'}];
 /* 고등 전용 — 시험용 계정과 선생님만 살 수 있어요. 이미 가진 것은 그대로 */
 const hsLocked=g=>!!g.hs&&!g.has&&!hsOpen();
 function ownItems(){ return ME.own||(ME.own=[]); }
@@ -15493,7 +15501,7 @@ function goodsList0(cat){
       ITEMS.filter(i=>i.cat!=='class'&&!i.hide&&f(i)).sort((a,b)=>ord(a.cat)-ord(b.cat)||(a.box?1:0)-(b.box?1:0)||byP(a,b)).map(It)); }
   return ITEMS.filter(i=>i.cat===cat&&!i.hide).sort((a,b)=>(a.box?1:0)-(b.box?1:0)||byP(a,b)).map(It);
 }
-const goodsGroup=g=>g.kind==='shape'?'몸':g.kind==='color'?'색':((CATS.find(c=>c.k===g.cat)||{}).n||'');
+const goodsGroup=g=>g.kind==='shape'?'캐릭터':g.kind==='color'?'색':((CATS.find(c=>c.k===g.cat)||{}).n||'');
 function wearOn(ch,g){
   const c={s:ch.s,c:ch.c,items:(ch.items||[]).slice()};
   if(g.kind==='shape') c.s=g.k;
@@ -15526,7 +15534,7 @@ function paintShop(){
     const L=goodsList(k); return [L.filter(g=>g.has).length,L.length]; };
   const tab=c=>{ const [a,b]=cnt(c.k);
     return `<button class="tab${shopCat===c.k?' on':''}${c.k==='new'?' tnew':c.k==='hs'?' ths':''}" data-k="${c.k}">${c.n} <small>${a}/${b}</small></button>`; };
-  el('shopTabs').innerHTML=`<div class="snrow"><span class="snl">둘러보기</span>${SHOP_TOP.filter(c=>c.k!=='hs'||hsOpen()).map(tab).join('')}</div>
+  el('shopTabs').innerHTML=`<div class="snrow"><span class="snl">둘러보기</span>${SHOP_TOP.map(tab).join('')}</div>
     <div class="snrow"><span class="snl">꾸미기</span>${CATS.map(tab).join('')}</div>`;
   el('shopTabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ shopCat=b.dataset.k; paintShop(); });
   const box=el('shopItems');
@@ -15565,7 +15573,7 @@ function paintShop(){
             : g.p?`<span class="price"><i></i>${g.p}</span>`:`<span class="state own">무료</span>`;
     let head='';
     if(grouped){ const gr=goodsGroup(g); if(gr!==lastGrp){ lastGrp=gr; head=`<div class="shoph">${gr}</div>`; } }
-    return `${head}<button class="item${g.on?' wear':''}${trying?' try':''}${poor?' poor':''}${lock?' hsl':''}" data-kind="${g.kind}" data-k="${g.k}">
+    return `${head}<button class="item${g.on?' wear':''}${trying?' try':''}${poor?' poor':''}${lock?' hsl':''}${!g.has&&(poor||lock||g.box)?' dis':''}" data-kind="${g.kind}" data-k="${g.k}">
       ${tag}<div class="ic">${icon}</div><div class="nm2">${g.n}</div>${st}</button>`;
   }).join('');
   el('shopItems').querySelectorAll('.item').forEach(b=>b.onclick=()=>tapGoods(b.dataset.kind,b.dataset.k));
@@ -15663,7 +15671,7 @@ function boxPanelHTML(){
     </div>`).join('')}</div>
     <h4 class="boxh">상자에서만 나오는 한정 아이템</h4>
     <div class="items">${BOX_ITEMS.map(i=>{ const has=ownItems().includes(i.id);
-      return `<button class="item${has?'':' locked'}" data-kind="item" data-k="${i.id}"><span class="tagw">한정</span>
+      return `<button class="item${has?'':' locked dis'}" data-kind="item" data-k="${i.id}"><span class="tagw">한정</span>
         <div class="ic">${avatarWith(ME.ch,i.id)}</div><div class="nm2">${i.n}</div>${has?'<span class="state own">가짐</span>':'<span class="state">상자에서만</span>'}</button>`; }).join('')}</div>
   </div>`;
 }
