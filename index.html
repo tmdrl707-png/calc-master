@@ -2281,7 +2281,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 17:50';
+const APP_VER='11.23 17:58';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -11841,7 +11841,7 @@ Object.assign(TOPICS,{
       {n:2, name:'ax + b > c 풀기', ex:'2x − 5 > 19', gen:genIQ2, take:12},
       {n:3, name:'음수 나눗셈 · 부등호 방향', ex:'−3x > 12', gen:genIQ3, take:12}
     ], cats:[['MI1'],['MI2'],['MI3']]},
-  sys:{k:'sys', n:'암산 연립방정식', sym:'{ }', school:'m', gr:'2학년', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
+  sys:{k:'sys', n:'연립방정식', sym:'{ }', school:'m', gr:'2학년', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'합과 차 · 바로 더하고 빼기 · 대입과 배수 소거',
     stages:[
       {n:1, name:'합과 차', ex:'x+y=20, x−y=4', gen:genSY1, take:12},
@@ -11971,8 +11971,8 @@ function mmNote(t,fh){
   const E=sc('e'), M=sc('m'), H=sc('h');
   E.topics=['addsub','fast','gugu','div','boxq','mix','fadd','fmul','dadd','dmul','ratio','unit'];
   E.sub='덧셈·뺄셈 · 빠른 암산 · 구구단 · 나눗셈 · □ 구하기 · 혼합계산 · 분수 · 소수 · 비와 비율 · 단위 변환';
-  M.topics=['pfac','int','power','alg','lineq','angle','expo','ineq','sys','linf','simr','root','factor','quad','pyth','trig'];
-  M.sub='소인수분해 · 정수 · 제곱수 · 문자식 · 일차방정식 · 각 · 지수 · 부등식 · 연립 · 함수 · 닮음 · 제곱근 · 인수분해 · 이차 · 피타고라스 · 삼각비';
+  M.topics=['pfac','int','power','alg','lineq','angle','expo','ineq','sys','linf','simr','pyth','root','factor','quad','trig'];
+  M.sub='소인수분해 · 정수 · 제곱수 · 문자식 · 일차방정식 · 각 · 지수 · 부등식 · 연립 · 함수 · 닮음 · 피타고라스 · 제곱근 · 인수분해 · 이차 · 삼각비';
   if(H){
     H.topics=['rem','cplx','comb','logx','tfn','seq'];
     H.sub='나머지정리 · 복소수 · 순열과 조합 · 지수와 로그 · 삼각함수 · 등차·등비수열';
@@ -11981,8 +11981,8 @@ function mmNote(t,fh){
     addsub:'저학년 · 1~3학년', fast:'저학년 · 1~3학년', gugu:'저학년 · 1~3학년', div:'저학년 · 1~3학년', boxq:'저학년 · 1~3학년',
     mix:'고학년 · 4~6학년', fadd:'고학년 · 4~6학년', fmul:'고학년 · 4~6학년', dadd:'고학년 · 4~6학년', dmul:'고학년 · 4~6학년', ratio:'고학년 · 4~6학년', unit:'고학년 · 4~6학년',
     pfac:'1학년', int:'1학년', power:'1학년', alg:'1학년', lineq:'1학년', angle:'1학년',
-    expo:'2학년', ineq:'2학년', sys:'2학년', linf:'2학년', simr:'2학년',
-    root:'3학년', factor:'3학년', quad:'3학년', pyth:'3학년', trig:'3학년',
+    expo:'2학년', ineq:'2학년', sys:'2학년', linf:'2학년', simr:'2학년', pyth:'2학년',
+    root:'3학년', factor:'3학년', quad:'3학년', trig:'3학년',
     rem:'공통수학1', cplx:'공통수학1', comb:'공통수학1', logx:'대수', tfn:'대수', seq:'대수'
   };
   Object.keys(GR).forEach(k=>{ if(TOPICS[k]) TOPICS[k].gr=GR[k]; });
