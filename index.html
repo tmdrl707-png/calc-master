@@ -2316,7 +2316,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 22:53';
+const APP_VER='11.23 22:58';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -12513,7 +12513,7 @@ function rvNote(t,N,fh){
 
 /* ═══════════════════ 선생님 모드 ═══════════════════
    학번 칸에 00000, 선생님 비밀번호를 넣으면 들어옵니다.
-   비밀번호 자체는 코드에 두지 않고 SHA-256 값만 둡니다. 새로고침하면 다시 비밀번호를 넣어요.
+   비밀번호 자체는 코드에 두지 않고 SHA-256 값만 둡니다. 새로고침해도 이 기기에서는 유지돼요(나가기를 누르면 해제).
    ① 랭킹  ② 계산별 정답률(학생 전체 기록을 모아서)  ③ 학생 정보          */
 
 const TEACHER_ID='00000', TEACHER_PWH='d4697a6e92d6a0dcceaa2bc6e4f0bd5c11319c25d46280c617359a11ba1dbf5c';
@@ -12527,11 +12527,12 @@ let tTest=0, tTestU={};
 let tClasses={};
 let isTeacher=false, tTab='rank', tTopic='gugu', tOpen=null, tUsers={}, tClass='', tHm='g', tCb='all', tRk='best', tSort='best';
 
-async function enterTeacher(){
+/* 선생님 모드도 새로고침해도 유지 — 이 기기에 비밀번호 확인 값과 보던 탭만 저장해요 (나가기를 누르면 지워요) */
+const tSave=()=>{ if(isTeacher&&tPwH4) LS.set(MEKEY,{teacher:1,ph:tPwH4,tab:tTab}); };
+async function enterTeacher(tab){
   isTeacher=true; ME=null; G=null;
   if(typeof stopFreezeWatch==='function') stopFreezeWatch();
-  LS.del(MEKEY);   /* 선생님 모드는 이 기기에 저장하지 않아요 */
-  tTab='rank'; tOpen=null;
+  tTab=(typeof tab==='string'&&tab)||'rank'; tOpen=null; tSave();
   show('s-teach'); await loadTeacher();
 }
 function leaveTeacher(){ isTeacher=false; LS.del(MEKEY);
@@ -12577,7 +12578,7 @@ function paintTeacher(){
     `<button class="sg${tTab===k?' on':''}" data-k="${k}">${n}</button>`).join('')}</div></div>`;
   el('tTabs').innerHTML=seg('기록',[['rank','랭킹'],['cls','학급 대항'],['fact','정답률'],['stu','학생 정보']])
     +seg('수업 · 설정',[['coop','협동 목표'],['boss','반 보스전'],['grade','등급 기준'],['tl','모드 잠금']]);
-  el('tTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ tTab=b.dataset.k; tOpen=null; paintTeacher(); });
+  el('tTabs').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ tTab=b.dataset.k; tOpen=null; tSave(); paintTeacher(); });
   const showT=!(tTab==='tl'||tTab==='cls'||tTab==='coop'||tTab==='boss'||tTab==='grade'||(tTab==='rank'&&!RKK[tRk].topic)), showC=!(tTab==='tl'||tTab==='cls'||tTab==='coop'||tTab==='boss'||tTab==='grade');
   el('tTopicBar').style.display=showT?'':'none';
   el('tClassBar').style.display=showC?'':'none';
@@ -15983,10 +15984,13 @@ async function voteClassText(k){
    · 이미 메인이면 한 번 더 누를 때 나가요  · 로그인 화면에서는 그대로 나가요                         */
 let BACK_ARM=0;
 const backGuard=()=>{ try{ history.pushState({cm:1},''); }catch(e){} };
+/* 폰 크롬은 화면을 만지지 않고 쌓은 기록을 뒤로 가기에서 건너뛰어요 — 그래서 화면을 처음 만질 때(와 뒤로 간 다음 만질 때) 한 번 더 쌓아 둬요 */
+const ensureGuard=()=>{ try{ if(!(history.state&&history.state.cm===1)) history.pushState({cm:1},''); }catch(e){} };
+['pointerdown','touchstart','keydown'].forEach(ev=>window.addEventListener(ev,ensureGuard,{capture:true,passive:true}));
 function onBack(){
   if(el('ovFreeze')&&el('ovFreeze').classList.contains('on')){ backGuard(); return; }
   const on=document.querySelector('.screen.on'), id=on?on.id:'';
-  if(id==='s-gate'){ history.back(); return; }
+  if(id==='s-gate'){ if(Date.now()-BACK_ARM<2500){ history.back(); return; } BACK_ARM=Date.now(); backGuard(); toast('한 번 더 누르면 나가요'); return; }
   const ov=[...document.querySelectorAll('.overlay.on')].filter(o=>o.id!=='ovFreeze');
   if(ov.length){ ov.forEach(o=>o.classList.remove('on')); backGuard(); return; }
   const inBattle=(G&&(G.mode==='battle'||G.mode==='boss')&&!G.over)||(typeof BT!=='undefined'&&BT.code&&id==='s-battle')||(typeof BOSS!=='undefined'&&BOSS.code&&id==='s-boss');
@@ -17444,7 +17448,9 @@ async function boot(){
   ['inSid','inPw'].forEach(id=>el(id).addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,''); }));
 
   const saved=LS.get(MEKEY,null);
-  if(saved&&saved.teacher) LS.del(MEKEY);   /* 선생님 모드는 새로고침하면 비밀번호를 다시 넣어요 */
+  if(saved&&saved.teacher&&saved.ph){                       /* 선생님 모드 — 새로고침해도 그대로 */
+    tPwH4=saved.ph; el('s-gate').classList.remove('restoring'); await enterTeacher(saved.tab); return; }
+  if(saved&&saved.teacher) LS.del(MEKEY);
   if(saved&&saved.sid){
     try{
       let u=await dbGet('users/'+saved.sid,null), up=false;
