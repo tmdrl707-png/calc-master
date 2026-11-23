@@ -4,7 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <title>계산 마스터</title>
-<meta name="description" content="구구단·덧셈뺄셈·제곱수 계산 연습 게임">
+<meta name="description" content="초·중·고 26개 주제 기초 계산 연습 게임 — 연습 스테이지, 1분 실전, 오답노트, 친구 대전, 반 전체 협동 보스전">
+<meta name="theme-color" content="#2f5bea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="계산 마스터">
+<meta property="og:title" content="계산 마스터 — 초·중·고 기초 계산 연습 게임">
+<meta property="og:description" content="연습 스테이지, 1분 실전, 오답노트, 캐릭터 상점, 친구 대전, 반 전체 협동 보스전">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f5bea'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='36' font-weight='900' fill='%23fff' font-family='sans-serif'%3E%C2%B1%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232f5bea'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='36' font-weight='900' fill='%23fff' font-family='sans-serif'%3E%C2%B1%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
@@ -16,13 +23,22 @@
 :root{
   --bg:#f5f5f6; --paper:#f6f7f9; --card:#fff; --soft:#f4f4f5; --soft2:#ececee;
   --ink:#111; --ink2:#3a3a3c; --dim:#6e6e73; --hair:#ececec; --line:#e4e4e7;
-  --o:#1f9d55; --x:#d6336c; --hi:#f5b301; --blue:#2f5bea; --violet:#2f5bea; --orange:#2f5bea;
+  --o:#1f9d55; --x:#d6336c; --hi:#f5b301; --blue:#2f5bea; --violet:#7c3aed; --orange:#f97316;
   --tc:#2f5bea; --ts:#eef2fe; --tl:#2f5bea;
   --scr:#fff;
   --sh:none; --sh2:none; --sh1:none;
   --r:16px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #f5b301;outline-offset:2px}
+.ttools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px;padding:10px 12px;background:var(--soft);border:1px solid var(--line);border-radius:14px}
+.ttools .tsrch{flex:1 1 160px;min-width:130px;padding:7px 11px;font-size:13.5px;letter-spacing:0;border-radius:10px;background:#fff}
+.ttools .tbulk{width:96px;padding:7px 9px;font-size:13.5px;letter-spacing:0;border-radius:10px;background:#fff}
+.tg-ed{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;padding:8px 10px;background:var(--soft);border-radius:10px}
+.tg-ed label{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:var(--dim)}
+.tg-ed input{width:54px;padding:5px 6px;font-size:13.5px;font-weight:800;text-align:center;letter-spacing:0;border:1px solid var(--line);border-radius:8px;background:#fff}
+.mp-sc{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.mp-sc .pk{padding:5px 12px;font-size:12.5px}
 html{-webkit-text-size-adjust:100%}
 body{
   color:var(--ink);background:var(--bg);
@@ -2265,7 +2281,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.22 22:06';
+const APP_VER='11.23 11:43';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -2375,6 +2391,16 @@ async function dbGet(path,dflt){
   try{ const db=await fbInit(); if(db){ const s=await db.ref(ROOT+'/'+path).get();
       return s.exists()?s.val():dflt; } }catch(e){ console.warn('읽기 실패',path,e); }
   return lget(path,dflt);
+}
+/* 엄격 읽기 — 로그인 시 일시적 네트워크 오류를 '미가입 계정'으로 오인해 덮어쓰는 사고를 막아요 */
+async function dbGetStrict(path){
+  if(!FB_READY) return {ok:true, val:lget(path,null), local:true};
+  try{
+    const db=await fbInit();
+    if(!db) return {ok:false, val:null};
+    const s=await db.ref(ROOT+'/'+path).get();
+    return {ok:true, val:s.exists()?s.val():null};
+  }catch(e){ console.warn('엄격 읽기 실패',path,e); return {ok:false, val:null}; }
 }
 async function dbSet(path,val){
   try{ const db=await fbInit(); if(db){ await db.ref(ROOT+'/'+path).set(val);
@@ -5938,9 +5964,9 @@ function seedRand(str){ let h=2166136261>>>0; for(const c of String(str)){ h^=c.
   return ()=>{ h=(h+0x6D2B79F5)>>>0; let x=h; x=Math.imul(x^x>>>15,x|1); x^=x+Math.imul(x^x>>>7,x|61); return ((x^x>>>14)>>>0)/4294967296; }; }
 /* 그 안에서만 Math.random 을 날짜로 정한 난수로 바꿔 둬요 (문제 만드는 함수들이 모두 Math.random 을 써요) */
 function withSeed(seed,fn){ const r=Math.random; Math.random=seedRand(seed); try{ return fn(); } finally{ Math.random=r; } }
-function stageRun(t,n){
+function stageRun(t,n,fresh){
   const st=stageOf(t,n), N=Math.min(PRAC_N,st.take);
-  const out=withSeed(todayKey()+'|'+t+'|'+n,()=>{ let L;
+  const run=()=>{ let L;
     if(st.facts){
       const all=st.facts();
       L=all.length<=N?all.slice():sampleN(st.pick?st.pick(all):all,N);
@@ -5950,8 +5976,8 @@ function stageRun(t,n){
         const f=st.gen(); if(seen.has(f.key)) continue; seen.add(f.key); L.push(f);
       }
     }
-    return easyFirst(L); });
-  return out;
+    return easyFirst(L); };
+  return fresh ? run() : withSeed(todayKey()+'|'+t+'|'+n, run);
 }
 /* 문제 난이도 어림 — 문제가 정한 값(dl)이 있으면 그것, 없으면
    식에 나온 숫자의 자릿수 · 계산 기호 수 · 답의 자릿수 · 음수 · 받아올림 · 문장 길이로 어림해요 */
@@ -5994,19 +6020,45 @@ function realWeights(S,L){
     if(k===lv-1) return L>=top+1?0:.2;
     return 0; });
 }
-function realPick(t,n,recent,L){
+const isTwoPlusAns=f=>!!(f&&!f.pick&&String(f.ans).replace(/[-.]/g,'').length>=2);
+function realPick(t,n,recent,L,opt){
   const S=realStagesOf(t), w=realWeights(S,L!=null?L:realLOf(n));
-  let f=null;
-  for(let g=0;g<30;g++){
+  const want2=!!(opt&&opt.want2);
+  let f=null, best=null;
+  const draws=want2?60:30;
+  for(let g=0;g<draws;g++){
     let r=Math.random()*w.reduce((a,b)=>a+b,0), i=0;
     while(i<w.length-1&&(r-=w[i])>0) i++;
     while(!w[i]&&i>0) i--;
     const st=S[i];
-    f= st.facts ? pickOne(st.facts()) : st.gen();
-    f._rl=i+1;
-    if(!recent||!recent.includes(f.key)) break;
+    const cand= st.facts ? pickOne(st.facts()) : st.gen();
+    if(!cand) continue;
+    cand._rl=i+1;
+    if(!best) best=cand;
+    const fresh=!recent||!recent.includes(cand.key);
+    if(want2){
+      if(isTwoPlusAns(cand)){
+        if(fresh) return cand;
+        if(!f||!isTwoPlusAns(f)) f=cand;
+      }else if(!f&&fresh){ f=cand; }
+    }else{
+      f=cand;
+      if(fresh) break;
+    }
   }
-  return f;
+  /* 찍기 의심 시 현재 난이도 구간에서 2자리 답을 못 찾으면 전체 실전/연습 단계에서 2자리 답을 찾아 출제 */
+  if(want2&&(!f||!isTwoPlusAns(f))){
+    const allS=S.concat(topicOf(t).stages||[]);
+    for(let g=0;g<60;g++){
+      const idx=Math.floor(Math.random()*allS.length), st=allS[idx];
+      const cand=st.facts ? pickOne(st.facts()) : st.gen();
+      if(!cand||!isTwoPlusAns(cand)) continue;
+      cand._rl=Math.min(S.length, idx+1);
+      if(!recent||!recent.includes(cand.key)) return cand;
+      f=cand;
+    }
+  }
+  return f||best;
 }
 
 /* ═══ 오답노트의 '확인 문제' — 같은 사실을 다른 모양으로 한 번 더 ═══
@@ -7399,7 +7451,23 @@ const TCALC=[
   ['2 sin 60° × cos 30°',3,2,['2 × √3/2 × √3/2 = 2 × 3/4','= 3/2']],
   ['4 sin 30° × cos 60°',1,0,['4 × 1/2 × 1/2','= 1']],
   ['(2 sin 60°)²',3,0,['(2 × √3/2)² = (√3)²','= 3']],
-  ['tan 45° − sin 30°',1,2,['1 − 1/2','= 1/2']]
+  ['tan 45° − sin 30°',1,2,['1 − 1/2','= 1/2']],
+  ['20 sin 30°',10,0,['20 × 1/2','= 10']],
+  ['24 cos 60°',12,0,['24 × 1/2','= 12']],
+  ['30 sin 30°',15,0,['30 × 1/2','= 15']],
+  ['36 cos 60°',18,0,['36 × 1/2','= 18']],
+  ['16 sin² 60°',12,0,['16 × (√3/2)² = 16 × 3/4','= 12']],
+  ['20 cos² 30°',15,0,['20 × (√3/2)² = 20 × 3/4','= 15']],
+  ['24 sin² 45°',12,0,['24 × (√2/2)² = 24 × 1/2','= 12']],
+  ['28 cos² 45°',14,0,['28 × (√2/2)² = 28 × 1/2','= 14']],
+  ['36 sin² 45°',18,0,['36 × (√2/2)² = 36 × 1/2','= 18']],
+  ['40 sin 30° − 6 tan 45°',14,0,['40 × 1/2 − 6 × 1 = 20 − 6','= 14']],
+  ['30 cos 60° − 4 tan 45°',11,0,['30 × 1/2 − 4 × 1 = 15 − 4','= 11']],
+  ['4 (tan 60°)²',12,0,['4 × (√3)² = 4 × 3','= 12']],
+  ['5 (tan 60°)²',15,0,['5 × (√3)² = 5 × 3','= 15']],
+  ['8 (tan 60°)²',24,0,['8 × (√3)² = 8 × 3','= 24']],
+  ['12 tan 60° × tan 30°',12,0,['12 × (√3 × √3/3) = 12 × 1','= 12']],
+  ['24 sin 30° + 4 tan 45°',16,0,['24 × 1/2 + 4 = 12 + 4','= 16']]
 ];
 const tC=i=>{ const [x,ans,den]=TCALC[i]; return F({key:'tC'+i, t:'trig', k:'tC', i, eq:[x,'=',den?{fr:['?',String(den)]}:'?'], ans}); };
 
@@ -7453,7 +7521,22 @@ const LPROP=[
   ['log₂ 3 + log₂ 4 − log₂ 6',1,['log₂ (3 × 4 ÷ 6) = log₂ 2','2¹ = 2 이므로 1']],
   ['log₂ 6 + log₂ 12 − log₂ 9',3,['log₂ (6 × 12 ÷ 9) = log₂ 8','2³ = 8 이므로 3']],
   ['log₂ 3 × log₃ 4 × log₄ 8',3,['밑변환으로 이어져 log₂ 8','2³ = 8 이므로 3']],
-  ['log₂₇ 3 + log₂₇ 9',1,['log₂₇ (3 × 9) = log₂₇ 27','27¹ = 27 이므로 1']]
+  ['log₂₇ 3 + log₂₇ 9',1,['log₂₇ (3 × 9) = log₂₇ 27','27¹ = 27 이므로 1']],
+  ['log₂ 8⁴',12,['지수는 앞으로: 4 log₂ 8','4 × 3 = 12']],
+  ['log₂ 8⁵',15,['지수는 앞으로: 5 log₂ 8','5 × 3 = 15']],
+  ['log₂ 16³',12,['지수는 앞으로: 3 log₂ 16','3 × 4 = 12']],
+  ['log₂ 16⁴',16,['지수는 앞으로: 4 log₂ 16','4 × 4 = 16']],
+  ['log₂ 16⁵',20,['지수는 앞으로: 5 log₂ 16','5 × 4 = 20']],
+  ['log₂ 32²',10,['지수는 앞으로: 2 log₂ 32','2 × 5 = 10']],
+  ['log₂ 32³',15,['지수는 앞으로: 3 log₂ 32','3 × 5 = 15']],
+  ['log₂ 64²',12,['지수는 앞으로: 2 log₂ 64','2 × 6 = 12']],
+  ['log₃ 27⁴',12,['지수는 앞으로: 4 log₃ 27','4 × 3 = 12']],
+  ['log₃ 81³',12,['지수는 앞으로: 3 log₃ 81','3 × 4 = 12']],
+  ['log₃ 9⁵',10,['지수는 앞으로: 5 log₃ 9','5 × 2 = 10']],
+  ['log₅ 25⁵',10,['지수는 앞으로: 5 log₅ 25','5 × 2 = 10']],
+  ['log₅ 125⁴',12,['지수는 앞으로: 4 log₅ 125','4 × 3 = 12']],
+  ['log 100⁵',10,['지수는 앞으로: 5 log 100','5 × 2 = 10']],
+  ['log 1000⁴',12,['지수는 앞으로: 4 log 1000','4 × 3 = 12']]
 ];
 const lP=i=>F({key:'lP'+i, t:'logx', k:'lP', i, eq:[LPROP[i][0],'=','?'], ans:LPROP[i][1]});
 const LEQ=[
@@ -7500,7 +7583,23 @@ const LEQ=[
   ['log₂ (x + 3) = 4',13,['x + 3 = 2⁴ = 16','x = 13']],
   ['log₅ (2x − 1) = 2',13,['2x − 1 = 5² = 25 → 2x = 26','x = 13']],
   ['log₂ x + log₂ 4 = 5',8,['log₂ 4x = 5 → 4x = 2⁵ = 32','x = 8']],
-  ['log₃ x − log₃ 2 = 2',18,['log₃ (x ÷ 2) = 2 → x ÷ 2 = 3² = 9','x = 18']]
+  ['log₃ x − log₃ 2 = 2',18,['log₃ (x ÷ 2) = 2 → x ÷ 2 = 3² = 9','x = 18']],
+  ['log₂ x = 4',16,['로그의 정의: x = 2⁴','x = 16']],
+  ['log₂ x = 6',64,['로그의 정의: x = 2⁶','x = 64']],
+  ['log₂ x = 7',128,['로그의 정의: x = 2⁷','x = 128']],
+  ['log₃ x = 3',27,['x = 3³','x = 27']],
+  ['log₅ x = 3',125,['x = 5³','x = 125']],
+  ['log₇ x = 2',49,['x = 7²','x = 49']],
+  ['log₈ x = 2',64,['x = 8²','x = 64']],
+  ['log₉ x = 2',81,['x = 9²','x = 81']],
+  ['log₄ x = 2',16,['x = 4²','x = 16']],
+  ['log₂ (x − 5) = 4',21,['x − 5 = 2⁴ = 16','x = 21']],
+  ['log₃ (x − 2) = 3',29,['x − 2 = 3³ = 27','x = 29']],
+  ['log₂ (x + 2) = 5',30,['x + 2 = 2⁵ = 32','x = 30']],
+  ['log₅ (x − 1) = 2',26,['x − 1 = 5² = 25','x = 26']],
+  ['log₂ x + log₂ 2 = 5',16,['log₂ 2x = 5 → 2x = 32','x = 16']],
+  ['log₂ x − log₂ 3 = 3',24,['log₂ (x ÷ 3) = 3 → x ÷ 3 = 8','x = 24']],
+  ['log₃ x − log₃ 4 = 2',36,['log₃ (x ÷ 4) = 2 → x ÷ 4 = 9','x = 36']]
 ];
 const lE=i=>F({key:'lE'+i, t:'logx', k:'lE', i, cond:`${LEQ[i][0]} 일 때`, eq:['x','=','?'], ans:LEQ[i][1]});
 
@@ -7596,14 +7695,16 @@ const ANG=[30,45,60], FNS=['s','c','t'];
 const TV_ALL=()=>FNS.flatMap(fn=>ANG.map(d=>tV(fn,d)));
 const TA_ALL=()=>FNS.flatMap(fn=>ANG.map(d=>tA(fn,d)));
 const TB_ALL=()=>FNS.flatMap(f1=>ANG.flatMap(d=>FNS.filter(f2=>f2!==f1).map(f2=>tB(f1,d,f2))));
-const TR_ALL=()=>[[3,4],[4,3],[5,12],[12,5],[8,15],[15,8],[7,24],[24,7],[20,21],[21,20]].flatMap(([a,b])=>FNS.map(fn=>tR(a,b,fn)));
-const TS_ALL=()=>ANG.flatMap(d=>[2,4,6,8,10,12].flatMap(c=>[tS(d,c,'o'),tS(d,c,'j')])).filter(f=>!(f.rt&&f.ans===1));   /* 1√2 처럼 계수 1이 보이는 문항은 빼요 */
+const TR_ALL=()=>[[3,4],[4,3],[5,12],[12,5],[8,15],[15,8],[7,24],[24,7],[20,21],[21,20],[9,40],[40,9],[12,35],[35,12],[11,60],[60,11],[16,63],[63,16],[28,45],[45,28]].flatMap(([a,b])=>FNS.map(fn=>tR(a,b,fn)));
+const TS_ALL=()=>ANG.flatMap(d=>[2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,36,40].flatMap(c=>[tS(d,c,'o'),tS(d,c,'j')])).filter(f=>!(f.rt&&f.ans===1));   /* 1√2 처럼 계수 1이 보이는 문항은 빼요 */
 const TC_ALL=()=>TCALC.map((_,i)=>tC(i));
 const LR_ALL=()=>[lR(3,2),lR(3,3),lR(3,4),lR(3,5),lR(3,-2),lR(3,-3),lR(4,2),lR(4,3),lR(5,2),lR(5,3),lR(5,-2),lR(2,12),
-  lR(3,6),lR(3,10),lR(3,-4),lR(3,-5),lR(4,4),lR(4,5),lR(5,4),lR(6,2),lR(7,2),lR(2,13),lR(2,15),lR(3,1),lR(5,-3)];
+  lR(3,6),lR(3,10),lR(3,-4),lR(3,-5),lR(4,4),lR(4,5),lR(5,4),lR(6,2),lR(7,2),lR(2,13),lR(2,15),lR(3,1),lR(5,-3),
+  lR(2,11),lR(2,14),lR(2,16),lR(2,18),lR(2,20),lR(2,25),lR(3,11),lR(3,12),lR(3,-10)];
 const LQ_ALL=()=>[[8,2,3],[27,2,3],[16,3,4],[4,3,2],[9,3,2],[32,2,5],[25,3,2],[64,2,3],[81,3,4],[100,3,2],[8,1,3],
                   [8,-2,3],[27,-1,3],[4,-3,2],[9,-1,2],[16,-1,4],
-                  [16,3,2],[36,1,2],[49,1,2],[125,2,3],[1000,2,3],[32,3,5],[81,1,4],[27,4,3],[64,5,6],[100,1,2],[8,5,3],[125,-1,3],[32,-2,5]].map(([a,p,q])=>lQ(a,p,q));
+                  [16,3,2],[36,1,2],[49,1,2],[125,2,3],[1000,2,3],[32,3,5],[81,1,4],[27,4,3],[64,5,6],[100,1,2],[8,5,3],[125,-1,3],[32,-2,5],
+                  [4,5,2],[9,5,2],[16,5,4],[8,4,3],[32,4,5],[125,4,3],[36,3,2],[49,3,2],[81,5,4],[16,-3,2],[27,-4,3],[4,-5,2],[8,-4,3],[25,-3,2]].map(([a,p,q])=>lQ(a,p,q));
 const LL_ALL=()=>[[2,3],[2,5],[2,6],[2,-3],[2,0],[3,2],[3,4],[3,-2],[5,3],[5,-1],[10,3],[10,-2],[2,1],[3,5],
                   [2,2],[2,4],[2,7],[2,8],[2,10],[2,-1],[2,-2],[2,-4],[3,1],[3,3],[3,0],[3,-1],[3,-3],[4,2],[4,3],[4,-1],
                   [5,2],[5,4],[5,0],[5,-2],[6,2],[7,2],[8,2],[9,2],[10,1],[10,4],[10,0],[10,-1],[10,-3]].map(([b,e])=>lL(b,e));
@@ -8912,9 +9013,9 @@ const nfCo=(n,d)=>gcd(n,d)===1;
 /* ── 분수의 덧셈과 뺄셈 ── */
 function genNA1(){            /* 분모가 같은 진분수 */
   for(let g=0;g<80;g++){
-    const d=ri(3,12), x=Math.random();
-    if(x<.45){ const a=ri(1,d-2), c=ri(1,d-1-a); if(c<1) continue; return nfF('a',[0,a,d],[0,c,d],'F','n'); }
-    if(x<.55){ const a=ri(1,d-1); return nfF('a',[0,a,d],[0,d-a,d],'F','n'); }      /* 합이 1 */
+    const d=ri(3,18), x=Math.random();
+    if(x<.5){ const a=ri(1,d-2), c=ri(1,d-1-a); if(c<1) continue; return nfF('a',[0,a,d],[0,c,d],'F','n'); }
+    if(x<.58){ const a=ri(1,d-1); return nfF('a',[0,a,d],[0,d-a,d],'F','n'); }      /* 합이 1 */
     const a=ri(2,d-1), c=ri(1,a-1); return nfF('s',[0,a,d],[0,c,d],'F','n');
   }
   return nfF('a',[0,2,7],[0,3,7],'F','n');
@@ -8927,24 +9028,24 @@ function genNA2(){            /* 가분수 ↔ 대분수 */
 }
 function genNA3(){            /* 분모가 같은 대분수·자연수 */
   for(let g=0;g<80;g++){
-    const d=ri(3,9), x=Math.random();
-    if(x<.3) return nfF('a',[ri(1,4),ri(1,d-1),d],[ri(1,3),ri(1,d-1),d],'M',Math.random()<.35?'w':'n');
-    if(x<.6){ const w1=ri(2,6), w2=ri(1,w1-1), n1=ri(1,d-1), n2=ri(1,d-1); if(n1===n2) continue;
+    const d=ri(3,14), x=Math.random();
+    if(x<.32) return nfF('a',[ri(1,6),ri(1,d-1),d],[ri(1,6),ri(1,d-1),d],'M',Math.random()<.4?'w':'n');
+    if(x<.62){ const w1=ri(2,9), w2=ri(1,w1-1), n1=ri(1,d-1), n2=ri(1,d-1); if(n1===n2) continue;
       return nfF('s',[w1,n1,d],[w2,n2,d],'M',Math.random()<.35?'w':'n'); }
-    if(x<.8){ const N=ri(1,5), n=ri(1,d-1); return nfF('s',[N,0,1],[0,n,d],'M',N>1&&Math.random()<.3?'w':'n'); }
-    const N=ri(3,7), w=ri(1,N-1), n=ri(1,d-1); return nfF('s',[N,0,1],[w,n,d],'M',Math.random()<.3?'w':'n');
+    if(x<.8){ const N=ri(1,6), n=ri(1,d-1); return nfF('s',[N,0,1],[0,n,d],'M',N>1&&Math.random()<.3?'w':'n'); }
+    const N=ri(3,9), w=ri(1,N-1), n=ri(1,d-1); return nfF('s',[N,0,1],[w,n,d],'M',Math.random()<.3?'w':'n');
   }
   return nfF('s',[3,1,4],[1,3,4],'M','n');
 }
-const NF_D=[2,3,4,5,6,8,9,10,12];
+const NF_D=[2,3,4,5,6,7,8,9,10,12,15];
 function genNA5(){            /* 분모가 다른 분수 (기약분수로) */
   for(let g=0;g<80;g++){
-    const b=pickOne(NF_D), d=pickOne(NF_D); if(b===d||lcm(b,d)>30) continue;
+    const b=pickOne(NF_D), d=pickOne(NF_D); if(b===d||lcm(b,d)>48) continue;
     const a=ri(1,b-1), c=ri(1,d-1); if(!nfCo(a,b)||!nfCo(c,d)) continue;
-    const k=Math.random()<.55?'a':'s';
+    const k=Math.random()<.58?'a':'s';
     let A=[0,a,b], B=[0,c,d];
     if(k==='s'&&nfCmp(A,B)<=0) [A,B]=[B,A];
-    const f=nfF(k,A,B,'f',pickOne(['n','n','d'])); if(f&&f.Q<=36&&f.P<=f.Q) return f;
+    const f=nfF(k,A,B,'f',pickOne(['n','n','d','d'])); if(f&&f.Q<=48&&f.P<=f.Q) return f;
   }
   return nfF('a',[0,1,2],[0,1,3],'f','n');
 }
@@ -9535,51 +9636,55 @@ function fcT(a,b,pos){
   else { o.cond=poly([[1,'x²'],[s,'x'],[P,'']]); o.eq=['=',{g:[fcLin(1,a,false,pos==='a'),fcLin(1,b,false,pos==='b')]}]; o.ans=Math.abs(pos==='a'?a:b); }
   return fcF('FCt'+a+'_'+b+'_'+pos,'FCt',o);
 }
-/* (px + q)(rx + s) — pos q · s */
+/* (px + q)(rx + s) — pos q · s · m(일차항 계수) */
 function fcA(p,q,r,s,pos){
   const A=p*r, M=p*s+q*r, C=q*s;
+  if(pos==='m') return fcF('FCa'+p+'_'+q+'_'+r+'_'+s+'_m','FCa',{f:'a', p, q, r, s, A, M, C, pos,
+    eq:[fcTerm(A,'x²'),M<0?'−':'+','?x',C<0?'−':'+',Math.abs(C),'=',{g:[fcLin(p,q),fcLin(r,s)]}], ans:Math.abs(M)});
   return fcF('FCa'+p+'_'+q+'_'+r+'_'+s+'_'+pos,'FCa',{f:'a', p, q, r, s, A, M, C, pos, cond:poly([[A,'x²'],[M,'x'],[C,'']]),
     eq:['=',{g:[fcLin(p,q,false,pos==='q'),fcLin(r,s,false,pos==='s')]}], ans:Math.abs(pos==='q'?q:s)});
 }
 const sgnR=()=>Math.random()<.5?1:-1;
 function genFC1(){
   for(let g=0;g<40;g++){
-    if(Math.random()<.6){ const k=ri(2,9), a=ri(1,6), b=sgnR()*ri(1,9); if(gcd(a,Math.abs(b))!==1||k*a>60||k*Math.abs(b)>60) continue;
+    if(Math.random()<.6){ const k=ri(2,12), a=ri(1,6), b=sgnR()*ri(1,12); if(gcd(a,Math.abs(b))!==1||k*a>72||k*Math.abs(b)>96) continue;
       return fcC(1,k,a,b,Math.random()<.5?'k':'b'); }
-    const k=ri(1,6), a=ri(1,6), b=sgnR()*ri(1,9); if(gcd(a,Math.abs(b))!==1||k*a>40||k*Math.abs(b)>40) continue;
+    const k=ri(1,12), a=ri(1,6), b=sgnR()*ri(1,12); if(gcd(a,Math.abs(b))!==1||k*a>60||k*Math.abs(b)>84) continue;
     return fcC(2,k,a,b,k>1&&Math.random()<.5?'k':'b');
   }
   return fcC(1,3,2,3,'b');
 }
 function genFC2(){
   for(let g=0;g<40;g++){
-    const p=Math.random()<.65?1:ri(2,3), q=sgnR()*ri(1,p>1?7:9); if(gcd(p,Math.abs(q))!==1) continue;
-    const x=Math.random(), pos=x<.45?'q':x<.6&&p>1?'p':x<.8?'c':'m';
+    const p=Math.random()<.65?1:ri(2,4), q=sgnR()*ri(1,p>1?7:12); if(gcd(p,Math.abs(q))!==1) continue;
+    const x=Math.random(), pos=x<.35?'q':x<.48&&p>1?'p':x<.74?'c':'m';
     return fcS(p,q,pos);
   }
   return fcS(1,3,'q');
 }
 function genFC3(){
   for(let g=0;g<40;g++){
-    const p=Math.random()<.6?1:ri(2,5), q=ri(1,p>1?7:9); if(gcd(p,q)!==1) continue;
-    const x=Math.random(); return fcD(p,q,x<.6?'q':x<.75&&p>1?'a':'c');
+    const p=Math.random()<.55?1:ri(2,6), q=ri(1,p>1?9:12); if(gcd(p,q)!==1) continue;
+    const x=Math.random(); return fcD(p,q,x<.45?'q':x<.68&&p>1?'a':'c');
   }
   return fcD(1,7,'q');
 }
 function genFC4(){
   for(let g=0;g<60;g++){
-    const a=sgnR()*ri(1,9), b=sgnR()*ri(1,9); if(a+b===0||Math.abs(a*b)>60) continue;
-    const x=Math.random(); if(x<.2&&Math.abs(a+b)>=2) return fcT(a,b,'m');
-    return fcT(a,b,x<.3?'a':'b');
+    const a=sgnR()*ri(1,12), b=sgnR()*ri(1,12); if(a+b===0||Math.abs(a*b)>120) continue;
+    const x=Math.random(); if(x<.32&&Math.abs(a+b)>=2) return fcT(a,b,'m');
+    return fcT(a,b,x<.55?'a':'b');
   }
   return fcT(2,3,'b');
 }
 function genFC5(){
   for(let g=0;g<60;g++){
-    const p=ri(2,5), r=Math.random()<.7?1:ri(2,3), q=sgnR()*ri(1,7), s=sgnR()*ri(1,7);
+    const p=ri(2,5), r=Math.random()<.7?1:ri(2,3), q=sgnR()*ri(1,11), s=sgnR()*ri(1,11);
     if(gcd(p,Math.abs(q))!==1||gcd(r,Math.abs(s))!==1) continue;
-    const M=p*s+q*r; if(M===0||Math.abs(M)>40||Math.abs(q*s)>40) continue;
-    return fcA(p,q,r,s,Math.random()<.5?'q':'s');
+    const M=p*s+q*r; if(M===0||Math.abs(M)>60||Math.abs(q*s)>60) continue;
+    const x=Math.random();
+    if(x<.3&&Math.abs(M)>=2) return fcA(p,q,r,s,'m');
+    return fcA(p,q,r,s,x<.65?'q':'s');
   }
   return fcA(2,1,1,3,'s');
 }
@@ -9636,7 +9741,7 @@ function currFact(key){
   if(m=R('FCs(\\d+)_'+N+'_([qpcm])')) return fcS(+m[1],+m[2],m[3]);
   if(m=R('FCd(\\d+)_(\\d+)_([qac])')) return fcD(+m[1],+m[2],m[3]);
   if(m=R('FCt'+N+'_'+N+'_([abm])')) return fcT(+m[1],+m[2],m[3]);
-  if(m=R('FCa(\\d+)_'+N+'_(\\d+)_'+N+'_([qs])')) return fcA(+m[1],+m[2],+m[3],+m[4],m[5]);
+  if(m=R('FCa(\\d+)_'+N+'_(\\d+)_'+N+'_([qsm])')) return fcA(+m[1],+m[2],+m[3],+m[4],m[5]);
   return null;
 }
 function currHint(f){
@@ -10525,32 +10630,32 @@ const lf3=(w,a,b)=>F({key:'LF3'+w+'_'+a+'_'+b, sk:'LF2', t:'linf', k:'lf3', w, a
 const lfP=(a,b,m)=>F({key:'LF2p'+a+'_'+b+'_'+m, sk:'LF2', t:'linf', k:'lfp', a, b, m,
   cond:`y = ${lfL(a,b)} 의 그래프를 y축의 방향으로 ${MI(m)}만큼 평행이동한 그래프의 y절편`, cb:true, eq:['?'], ans:b+m});
 const lf2=(x1,y1,x2,y2)=>F({key:'LF2'+[x1,y1,x2,y2].join('_'), sk:'LF3', t:'linf', k:'lf2', x1, y1, x2, y2,
-  cond:`두 점 (${MI(x1)}, ${MI(y1)}), (${MI(x2)}, ${MI(y2)})을 지나는 직선의 기울기`, cb:true, eq:['?'], ans:(y2-y1)/(x2-x1)});
+  cond:`두 점 (${MI(x1)}, ${MI(y1)}), (${MI(x2)}, ${MI(y2)})${josa(y2,'을','를')} 지나는 직선의 기울기`, cb:true, eq:['?'], ans:(y2-y1)/(x2-x1)});
 /* 증가량 — q: 기울기와 x의 증가량 → y의 증가량,  r: 두 증가량 → 기울기 */
 const lfD=(w,a,dx,b)=>F({key:'LF3'+w+a+'_'+dx+'_'+b, sk:'LF3', t:'linf', k:'lfd', w, a, dx, b,
   cond:w==='q'?`일차함수 y = ${lfL(a,b)} 에서 x의 값이 ${dx}만큼 증가할 때 y의 값의 증가량`
               :`일차함수 y = ax ${b<0?'−':'+'} ${Math.abs(b)} 의 그래프에서 x의 값이 ${dx}만큼 증가할 때 y의 값은 ${Math.abs(a*dx)}만큼 ${a>0?'증가':'감소'}한다. 상수 a의 값`, cb:true,
   eq:w==='q'?['?']:['a','=','?'], ans:w==='q'?a*dx:a});
 const lf4=(a,p,q)=>F({key:'LF4'+a+'_'+p+'_'+q, sk:'LF4', t:'linf', k:'lf4', a, p, q,
-  cond:`기울기가 ${MI(a)}이고 점 (${MI(p)}, ${MI(q)})을 지나는 직선 y = ${lfL(a,0)} + b`, cb:true, eq:['b','=','?'], ans:q-a*p});
+  cond:`기울기가 ${MI(a)}이고 점 (${MI(p)}, ${MI(q)})${josa(q,'을','를')} 지나는 직선 y = ${lfL(a,0)} + b`, cb:true, eq:['b','=','?'], ans:q-a*p});
 const lfT=(x1,y1,x2,y2)=>F({key:'LF4t'+[x1,y1,x2,y2].join('_'), sk:'LF4', t:'linf', k:'lft', x1, y1, x2, y2, a:(y2-y1)/(x2-x1),
-  cond:`두 점 (${MI(x1)}, ${MI(y1)}), (${MI(x2)}, ${MI(y2)})을 지나는 직선 y = ax + b`, cb:true, eq:['b','=','?'], ans:y1-(y2-y1)/(x2-x1)*x1});
+  cond:`두 점 (${MI(x1)}, ${MI(y1)}), (${MI(x2)}, ${MI(y2)})${josa(y2,'을','를')} 지나는 직선 y = ax + b`, cb:true, eq:['b','=','?'], ans:y1-(y2-y1)/(x2-x1)*x1});
 const lfI=(m,n)=>F({key:'LF4i'+m+'_'+n, sk:'LF4', t:'linf', k:'lfi', m, n,
   cond:`x절편이 ${MI(m)}, y절편이 ${MI(n)}인 직선의 기울기`, cb:true, eq:['?'], ans:-n/m});
 const nzI=(lo,hi)=>{ let v=0; while(!v) v=ri(lo,hi); return v; };
-const genLF1=()=>{ const a=nzI(-4,5), b=ri(-9,9), c=ri(-3,6); return lf1(a,b,c); };
-function genLF2(){ if(Math.random()<.3) return lfP(nzI(-4,5),ri(-6,6),nzI(-6,6));
-  if(Math.random()<.3) return lf3('y',nzI(-5,5),nzI(-9,9));
-  const a=nzI(-4,5), r=nzI(-6,6); return lf3('x',a,-a*r); }
-function twoPts(){ for(let g=0;g<40;g++){ const a=nzI(-4,5), x1=ri(-3,4), dx=nzI(-3,4), y1=ri(-5,6), x2=x1+dx, y2=y1+a*dx;
-  if(Math.abs(y2)<=20) return [x1,y1,x2,y2]; } return [1,3,3,7]; }
+const genLF1=()=>{ const a=nzI(-5,6), b=ri(-12,12), c=ri(-4,7); return lf1(a,b,c); };
+function genLF2(){ if(Math.random()<.35) return lfP(nzI(-4,5),ri(-9,9),nzI(-9,9));
+  if(Math.random()<.35) return lf3('y',nzI(-5,5),nzI(-18,18));
+  const a=nzI(-4,5), r=nzI(-12,12); return lf3('x',a,-a*r); }
+function twoPts(){ for(let g=0;g<40;g++){ const a=nzI(-5,5), x1=ri(-4,5), dx=nzI(-3,4), y1=ri(-8,10), x2=x1+dx, y2=y1+a*dx;
+  if(Math.abs(y2)<=28) return [x1,y1,x2,y2]; } return [1,3,3,7]; }
 function genLF3(){ const r=Math.random();
-  if(r<.5) return lf2(...twoPts());
-  return lfD(r<.75?'q':'r',nzI(-4,5),ri(2,5),nzI(-6,6)); }
+  if(r<.42) return lf2(...twoPts());
+  return lfD(r<.82?'q':'r',nzI(-5,6),ri(2,7),nzI(-8,8)); }
 function genLF4(){ const r=Math.random();
-  if(r<.45) return lf4(nzI(-4,5),nzI(-3,4),ri(-8,10));
-  if(r<.8) return lfT(...twoPts());
-  for(let g=0;g<40;g++){ const m=nzI(-6,6), a=nzI(-3,3), n=-a*m; if(Math.abs(n)<=12) return lfI(m,n); } return lfI(3,6); }
+  if(r<.5) return lf4(nzI(-5,6),nzI(-4,5),ri(-12,15));
+  if(r<.82) return lfT(...twoPts());
+  for(let g=0;g<40;g++){ const m=nzI(-6,6), a=nzI(-3,3), n=-a*m; if(Math.abs(n)<=18) return lfI(m,n); } return lfI(3,6); }
 
 /* ════════ 도형의 각 ════════ */
 const ag1=(w,a,b)=>F({key:'AG1'+w+'_'+a+'_'+b, sk:'AG1', t:'angle', k:'ag1', w, a, b, fig:true,
@@ -10603,26 +10708,67 @@ function agSVG(f){
 
 /* ════════ 닮음비 ════════ */
 const SR_R=()=>[[1,2],[1,3],[2,3],[3,4],[2,5],[3,5],[4,5],[1,4]];
-const sr1=(m,n,k,w)=>F({key:'SR1'+m+'_'+n+'_'+k+'_'+w, sk:'SR1', t:'simr', k:'sr1', m, n, kk:k, w,
+const sr1=(m,n,k,w)=>F({key:'SR1'+m+'_'+n+'_'+k+'_'+w, sk:'SR1', t:'simr', k:'sr1', m, n, kk:k, w, fig:true,
   cond:w==='r'?`대응변의 길이가 각각 ${m*k} cm, ${n*k} cm인 두 닮은 도형의 닮음비`
       :w==='p'?`닮음비가 ${m} : ${n}인 두 도형에서 작은 도형의 둘레가 ${m*k*3} cm일 때 큰 도형의 둘레`
       :w==='b'?`닮음비가 ${m} : ${n}인 두 도형에서 작은 도형의 한 변이 ${m*k} cm일 때 대응하는 큰 도형의 변`
               :`닮음비가 ${m} : ${n}인 두 도형에서 큰 도형의 한 변이 ${n*k} cm일 때 대응하는 작은 도형의 변`, cb:true,
   eq:w==='r'?[m,':','?']:['?',{u:'cm'}], ans:w==='r'?n:w==='p'?n*k*3:w==='b'?n*k:m*k});
 function srP(p,m,n,k){ const P=x=>Math.pow(x,p), nm=p===2?'넓이':'부피', un=p===2?'cm²':'cm³';
-  if(k===0) return F({key:'SR'+p+'r_'+m+'_'+n, sk:'SR'+p, t:'simr', k:'srp', p, m, n, kk:0,
+  if(k===0) return F({key:'SR'+p+'r_'+m+'_'+n, sk:'SR'+p, t:'simr', k:'srp', p, m, n, kk:0, fig:true,
     cond:`닮음비가 ${m} : ${n}이면 ${nm}의 비는`, cb:true, eq:[P(m),':','?'], ans:P(n)});
-  return F({key:'SR'+p+'v_'+m+'_'+n+'_'+k, sk:'SR'+p, t:'simr', k:'srp', p, m, n, kk:k,
+  return F({key:'SR'+p+'v_'+m+'_'+n+'_'+k, sk:'SR'+p, t:'simr', k:'srp', p, m, n, kk:k, fig:true,
     cond:`닮음비가 ${m} : ${n}이고 작은 도형의 ${nm}가 ${P(m)*k} ${un}일 때 큰 도형의 ${nm}`, cb:true, eq:['?',{u:un}], ans:P(n)*k}); }
-const sr4=(p,m,n)=>F({key:'SR4'+p+'_'+m+'_'+n, sk:'SR4', t:'simr', k:'sr4', p, m, n,
+const sr4=(p,m,n)=>F({key:'SR4'+p+'_'+m+'_'+n, sk:'SR4', t:'simr', k:'sr4', p, m, n, fig:true,
   cond:`${p===2?'넓이':'부피'}의 비가 ${Math.pow(m,p)} : ${Math.pow(n,p)}인 두 닮은 도형의 닮음비`, cb:true, eq:[m,':','?'], ans:n});
 const genSR1=()=>{ const [m,n]=pickOne(SR_R()), r=Math.random(); return sr1(m,n,ri(2,6),r<.25?'r':r<.55?'b':r<.8?'s':'p'); };
 const genSR2=()=>{ const [m,n]=pickOne(SR_R().filter(([,n])=>n<=5)); return srP(2,m,n,Math.random()<.45?0:ri(2,5)); };
 const genSR3=()=>{ const [m,n]=pickOne(SR_R().filter(([,n])=>n<=4)); return srP(3,m,n,Math.random()<.5?0:ri(1,3)); };
-const sr4e=(m,n,k)=>F({key:'SR4e_'+m+'_'+n+'_'+k, sk:'SR4', t:'simr', k:'sr4e', m, n, kk:k,
+const sr4e=(m,n,k)=>F({key:'SR4e_'+m+'_'+n+'_'+k, sk:'SR4', t:'simr', k:'sr4e', m, n, kk:k, fig:true,
   cond:`부피의 비가 ${m*m*m} : ${n*n*n}인 두 정육면체에서 큰 정육면체의 한 모서리가 ${n*k} cm일 때 작은 정육면체의 한 모서리`, cb:true,
   eq:['?',{u:'cm'}], ans:m*k});
 const genSR4=()=>{ const [m,n]=pickOne(SR_R()), r=Math.random(); if(n<=4&&r<.3) return sr4e(m,n,ri(2,5)); return sr4(n<=4&&r<.55?3:2,m,n); };
+/* 닮음비 도형 SVG — 길이(삼각형) · 넓이(사각형) · 부피(정육면체)를 한눈에 비교 */
+function srSVG(f){
+  const m=f.m, n=f.n, r=Math.max(.42,Math.min(.78,m/n));
+  const isVol=(f.k==='srp'&&f.p===3)||(f.k==='sr4'&&f.p===3)||f.k==='sr4e';
+  const isArea=(f.k==='srp'&&f.p===2)||(f.k==='sr4'&&f.p===2);
+  const tx=(x,y,s,c,sz)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="${sz||13}" font-weight="800" fill="${c||'#1f2433'}" font-family="${FONT}">${s}</text>`;
+  let g='';
+  if(isVol){
+    const cube=(cx,by,s,col,str)=>{ const dx=s*.36, dy=s*.24;
+      const p1=`${cx-s/2},${by} ${cx+s/2},${by} ${cx+s/2},${by-s} ${cx-s/2},${by-s}`;
+      const p2=`${cx-s/2},${by-s} ${cx-s/2+dx},${by-s-dy} ${cx+s/2+dx},${by-s-dy} ${cx+s/2},${by-s}`;
+      const p3=`${cx+s/2},${by} ${cx+s/2+dx},${by-dy} ${cx+s/2+dx},${by-s-dy} ${cx+s/2},${by-s}`;
+      return `<polygon points="${p1}" fill="${col}" stroke="${str}" stroke-width="1.8" stroke-linejoin="round"/>`+
+        `<polygon points="${p2}" fill="#fff" fill-opacity=".45" stroke="${str}" stroke-width="1.6" stroke-linejoin="round"/>`+
+        `<polygon points="${p3}" fill="${str}" fill-opacity=".18" stroke="${str}" stroke-width="1.6" stroke-linejoin="round"/>`; };
+    const s2=52, s1=Math.round(s2*r);
+    g+=cube(68,96,s1,'#dbeafe','#2f5bea')+cube(184,96,s2,'#d3f9d8','#12a05c');
+    const L1=f.k==='sr4e'?'? cm':f.k==='sr4'?`부피 ${m*m*m}`:(f.kk?`${m*m*m*f.kk} cm³`:`${m}`);
+    const L2=f.k==='sr4e'?`${n*f.kk} cm`:f.k==='sr4'?`부피 ${n*n*n}`:(f.kk?'? cm³':`${n}`);
+    g+=tx(68,116,L1,L1.includes('?')?'#e5484d':'#2f5bea')+tx(184,116,L2,L2.includes('?')?'#e5484d':'#12a05c');
+    g+=tx(126,64,f.k==='sr4'||f.k==='sr4e'?`${m*m*m} : ${n*n*n}`:`닮음 ${m} : ${n}`,'#495057',12);
+  }else if(isArea){
+    const w2=76, h2=54, w1=Math.round(w2*r), h1=Math.round(h2*r);
+    g+=`<rect x="${66-w1/2}" y="${92-h1}" width="${w1}" height="${h1}" rx="4" fill="#eef2fe" stroke="#2f5bea" stroke-width="2"/>`;
+    g+=`<rect x="${186-w2/2}" y="${92-h2}" width="${w2}" height="${h2}" rx="4" fill="#ebfbee" stroke="#12a05c" stroke-width="2"/>`;
+    const L1=f.k==='sr4'?`${m*m}`:(f.kk?`${m*m*f.kk} cm²`:`변 ${m}`);
+    const L2=f.k==='sr4'?`${n*n}`:(f.kk?'? cm²':`변 ${n}`);
+    g+=tx(66,92-h1/2+5,L1,'#2f5bea',12.5)+tx(186,92-h2/2+5,L2,L2.includes('?')?'#e5484d':'#12a05c',12.5);
+    g+=tx(126,56,f.k==='sr4'?`넓이비 ${m*m}:${n*n}`:`닮음비 ${m} : ${n}`,'#495057',12);
+    g+=tx(66,112,f.k==='sr4'?`변 ${m}`:`닮음 ${m}`,'#64748b',11.5)+tx(186,112,f.k==='sr4'?'변 ?':`닮음 ${n}`,f.k==='sr4'?'#e5484d':'#64748b',11.5);
+  }else{
+    const w2=78, h2=62, w1=Math.round(w2*r), h1=Math.round(h2*r);
+    g+=`<polygon points="${64-w1/2},94 ${64+w1/2},94 ${64-w1/6},${94-h1}" fill="#fff4e6" stroke="#e8590c" stroke-width="2" stroke-linejoin="round"/>`;
+    g+=`<polygon points="${186-w2/2},94 ${186+w2/2},94 ${186-w2/6},${94-h2}" fill="#eef2fe" stroke="#2f5bea" stroke-width="2" stroke-linejoin="round"/>`;
+    const L1=f.w==='r'?`${m*f.kk} cm`:f.w==='p'?`둘레 ${m*f.kk*3}`:f.w==='b'?`${m*f.kk} cm`:'? cm';
+    const L2=f.w==='r'?`${n*f.kk} cm`:f.w==='p'?'둘레 ?':f.w==='b'?'? cm':`${n*f.kk} cm`;
+    g+=tx(64,114,L1,L1.includes('?')?'#e5484d':'#d9480f')+tx(186,114,L2,L2.includes('?')?'#e5484d':'#2f5bea');
+    g+=tx(125,58,f.w==='r'?'닮음비 ?':`닮음비 ${m} : ${n}`,'#495057',12);
+  }
+  return `<svg viewBox="0 0 252 124" class="vis ang" data-keep="1" role="img" aria-label="닮은 두 도형 그림">${g}</svg>`;
+}
 
 /* ════════ 확률 ════════ */
 const PB_EV=[['짝수의 눈',x=>x%2===0],['홀수의 눈',x=>x%2===1],['3의 배수',x=>x%3===0],['소수',isPrime],
@@ -10671,7 +10817,7 @@ function pbO(w,a,b,N){
     cond:`서로 다른 두 개의 주사위를 동시에 던질 때 두 눈의 수의 합이 ${a} 또는 ${b}일 확률 (기약분수)`, cb:true},x));
 }
 function genPB4(){
-  if(Math.random()<.5){ for(let g=0;g<60;g++){ const N=pickOne([10,12,15,20,24,30]), a=ri(3,9), b=ri(3,9);
+  if(Math.random()<.55){ for(let g=0;g<60;g++){ const N=pickOne([12,15,20,24,30,36,40]), a=ri(3,9), b=ri(3,9);
       if(a<b&&lcmN(a,b)>N&&Math.floor(N/a)&&Math.floor(N/b)) return pbO('c',a,b,N); } return pbO('c',4,5,12); }
   const a=ri(2,11); let b=ri(2,12); while(b===a) b=ri(2,12); return pbO('s',Math.min(a,b),Math.max(a,b)); }
 /* 5단계 — 확률의 곱셈: 두 사건이 서로 영향을 끼치지 않을 때  p × q */
@@ -10683,20 +10829,20 @@ function pbA(w,a,b,c,d){
   return F(Object.assign({key:`PB5b${a}_${b}_${c}_${d}`, sk:'PB5', t:'prob', k:'pba', w, a, b, c, d,
     cond:`A 상자(빨간 공 ${a}개, 파란 공 ${b}개)와 B 상자(빨간 공 ${c}개, 파란 공 ${d}개)에서 한 개씩 꺼낼 때 모두 빨간 공일 확률 (기약분수)`, cb:true},x));
 }
-function genPB5(){ if(Math.random()<.4){ let e; do{ e=ri(0,9); }while(e===4||e===5||e===6); return pbA('c',e); }
-  return pbA('b',ri(1,5),ri(1,5),ri(1,5),ri(1,5)); }
+function genPB5(){ if(Math.random()<.3){ let e; do{ e=ri(0,9); }while(e===4||e===5||e===6); return pbA('c',e); }
+  return pbA('b',ri(1,6),ri(1,6),ri(1,6),ri(1,6)); }
 function pb4(r,s,y,c){
   const L=[r,s,y], T=r+s+y, g=gcd(L[c],T);
   return F({key:'PB4'+r+'_'+s+'_'+y+'_'+c, sk:'PB1', t:'prob', k:'pb4', L, T, c, g,
     cond:`빨간 공 ${r}개, 파란 공 ${s}개${y?`, 노란 공 ${y}개`:''}가 든 주머니에서 한 개를 꺼낼 때 ${PB_COL[c]} 공일 확률 (기약분수)`, cb:true,
     eq:[{fr:[String(L[c]/g),'?']}], ans:T/g});
 }
-function genPB1(){ for(let g=0;g<40;g++){ const N=pickOne([6,6,6,10,12,20]), e=ri(0,PB_EV.length-1); if(N===6&&e>=5&&e<=6) continue; if(pb1Ok(N,e)) return pb1(N,e); } return pb1(6,0); }
+function genPB1(){ for(let g=0;g<40;g++){ const N=pickOne([6,6,10,12,15,18,20,24,25,30]), e=ri(0,PB_EV.length-1); if(N===6&&e>=5&&e<=6) continue; if(pb1Ok(N,e)) return pb1(N,e); } return pb1(6,0); }
 function genPB2(){ const r=Math.random();
-  if(r<.3) return pb2('c',pickOne(['21','20','31','32','30','33']));
-  if(r<.6) return pb2('s',ri(3,11)); if(r<.75) return pb2('d',ri(1,4)); if(r<.9) return pb2('m',pickOne([4,6,12])); return pb2('e',0); }
-function genPB3(){ const r=Math.random(); if(r<.25) return pb3('a',ri(2,4)); if(r<.35) return pb3('d'); if(r<.55) return pb3('n',ri(3,11));
-  for(let g=0;g<40;g++){ const b=ri(3,12), a=ri(1,b-1); if(gcd(a,b)===1) return pb3('p',a,b); } return pb3('p',2,7); }
+  if(r<.28) return pb2('c',pickOne(['21','20','31','32','30','33','41','42','43','40','44']));
+  if(r<.6) return pb2('s',ri(2,12)); if(r<.78) return pb2('d',ri(1,5)); if(r<.92) return pb2('m',pickOne([4,6,12])); return pb2('e',0); }
+function genPB3(){ const r=Math.random(); if(r<.25) return pb3('a',ri(2,5)); if(r<.33) return pb3('d'); if(r<.58) return pb3('n',ri(2,12));
+  for(let g=0;g<40;g++){ const b=ri(4,25), a=ri(1,b-1); if(gcd(a,b)===1) return pb3('p',a,b); } return pb3('p',2,7); }
 function genPBbag(){ for(let g=0;g<60;g++){ const r=ri(1,8), s=ri(1,8), y=Math.random()<.4?ri(1,6):0, c=y?ri(0,2):ri(0,1), L=[r,s,y];
   if(L[c]&&gcd(L[c],r+s+y)>1&&r+s+y<=20) return pb4(r,s,y,c); } return pb4(2,4,0,0); }
 
@@ -10971,7 +11117,7 @@ function g2Note(t,fromHint){
   extHint=f=>{ if(!G2T.includes(f.t)) return h0(f); const h=g2Hint(f); if(h&&h.svg==null) h.svg=''; return h; };
   extPreview=(t,n)=>G2T.includes(t)?g2Preview(t,n):p0(t,n);
   extNote=(t,fh)=>G2T.includes(t)?g2Note(t,fh):n0(t,fh); }
-{ const q0=qFigOf; qFigOf=f=>f.t==='angle'&&(f.k==='ag1'||f.k==='ag2')?agSVG(f):q0(f); }
+{ const q0=qFigOf; qFigOf=f=>f.t==='angle'&&(f.k==='ag1'||f.k==='ag2')?agSVG(f):f.t==='simr'?srSVG(f):q0(f); }
 /* 실전 — 꼭대기 단계는 한 유형만 나오지 않게 네 유형을 섞어요 (마지막 유형을 조금 더 자주) */
 G2T.forEach(t=>{ const T=TOPICS[t], g=T.stages.map(s=>s.gen);
   const L=T.stages.length; T.realStages=T.stages.slice(0,L-1).concat([{n:L, name:'섞어서', ex:'모든 유형', take:10, gen:()=>pickOne(g.concat([g[L-1]]))()}]); });
@@ -11170,20 +11316,26 @@ const kmVariant=f=>({KiQd:genIQ,KiQf:genIQ,KiX:genIX,KeE:genEE,KeF:genEE,KeU:gen
 /* ════════ 단계 붙이기 ════════ */
 { const I=TOPICS.int; I.realStages=I.realStages||I.stages.slice();
   I.desc='부호 규칙 · 괄호 없는 식 · 거듭제곱 · 유리수 · 혼합 계산';
-  I.stages=I.stages.concat([
+  const iAdd=[
     {n:5, name:'유리수의 계산', ex:'(−1/2) + (+1/3)', gen:genIQ, take:12},
-    {n:6, name:'혼합 계산', ex:'3 × (−4) + 10', gen:genIX, take:10}]);
+    {n:6, name:'혼합 계산', ex:'3 × (−4) + 10', gen:genIX, take:10}];
+  I.stages=I.stages.concat(iAdd);
+  I.realStages=I.realStages.concat(iAdd.map(s=>({n:s.n, name:s.name, gen:s.gen})));
   I.cats=(I.cats||[]).concat([['iQd'],['iQf'],['iX']]);
   const E=TOPICS.expo; E.realStages=E.realStages||E.stages.slice();
   const s2=E.stages.find(s=>s.n===2), g2=s2.gen; s2.gen=()=>Math.random()<.25?genEE():g2();
   E.desc='거듭제곱의 값 · 네 가지 지수법칙 · 단항식의 곱셈과 나눗셈';
-  E.stages=E.stages.concat([{n:5, name:'단항식의 곱셈과 나눗셈', ex:'3a² × 4a³ = □a⁵', gen:genEU, take:12}]);
+  const eAdd={n:5, name:'단항식의 곱셈과 나눗셈', ex:'3a² × 4a³ = □a⁵', gen:genEU, take:12};
+  E.stages=E.stages.concat([eAdd]);
+  E.realStages=E.realStages.concat([{n:eAdd.n, name:eAdd.name, gen:eAdd.gen}]);
   E.cats=(E.cats||[]).concat([['aᵐ ÷ aⁿ (m ≤ n)',sk=>sk==='eE'],['단항식의 곱셈·나눗셈',sk=>sk==='eU']]);
   const Q=TOPICS.root; Q.realStages=Q.realStages||Q.stages.slice();
   Q.desc='√ 의 값 · 근호 밖과 안 · 곱셈과 나눗셈 · 덧셈과 뺄셈 · 분모의 유리화';
-  Q.stages=Q.stages.concat([
+  const qAdd=[
     {n:4, name:'덧셈과 뺄셈', ex:'3√2 + 5√2 = □√2', gen:kmGenQA, take:12},
-    {n:5, name:'분모의 유리화', ex:'6/√3 = □√3', gen:genQR, take:10}]);
+    {n:5, name:'분모의 유리화', ex:'6/√3 = □√3', gen:genQR, take:10}];
+  Q.stages=Q.stages.concat(qAdd);
+  Q.realStages=Q.realStages.concat(qAdd.map(s=>({n:s.n, name:s.name, gen:s.gen})));
   Q.cats=(Q.cats||[]).concat([['근호의 덧셈·뺄셈',sk=>sk==='qA'],['분모의 유리화',sk=>sk==='qR']]);
   const R=TOPICS.ratio;
   R.desc='비의 성질 · 비례식 · 비례배분 · 비율과 백분율';
@@ -11524,15 +11676,15 @@ function paintTFact(){
     `<span><i style="background:${accColor(v)}"></i>${n}</span>`).join('')}<span><i style="background:#f1f4f9"></i>기록 없음</span></div>`;
   if(t==='gugu'){
     body+=`<div class="chips" style="margin:0 0 10px">
-      <button class="chip${tHm==='g'?' on':''}" data-h="g">곱 구하기 (7 × 8)</button>
+      <button class="chip${tHm==='g'?' on':''}" data-h="g">곱 구하기 (0~9단)</button>
       <button class="chip${tHm==='r'?' on':''}" data-h="r">거꾸로 찾기 (7 × □ = 56)</button></div>`;
-    const lo=tHm==='r'?2:1;
+    const lo=tHm==='r'?2:0, rowsD=tHm==='r'?range(2,9):range(0,9);
     body+=`<div class="hmgrid" style="--cols:${10-lo}"><span class="hh">×</span>${range(lo,9).map(b=>`<span class="hh">${b}</span>`).join('')}`+
-      range(2,9).map(a=>`<span class="hh">${a}단</span>`+range(lo,9).map(b=>cellHTML(A[tHm+a+'x'+b],`${a} × ${b}`)).join('')).join('')+`</div>`;
+      rowsD.map(a=>`<span class="hh">${a}단</span>`+range(lo,9).map(b=>cellHTML(A[tHm+a+'x'+b],`${a} × ${b}`)).join('')).join('')+`</div>`;
   }else if(t==='power'){
     body+=`<div class="pwtab"><div class="pwh"><span>n</span><span>n²</span><span>□² 찾기</span><span>n³</span><span>□³ 찾기</span></div>`+
-      range(1,20).map(n=>`<div class="pwr"><span class="hh">${n}</span>${cellHTML(A['s'+n],n+'²')}${n>=2?cellHTML(A['rs'+n],'□²='+n*n):'<span></span>'}
-        ${n<=10?cellHTML(A['c'+n],n+'³'):'<span></span>'}${n>=2&&n<=10?cellHTML(A['rc'+n],'□³='+n*n*n):'<span></span>'}</div>`).join('')+`</div>`;
+      range(1,25).map(n=>`<div class="pwr"><span class="hh">${n}</span>${cellHTML(A['s'+n],n+'²')}${n>=2?cellHTML(A['rs'+n],'□²='+n*n):'<span></span>'}
+        ${n<=12?cellHTML(A['c'+n],n+'³'):'<span></span>'}${n>=2&&n<=12?cellHTML(A['rc'+n],'□³='+n*n*n):'<span></span>'}</div>`).join('')+`</div>`;
   }else if(topicOf(t).cats){
     const rows=topicOf(t).cats.map(([code,test])=>{
       const fn=test||(sk=>sk===code), s3=[0,0,0];
@@ -11567,15 +11719,37 @@ function paintTFact(){
 /* ── ③ 학생 정보 ── */
 const T_SORTS=[['best','누적 기록',r=>r.best],['today','오늘 기록',r=>r.today],['effort','노력',r=>r.solved],['prac','연습',r=>r.prac],
   ['coin','코인',r=>r.coin],['battle','대전',r=>r.bw*1000+r.rate],['wrong','오답노트',r=>r.wrong],['sid','학번',null]];
+let tQuery='';
+function exportTeacherCSV(rows){
+  const T=topicOf(tTopic), q=s=>`"${String(s==null?'':s).replace(/"/g,'""')}"`;
+  const head=['학번','닉네임','반',`${T.n} 최고`,`${T.n} 등급`,`${T.n} 오늘`,`${T.n} 클리어`,`${T.n} 오답`,'총 푼 문제','보유 코인','연속 출석','대전 승','대전 판'];
+  const lines=[head.map(q).join(',')].concat(rows.map(r=>{
+    const u=r.u||{}, att=(u.att&&u.att.s)||0, gr=gradeOfRec(tTopic,r.best)||'-';
+    return [r.sid, u.nk||'', classShort(classOf(r.sid)), r.best, gr, r.today, `${r.clear}/${T.stages.length}`, r.wrong, r.solved, r.have, att, r.bw, r.bp].map(q).join(',');
+  }));
+  const blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob), a=document.createElement('a');
+  a.href=url; a.download=`calc-master_${tClass||'all'}_${tTopic}_${todayKey()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast(`${rows.length}명 기록을 CSV로 내려받았어요`);
+}
 function paintTStu(rows){
   const S=T_SORTS.find(x=>x[0]===tSort)||T_SORTS[0], f=S[2];
   rows.sort((a,b)=>f?(f(b)-f(a)||a.sid.localeCompare(b.sid)):a.sid.localeCompare(b.sid));
+  const qNorm=(tQuery||'').trim().toLowerCase();
+  const filt=qNorm?rows.filter(r=>r.sid.includes(qNorm)||String((r.u&&r.u.nk)||'').toLowerCase().includes(qNorm)):rows;
   const T=topicOf(tTopic);
-  const bar=`<div class="tpick tsort"><span class="tlab">정렬</span><div class="hsc">${T_SORTS.map(([k,n])=>`<button class="pk${tSort===k?' on':''}" data-so="${k}">${n}</button>`).join('')}</div></div>`;
+  const tools=`<div class="ttools">
+    <input type="text" class="tsrch" id="tSrch" value="${esc(tQuery)}" placeholder="학번 또는 닉네임 검색…">
+    <button class="btn sm" id="tCsvBtn">📥 CSV 내보내기 (${filt.length}명)</button>
+    <input type="tel" maxlength="4" inputmode="numeric" class="tbulk" id="tBulkCoin" placeholder="코인">
+    <button class="btn sm" id="tBulkBtn">${tClass?classShort(tClass):'표시 학생'} 일괄 지급</button>
+  </div>`;
+  const bar=tools+`<div class="tpick tsort"><span class="tlab">정렬</span><div class="hsc">${T_SORTS.map(([k,n])=>`<button class="pk${tSort===k?' on':''}" data-so="${k}">${n}</button>`).join('')}</div></div>`;
   const val=r=>tSort==='today'?`오늘 <em class="tsb">${r.today}개</em>`:tSort==='effort'?`푼 문제 <em class="tsb">${cn(r.solved)}개</em>`
     :tSort==='prac'?`연습 <em class="tsb">${r.prac}단계</em>`:tSort==='coin'?`모은 코인 <em class="tsb">${cn(r.coin)}</em>`
     :tSort==='battle'?`대전 <em class="tsb">${r.bw}승 ${r.bl}패</em>`:`${T.n} 최고 <em class="tsb">${r.best}개</em>`;
-  el('tBody').innerHTML=bar+(rows.length?rows.map((r,ri)=>{
+  el('tBody').innerHTML=bar+(filt.length?filt.map((r,ri)=>{
     const open=tOpen===r.sid, u=r.u, fs=u.fs||{};
     const nRec=TOPIC_ORDER.filter(k=>(((u.R||{})[k]||{}).best||0)>0).length;
     const wk=open?weakList(fs,tTopic,8):[], cu=coinUse(u,r.sid,tClasses);
@@ -11625,7 +11799,17 @@ function paintTStu(rows){
         </div>
       </div>`:''}
     </div>`;
-  }).join(''):`<div class="empty">아직 등록된 학생이 없습니다.</div>`);
+  }).join(''):`<div class="empty">${qNorm?'검색 결과가 없습니다.':'아직 등록된 학생이 없습니다.'}</div>`);
+  const sr=el('tSrch');
+  if(sr){
+    sr.oninput=()=>{ tQuery=sr.value; const pos=sr.selectionStart; paintTStu(teacherRows(tTopic)); const sr2=el('tSrch'); if(sr2){ sr2.focus(); try{ sr2.setSelectionRange(pos,pos); }catch(e){} } };
+  }
+  if(el('tCsvBtn')) el('tCsvBtn').onclick=()=>exportTeacherCSV(filt);
+  if(el('tBulkBtn')) el('tBulkBtn').onclick=()=>{
+    const v=+((el('tBulkCoin')||{}).value||'').replace(/\D/g,'');
+    if(!filt.length) return toast('대상 학생이 없어요');
+    tGiveCoins(filt.map(r=>r.sid),v,`${tClass?classLabel(tClass):'표시된 학생'} ${filt.length}명에게`);
+  };
   el('tBody').querySelectorAll('[data-so]').forEach(b=>b.onclick=()=>{ tSort=b.dataset.so; tOpen=null; paintTStu(teacherRows(tTopic)); });
   hscShow(el('tBody'));
   el('tBody').querySelectorAll('.stuhead').forEach(b=>b.onclick=()=>{
@@ -11680,7 +11864,7 @@ async function deleteStudent(sid){
   paintTeacher();
 }
 async function teacherWipe(){
-  if(!confirm('학생들의 실전 기록(세 주제의 최고 기록·도전 기록)과 오답노트를 모두 지울까요?\n캐릭터·코인·연습 기록·계산별 정답률은 그대로 남습니다.')) return;
+  if(!confirm('학생들의 모든 주제(26개) 실전 기록(최고 기록·도전 기록)과 오답노트를 모두 지울까요?\n캐릭터·코인·연습 기록·계산별 정답률은 그대로 남습니다.')) return;
   for(const sid of Object.keys(tUsers)){
     try{ await dbUpdate('users/'+sid,{R:null,W:null}); }catch(e){}
   }
@@ -11689,12 +11873,14 @@ async function teacherWipe(){
 
 /* ── 등급 기준 — 등급은 절대평가(기본값)예요. 학생 기록은 참고로만 보여 주고, 바꾸고 싶으면 직접 입력해요 (config/gcut) ── */
 function pctl(a,q){ if(!a.length) return 0; const s=a.slice().sort((x,y)=>x-y), i=(s.length-1)*q, lo=Math.floor(i), hi=Math.ceil(i); return s[lo]+(s[hi]-s[lo])*(i-lo); }
+let tgEdit='';
 function paintTGrade(){
   const box=el('tBody'), topics=TOPIC_ORDER.filter(t=>GRADE_DEF[t]);
   const rows=topics.map(t=>{ const v=Object.keys(tUsers).map(sid=>+((((tUsers[sid].R||{})[t])||{}).best)||0).filter(x=>x>0);
     const cnt={SSS:0,SS:0,S:0,A:0,B:0,'-':0}; v.forEach(x=>cnt[gradeOfRec(t,x)||'-']++);
     return {t,v,cur:GRADE_CUT[t].slice(),def:GRADE_DEF[t],cnt,own:!!(CFG.gcut||{})[t],open:topicOpen(t)}; }).sort((a,b)=>(b.open-a.open)||(b.v.length-a.v.length));
   const fmt=c=>c.map(x=>`<b>${x}</b>`).join(' · ');
+  const labs=['SSS','SS','S','A','B'];
   box.innerHTML=`<div class="tgrade">
     <h3 style="margin:0 0 4px">실전 등급 기준 (절대평가)</h3>
     <div class="sub" style="margin-bottom:10px">기준 개수는 <b>SSS · SS · S · A · B</b> 순서(실전 1분에 맞힌 개수)예요. B에 못 미치면 등급이 없어요.<br>
@@ -11705,15 +11891,23 @@ function paintTGrade(){
       <div class="tg-h"><b>${esc(topicOf(r.t).n)}</b>${r.open?'':'<small>잠김</small>'}${r.own?'<small class="own">직접 고친 기준</small>':''}<em>기록 ${r.v.length}명${r.v.length?` · 최고 ${Math.max(...r.v)}개 · 중간 ${Math.round(pctl(r.v,.5))}개`:''}</em></div>
       <div class="tg-c">기준 ${fmt(r.cur)}${r.own?` <span class="dim">(기본 ${r.def.join('·')})</span>`:''}</div>
       ${r.v.length?`<div class="tg-d">${['SSS','SS','S','A','B','-'].map(g=>`<span>${g==='-'?'등급 없음':gBadge(g)} ${r.cnt[g]}명</span>`).join('')}</div>`:''}
-      <div class="tg-c">${r.own?`<button class="btn sm" data-df="${r.t}">기본값</button>`:''}<button class="btn sm" data-ed="${r.t}">직접 입력</button></div>
+      ${tgEdit===r.t?`<div class="tg-ed" data-form="${r.t}">
+        ${labs.map((lb,idx)=>`<label>${lb}<input type="number" min="1" max="200" data-gi="${idx}" value="${r.cur[idx]}"></label>`).join('')}
+        <button class="btn sm primary" data-sv="${r.t}">저장</button>
+        <button class="btn sm" data-cn="1">취소</button>
+      </div>`:`<div class="tg-c">${r.own?`<button class="btn sm" data-df="${r.t}">기본값</button>`:''}<button class="btn sm" data-ed="${r.t}">직접 입력</button></div>`}
     </div>`).join('')}</div></div>`;
-  const save=async(o,msg)=>{ CFG.gcut=o; await dbSet('config/gcut',o); applyGcut(o); toast(msg); paintTGrade(); };
+  const save=async(o,msg)=>{ CFG.gcut=o; await dbSet('config/gcut',o); applyGcut(o); tgEdit=''; toast(msg); paintTGrade(); };
   const cp=()=>Object.assign({},CFG.gcut||{});
   box.querySelectorAll('[data-df]').forEach(b=>b.onclick=()=>{ const o=cp(); delete o[b.dataset.df]; save(o,'기본값으로 돌렸어요'); });
-  box.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const t=b.dataset.ed, v=prompt(`${topicOf(t).n} 기준을 SSS,SS,S,A,B 순서로 (큰 수부터)`,GRADE_CUT[t].join(','));
-    if(v==null) return; const a=v.split(/[,\s]+/).map(Number).filter(x=>x>0);
-    if(a.length!==5||a.some((x,i)=>i&&x>=a[i-1])) return toast('다섯 개를 큰 수부터 차례로 넣어 주세요');
-    const o=cp(); o[t]=a; save(o,'기준을 바꿨어요'); });
+  box.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ tgEdit=b.dataset.ed; paintTGrade(); });
+  box.querySelectorAll('[data-cn]').forEach(b=>b.onclick=()=>{ tgEdit=''; paintTGrade(); });
+  box.querySelectorAll('[data-sv]').forEach(b=>b.onclick=()=>{
+    const t=b.dataset.sv, form=box.querySelector(`.tg-ed[data-form="${t}"]`);
+    const a=[...form.querySelectorAll('input[data-gi]')].map(i=>Math.round(Number(i.value)));
+    if(a.length!==5||a.some(x=>!(x>0))||a.some((x,i)=>i&&x>=a[i-1])) return toast('SSS부터 B까지 큰 수부터 차례로 넣어 주세요');
+    const o=cp(); o[t]=a; save(o,'기준을 바꿨어요');
+  });
   el('tgReset').onclick=()=>{ if(confirm('모든 주제를 기본 기준으로 돌릴까요?')) save({},'모두 기본값으로 돌렸어요'); };
 }
 
@@ -11906,16 +12100,37 @@ async function btResume(){
 function btLevel(kind,len,i,frac){
   return kind==='t'?frac:kind==='n'?i/Math.max(1,len):Math.min(1,i/16);   /* 0 ~ 1 : 얼마나 왔나 */
 }
-function btPickKey(t,prog,used){
+function btPickKey(t,prog,used,boost2){
   const S=realStagesOf(t), lv=Math.min(S.length,1+Math.floor(Math.max(0,prog)*S.length));
   const st=S[lv-1], U=new Set(used||[]);
   const ok=f=>f&&!U.has(f.key)&&!(f.k==='mul'&&(f.a===1||f.b===1));   /* × 1 처럼 너무 쉬운 것은 빼요 */
+  /* 대전 모드: 1자리 연타 찍기 예방을 위해 2자리 이상 답안 비중을 높임 (기본 65%, 의심 시 85%) */
+  const prefer2=Math.random()<(boost2?.85:.65);
   if(st.facts){
     const all=st.facts(), pool=(st.pick?st.pick(all):all).filter(ok), rest=all.filter(ok);
-    const f=pickOne(pool.length?pool:rest.length?rest:all); return f.key;
+    const src=pool.length?pool:rest.length?rest:all;
+    if(prefer2){
+      let p2=src.filter(isTwoPlusAns);
+      if(!p2.length) p2=S.flatMap(s=>s.facts?s.facts():[]).filter(f=>ok(f)&&isTwoPlusAns(f));
+      if(p2.length) return pickOne(p2).key;
+    }
+    return pickOne(src).key;
   }
-  for(let g=0;g<40;g++){ const f=st.gen(); if(ok(f)) return f.key; }
-  return st.gen().key;
+  let fb=null;
+  const draws=prefer2?50:40;
+  for(let g=0;g<draws;g++){
+    const f=st.gen();
+    if(!ok(f)) continue;
+    if(!fb) fb=f;
+    if(!prefer2||isTwoPlusAns(f)) return f.key;
+  }
+  if(prefer2){
+    for(let g=0;g<30;g++){
+      const s2=pickOne(S), f=s2.facts?pickOne(s2.facts()):s2.gen();
+      if(ok(f)&&isTwoPlusAns(f)) return f.key;
+    }
+  }
+  return (fb||st.gen()).key;
 }
 
 function btPlayers(room){
@@ -12206,12 +12421,14 @@ function btQLabel(){ return `${G.qi+1}번째 문제 · 먼저 맞히면 1개${G.
 /* 다음 문제로 — 여러 명이 동시에 눌러도 한 번만 넘어가게, 넘기는 사람이 다음 문항을 뽑아요 */
 function btAdvance(i){
   if(!G||G.mode!=='battle') return;
-  const t=G.t, kind=G.kind, v=G.v, at0=G.at, endAt=G.endAt;
+  const t=G.t, kind=G.kind, v=G.v, at0=G.at, endAt=G.endAt, spMe=(G.btSpam||0)>0;
+  if(G.btSpam>0) G.btSpam--;
   dbTx(`battles/${G.code}/cur`, c=>{
     if(!c||c.i!==i) return undefined;
     const now=serverNow(), frac=kind==='t'?(now-at0)/Math.max(1,endAt-at0):0;
-    const k=btPickKey(t,btLevel(kind,v,i+1,frac),c.u||[]);
-    return {i:i+1, at:now+BT_GAP, k, u:(c.u||[]).concat(k).slice(-80)};
+    const sp=spMe?4:Math.max(0,(+c.sp||0)-1);
+    const k=btPickKey(t,btLevel(kind,v,i+1,frac),c.u||[],sp>0);
+    return {i:i+1, at:now+BT_GAP, k, sp, u:(c.u||[]).concat(k).slice(-80)};
   });
 }
 function btTick(){
@@ -12768,7 +12985,7 @@ const REAL_SEC=60, COIN_PER=3, CLEAR_FIRST=30, PRAC_Q=1, REAL_FULL=15, NOTE_COIN
    숫자를 바꿔 가며 넣어 보는 것으로 답을 맞히지 못하게.                  */
 const AUTO_OK=true;
 /* 연습 모드는 [확인]을 눌러야 채점해요 — 숫자를 바꿔 가며 찍어서 맞히지 못하게 */
-const autoOk=()=>AUTO_OK&&G&&G.mode!=='practice';
+const autoOk=()=>AUTO_OK&&G&&G.mode!=='practice'&&G.mode!=='note';
 
 let CUR={school:'e', topic:'addsub'};
 let G=null;
@@ -12982,11 +13199,21 @@ async function tryLogin(){
     return enterTeacher();
   }
   el('gGo').disabled=true; el('gGo').textContent='확인하는 중…';
-  let u=null;
-  let up=false;
-  try{ u=await dbGet('users/'+sid,null); }catch(e){}
-  /* 서버에 없지만 이 휴대폰에 기록이 남아 있으면 (연결이 끊긴 채 만든 계정) 그 기록으로 들어가 서버에 올려요 */
-  if(!(u&&u.h)&&online()){ const lu=lget('users/'+sid,null); if(lu&&lu.h){ u=lu; up=true; } }
+  let u=null, up=false;
+  const rd=await dbGetStrict('users/'+sid);
+  if(rd.ok){
+    u=rd.val;
+    /* 서버에 없지만 이 휴대폰에 기록이 남아 있으면 (연결이 끊긴 채 만든 계정) 그 기록으로 들어가 서버에 올려요 */
+    if(!(u&&u.h)&&online()){ const lu=lget('users/'+sid,null); if(lu&&lu.h){ u=lu; up=true; } }
+  }else{
+    /* 서버 읽기 실패 시: 이 기기에 이미 저장된 본인 계정이 있을 때만 오프라인 로그인 허용, 없으면 신규 가입으로 넘기지 않음(기존 계정 덮어쓰기 방지) */
+    const lu=lget('users/'+sid,null);
+    if(lu&&lu.h){ u=lu; }
+    else{
+      el('gGo').disabled=false; el('gGo').textContent='들어가기';
+      return gateErr('gErr','서버에 연결할 수 없어요. 인터넷을 확인하고 잠시 뒤 다시 눌러 주세요.');
+    }
+  }
   el('gGo').disabled=false; el('gGo').textContent='들어가기';
   if(u&&u.h){
     if(u.h!==hash4(sid,pw)) return gateErr('gErr','비밀번호가 맞지 않습니다.');
@@ -13012,8 +13239,13 @@ async function makeAccount(){
   const c0=[...new Set(CH_COLORS.filter(x=>!x.p).map(x=>x.k).concat([newCh.c]))];
   const rec0={h:hash4(sid,pw), ch:{s:newCh.s,c:newCh.c,items:[]}, coin:0,
              own:[], ownS:s0, ownC:c0, at:Date.now()};
-  await dbSet('users/'+sid,rec0);
+  /* 기존 계정이 서버에 이미 있으면 덮어쓰지 않고 중단 (트랜잭션 방어) */
+  const tx=await dbTx('users/'+sid, cur=>(cur&&cur.h)?undefined:rec0);
   el('gMake').disabled=false; el('gMake').textContent='이 친구로 시작하기';
+  if(!tx.ok){
+    el('gNew').style.display='none'; el('gLogin').style.display='';
+    return gateErr('gErr','이미 등록된 학번이에요. 기존 비밀번호로 들어가 주세요.');
+  }
   ME=meFrom(sid,rec0); ME._c0=0;
   LS.set(MEKEY,{sid,h:rec0.h});
   if(typeof startFreezeWatch==='function') startFreezeWatch();
@@ -13271,13 +13503,15 @@ function renderStages(){
 }
 
 /* ═══════════════════ 연습 모드 ═══════════════════ */
-function startStage(t,n){
+function startStage(t,n,opt){
   CUR.topic=t; stopTimer();
-  const run=stageRun(t,n);
-  G={mode:'practice', t, st:n, queue:run.slice(), need:run.length, mastered:new Set(),
+  const fresh=!!(opt&&opt.fresh);
+  const run=stageRun(t,n,fresh);
+  G={mode:'practice', t, st:n, fresh, queue:run.slice(), need:run.length, mastered:new Set(),
      wrongOnce:new Map(), solved:0, right:0, combo:0, best:0, t0:0,
      phase:'preview', typed:'', clean:true, locked:false};
-  setupHUD(); show('s-play'); renderPreview();
+  setupHUD(); show('s-play');
+  if(fresh){ G.t0=performance.now(); next(); } else renderPreview();
 }
 function renderPreview(){
   const t=G.t, n=G.st, T=topicOf(t), s=stageOf(t,n), pv=stagePreview(t,n);
@@ -13404,13 +13638,15 @@ function next(){
     askQ(G.queue.shift());
   }else if(G.mode==='real'){
     if(G.tLeft<=0){ finish(true); return; }
-    const f=realPick(G.t,G.qi+1,G.recent,G.L); G.qLv=f._rl||1;
+    const want2=(G.force2||0)>0; if(want2) G.force2--;
+    const f=realPick(G.t,G.qi+1,G.recent,G.L,{want2}); G.qLv=f._rl||1;
     G.recent.push(f.key); if(G.recent.length>12) G.recent.shift();
     askQ(f);
   }else if(G.mode==='battle'){
     return;   /* 친구 대전은 btTick 이 모두 함께 다음 문제로 넘깁니다 */
   }else if(G.mode==='boss'){
-    const f=realPick(G.t,G.qi+1,G.recent,G.L); G.qLv=f._rl||1;
+    const want2=(G.force2||0)>0; if(want2) G.force2--;
+    const f=realPick(G.t,G.qi+1,G.recent,G.L,{want2}); G.qLv=f._rl||1;
     G.recent.push(f.key); if(G.recent.length>12) G.recent.shift();
     askQ(f);
   }
@@ -13425,7 +13661,7 @@ function qLabel(){
   return `${G.st}단계 · ${stageOf(G.t,G.st).name}`;
 }
 function askQ(f){
-  G.ask=f; G.phase='q'; G.typed=''; G.clean=true; G.locked=false;
+  G.ask=f; G.phase='q'; G.typed=''; G.clean=true; G.locked=false; G.qDels=0; G.q1Dels=0;
   el('keypad').style.display=''; cardScr(true);
   /* 보기에서 고르는 문항(예: 예각·직각·둔각)은 숫자판 대신 보기 단추 */
   if(f.pick) pickPad(f.pick); else if(KP_NEG==='pick'){ KP_NEG=null; buildKeypad(kpMode(G.t)); }
@@ -13484,7 +13720,21 @@ function press(k){
   if(G.phase==='hint'){ if(k==='ok'&&G.onNext&&performance.now()-(G.hintAt||0)>300) G.onNext(); return; }
   if(G.phase==='preview'){ if(k==='ok') beginStage(); return; }
   if(G.phase!=='q'||G.locked) return;
-  if(k==='del'){ if(G.typed){ G.typed=G.typed.slice(0,-1); G.clean=false; paintTyped(); } return; }
+  if(k==='del'){
+    if(G.typed){
+      const was1=G.typed.length===1&&/^\d$/.test(G.typed);
+      G.typed=G.typed.slice(0,-1); G.clean=false;
+      G.qDels=(G.qDels||0)+1;
+      if(was1) G.q1Dels=(G.q1Dels||0)+1;
+      /* 실전·보스전·대전에서 1자리 오답 연타(지우기 반복) 감지 → 다음 4문항 연속 2자리 답 출제(대전은 2자리 비중 상향) */
+      if(autoOk()&&(G.qDels>=2||G.q1Dels>=2)){
+        if(G.mode==='real'||G.mode==='boss') G.force2=Math.max(G.force2||0,4);
+        else if(G.mode==='battle') G.btSpam=Math.max(G.btSpam||0,5);
+      }
+      paintTyped();
+    }
+    return;
+  }
   if(k==='ok'){ if(/\d/.test(G.typed)) submit(); return; }
   if(k==='neg'){ if(!topicOf(G.t).neg) return;
     G.typed=G.typed[0]==='-'?G.typed.slice(1):'-'+G.typed; paintTyped();
@@ -13498,6 +13748,15 @@ function press(k){
 }
 function submit(){
   const f=G.ask, ok=(Math.abs(+G.typed-f.ans)<1e-9&&/\d/.test(G.typed)), sec=(performance.now()-G.qStart)/1000;
+  /* 연속 2문항 이상 1자리 답에서 지우기 후 맞힌 경우도 찍기 의심으로 감지 → 2자리 연달아 출제 */
+  if(ok&&autoOk()&&!isTwoPlusAns(f)&&!f.pick&&(G.qDels||0)>=1){
+    G.oneDelStreak=(G.oneDelStreak||0)+1;
+    if(G.oneDelStreak>=2){
+      if(G.mode==='real'||G.mode==='boss') G.force2=Math.max(G.force2||0,4);
+      else if(G.mode==='battle') G.btSpam=Math.max(G.btSpam||0,5);
+      G.oneDelStreak=0;
+    }
+  }else if(ok&&(G.qDels||0)===0){ G.oneDelStreak=0; }
   G.locked=true; G.solved++;
   logFact(f,ok,sec);
   if(G.mode==='real') return realAnswer(ok,f,sec);
@@ -13578,7 +13837,7 @@ function showHint(f,typed,note,onNext,opt){
 }
 /* 그림은 '실제로 도움이 되는' 주제에만 보여 줍니다 — 피타고라스·삼각비·삼각함수, 그리고 곱셈 분배(넓이 모델).
    구구단·제곱수·덧셈뺄셈 같은 계산 연습에서는 그림 없이 식과 설명만 보여요. */
-const FIG_TOPICS=['pyth','trig','tfn'];
+const FIG_TOPICS=['pyth','trig','tfn','int','simr','angle'];
 const figOK=svg=>!!svg&&(FIG_TOPICS.includes((G&&G.t)||CUR.topic)||/data-keep="1"/.test(svg));
 const hintBox=h=>`<div class="hbody">
     ${figOK(h.svg)?`<div class="hfig">${h.svg}</div>`:''}
@@ -13670,7 +13929,8 @@ async function stageClear(){
   const btns=[];
   if(n<T.stages.length) btns.push(`<button class="btn primary" style="flex:0 0 auto" onclick="startStage('${t}',${n+1})">${n+1}단계로 →</button>`);
   else btns.push(`<button class="btn primary" style="flex:0 0 auto" onclick="tryReal('${t}')">실전 모드 도전!</button>`);
-  btns.push(`<button class="btn" onclick="startStage('${t}',${n})">다시 풀기</button>`);
+  btns.push(`<button class="btn" onclick="startStage('${t}',${n},{fresh:true})">새 문제 더 풀기</button>`);
+  btns.push(`<button class="btn" onclick="startStage('${t}',${n})">오늘 문제 다시</button>`);
   btns.push(`<button class="btn" onclick="openStages('${t}')">스테이지 고르기</button>`);
   el('clBtns').innerHTML=btns.join('');
   if(ms) el('clMiss').insertAdjacentHTML('afterbegin',`<div class="gainbox good msgain">${ms.msg}</div>`);
@@ -13894,8 +14154,13 @@ function paintMineOwn(){
 function paintMine(){
   const t=MP.topic, T=topicOf(t), r=rec(t), p=prog(t), h=r.hist, day=todayKey();
   const msc=(SCHOOLS.find(x=>x.topics.includes(t))||schoolOf(CUR.school));
-  el('mpTopics').innerHTML=msc.topics.map(k=>
+  const scTabs=`<div class="mp-sc">${SCHOOLS.filter(s=>s.k!=='h'||hsOpen()||s.topics.some(k=>((ME.R||{})[k]||{}).best>0)).map(s=>
+    `<button class="pk${s.k===msc.k?' on':''}" data-sc="${s.k}">${s.n}</button>`).join('')}</div>`;
+  el('mpTopics').innerHTML=scTabs+msc.topics.map(k=>
     `<button class="tab${k===t?' on':''}" data-k="${k}">${topicOf(k).n}</button>`).join('');
+  el('mpTopics').querySelectorAll('[data-sc]').forEach(b=>b.onclick=()=>{
+    const sc=schoolOf(b.dataset.sc); if(sc&&sc.topics.length){ MP.topic=sc.topics[0]; paintMine(); paintMineGrowth(); }
+  });
   el('mpTopics').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ MP.topic=b.dataset.k; paintMine(); paintMineGrowth(); });
   const td=h.filter(x=>x&&x.d===day);
   const fsT=Object.keys(ME.fs||{}).filter(sk=>skTopic(sk)===t).map(sk=>ME.fs[sk]);
@@ -14747,6 +15012,262 @@ const NOTE_PLUS={
        p:'<b>√n</b>은 <b>넓이가 n인 정사각형의 한 변 길이</b>예요. 곱셈(√a × √b = √ab)은 근호 안끼리 합칠 수 있지만, 덧셈·뺄셈은 <b>근호 안의 수가 똑같을 때만</b> 계수끼리 더해요.'}
     ],
     miss:[{w:'√2 + √3 = √5', r:'그대로 √2 + √3 (더 합칠 수 없음)', y:'근호 안의 수가 다르면 더하거나 뺄 수 없어요. 2√3 + 5√3 = 7√3처럼 근호 안이 같을 때만 계산해요.'}]
+  },
+  addsub:{
+    why:[{h:'왜 10을 만들어서 더하고 빼면 암산이 쉬울까?', tag:'가르기·모으기 원리',
+      svg:`<svg viewBox="0 0 360 100" width="360" height="100" aria-label="10 만들기 덧셈">
+        <rect x="14" y="14" width="120" height="32" rx="8" fill="#eef2fe" stroke="#2f5bea"/>
+        <text x="74" y="35" text-anchor="middle" font-size="14" font-weight="900" fill="#111">47 + 36</text>
+        <text x="150" y="35" font-size="14" font-weight="900" fill="#2f5bea">→</text>
+        <rect x="168" y="14" width="178" height="32" rx="8" fill="#ebfbee" stroke="#12a05c"/>
+        <text x="257" y="35" text-anchor="middle" font-size="13.5" font-weight="800" fill="#111">(47 + 3) + 33 = 50 + 33</text>
+        <text x="180" y="78" text-anchor="middle" font-size="14" font-weight="900" fill="#2f5bea">십의 자리로 딱 떨어지는 수(50)를 만들면 → 83!</text>
+      </svg>`,
+      p:'받아올림은 <b>10이 모이면 십의 자리 1로 바꾸는 약속</b>이에요. 일의 자리에서 부족한 만큼만 먼저 채워 10·50·100을 만들면 훨씬 빠르고 정확해요.'}],
+    miss:[{w:'83 − 29 = 64', r:'54', y:'일의 자리에서 10을 빌려 오면 십의 자리가 8에서 7로 줄어들어요. 70 − 20 = 50, 13 − 9 = 4 → 54.'}]
+  },
+  gugu:{
+    why:[{h:'곱셈은 왜 순서를 바꿔도 같고, 묶어서 나눌 수 있을까?', tag:'격자 넓이 원리',
+      svg:`<svg viewBox="0 0 360 104" width="360" height="104" aria-label="구구단 분배 모델">
+        <rect x="18" y="14" width="90" height="60" rx="5" fill="#eef2fe" stroke="#2f5bea" stroke-width="1.8"/>
+        <rect x="108" y="14" width="54" height="60" rx="5" fill="#ebfbee" stroke="#12a05c" stroke-width="1.8"/>
+        <text x="63" y="49" text-anchor="middle" font-size="13.5" font-weight="900" fill="#2f5bea">7 × 5 = 35</text>
+        <text x="135" y="49" text-anchor="middle" font-size="13.5" font-weight="900" fill="#12a05c">7 × 3 = 21</text>
+        <text x="90" y="92" text-anchor="middle" font-size="12" font-weight="800" fill="#555">가로 5 + 3 = 8칸</text>
+        <text x="262" y="40" text-anchor="middle" font-size="14" font-weight="900" fill="#111">7 × 8 = 35 + 21</text>
+        <text x="262" y="66" text-anchor="middle" font-size="16" font-weight="900" fill="#2f5bea">= 56</text>
+      </svg>`,
+      p:'7 × 8이 바로 안 떠오를 땐 <b>7×5(35)에 7×3(21)을 더하거나</b>, 8×7로 순서를 바꿔 생각해요. 어떤 수에 0을 곱하면 묶음이 0개이므로 항상 0이에요.'}],
+    miss:[{w:'7 × 0 = 7', r:'0', y:'1을 곱할 때(7 × 1 = 7)와 헷갈리기 쉬워요. 0을 곱하면 무조건 0이에요.'}]
+  },
+  boxq:{
+    why:[{h:'□를 구할 때 왜 거꾸로 연산하면 될까?', tag:'거꾸로 화살표',
+      svg:`<svg viewBox="0 0 360 104" width="360" height="104" aria-label="거꾸로 계산 화살표">
+        <rect x="16" y="14" width="44" height="30" rx="7" fill="#fff4e6" stroke="#e8590c" stroke-width="1.8"/>
+        <text x="38" y="34" text-anchor="middle" font-size="15" font-weight="900" fill="#e8590c">□</text>
+        <text x="86" y="34" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f5bea">× 3 →</text>
+        <rect x="116" y="14" width="52" height="30" rx="7" fill="#f1f5f9" stroke="#94a3b8"/>
+        <text x="142" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="#334155">□×3</text>
+        <text x="196" y="34" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f5bea">+ 4 →</text>
+        <rect x="226" y="14" width="46" height="30" rx="7" fill="#eef2fe" stroke="#2f5bea" stroke-width="1.8"/>
+        <text x="249" y="34" text-anchor="middle" font-size="15" font-weight="900" fill="#2f5bea">19</text>
+        <text x="196" y="76" text-anchor="middle" font-size="12.5" font-weight="800" fill="#12a05c">← − 4 (15)</text>
+        <text x="86" y="76" text-anchor="middle" font-size="12.5" font-weight="800" fill="#12a05c">← ÷ 3 (5)</text>
+        <text x="314" y="54" text-anchor="middle" font-size="14" font-weight="900" fill="#12a05c">□ = 5</text>
+      </svg>`,
+      p:'□에서 출발해 계산한 순서를 <b>뒤에서부터 반대 연산(+↔−, ×↔÷)</b>으로 되돌아가면 □가 나와요. 단, <code>60 − □ = 24</code>처럼 □를 뺄 때는 큰 수에서 결과를 빼요(60 − 24).'}],
+    miss:[{w:'50 − □ = 18 → □ = 50 + 18 = 68', r:'50 − 18 = 32', y:'50에서 □를 뺐더니 18이 남았으므로 □는 50보다 작아야 해요. 큰 수 50에서 18을 빼요.'}]
+  },
+  ratio:{
+    why:[{h:'비례식에서 왜 외항의 곱 = 내항의 곱일까?', tag:'분수 비례 원리',
+      svg:`<svg viewBox="0 0 360 100" width="360" height="100" aria-label="비례식 외항과 내항">
+        <text x="90" y="42" text-anchor="middle" font-size="17" font-weight="900" fill="#111">3 : 4 = 9 : 12</text>
+        <path d="M48 48 C48 76, 134 76, 134 48" fill="none" stroke="#2f5bea" stroke-width="2.2"/>
+        <path d="M74 48 C74 64, 108 64, 108 48" fill="none" stroke="#12a05c" stroke-width="2.2"/>
+        <text x="256" y="34" text-anchor="middle" font-size="13" font-weight="800" fill="#2f5bea">외항의 곱: 3 × 12 = 36</text>
+        <text x="256" y="58" text-anchor="middle" font-size="13" font-weight="800" fill="#12a05c">내항의 곱: 4 × 9 = 36</text>
+        <text x="256" y="82" text-anchor="middle" font-size="12" font-weight="700" fill="#495057">전항·후항에 같은 수를 곱해도 비율은 같아요</text>
+      </svg>`,
+      p:'<code>a : b = c : d</code>는 분수 <code>a/b = c/d</code>와 같아요. 양변에 <code>bd</code>를 곱하면 <b>ad = bc(외항의 곱 = 내항의 곱)</b>가 항상 성립해요. 백분율은 비율(비교량 ÷ 기준량)에 100을 곱한 값이에요.'}],
+    miss:[{w:'20을 3 : 2로 나눌 때 앞 몫 = 20 × 3/2', r:'20 × 3/(3+2) = 12', y:'비례배분 분모는 두 항의 합(3 + 2 = 5)이에요. 전체 5등분 중 3조각이 앞 몫이에요.'}]
+  },
+  pfac:{
+    why:[{h:'왜 약수의 개수는 (지수+1)끼리 곱할까?', tag:'약수 곱셈표',
+      svg:`<svg viewBox="0 0 360 106" width="360" height="106" aria-label="소인수분해 약수 표">
+        <rect x="16" y="14" width="150" height="78" rx="8" fill="#f8f9fa" stroke="#dee2e6"/>
+        <text x="91" y="34" text-anchor="middle" font-size="12.5" font-weight="900" fill="#2f5bea">12 = 2² × 3¹</text>
+        <text x="91" y="56" text-anchor="middle" font-size="12" font-weight="700" fill="#111">2의 선택: 1, 2, 2² (3가지)</text>
+        <text x="91" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#12a05c">3의 선택: 1, 3¹ (2가지)</text>
+        <text x="266" y="42" text-anchor="middle" font-size="14" font-weight="900" fill="#111">약수의 개수</text>
+        <text x="266" y="66" text-anchor="middle" font-size="15" font-weight="900" fill="#2f5bea">(2+1) × (1+1) = 6개</text>
+        <text x="266" y="88" text-anchor="middle" font-size="11.5" font-weight="700" fill="#64748b">지수가 0(안 뽑기=1)인 경우 +1!</text>
+      </svg>`,
+      p:'소인수를 <b>0번(즉 1)부터 지수 번까지</b> 몇 번 고르느냐의 조합이 모든 약수를 만들어요. 0번 고르는 1가지를 더해서 <b>(지수+1)</b>끼리 곱해요.'}],
+    miss:[{w:'2² × 3 의 약수의 개수 = 2 × 1 = 2개', r:'(2+1) × (1+1) = 6개', y:'지수가 안 적힌 3은 3¹이에요. 각 지수에 1씩 더한 뒤 곱해야 해요.'}]
+  },
+  angle:{
+    why:[{h:'왜 삼각형의 외각은 이웃하지 않는 두 내각의 합일까?', tag:'평각 180° 원리',
+      svg:`<svg viewBox="0 0 360 104" width="360" height="104" aria-label="삼각형 외각 원리">
+        <polygon points="36,84 146,84 96,20" fill="#fff4e6" stroke="#1f2433" stroke-width="2"/>
+        <line x1="146" y1="84" x2="206" y2="84" stroke="#1f2433" stroke-width="2"/>
+        <text x="64" y="76" font-size="13" font-weight="900" fill="#2f5bea">a</text>
+        <text x="96" y="44" text-anchor="middle" font-size="13" font-weight="900" fill="#12a05c">b</text>
+        <text x="128" y="76" font-size="12" font-weight="800" fill="#64748b">c</text>
+        <text x="172" y="74" font-size="13" font-weight="900" fill="#e5484d">a+b</text>
+        <text x="282" y="38" text-anchor="middle" font-size="13" font-weight="800" fill="#111">a + b + c = 180°</text>
+        <text x="282" y="60" text-anchor="middle" font-size="13" font-weight="800" fill="#e5484d">외각 + c = 180°</text>
+        <text x="282" y="84" text-anchor="middle" font-size="13.5" font-weight="900" fill="#2f5bea">∴ 외각 = a + b</text>
+      </svg>`,
+      p:'삼각형의 세 내각 합(180°)과 일직선 평각(180°)이 같기 때문에 외각은 곧바로 <b>이웃하지 않는 두 내각의 합</b>이에요. 다각형의 외각의 합은 몇 각형이든 항상 <b>360°</b>예요.'}],
+    miss:[{w:'육각형의 내각의 합 = 180° × 6', r:'180° × (6 − 2) = 720°', y:'n각형은 한 꼭짓점에서 대각선을 그으면 삼각형이 (n − 2)개 생겨요.'}]
+  },
+  power:{
+    why:[{h:'11²~25² 제곱수를 빠르게 외우고 확인하는 법', tag:'끝자리·곱셈공식',
+      svg:`<svg viewBox="0 0 360 100" width="360" height="100" aria-label="제곱수 분해 모델">
+        <rect x="16" y="14" width="156" height="72" rx="8" fill="#eef2fe" stroke="#2f5bea"/>
+        <text x="94" y="38" text-anchor="middle" font-size="14" font-weight="900" fill="#2f5bea">13² = (10 + 3)²</text>
+        <text x="94" y="60" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111">= 100 + 60 + 9 = 169</text>
+        <text x="94" y="78" text-anchor="middle" font-size="11.5" font-weight="700" fill="#64748b">끝자리 3² = 9로 검산!</text>
+        <rect x="188" y="14" width="156" height="72" rx="8" fill="#ebfbee" stroke="#12a05c"/>
+        <text x="266" y="38" text-anchor="middle" font-size="14" font-weight="900" fill="#12a05c">□² = 225 찾기</text>
+        <text x="266" y="60" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111">10²=100 &lt; 225 &lt; 20²=400</text>
+        <text x="266" y="78" text-anchor="middle" font-size="11.5" font-weight="800" fill="#12a05c">끝자리 5 → 15!</text>
+      </svg>`,
+      p:'거꾸로 찾기(<code>□² = 289</code>)는 먼저 <b>10²(100), 20²(400)</b> 사이로 범위를 좁히고, <b>일의 자리(7²=49 → 끝자리 9)</b>로 후보를 좁히면 순식간에 찾아요.'}],
+    miss:[{w:'14² = 194 또는 169', r:'196', y:'13² = 169, 14² = 196은 끝 두 자리가 서로 뒤집혀 있어요(69 ↔ 96).'}]
+  },
+  rdec:{
+    why:[{h:'왜 순환소수 공식의 분모에 9와 0이 나올까?', tag:'10ⁿ 배 빼기 원리',
+      svg:`<svg viewBox="0 0 360 104" width="360" height="104" aria-label="순환소수 분수 변환 원리">
+        <text x="18" y="28" font-size="13" font-weight="800" fill="#111">x = 0.2333…</text>
+        <text x="18" y="52" font-size="13" font-weight="800" fill="#2f5bea">100x = 23.333…</text>
+        <text x="18" y="74" font-size="13" font-weight="800" fill="#12a05c">− 10x =  2.333…</text>
+        <line x1="16" y1="81" x2="156" y2="81" stroke="#333" stroke-width="1.5"/>
+        <text x="18" y="98" font-size="13.5" font-weight="900" fill="#e5484d">90x = 23 − 2 = 21</text>
+        <rect x="180" y="18" width="166" height="72" rx="10" fill="#eef2fe" stroke="#2f5bea"/>
+        <text x="263" y="44" text-anchor="middle" font-size="13" font-weight="900" fill="#2f5bea">순환마디 1개 → 9 한 개</text>
+        <text x="263" y="64" text-anchor="middle" font-size="13" font-weight="900" fill="#12a05c">비순환 소수 1개 → 0 한 개</text>
+        <text x="263" y="83" text-anchor="middle" font-size="12" font-weight="700" fill="#111">x = 21/90 = 7/30</text>
+      </svg>`,
+      p:'소수점 아래 <b>무한히 반복되는 꼬리를 빼서 없애기</b> 위해 10ⁿ배를 빼요. 그래서 분모가 100−10=<b>90</b>, 100−1=<b>99</b>처럼 9와 0으로 만들어져요. 유한소수 판별은 꼭 <b>기약분수</b>부터 만든 뒤 분모에 2·5 외 소인수가 있는지 봐요.'}],
+    miss:[{w:'3/15는 분모에 3이 있으니 순환소수', r:'유한소수 (1/5 = 0.2)', y:'약분하기 전에 판별하면 안 돼요! 먼저 기약분수 1/5로 만든 뒤 분모의 소인수를 확인해요.'}]
+  },
+  simr:{
+    why:[{h:'왜 넓이의 비는 m² : n², 부피의 비는 m³ : n³일까?', tag:'차원(길이·넓이·부피)',
+      svg:`<svg viewBox="0 0 360 106" width="360" height="106" aria-label="닮음비와 넓이·부피비">
+        <rect x="18" y="42" width="30" height="30" fill="#dbeafe" stroke="#2f5bea" stroke-width="1.8"/>
+        <text x="33" y="88" text-anchor="middle" font-size="12" font-weight="800" fill="#2f5bea">길이 1</text>
+        <rect x="66" y="12" width="60" height="60" fill="#d3f9d8" stroke="#12a05c" stroke-width="1.8"/>
+        <line x1="96" y1="12" x2="96" y2="72" stroke="#12a05c" stroke-dasharray="3 2"/>
+        <line x1="66" y1="42" x2="126" y2="42" stroke="#12a05c" stroke-dasharray="3 2"/>
+        <text x="96" y="88" text-anchor="middle" font-size="12" font-weight="800" fill="#12a05c">길이 2 → 넓이 4칸!</text>
+        <text x="246" y="34" text-anchor="middle" font-size="13.5" font-weight="900" fill="#111">닮음비(길이·둘레) = m : n</text>
+        <text x="246" y="58" text-anchor="middle" font-size="13.5" font-weight="900" fill="#2f5bea">넓이의 비 = m² : n²</text>
+        <text x="246" y="82" text-anchor="middle" font-size="13.5" font-weight="900" fill="#12a05c">부피의 비 = m³ : n³</text>
+      </svg>`,
+      p:'길이가 2배가 되면 가로는 2배, 세로도 2배가 되어 넓이는 <b>2×2 = 4배(2²)</b>, 높이를 더해 부피는 <b>2×2×2 = 8배(2³)</b>가 돼요.'}],
+    miss:[{w:'닮음비가 2 : 3이면 넓이의 비도 2 : 3', r:'2² : 3² = 4 : 9', y:'둘레의 비는 2 : 3 그대로지만, 넓이는 제곱(4 : 9), 부피는 세제곱(8 : 27)이에요.'}]
+  },
+  pyth:{
+    why:[{h:'왜 직각삼각형에서 a² + b² = c² 이 성립할까?', tag:'정사각형 넓이 합',
+      svg:`<svg viewBox="0 0 360 106" width="360" height="106" aria-label="피타고라스 정리">
+        <polygon points="34,82 114,82 34,22" fill="#eef2fe" stroke="#1f2433" stroke-width="2"/>
+        <rect x="34" y="70" width="12" height="12" fill="none" stroke="#1f2433" stroke-width="1.4"/>
+        <text x="22" y="56" text-anchor="middle" font-size="13" font-weight="900" fill="#2f5bea">3</text>
+        <text x="74" y="96" text-anchor="middle" font-size="13" font-weight="900" fill="#12a05c">4</text>
+        <text x="84" y="46" text-anchor="middle" font-size="13" font-weight="900" fill="#e5484d">5</text>
+        <text x="240" y="34" text-anchor="middle" font-size="14" font-weight="900" fill="#111">3² + 4² = 9 + 16 = 25 = 5²</text>
+        <text x="240" y="58" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f5bea">자주 나오는 수: (3,4,5) · (5,12,13) · (8,15,17)</text>
+        <text x="240" y="82" text-anchor="middle" font-size="12" font-weight="700" fill="#495057">세 변에 같은 배수(×2, ×0.2)를 해도 직각삼각형!</text>
+      </svg>`,
+      p:'직각을 낀 두 변을 한 변으로 하는 정사각형 넓이의 합이 <b>가장 긴 빗변</b>의 정사각형 넓이와 같아요. 닮은 직각삼각형은 <code>(3,4,5)</code>의 배수인지 먼저 약분해 보면 1초 만에 풀려요.'}],
+    miss:[{w:'빗변이 5, 한 변이 3일 때 나머지 변 = √(5²+3²)', r:'√(5²−3²) = 4', y:'빗변이 가장 긴 변이에요! 빗변이 아닌 변을 구할 때는 빗변²에서 다른 변²을 빼야 해요.'}]
+  },
+  cnt:{
+    why:[{h:'언제 더하고(합의 법칙), 언제 곱할까(곱의 법칙)?', tag:'또는(+) vs 그리고(×)',
+      svg:`<svg viewBox="0 0 360 102" width="360" height="102" aria-label="합의 법칙과 곱의 법칙">
+        <rect x="14" y="14" width="158" height="74" rx="10" fill="#eef2fe" stroke="#2f5bea"/>
+        <text x="93" y="36" text-anchor="middle" font-size="13.5" font-weight="900" fill="#2f5bea">또는 · 동시에 X → 더하기(+)</text>
+        <text x="93" y="58" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111">버스 3개 또는 지하철 2개</text>
+        <text x="93" y="77" text-anchor="middle" font-size="13.5" font-weight="900" fill="#2f5bea">3 + 2 = 5가지</text>
+        <rect x="188" y="14" width="158" height="74" rx="10" fill="#ebfbee" stroke="#12a05c"/>
+        <text x="267" y="36" text-anchor="middle" font-size="13.5" font-weight="900" fill="#12a05c">그리고 · 잇달아 → 곱하기(×)</text>
+        <text x="267" y="58" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111">상의 3벌과 하의 4벌 짝짓기</text>
+        <text x="267" y="77" text-anchor="middle" font-size="13.5" font-weight="900" fill="#12a05c">3 × 4 = 12가지</text>
+      </svg>`,
+      p:'둘 중 <b>하나만</b> 고르면 끝나면 <b>더하기(+)</b>, 첫 번째를 고른 뒤 <b>이어서</b> 두 번째까지 골라야 끝나면 <b>곱하기(×)</b>예요. "적어도 한 개"는 <b>전체 − (모두 아닌 경우)</b>가 훨씬 빨라요.'}],
+    miss:[{w:'상의 3벌, 하의 4벌을 고르는 경우 = 3 + 4 = 7', r:'3 × 4 = 12가지', y:'상의와 하의를 둘 다 입어야 한 세트가 완성되므로 곱의 법칙이에요.'}]
+  },
+  prob:{
+    why:[{h:'확률은 왜 항상 0과 1 사이의 분수일까?', tag:'부분 / 전체 모델',
+      svg:`<svg viewBox="0 0 360 100" width="360" height="100" aria-label="확률 여사건 막대">
+        <rect x="20" y="22" width="320" height="30" rx="8" fill="#eef2fe" stroke="#2f5bea" stroke-width="1.8"/>
+        <rect x="20" y="22" width="210" height="30" rx="7" fill="#748ffc" opacity=".75"/>
+        <text x="125" y="42" text-anchor="middle" font-size="13" font-weight="900" fill="#fff">일어날 확률 p</text>
+        <text x="285" y="42" text-anchor="middle" font-size="13" font-weight="900" fill="#2f5bea">안 일어날 확률 1−p</text>
+        <text x="180" y="78" text-anchor="middle" font-size="13.5" font-weight="900" fill="#111">확률 = (사건의 경우의 수) ÷ (전체 경우의 수) · 마지막엔 기약분수!</text>
+      </svg>`,
+      p:'전체 경우 중 사건이 차지하는 비율이므로 절대 0보다 작거나 1보다 클 수 없어요. <b>"또는"</b>은 확률끼리 더하고(겹치지 않을 때), <b>"동시에·연달아"</b>는 확률끼리 곱해요.'}],
+    miss:[{w:'주사위 2개 합이 7일 확률 = 6/36 (약분 안 함)', r:'1/6', y:'확률 답은 항상 분자·분모의 최대공약수로 나눈 기약분수로 적어야 해요.'}]
+  },
+  factor:{
+    why:[{h:'인수분해는 왜 전개의 거꾸로 과정일까?', tag:'직사각형 넓이 분해',
+      svg:`<svg viewBox="0 0 360 108" width="360" height="108" aria-label="인수분해 넓이 모델">
+        <rect x="22" y="14" width="60" height="46" fill="#dbeafe" stroke="#2f5bea"/>
+        <rect x="82" y="14" width="44" height="46" fill="#e0e7ff" stroke="#2f5bea"/>
+        <rect x="22" y="60" width="60" height="30" fill="#d3f9d8" stroke="#12a05c"/>
+        <rect x="82" y="60" width="44" height="30" fill="#fef3c7" stroke="#d97706"/>
+        <text x="52" y="42" text-anchor="middle" font-size="13" font-weight="900" fill="#1e3a8a">x²</text>
+        <text x="104" y="42" text-anchor="middle" font-size="12.5" font-weight="800" fill="#3730a3">3x</text>
+        <text x="52" y="80" text-anchor="middle" font-size="12.5" font-weight="800" fill="#065f46">2x</text>
+        <text x="104" y="80" text-anchor="middle" font-size="12.5" font-weight="800" fill="#92400e">6</text>
+        <text x="246" y="40" text-anchor="middle" font-size="14" font-weight="900" fill="#111">x² + 5x + 6</text>
+        <text x="246" y="64" text-anchor="middle" font-size="15" font-weight="900" fill="#2f5bea">= (x + 2)(x + 3)</text>
+        <text x="246" y="86" text-anchor="middle" font-size="12" font-weight="700" fill="#495057">합이 5, 곱이 6인 두 수 → 2, 3!</text>
+      </svg>`,
+      p:'항이 여러 개 더해진 다항식을 <b>(가로) × (세로)</b>처럼 다항식의 곱으로 묶어 내는 것이 인수분해예요. <b>① 공통인수 먼저 묶기 → ② 공식 적용</b> 순서를 꼭 지켜요.'}],
+    miss:[{w:'x² − 9 = (x − 3)²', r:'(x + 3)(x − 3)', y:'(x − 3)²을 전개하면 x² − 6x + 9로 가운데 −6x가 생겨요. 제곱 − 제곱은 합차 공식이에요.'}]
+  },
+  trig:{
+    why:[{h:'sin · cos · tan 는 직각삼각형의 어느 두 변의 비일까?', tag:'필기체 S · C · T',
+      svg:`<svg viewBox="0 0 360 108" width="360" height="108" aria-label="삼각비 직각삼각형">
+        <polygon points="30,86 138,86 138,20" fill="#eef2fe" stroke="#1f2433" stroke-width="2"/>
+        <rect x="126" y="74" width="12" height="12" fill="none" stroke="#1f2433" stroke-width="1.4"/>
+        <text x="48" y="80" font-size="12.5" font-weight="900" fill="#e5484d">A</text>
+        <text x="74" y="48" font-size="12" font-weight="800" fill="#2f5bea">빗변</text>
+        <text x="84" y="100" text-anchor="middle" font-size="12" font-weight="800" fill="#12a05c">밑변</text>
+        <text x="155" y="56" font-size="12" font-weight="800" fill="#e5484d">높이</text>
+        <text x="266" y="32" text-anchor="middle" font-size="13" font-weight="900" fill="#2f5bea">sin A = 높이 / 빗변</text>
+        <text x="266" y="56" text-anchor="middle" font-size="13" font-weight="900" fill="#12a05c">cos A = 밑변 / 빗변</text>
+        <text x="266" y="80" text-anchor="middle" font-size="13" font-weight="900" fill="#e5484d">tan A = 높이 / 밑변</text>
+      </svg>`,
+      p:'기준각 A가 같으면 직각삼각형이 커지든 작아지든 <b>모두 닮음</b>이라 세 변의 비율이 일정해요. 특수각 30°·45°·60°의 <code>sin</code>은 <b>√1/2, √2/2, √3/2</b> 순서로 커져요!'}],
+    miss:[{w:'sin 30° = √3/2, cos 30° = 1/2', r:'sin 30° = 1/2, cos 30° = √3/2', y:'각이 작을수록 높이(sin)는 짧고 밑변(cos)은 길어요. 30°는 sin이 1/2로 더 작아요.'}]
+  },
+  logx:{
+    why:[{h:'로그(log)는 대체 무엇을 묻는 기호일까?', tag:'지수 ↔ 로그 변환',
+      svg:`<svg viewBox="0 0 360 102" width="360" height="102" aria-label="지수와 로그의 관계">
+        <rect x="18" y="18" width="124" height="44" rx="10" fill="#eef2fe" stroke="#2f5bea" stroke-width="1.8"/>
+        <text x="80" y="46" text-anchor="middle" font-size="18" font-weight="900" fill="#2f5bea">2³ = 8</text>
+        <text x="166" y="46" text-anchor="middle" font-size="18" font-weight="900" fill="#64748b">⇔</text>
+        <rect x="190" y="18" width="152" height="44" rx="10" fill="#ebfbee" stroke="#12a05c" stroke-width="1.8"/>
+        <text x="266" y="46" text-anchor="middle" font-size="17" font-weight="900" fill="#12a05c">log₂ 8 = 3</text>
+        <text x="180" y="86" text-anchor="middle" font-size="13" font-weight="800" fill="#111">"밑 2를 몇 제곱해야 8이 될까?" → 그 지수(3)가 바로 로그!</text>
+      </svg>`,
+      p:'로그는 새로운 계산이 아니라 <b>"지수만 주인공으로 꺼내 쓴 식"</b>이에요. 그래서 지수의 곱셈이 덧셈이 되듯, <b>로그의 덧셈은 진수의 곱셈</b>(<code>log a + log b = log ab</code>)이 돼요.'}],
+    miss:[{w:'log₂ 4 + log₂ 8 = log₂ 12', r:'log₂ (4 × 8) = log₂ 32 = 5', y:'로그끼리 더할 때는 진수끼리 더하는 게 아니라 곱해야 해요!'}]
+  },
+  tfn:{
+    why:[{h:'사분면별 삼각함수의 부호와 호도법(π = 180°)', tag:'단위원 · 얼싸탄코',
+      svg:`<svg viewBox="0 0 360 112" width="360" height="112" aria-label="단위원 사분면 부호">
+        <circle cx="88" cy="56" r="40" fill="#f8f9fa" stroke="#cbd5e1" stroke-width="1.8"/>
+        <line x1="36" y1="56" x2="140" y2="56" stroke="#334155" stroke-width="1.4"/>
+        <line x1="88" y1="8" x2="88" y2="104" stroke="#334155" stroke-width="1.4"/>
+        <text x="112" y="38" text-anchor="middle" font-size="11.5" font-weight="900" fill="#2f5bea">All(+)</text>
+        <text x="64" y="38" text-anchor="middle" font-size="11.5" font-weight="900" fill="#12a05c">sin(+)</text>
+        <text x="64" y="78" text-anchor="middle" font-size="11.5" font-weight="900" fill="#d97706">tan(+)</text>
+        <text x="112" y="78" text-anchor="middle" font-size="11.5" font-weight="900" fill="#e5484d">cos(+)</text>
+        <text x="252" y="34" text-anchor="middle" font-size="13.5" font-weight="900" fill="#111">π 라디안 = 180°</text>
+        <text x="252" y="58" text-anchor="middle" font-size="13" font-weight="800" fill="#2f5bea">sin²θ + cos²θ = 1</text>
+        <text x="252" y="82" text-anchor="middle" font-size="12.5" font-weight="700" fill="#495057">y = a sin bx + c → 주기 2π/|b|</text>
+      </svg>`,
+      p:'단위원 위의 점 <code>(cos θ, sin θ)</code>에서 x좌표가 cos, y좌표가 sin이에요. 그래서 제1사분면부터 <b>All → sin → tan → cos</b> 순으로 양수(+)가 돼요.'}],
+    miss:[{w:'θ가 제2사분면이고 sin θ = 3/5이면 cos θ = 4/5', r:'−4/5', y:'제2사분면에서는 x좌표(cos θ)가 음수예요! 크기를 구한 뒤 사분면 부호를 꼭 붙여요.'}]
+  },
+  comb:{
+    why:[{h:'순열(ₙPᵣ)과 조합(ₙCᵣ)은 왜 r! 만큼 차이가 날까?', tag:'순서 있음 vs 없음',
+      svg:`<svg viewBox="0 0 360 102" width="360" height="102" aria-label="순열과 조합의 관계">
+        <rect x="14" y="14" width="154" height="74" rx="10" fill="#eef2fe" stroke="#2f5bea"/>
+        <text x="91" y="36" text-anchor="middle" font-size="13.5" font-weight="900" fill="#2f5bea">순열 ₙPᵣ (줄 세우기)</text>
+        <text x="91" y="58" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111">(A, B) ≠ (B, A) 서로 다름</text>
+        <text x="91" y="77" text-anchor="middle" font-size="13" font-weight="900" fill="#2f5bea">반장·부반장 뽑기</text>
+        <rect x="192" y="14" width="154" height="74" rx="10" fill="#ebfbee" stroke="#12a05c"/>
+        <text x="269" y="36" text-anchor="middle" font-size="13.5" font-weight="900" fill="#12a05c">조합 ₙCᵣ = ₙPᵣ ÷ r!</text>
+        <text x="269" y="58" text-anchor="middle" font-size="12.5" font-weight="700" fill="#111">{A, B} = {B, A} 같은 묶음</text>
+        <text x="269" y="77" text-anchor="middle" font-size="13" font-weight="900" fill="#12a05c">대표 2명·선분·악수</text>
+      </svg>`,
+      p:'조합은 뽑기만 하고 순서를 신경 쓰지 않으므로, 같은 r명을 줄 세우는 중복 <b>r!가지</b>로 나눠 주면 <code>ₙCᵣ = ₙPᵣ / r!</code>가 돼요. 또한 <code>ₙCᵣ = ₙCₙ₋ᵣ</code>를 쓰면 큰 r도 빠르게 계산해요.'}],
+    miss:[{w:'6명 중 대표 2명 뽑기 = ₆P₂ = 30', r:'₆C₂ = 30 ÷ 2 = 15', y:'자격이 같은 대표 2명은 A·B를 뽑으나 B·A를 뽑으나 같으므로 2!로 나눠야 해요.'}]
   }
 };
 
@@ -14977,8 +15498,8 @@ async function paintCoopStudent(){
   const mine=classOf(ME.sid);
   const goals=allGoals.filter(g=>g.scope==='all'||g.scope===mine);
   if(!goals.length){ box.innerHTML=''; return; }
-  let U=RK.users;
-  if(!U){ try{ U=(await dbGet('users',{}))||{}; }catch(e){ U={}; } }
+  let U=(RK.users&&RK._at&&Date.now()-RK._at<60000)?RK.users:null;
+  if(!U){ try{ U=(await dbGet('users',{}))||{}; RK.users=U; RK._at=Date.now(); }catch(e){ U={}; } }
   box.innerHTML=goals.map(g=>{
     const cur=calcCoopProgress(g,U), tgt=Math.max(1,+g.target||100), pct=Math.min(100,Math.round(cur/tgt*100));
     const done=cur>=tgt, claimed=!!(ME.coopC&&ME.coopC[g.id]);
@@ -15146,20 +15667,15 @@ const BOSS_HPX=4, BOSS_HURT=1e13;   /* 1문제 평균 대미지 4 · 부상은 �
 /* 참여자 전원이 부상이면 그 판은 패배 */
 function bossAllDown(r){ const m=Object.values((r&&r.p)||{}); const now=serverNow(); return m.length>0&&m.every(x=>+x.hurtUntil>now); }
 /* 대미지 — 그 주제 SSS 속도(60초/SSS 기준 개수)보다 빠르면 6, 두 배 안이면 4, 그보다 느리면 2 · 부상이면 절반 */
-function bossDmg(t,sec,hurt){ const c=GRADE_CUT[t]||[15,12,9,6], Tf=60/c[0];
+const bossCut=t=>((typeof gradeCuts==='function'&&gradeCuts(t))?gradeCuts(t).map(x=>x[1]):null)||GRADE_CUT[t]||[15,12,9,6,3];
+function bossDmg(t,sec,hurt){ const c=bossCut(t), Tf=60/c[0];
   const d=sec<=Tf?6:sec<=Tf*2?4:2; return hurt?d/2:d; }
 const bossGrOf=r=>BOSS_GR[r&&r.grade]?r.grade:'A';
-/* 1인당 목표 : 그 주제 실전 1분 등급 기준 × 3분 × 0.4 (여럿이 힘을 모으니 개인 기록보다 낮게) */
-/* 1인당 HP — 학생 개인 기록과 상관없이, 실전 모드의 고정 등급 기준(GRADE_CUT : 1분에 SSS·SS·S·A 개수)을 따라요.
-   기준 개수 × 2.5분(반격에 쓰는 시간을 뺀 몫) × 평균 대미지 4 */
 const BOSS_MIN=1.7;
-function bossPer(t,g){ const c=GRADE_CUT[t]||[15,12,9,6,3]; return Math.max(5,Math.round(c[BOSS_GR[g].ci]*BOSS_MIN)); }
-/* 1인당 HP = 그 등급 실력의 학생이 2분 동안(반격 대응 시간 빼고 1.7분) 넣을 대미지.
-   보스 기본 문제는 실전보다 쉬워서 그 등급 속도의 0.85배 시간에 푼다고 보고, 그 속도의 대미지(2·4·6)를 곱해요.
-   → A 보스는 A 실력 반이, SS 보스는 SS 실력 반이 딱 깰 만큼 · SSS 보스는 SS 실력 + 방어 성공(운)이 있어야 */
-function bossDmgAvg(t,sec){ const c=GRADE_CUT[t]||[15,12,9,6,3], x=sec/(60/c[0]);   /* 속도가 고르지 않으니 2·4·6 사이를 부드럽게 */
+function bossPer(t,g){ const c=bossCut(t); return Math.max(5,Math.round(c[BOSS_GR[g].ci]*BOSS_MIN)); }
+function bossDmgAvg(t,sec){ const c=bossCut(t), x=sec/(60/c[0]);   /* 속도가 고르지 않으니 2·4·6 사이를 부드럽게 */
   return x<=1?6:x<=2?6-2*(x-1):x<=3?4-2*(x-2):2; }
-function bossPerHPof(t,g){ const c=GRADE_CUT[t]||[15,12,9,6,3], q=c[BOSS_GR[g].ci]; return Math.round(bossPer(t,g)*bossDmgAvg(t,60/q*.85)); }
+function bossPerHPof(t,g){ const c=bossCut(t), q=c[BOSS_GR[g].ci]; return Math.round(bossPer(t,g)*bossDmgAvg(t,60/q*.85)); }
 const bossPerHP=r=>r.per||bossPerHPof(r.t,bossGrOf(r));
 const bossTargetNow=(r,n)=>r.state!=='wait'?r.target:Math.max(1,n)*bossPerHP(r);
 const bossClear=r=>r&&r.startedAt&&r.endedAt?clock(Math.max(0,(r.endedAt-r.startedAt)/1000)):'';
@@ -15172,11 +15688,48 @@ function bossStopWatch(){
   if(BOSS.off){ try{ BOSS.off(); }catch(e){} BOSS.off=null; }
   if(BOSS.tId){ clearInterval(BOSS.tId); BOSS.tId=null; }
 }
+async function bossCleanOld(){
+  try{
+    const all=(await dbGet('bosses',{}))||{};
+    const now=Date.now(), live=[];
+    for(const [c,r] of Object.entries(all)){
+      if(!r||!r.createdAt||(now-(+r.createdAt||0)>3*3600e3)){ await dbSet('bosses/'+c,null); continue; }
+      if(r.state==='wait'||r.state==='play') live.push(r);
+    }
+    return live.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  }catch(e){ return []; }
+}
+async function attachBossHost(code){
+  const room=await dbGet('bosses/'+code,null);
+  if(!room) return toast('이미 닫힌 보스전 방이에요');
+  BOSS.code=code; BOSS.room=room; BOSS.host=true; BOSS.tSeen=null; BOSS.tN={}; BOSS.tK={}; BOSS.log=[]; BOSS.atkFor=null; BOSS.atkRes=''; BOSS.tAtk=''; BOSS.hpPhase=0;
+  bossStopWatch();
+  BOSS.off=await dbOn('bosses/'+code,r=>{
+    if(!r){ BOSS.code=''; BOSS.room=null; bossStopWatch(); if(isTeacher&&tTab==='boss') paintTBoss(); return; }
+    BOSS.room=r;
+    if(r.state==='play'){
+      const sum=bossSum(r);
+      if(sum>=r.target) dbUpdate('bosses/'+code,{state:'win',endedAt:serverNow()});
+      else if(bossAllDown(r)) dbUpdate('bosses/'+code,{state:'fail',why:'down',endedAt:serverNow()});
+    }
+    if(isTeacher&&tTab==='boss') paintTBossLive(el('tBody'));
+  });
+  BOSS.tId=setInterval(()=>{
+    if(!BOSS.host||!BOSS.room||BOSS.room.state!=='play') return;
+    const left=Math.max(0,(BOSS.room.endAt-serverNow())/1000);
+    const clk=el('tbClock'); if(clk) clk.textContent=clock(left);
+    if(left<=0) dbUpdate('bosses/'+BOSS.code,{state:'fail',endedAt:serverNow()});
+    else bossAtkTick(BOSS.room);
+  },250);
+  paintTBossLive(el('tBody'));
+  toast(`방 ${code}에 다시 연결했어요`);
+}
 function paintTBoss(){
   const box=el('tBody'); if(!box) return;
   if(BOSS.code&&BOSS.room){ paintTBossLive(box); return; }
   const topics=SCHOOLS.flatMap(s=>s.topics);
   box.innerHTML=`<div class="bs-board">
+    <div id="tbResume"></div>
     <h3 style="margin:0 0 6px">🛡 반 전체 협동 「단원 마스터 보스전」 열기</h3>
     <div class="sub" style="margin-bottom:14px">선생님이 방을 열면 반 친구들이 모두 함께 들어와 목표 문제 수(보스 HP)를 협동으로 격파합니다.</div>
     <div class="tcoop-form" style="margin-bottom:12px">
@@ -15190,14 +15743,20 @@ function paintTBoss(){
     <button class="btn primary" id="tbOpen" style="width:100%">⚔ 반 보스전 방 만들기</button>
   </div>`;
   let gr='S';
-  const pv=()=>{ const t=el('tbTopic').value, per=bossPerHPof(t,gr), G_=BOSS_GR[gr];
+  const pv=()=>{ const t=el('tbTopic').value, per=bossPerHPof(t,gr), G_=BOSS_GR[gr], c=bossCut(t);
     el('tbPrev').innerHTML=`<div class="bsav big">${bossAv(t)}</div><b>${esc(bossLookOf(t).n)}</b><small>${esc(topicOf(t).n)} 보스 · ${gr}등급</small>`;
-    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>보스 HP = 참여 인원 × 1인당 HP <b>${per}</b> (실전 1분 ${gr} 기준 ${(GRADE_CUT[t]||[15,12,9,6])[BOSS_GR[gr].ci]}개 × ${BOSS_MIN}분 × 그 속도의 평균 대미지 ${bossDmgAvg(t,60/(GRADE_CUT[t]||[15,12,9,6,3])[BOSS_GR[gr].ci]*.85).toFixed(1)}) ·  실력의 반이 딱 깰 만큼 · 제한 시간 <b>${clock(BOSS_SEC)}</b> (격파하면 걸린 시간도 기록돼요)<br>보스 반격 : 남은 시간 <b>${BOSS_ATK_AT}초</b>부터 시작! 보스 HP가 적을수록 더 자주·더 많은 학생을 노려요 → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 <b>끝까지 부상(대미지 절반)</b> · 전원이 부상이면 패배<br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
+    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>보스 HP = 참여 인원 × 1인당 HP <b>${per}</b> (실전 1분 ${gr} 기준 ${c[BOSS_GR[gr].ci]}개 × ${BOSS_MIN}분 × 그 속도의 평균 대미지 ${bossDmgAvg(t,60/c[BOSS_GR[gr].ci]*.85).toFixed(1)}) · <b>${gr}등급</b> 실력의 반이 딱 깰 만큼 · 제한 시간 <b>${clock(BOSS_SEC)}</b> (격파하면 걸린 시간도 기록돼요)<br>보스 반격 : <b>HP 70% · 40% · 15% 도달 시</b> 또는 남은 시간 <b>${BOSS_ATK_AT}초</b>부터 발동! → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 <b>끝까지 부상(대미지 절반)</b> · 전원이 부상이면 패배<br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
     el('tbGr').querySelectorAll('.sg').forEach(b=>b.classList.toggle('on',b.dataset.g===gr)); };
   el('tbTopic').onchange=pv;
   el('tbGr').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ gr=b.dataset.g; pv(); });
   pv();
   el('tbOpen').onclick=()=>hostBossRoom(gr);
+  /* 3시간 지난 보스 방 자동 정리 + 새로고침으로 끊긴 활성 방 복구 배너 표시 */
+  bossCleanOld().then(live=>{
+    const rb=el('tbResume'); if(!rb||!live.length||BOSS.code) return;
+    rb.innerHTML=`<div class="tfreeze" style="margin:0 0 12px"><div class="tfl"><b>진행 중인 보스전 방 ${live.length}개 발견</b><small>${live.map(r=>`방 ${esc(r.code)} · ${esc(topicOf(r.t).n)} (${r.state==='play'?'진행 중':'대기 중'} · ${Object.keys(r.p||{}).length}명)`).join(' / ')}</small></div><div class="tfr">${live.slice(0,2).map(r=>`<button class="btn primary" data-re="${esc(r.code)}">방 ${esc(r.code)} 다시 열기</button>`).join('')}</div></div>`;
+    rb.querySelectorAll('[data-re]').forEach(b=>b.onclick=()=>attachBossHost(b.dataset.re));
+  });
 }
 async function hostBossRoom(grade){
   grade=BOSS_GR[grade]?grade:'S';
@@ -15241,13 +15800,18 @@ function bossAtkTick(r){
       dbUpdate(`bosses/${r.code}/p/${sid}`,{hit:a.id,hurtUntil:a.until+BOSS_HURT}); });
     if(el('tbAtk')) paintTBossLive(el('tBody')); return; }
   if(CFG.freeze&&CFG.freeze.on) return;
-  /* 보스는 제한 시간이 BOSS_ATK_AT 초 남았을 때부터 반격해요 — 보스 HP가 적을수록 더 자주, 더 많은 학생을 노려요 */
-  if(r.endAt-now>BOSS_ATK_AT*1000||r.endAt-now<4000) return;
-  if(BOSS.atkFor!==r.startedAt){ BOSS.atkFor=r.startedAt; BOSS.nextAtk=0; }
-  if(now<BOSS.nextAtk) return;
+  /* 보스는 HP 70% · 40% · 15% 구간에 도달하거나 남은 시간이 BOSS_ATK_AT 초 이하일 때 반격해요 */
+  if(r.endAt-now<4000) return;
+  if(BOSS.atkFor!==r.startedAt){ BOSS.atkFor=r.startedAt; BOSS.nextAtk=0; BOSS.hpPhase=0; }
+  const ratio=Math.max(0,r.target-bossSum(r))/Math.max(1,r.target);
+  const phaseNeed=ratio<=.15?3:ratio<=.40?2:ratio<=.70?1:0;
+  const hpTrig=phaseNeed>(BOSS.hpPhase||0);
+  const timeTrig=(r.endAt-now<=BOSS_ATK_AT*1000)&&(now>=BOSS.nextAtk);
+  if(!hpTrig&&!timeTrig) return;
+  if(hpTrig) BOSS.hpPhase=phaseNeed;
   const mem=bossMembers(r).map(m=>m.sid); if(!mem.length) return;
   const fresh=mem.filter(sid=>!(+((r.p[sid]||{}).hurtUntil)>now)), pool=fresh.sort(()=>Math.random()-.5); if(!pool.length) return;
-  const ratio=Math.max(0,r.target-bossSum(r))/Math.max(1,r.target), rage=bossRage(ratio);
+  const rage=bossRage(ratio);
   const k=Math.min(mem.length,Math.max(1,Math.round(mem.length*rage.k))), t={};
   pool.slice(0,k).forEach(sid=>t[sid]=1);
   BOSS.nextAtk=now+(g.aw+rage.gap*g.gap/30)*1000;
@@ -15605,12 +16169,27 @@ async function boot(){
   setTimeout(()=>{ try{ el(BT_INV?'gvNick':'inSid').focus(); }catch(e){} },120);
 }
 
-/* 컴퓨터 자판 — 숫자 · 지우기 · Enter */
+/* 컴퓨터 자판 — Esc(팝업 닫기) · 보기(1~4) · 숫자 · 지우기 · Enter */
 document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    /* 수업 집중 모드(ovFreeze)는 Esc로 닫히지 않아요 · 다른 창은 바깥을 누른 것처럼 닫아 마무리 동작까지 */
+    const ov=[...document.querySelectorAll('.overlay.on')].filter(o=>o.id!=='ovFreeze'&&o.onclick).pop();
+    if(ov){ e.preventDefault(); ov.click(); }
+    return;
+  }
   if(!G||!el('s-play').classList.contains('on')) return;
   if(document.querySelector('.overlay.on')) return;
   if(e.ctrlKey||e.metaKey||e.altKey) return;
   const k=e.key;
+  if(G.ask&&G.ask.pick&&/^[1-9]$/.test(k)){
+    const idx=+k;
+    if(idx>=1&&idx<=G.ask.pick.length){
+      e.preventDefault();
+      if(G.phase==='hint'&&G.onNext&&performance.now()-(G.hintAt||0)>300) return G.onNext();
+      if(G.phase==='q'&&!G.locked&&!G.frozen){ G.typed=String(idx); paintTyped(); submit(); }
+    }
+    return;
+  }
   if(/^[0-9]$/.test(k)){ e.preventDefault(); press(k); }
   else if(k==='Backspace'){ e.preventDefault(); press('del'); }
   else if(k==='-'||k==='Subtract'){ e.preventDefault(); press('neg'); }
