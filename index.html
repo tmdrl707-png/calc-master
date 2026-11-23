@@ -1834,6 +1834,40 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 .item.dis .tagw{color:#6b6b70!important;background:#d4d4d8!important}
 .item.dis.try{background:#fff!important;border-color:var(--ink)!important;box-shadow:0 0 0 2px var(--soft2)}
 .item.dis.try .ic{filter:grayscale(1)}
+
+/* 대전 무대 — 나(우리 팀) vs 상대 */
+.blive.arena{display:flex;align-items:center;gap:6px;overflow:visible;padding:8px 8px 9px;margin:-4px 0 8px;border:1px solid var(--line);border-radius:18px;
+  background:linear-gradient(90deg,#eef3ff 0,#fff 42%,#fff 58%,#fff2ee 100%)}
+.bside{flex:1 1 0;min-width:0;display:flex;flex-direction:column;gap:4px;justify-content:center}
+.bside.one{flex:0 0 74px;align-items:center;gap:0}
+.bvs{flex:none;font-weight:900;font-style:italic;color:#ff4f6d;font-size:14px;letter-spacing:-.5px}
+.bgrp{display:flex;flex-wrap:wrap;gap:3px;align-items:flex-end;justify-content:center;border-radius:12px;padding:3px}
+.bgrp[style*="--tc"]{background:color-mix(in srgb,var(--tc) 9%,#fff);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--tc) 45%,#fff)}
+.bgh{width:100%;display:flex;justify-content:space-between;align-items:center;padding:0 4px;font-size:11px;font-weight:800;color:var(--tc);line-height:14px}
+.bgh b{font-size:14px;font-variant-numeric:tabular-nums}
+.ba{position:relative;flex:none;display:block}
+.ba .bav,.ba .bav svg{width:100%;height:100%;display:block;overflow:visible}
+.ba em{position:absolute;right:-4px;bottom:-3px;min-width:15px;height:15px;padding:0 3px;border-radius:99px;background:#fff;border:1px solid var(--line);
+  font-style:normal;font-weight:800;font-size:10px;line-height:13px;text-align:center;color:var(--ink);font-variant-numeric:tabular-nums}
+.ba.me em{background:var(--blue);border-color:var(--blue);color:#fff}
+.ba.me:not(:only-child) .bav{filter:drop-shadow(0 0 3px rgba(47,91,234,.7))}
+.ba.lead::before{content:'👑';position:absolute;left:50%;top:-9px;transform:translateX(-50%);font-size:10px;line-height:1}
+.ba.out .bav{opacity:.35;filter:grayscale(1)}
+.ba > i{position:absolute;inset:0;display:grid;place-items:center;color:#ff4f6d;font-style:normal;font-weight:900}
+.bme-nm{font-size:11px;font-weight:700;color:var(--blue);margin-top:1px}
+.bme-sc{font-size:20px;font-weight:900;color:var(--blue);line-height:1;font-variant-numeric:tabular-nums}
+.bwait{font-size:12px;color:var(--dim);text-align:center}
+.ba.atk{animation:baAtk .55s ease-out;z-index:3}
+@keyframes baAtk{0%{transform:scale(1)}30%{transform:scale(1.4) translateY(-5px);filter:drop-shadow(0 0 8px #ffd43b)}100%{transform:scale(1)}}
+.ba.struck{animation:baHit .5s ease-out}
+@keyframes baHit{0%,100%{transform:none;filter:none}15%{transform:translateX(-4px) rotate(-10deg);filter:brightness(1.4) drop-shadow(0 0 6px #ff4f6d)}45%{transform:translateX(4px) rotate(7deg)}70%{transform:translateX(-2px) rotate(-3deg)}}
+.bafl{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-weight:900;font-size:15px;color:#12a05c;white-space:nowrap;pointer-events:none;
+  text-shadow:0 0 3px #fff,0 0 3px #fff;animation:bsDmg .95s ease-out forwards;z-index:4}
+.bafl.hurt{font-size:13px}
+.btshot{width:18px;height:18px;background:radial-gradient(circle,#fff 0 25%,var(--bc) 45%,transparent 72%)!important;box-shadow:0 0 12px 4px color-mix(in srgb,var(--bc) 55%,transparent)}
+.btshot.crit{width:22px;height:22px}
+#card.bthit{animation:btCardHit .45s ease-out}
+@keyframes btCardHit{0%,100%{transform:none;box-shadow:var(--sh1)}20%{transform:translateX(-5px);box-shadow:inset 0 0 0 3px #ff4f6d}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
 </style>
 </head>
 <body>
@@ -2282,7 +2316,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 22:37';
+const APP_VER='11.23 22:46';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -12676,7 +12710,7 @@ function paintTClass(){
 }
 /* 선생님이 코인 주기 — 학생 기록의 coin 을 트랜잭션으로 더하고, 학생이 다음에 들어올 때 알림(gf)으로 보여 줘요 */
 async function tGiveCoins(sids,v,who){
-  if(!(v>0)||v>5000) return toast('코인은 1 ~ 5000 사이로 넣어 주세요');
+  if(!(v>0)||v>(sids.length===1?999999:5000)) return toast(sids.length===1?'코인 수를 숫자로 넣어 주세요':'코인은 1 ~ 5000 사이로 넣어 주세요');
   if(!sids.length) return toast('줄 학생이 없어요');
   if(!confirm(`${who} ${sids.length}명에게 ${v}코인씩 줄까요?`)) return;
   const ts=Date.now();
@@ -12685,6 +12719,18 @@ async function tGiveCoins(sids,v,who){
       if(tUsers[sid]) tUsers[sid].coin=(+tUsers[sid].coin||0)+v; }catch(e){}
   }
   toast(`${sids.length}명에게 ${v}코인씩 주었어요`); paintTeacher();
+}
+
+/* 학생 한 명의 코인 — 주기 · 빼기 · 정한 값으로 맞추기 (서버 값을 바로 고쳐요) */
+async function tSetCoin(sid,mode,v){
+  if(!Number.isFinite(v)||v<0||v>999999||(mode!=='set'&&!(v>0))) return toast('코인 수를 숫자로 넣어 주세요');
+  if(mode==='add') return tGiveCoins([sid],v,sid);
+  const u=tUsers[sid]||tTestU[sid]||{}, now=+u.coin||0;
+  const msg=mode==='sub'?`${sid}의 코인에서 ${v}개를 뺄까요? (지금 ${now}개)`:`${sid}의 코인을 ${v}개로 맞출까요? (지금 ${now}개)`;
+  if(!confirm(msg)) return;
+  const r=await dbTx(`users/${sid}/coin`,c=>mode==='sub'?Math.max(0,(+c||0)-v):v);
+  if(!(r&&r.ok)) return toast('바꾸지 못했어요. 잠시 뒤 다시 해 주세요');
+  u.coin=+r.val; toast(`${sid}의 코인을 ${r.val}개로 바꿨어요`); paintTeacher();
 }
 
 /* ── 주제 열기 — 주제마다 연습·실전·친구 대전을 선생님이 바로 열고 잠급니다 (누르는 즉시 저장) ── */
@@ -12862,9 +12908,11 @@ function paintTStu(rows){
           <button class="btn danger" data-del="${esc(r.sid)}">계정 삭제</button>
         </div>
         <div class="admin">
-          <input type="tel" maxlength="4" inputmode="numeric" class="pwin" id="gcn_${esc(r.sid)}" placeholder="코인 (1~5000)">
-          <button class="btn" data-give="${esc(r.sid)}">코인 주기</button>
-          <span class="hint" style="margin:0">학생이 다음에 들어오면 '선생님이 주신 코인' 알림이 떠요</span>
+          <input type="tel" maxlength="6" inputmode="numeric" class="pwin" id="gcn_${esc(r.sid)}" placeholder="코인 수">
+          <button class="btn" data-cm="add" data-sid="${esc(r.sid)}">주기 +</button>
+          <button class="btn" data-cm="sub" data-sid="${esc(r.sid)}">빼기 −</button>
+          <button class="btn" data-cm="set" data-sid="${esc(r.sid)}">이 값으로 맞추기</button>
+          <span class="hint" style="margin:0">지금 ${cn(+u.coin||0)}코인 · 주면 학생이 다음에 들어올 때 '선생님이 주신 코인' 알림이 떠요</span>
         </div>
       </div>`:''}
     </div>`;
@@ -12886,8 +12934,8 @@ function paintTStu(rows){
   el('tBody').querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>resetPw(b.dataset.reset));
   el('tBody').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>deleteStudent(b.dataset.del));
   el('tBody').querySelectorAll('[data-nkdel]').forEach(b=>b.onclick=()=>clearNick(b.dataset.nkdel));
-  el('tBody').querySelectorAll('[data-give]').forEach(b=>b.onclick=()=>{ const sid=b.dataset.give, v=+((el('gcn_'+sid)||{}).value||'').replace(/\D/g,'');
-    tGiveCoins([sid],v,sid); });
+  el('tBody').querySelectorAll('[data-cm]').forEach(b=>b.onclick=()=>{ const sid=b.dataset.sid, raw=((el('gcn_'+sid)||{}).value||'').replace(/\D/g,'');
+    tSetCoin(sid,b.dataset.cm,raw===''?NaN:+raw); });
 }
 /* 학생의 오늘의 미션 — 목록 한 줄 · 펼친 곳 자세히 */
 const tMsToday=u=>u&&u.ms&&u.ms.d===todayKey()&&Array.isArray(u.ms.L)?u.ms:null;
@@ -12907,8 +12955,9 @@ async function teacherPlay(){
   const sid=TEACHER_ID, h=tPwH4; let u=null;
   try{ u=await dbGet('users/'+sid,null); }catch(e){}
   if(!(u&&u.h)){ const s0=CH_SHAPES.filter(x=>!x.p).map(x=>x.k), c0=CH_COLORS.filter(x=>!x.p).map(x=>x.k);
-    u={h, ch:{s:DEF_CH.s,c:DEF_CH.c,items:[]}, coin:0, own:[], ownS:s0, ownC:c0, at:Date.now()};
+    u={h, ch:{s:DEF_CH.s,c:DEF_CH.c,items:[]}, coin:TEST_COIN, t10k:1, own:[], ownS:s0, ownC:c0, at:Date.now()};
     await dbSet('users/'+sid,u); }
+  await testCoinUp(sid,u);
   isTeacher=false; ME=meFrom(sid,u); ME._c0=ME.coin; LS.set(MEKEY,{sid,h:u.h});
   openSchool(); toast('선생님 캐릭터로 들어왔어요 · 랭킹에 "선생님"으로 보여요');
 }
@@ -13563,6 +13612,7 @@ function btReveal(win,why,A){
                    :`${why} · 정답 <b>${MI(f.ans)}</b>`; }
   if(me){ G.combo++; G.best=Math.max(G.best,G.combo); } else G.combo=0;
   paintBLive(); updHUD();
+  if(win) btAttackFx(win);
 }
 async function btAnswer(ok,f){
   if(!G||G.phase!=='q') return;
@@ -13584,19 +13634,73 @@ async function btAnswer(ok,f){
   }
   updHUD();
 }
-/* 문제 위 실시간 띠 */
-function paintBLive(){
-  const box=el('bLive'); if(!box) return;
-  if(!G||G.mode!=='battle'){ box.style.display='none'; box.innerHTML=''; return; }
+/* 문제 위 대전 무대 — 개인전: 나 1명 vs 나머지 · 팀전: 우리 팀 vs 상대 팀.
+   먼저 맞힌 친구가 상대 쪽 모두에게 공격 구슬을 날려요 (btAttackFx) */
+function btLiveP(){
   const P=BT.room?btPlayers(BT.room).filter(p=>btRoster(BT.room).includes(p.sid)):[];
   if(!P.find(p=>p.sid===ME.sid)) P.push({sid:ME.sid, ch:cleanCh(ME.ch), n:G.score, rk:G.score});
-  const R=rankList(btSort(P),p=>p.rk);
-  const mr=R.find(x=>x.r.sid===ME.sid); G.rank=mr?mr.rank:1; G.nP=P.length;
-  box.style.display='';
+  return P;
+}
+/* 한쪽 칸에 들어갈 캐릭터 크기 — 3줄 안쪽, 높이 약 100px 안에 */
+function btAvSize(groups,w){
+  for(const s of [46,40,34,29,25,22,19,17]){
+    const per=Math.max(1,Math.floor((w-6)/(s+3)));
+    const h=groups.reduce((a,g)=>a+Math.ceil(Math.max(1,g.mem.length)/per)*(s+3)+(g.n?17:0),0);
+    if(h<=104) return s; }
+  return 16;
+}
+function paintBLive(){
+  const box=el('bLive'); if(!box) return;
+  if(!G||G.mode!=='battle'){ box.style.display='none'; box.innerHTML=''; box.dataset.sig=''; return; }
+  const P=btLiveP();
+  const R=rankList(btSort(P.slice()),p=>p.rk), RK={}; R.forEach(x=>RK[x.r.sid]=x.rank);
+  G.rank=RK[ME.sid]||1; G.nP=P.length;
+  box.style.display=''; box.className='blive arena';
   const team=btTeamOn(BT.room), TM=team?btTeams(BT.room):{};
-  const tl=team?btTeamScores(BT.room,P).map(g=>`<span class="blt${g.mem.some(p=>p.sid===ME.sid)?' me':''}" style="--tc:${g.c}"><b>${g.n}</b><em>${g.sum}</em></span>`).join(''):'';
-  box.innerHTML=tl+R.map(({r:p,rank})=>`<span class="blv${p.sid===ME.sid?' me':''}${p.out?' out':''}"${team?` style="--tc:${BT_TEAMS[TM[p.sid]].c}"`:''}><i>${p.out?'✕':rank}</i>
-    <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${whoHTML(p.sid,p)}</b><em>${p.n}</em></span>`).join('');
+  const byRk=(a,b)=>RK[a.sid]-RK[b.sid]||a.sid.localeCompare(b.sid);
+  let L,Rg;
+  if(team){ const TS=btTeamScores(BT.room,P), mine=TM[ME.sid];
+    L=TS.filter(g=>g.i===mine); Rg=TS.filter(g=>g.i!==mine);
+    if(!L.length) L=[{n:'',mem:[]}]; }
+  else{ L=[{mem:[P.find(p=>p.sid===ME.sid)]}]; Rg=[{mem:P.filter(p=>p.sid!==ME.sid).sort(byRk)}]; }
+  const sig=[team?1:0, box.clientWidth, L.concat(Rg).map(g=>(g.i==null?'':g.i)+':'+g.mem.map(p=>p.sid+(p.out?'x':'')).join(',')).join('|')].join('#');
+  if(box.dataset.sig===sig){                                   /* 모양은 그대로 — 점수만 바꿔요 (공격 연출이 끊기지 않게) */
+    P.forEach(p=>{ const e=box.querySelector(`.ba[data-sid="${CSS.escape(p.sid)}"]`); if(!e) return;
+      const m=e.querySelector('em'); if(m) m.textContent=p.n||0; e.classList.toggle('lead',RK[p.sid]===1&&(p.n||0)>0); });
+    box.querySelectorAll('.bgh[data-i]').forEach(h=>{ const g=L.concat(Rg).find(x=>String(x.i)===h.dataset.i); if(g) h.querySelector('b').textContent=g.sum; });
+    const ms=box.querySelector('.bme-sc'); if(ms&&!team) ms.textContent=(P.find(p=>p.sid===ME.sid)||{}).n||0;
+    return; }
+  box.dataset.sig=sig;
+  const W=box.clientWidth||336;
+  const av=(p,s)=>`<span class="ba${p.sid===ME.sid?' me':''}${p.out?' out':''}${RK[p.sid]===1&&(p.n||0)>0?' lead':''}" data-sid="${esc(p.sid)}" title="${esc(whoPlain(p.sid,p))}" style="width:${s}px;height:${s}px">
+    <span class="bav">${avatarSVG(p.ch,{tight:true})}</span>${p.out?'<i>✕</i>':''}<em>${p.n||0}</em></span>`;
+  const grp=(g,s)=>`<div class="bgrp"${g.c?` style="--tc:${g.c}"`:''}>${g.n?`<div class="bgh" data-i="${g.i}"><span>${g.n}</span><b>${g.sum}</b></div>`:''}${g.mem.map(p=>av(p,s)).join('')}</div>`;
+  let lh;
+  if(team){ const sL=btAvSize(L,(W-44)/2); lh=`<div class="bside">${L.map(g=>grp(g,sL)).join('')}</div>`; }
+  else{ const me=L[0].mem[0];
+    lh=`<div class="bside one">${av(me,52).replace('<em>','<em hidden>')}<div class="bme-nm">나</div><div class="bme-sc">${me.n||0}</div></div>`; }
+  const sR=btAvSize(Rg,team?(W-44)/2:W-112);
+  box.innerHTML=lh+`<div class="bvs">VS</div><div class="bside">${Rg.length&&Rg[0].mem.length?Rg.map(g=>grp(g,sR)).join(''):'<div class="bwait">상대를 기다려요</div>'}</div>`;
+}
+/* 먼저 맞힌 사람의 공격 — 개인전은 나머지 모두에게, 팀전은 상대 팀 모두에게 */
+function btAttackFx(win){
+  const box=el('bLive'); if(!box||!win||!G||G.mode!=='battle') return;
+  const q=s=>box.querySelector(`.ba[data-sid="${CSS.escape(s)}"]`), A=q(win); if(!A) return;
+  const team=btTeamOn(BT.room), TM=team?btTeams(BT.room):null;
+  const T=[...box.querySelectorAll('.ba')].filter(e=>e.dataset.sid!==win&&!e.classList.contains('out')&&(!team||TM[e.dataset.sid]!==TM[win]));
+  const mine=win===ME.sid, col=team?BT_TEAMS[TM[win]].c:mine?'#2f5bea':'#ff7b29';
+  const pop=(e,txt,cls)=>{ const d=document.createElement('span'); d.className='bafl'+(cls?' '+cls:''); d.textContent=txt; e.appendChild(d); setTimeout(()=>d.remove(),950); };
+  const re=(e,c)=>{ e.classList.remove(c); void e.offsetWidth; e.classList.add(c); };
+  re(A,'atk'); pop(A,'+1','up');
+  const a=A.getBoundingClientRect(), fly=sampleN(T,14), root=document.fullscreenElement||document.body;
+  T.forEach((t,k)=>{ const dl=Math.min(k,10)*35;
+    if(fly.includes(t)){ setTimeout(()=>{ const b=t.getBoundingClientRect(), o=document.createElement('div');
+        o.className='bsshot btshot'+(mine?' crit':''); o.style.setProperty('--bc',col);
+        o.style.left=(a.left+a.width/2-9)+'px'; o.style.top=(a.top+a.height/2-9)+'px'; root.appendChild(o);
+        requestAnimationFrame(()=>{ o.style.transform=`translate(${b.left+b.width/2-(a.left+a.width/2)}px,${b.top+b.height/2-(a.top+a.height/2)}px) scale(.7)`; o.style.opacity='.95'; });
+        setTimeout(()=>o.remove(),320); },120+dl); }
+    setTimeout(()=>{ re(t,'struck'); if(t.dataset.sid===ME.sid||T.length<=8) pop(t,'💥','hurt'); },420+dl); });
+  if(T.some(t=>t.dataset.sid===ME.sid)){ const c=el('card'); if(c) setTimeout(()=>re(c,'bthit'),440); }
 }
 async function btFinish(quit){
   if(!G||G.mode!=='battle'||G.over) return;
@@ -14294,6 +14398,7 @@ async function tryLogin(){
   el('gGo').disabled=false; el('gGo').textContent='들어가기';
   if(u&&u.h){
     if(u.h!==hash4(sid,pw)) return gateErr('gErr','비밀번호가 맞지 않습니다.');
+    if(!up) await testCoinUp(sid,u);
     ME=meFrom(sid,u); ME._c0=up?null:ME.coin; giftNote(u);
     LS.set(MEKEY,{sid,h:u.h});
     if(typeof startFreezeWatch==='function') startFreezeWatch();
@@ -14306,6 +14411,13 @@ async function tryLogin(){
     drawNewPicker();
   }
 }
+/* 시험용 계정(000…)은 처음 한 번 코인을 1만 개까지 채워 줘요 — 서버 값을 바로 고쳐서 합치기와 어긋나지 않게 */
+const TEST_COIN=10000;
+async function testCoinUp(sid,u){
+  if(!isTestSid(sid)||!u||u.t10k) return;
+  try{ const r=await dbTx(`users/${sid}/coin`,c=>Math.max(+c||0,TEST_COIN)); await dbSet(`users/${sid}/t10k`,1);
+    u.coin=r&&r.ok&&r.val!=null?+r.val:Math.max(+u.coin||0,TEST_COIN); u.t10k=1; }catch(e){}
+}
 async function makeAccount(){
   const sid=(el('inSid').value||'').replace(/\D/g,'');
   const pw =(el('inPw').value||'').replace(/\D/g,'');
@@ -14314,7 +14426,7 @@ async function makeAccount(){
   el('gMake').disabled=true; el('gMake').textContent='만드는 중…';
   const s0=[...new Set(CH_SHAPES.filter(x=>!x.p).map(x=>x.k).concat([newCh.s]))];
   const c0=[...new Set(CH_COLORS.filter(x=>!x.p).map(x=>x.k).concat([newCh.c]))];
-  const rec0={h:hash4(sid,pw), ch:{s:newCh.s,c:newCh.c,items:[]}, coin:0,
+  const rec0={h:hash4(sid,pw), ch:{s:newCh.s,c:newCh.c,items:[]}, coin:isTestSid(sid)?TEST_COIN:0, t10k:isTestSid(sid)?1:0,
              own:[], ownS:s0, ownC:c0, at:Date.now()};
   /* 기존 계정이 서버에 이미 있으면 덮어쓰지 않고 중단 (트랜잭션 방어) */
   const tx=await dbTx('users/'+sid, cur=>(cur&&cur.h)?undefined:rec0);
@@ -17337,7 +17449,7 @@ async function boot(){
     try{
       let u=await dbGet('users/'+saved.sid,null), up=false;
       if(!(u&&u.h)&&online()){ const lu=lget('users/'+saved.sid,null); if(lu&&lu.h===saved.h){ u=lu; up=true; } }
-      if(u&&u.h===saved.h){ ME=meFrom(saved.sid,u); ME._c0=up?null:ME.coin; giftNote(u); startFreezeWatch(); openSchool(); if(BOSS_INV) joinBossRoom(BOSS_INV); else if(BT_INV) btInviteGo(); else btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
+      if(u&&u.h===saved.h){ if(!up) await testCoinUp(saved.sid,u); ME=meFrom(saved.sid,u); ME._c0=up?null:ME.coin; giftNote(u); startFreezeWatch(); openSchool(); if(BOSS_INV) joinBossRoom(BOSS_INV); else if(BT_INV) btInviteGo(); else btResume(); if(up) saveMe().then(()=>toast('이 휴대폰에만 있던 기록을 서버에 올렸어요')); return; }
     }catch(e){}
   }
   el('s-gate').classList.remove('restoring');
