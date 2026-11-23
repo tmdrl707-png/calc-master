@@ -1868,6 +1868,12 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 .btshot.crit{width:22px;height:22px}
 #card.bthit{animation:btCardHit .45s ease-out}
 @keyframes btCardHit{0%,100%{transform:none;box-shadow:var(--sh1)}20%{transform:translateX(-5px);box-shadow:inset 0 0 0 3px #ff4f6d}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+
+/* 시상대 — 캐릭터 꾸미기(배경·테두리·날개)가 잘리지 않게 넓은 비율로 그려요 */
+.cbp .cbpav{width:84px;height:84px}
+.cbp.p1 .cbpav{width:104px;height:104px}
+.cbp .cbpav svg{overflow:visible}
+@media(max-width:380px){.cbp .cbpav{width:78px;height:78px}.cbp.p1 .cbpav{width:94px;height:94px}}
 </style>
 </head>
 <body>
@@ -2316,7 +2322,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 22:58';
+const APP_VER='11.23 23:06';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -12716,7 +12722,7 @@ async function tGiveCoins(sids,v,who){
   if(!confirm(`${who} ${sids.length}명에게 ${v}코인씩 줄까요?`)) return;
   const ts=Date.now();
   for(const sid of sids){
-    try{ await dbTx(`users/${sid}/coin`,cur=>(+cur||0)+v); await dbSet(`users/${sid}/gf/${ts}`,{v,m:'선생님이 주신 코인'});
+    try{ await dbTx(`users/${sid}/coin`,cur=>(+cur||0)+v); await dbTx(`users/${sid}/tg`,cur=>(+cur||0)+v); await dbSet(`users/${sid}/gf/${ts}`,{v,m:'선생님이 주신 코인',tg:1});
       { const uu=tUsers[sid]||tTestU[sid]; if(uu) uu.coin=(+uu.coin||0)+v; } }catch(e){}
   }
   toast(`${sids.length}명에게 ${v}코인씩 주었어요`); paintTeacher();
@@ -12729,8 +12735,10 @@ async function tSetCoin(sid,mode,v){
   const u=tUsers[sid]||tTestU[sid]||{}, now=+u.coin||0;
   const msg=mode==='sub'?`${sid}의 코인에서 ${v}개를 뺄까요? (지금 ${now}개)`:`${sid}의 코인을 ${v}개로 맞출까요? (지금 ${now}개)`;
   if(!confirm(msg)) return;
-  const r=await dbTx(`users/${sid}/coin`,c=>mode==='sub'?Math.max(0,(+c||0)-v):v);
+  let old=0; const r=await dbTx(`users/${sid}/coin`,c=>{ old=+c||0; return mode==='sub'?Math.max(0,old-v):v; });
   if(!(r&&r.ok)) return toast('바꾸지 못했어요. 잠시 뒤 다시 해 주세요');
+  const d=(+r.val)-old; if(d) await dbTx(`users/${sid}/tg`,c=>(+c||0)+d);   /* 순위용: 선생님이 바꾼 만큼 */
+  u.tg=(+u.tg||0)+d;
   u.coin=+r.val; toast(`${sid}의 코인을 ${r.val}개로 바꿨어요`); paintTeacher();
 }
 
@@ -12885,6 +12893,7 @@ function paintTStu(rows){
           <div><b>${cn(cu.shop)}</b><span>상점 · 물건 ${cu.nOwn}개</span></div>
           <div><b>${cn(cu.box)}</b><span>랜덤 상자 ${cu.boxN}번</span></div>
           <div><b>${cn(cu.gift)}</b><span>우리 반 모금</span></div>
+          <div><b>${cn(cu.tg)}</b><span>선생님이 준 코인(순위 제외)</span></div>
         </div>
         ${tMsHTML(u)}
         <div class="chartlab" style="margin:10px 0 6px;text-align:left">주제별 한눈에 — 연습 등급은 스테이지 최고 시간, 실전 등급은 1분 최고 기록</div>
@@ -12956,7 +12965,7 @@ async function teacherPlay(){
   const sid=TEACHER_ID, h=tPwH4; let u=null;
   try{ u=await dbGet('users/'+sid,null); }catch(e){}
   if(!(u&&u.h)){ const s0=CH_SHAPES.filter(x=>!x.p).map(x=>x.k), c0=CH_COLORS.filter(x=>!x.p).map(x=>x.k);
-    u={h, ch:{s:DEF_CH.s,c:DEF_CH.c,items:[]}, coin:TEST_COIN, t10k:1, own:[], ownS:s0, ownC:c0, at:Date.now()};
+    u={h, ch:{s:DEF_CH.s,c:DEF_CH.c,items:[]}, coin:TEST_COIN, t10k:1, tg:TEST_COIN, own:[], ownS:s0, ownC:c0, at:Date.now()};
     await dbSet('users/'+sid,u); }
   await testCoinUp(sid,u);
   isTeacher=false; ME=meFrom(sid,u); ME._c0=ME.coin; LS.set(MEKEY,{sid,h:u.h});
@@ -13737,7 +13746,7 @@ function btPaintResult(){
       <div class="bttrh"><span class="medal ${final&&rank<=3?'m'+rank:''}">${final?rank:'·'}</span><b>${g.n}</b>${final&&rank===1?'<em>우승</em>':''}<strong>${g.sum}<small>개</small></strong></div>
       <div class="bttrm">${g.mem.map((p,j)=>`<span class="bttm${j===0&&p.n>0?' mvp':''}"><i>${avatarSVG(p.ch,{tight:true})}</i><b>${whoHTML(p.sid,p)}</b><em>${p.n}</em></span>`).join('')}</div></div>`).join('')}</div>`:'';
   const pod=!team&&final&&P.length>=2?`<div class="cbpod btpod">${[1,0,2].filter(i=>R[i]).map(i=>{ const {r:p,rank}=R[i];
-      return `<div class="cbp p${Math.min(rank,3)}${p.sid===ME.sid?' me':''}"><div class="cbpav">${avatarSVG(p.ch,{tight:true})}</div>
+      return `<div class="cbp p${Math.min(rank,3)}${p.sid===ME.sid?' me':''}"><div class="cbpav">${avatarSVG(p.ch)}</div>
         <span class="medal m${Math.min(rank,3)}">${rank}</span><b>${whoHTML(p.sid,p)}</b><em>${p.n}개</em><i style="height:${[0,64,46,34][Math.min(rank,3)]}px"></i></div>`; }).join('')}</div>`:'';
   el('btBody').innerHTML=`
     <div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>${final?(team?(myTR===1?'우리 팀 우승!':'팀전 결과'):(mr===1&&P.length>1?'우승!':'대전 결과')):'친구들이 끝나기를 기다리는 중…'}</h2>
@@ -14416,8 +14425,10 @@ async function tryLogin(){
 const TEST_COIN=10000;
 async function testCoinUp(sid,u){
   if(!isTestSid(sid)||!u||u.t10k) return;
-  try{ const r=await dbTx(`users/${sid}/coin`,c=>Math.max(+c||0,TEST_COIN)); await dbSet(`users/${sid}/t10k`,1);
-    u.coin=r&&r.ok&&r.val!=null?+r.val:Math.max(+u.coin||0,TEST_COIN); u.t10k=1; }catch(e){}
+  try{ let old=0; const r=await dbTx(`users/${sid}/coin`,c=>{ old=+c||0; return Math.max(old,TEST_COIN); });
+    const nw=r&&r.ok&&r.val!=null?+r.val:Math.max(+u.coin||0,TEST_COIN), d=Math.max(0,nw-old);
+    if(d>0) await dbTx(`users/${sid}/tg`,c=>(+c||0)+d);
+    await dbSet(`users/${sid}/t10k`,1); u.coin=nw; u.t10k=1; u.tg=(+u.tg||0)+d; }catch(e){}
 }
 async function makeAccount(){
   const sid=(el('inSid').value||'').replace(/\D/g,'');
@@ -14427,7 +14438,7 @@ async function makeAccount(){
   el('gMake').disabled=true; el('gMake').textContent='만드는 중…';
   const s0=[...new Set(CH_SHAPES.filter(x=>!x.p).map(x=>x.k).concat([newCh.s]))];
   const c0=[...new Set(CH_COLORS.filter(x=>!x.p).map(x=>x.k).concat([newCh.c]))];
-  const rec0={h:hash4(sid,pw), ch:{s:newCh.s,c:newCh.c,items:[]}, coin:isTestSid(sid)?TEST_COIN:0, t10k:isTestSid(sid)?1:0,
+  const rec0={h:hash4(sid,pw), ch:{s:newCh.s,c:newCh.c,items:[]}, coin:isTestSid(sid)?TEST_COIN:0, t10k:isTestSid(sid)?1:0, tg:isTestSid(sid)?TEST_COIN:0,
              own:[], ownS:s0, ownC:c0, at:Date.now()};
   /* 기존 계정이 서버에 이미 있으면 덮어쓰지 않고 중단 (트랜잭션 방어) */
   const tx=await dbTx('users/'+sid, cur=>(cur&&cur.h)?undefined:rec0);
@@ -15398,7 +15409,9 @@ function coinUse(u,sid,classes){
   const gift=Math.max(cu.g||0,(cg&&cg[sid])||0);
   const exact=!!u.cu&&!(u.boxN>(cu.bn||0))&&shop===(cu.s||0);
   const have=u.coin||0, spent=shop+box+gift+(+cu.n||0);
-  return {have, shop, nOwn, box, boxN, gift, spent, total:have+spent, exact};
+  /* 선생님이 주거나 시험용으로 채워 준 코인(tg)은 '모은 코인' 순위에서 빼요 — 아직 알림 전인 예전 선물도 */
+  const tg=(+u.tg||0)+(u.gf&&typeof u.gf==='object'?Object.values(u.gf).reduce((a,x)=>a+((x&&!x.tg&&+x.v>0)?+x.v:0),0):0);
+  return {have, shop, nOwn, box, boxN, gift, spent, tg, total:Math.max(0,have+spent-tg), exact};
 }
 const cn=v=>Number(v||0).toLocaleString('ko-KR');
 
@@ -15447,7 +15460,7 @@ const RKK={
   prac  :{n:'연습왕',   unit:'단계', v:r=>r.prac,   sub:r=>`푼 문제 ${cn(r.solved)}개`,
           desc:()=>'모든 주제에서 클리어한 연습 스테이지 수', empty:'아직 클리어한 스테이지가 없어요.'},
   coin  :{n:'코인',     unit:'코인', v:r=>r.coin,   sub:r=>`가진 코인 ${cn(r.have)} · 쓴 코인 ${cn(r.spent)}`, fmt:1,
-          desc:()=>'모은 코인 = 가진 코인 + 상점·상자·우리 반 모금에 쓴 코인', empty:'아직 코인 기록이 없어요.'},
+          desc:()=>'모은 코인 = 가진 코인 + 쓴 코인 (선생님이 준 코인은 빼요)', empty:'아직 코인 기록이 없어요.'},
   battle:{n:'대전',     unit:'승',  v:r=>r.bw,     sub:r=>`${r.bp}판 · ${r.bl}패 · 우승률 ${Math.round(r.rate*100)}%`, key:r=>r.bw*1000+r.rate,
           desc:()=>'친구 대전에서 우승한 횟수 · 같으면 우승률 순 (2명 이상이 끝까지 한 판만 세요)', empty:'아직 친구 대전 기록이 없어요.'}
 };
@@ -15460,7 +15473,7 @@ function rankList(list,val){
 function podiumHTML(R,val,unit,meSid){
   if(R.length<2) return '';
   return `<div class="cbpod rkpod">${[1,0,2].filter(i=>R[i]&&R[i].rank<=3).map(i=>{ const {r,rank}=R[i];
-    return `<div class="cbp p${rank}${meSid&&r.sid===meSid?' me':''}" data-sid="${esc(r.sid)}"><div class="cbpav">${avatarSVG(r.ch,{tight:true})}</div>
+    return `<div class="cbp p${rank}${meSid&&r.sid===meSid?' me':''}" data-sid="${esc(r.sid)}"><div class="cbpav">${avatarSVG(r.ch)}</div>
       <span class="medal m${rank}">${rank}</span><b>${whoHTML(r.sid,r.u)}</b><em>${val(r)}${unit?`<small>${unit}</small>`:''}</em><i style="height:${[0,58,42,30][rank]}px"></i></div>`; }).join('')}</div>`;
 }
 const belowPod=R=>R.length>=2?R.filter(o=>o.rank>3):R;
