@@ -2274,7 +2274,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 20:53';
+const APP_VER='11.23 22:35';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -12369,37 +12369,37 @@ rvReal(TOPICS.pfac);
   I.desc='부호 규칙 · 괄호 없는 식 · 거듭제곱 · 혼합 계산'; delete I.realStages;
   I.cats=(I.cats||[]).filter(c=>c[0]!=='iQd'&&c[0]!=='iQf'); }
 Object.assign(TOPICS.expo,{desc:'지수법칙 ⑴ ⑵ ⑶ ⑷와 혼합 계산',
-  stages:[{n:1, name:'지수법칙 ⑴ 거듭제곱의 곱셈', ex:'a³ × a⁴ = a<sup>□</sup>', gen:genE1, take:12},
-          {n:2, name:'지수법칙 ⑵ 거듭제곱의 거듭제곱', ex:'(a³)⁴ = a<sup>□</sup>', gen:genE2, take:12},
-          {n:3, name:'지수법칙 ⑶ 거듭제곱의 나눗셈', ex:'a⁷ ÷ a³ = a<sup>□</sup>', gen:genE3, take:12},
-          {n:4, name:'지수법칙 ⑷ 곱과 몫의 거듭제곱', ex:'(a²b³)⁴ = a⁸b<sup>□</sup>', gen:genE4, take:12},
+  stages:[{n:1, name:'지수법칙 ⑴ 곱셈', ex:'a³ × a⁴ = a<sup>□</sup>', gen:genE1, take:12},
+          {n:2, name:'지수법칙 ⑵ 거듭제곱', ex:'(a³)⁴ = a<sup>□</sup>', gen:genE2, take:12},
+          {n:3, name:'지수법칙 ⑶ 나눗셈', ex:'a⁷ ÷ a³ = a<sup>□</sup>', gen:genE3, take:12},
+          {n:4, name:'지수법칙 ⑷ 곱·몫의 거듭제곱', ex:'(a²b³)⁴ = a⁸b<sup>□</sup>', gen:genE4, take:12},
           {n:5, name:'혼합 계산', ex:'a⁵ × a³ ÷ a⁴ = a<sup>□</sup>', gen:genEX, take:10}],
   cats:[['⑴ aᵐ × aⁿ',sk=>/^e[MT]/.test(sk)],['⑵ (aᵐ)ⁿ',sk=>/^e[PQ]/.test(sk)],['⑶ aᵐ ÷ aⁿ',sk=>/^e[DE]/.test(sk)],['⑷ (ab)ⁿ · (a/b)ⁿ',sk=>/^e[CBR]/.test(sk)],['혼합 계산',sk=>/^eX/.test(sk)]]});
 delete TOPICS.expo.realStages;
 Object.assign(TOPICS.ineq,{desc:'이항 · 음수로 나누기와 부등호 방향 · ax + b > c · 분수·소수 계수',
   stages:[{n:1, name:'한 번에 풀기', ex:'x + 5 > 18', gen:genIQ1, take:12},
-          {n:2, name:'음수 나눗셈 · 부등호 방향', ex:'−3x > 12', gen:genIQ3, take:12},
+          {n:2, name:'음수로 나누기', ex:'−3x > 12', gen:genIQ3, take:12},
           {n:3, name:'ax + b > c 풀기', ex:'−2x + 5 > 19', gen:genIQ3n, take:12},
           {n:4, name:'분수·소수 계수', ex:'0.3x − 1.2 < 0.6', gen:genIQ4, take:12}],
   cats:[['MI1'],['MI3'],['MI2'],['MI4']]});
 Object.assign(TOPICS.linf,{desc:'함숫값 · 절편 · 기울기 · 일차함수의 식',
-  stages:[{n:1, name:'함숫값', ex:'f(x) = 4x − 1, f(2)', gen:genLF1, take:12},
-          {n:2, name:'절편', ex:'y = 2x − 6 의 x절편', gen:genLF2n, take:10},
-          {n:3, name:'기울기', ex:'(1, 3), (3, 7)의 기울기', gen:genLF3n, take:10},
-          {n:4, name:'일차함수의 식', ex:'(1, 3), (3, 7) → y = □x + 1', gen:genLF4n, take:10}]});
+  stages:[{n:1, name:'함숫값', ex:'f(x)=4x−1 → f(2)', gen:genLF1, take:12},
+          {n:2, name:'절편', ex:'y=2x−6 → x절편', gen:genLF2n, take:10},
+          {n:3, name:'기울기', ex:'(1,3),(3,7) → a', gen:genLF3n, take:10},
+          {n:4, name:'일차함수의 식', ex:'y = □x + 1', gen:genLF4n, take:10}]});
 rvReal(TOPICS.linf);
 Object.assign(TOPICS.angle,{desc:'삼각형의 내각·외각 · 다각형의 대각선 · 다각형의 내각 · 다각형의 외각',
-  stages:[{n:1, name:'삼각형의 내각과 외각', ex:'그림을 보고 ?', gen:genAGt, take:10},
-          {n:2, name:'다각형의 대각선', ex:'육각형의 대각선', gen:genAGd, take:10},
-          {n:3, name:'다각형의 내각', ex:'정육각형의 한 내각', gen:genAGi, take:10},
-          {n:4, name:'다각형의 외각', ex:'정팔각형의 한 외각', gen:genAGe, take:10}],
+  stages:[{n:1, name:'삼각형의 내각과 외각', ex:'50°+70°+□=180°', gen:genAGt, take:10},
+          {n:2, name:'다각형의 대각선', ex:'n(n−3)÷2', gen:genAGd, take:10},
+          {n:3, name:'다각형의 내각', ex:'180°×(n−2)', gen:genAGi, take:10},
+          {n:4, name:'다각형의 외각', ex:'360° ÷ 8 = □', gen:genAGe, take:10}],
   cats:[['AG1'],['AG2'],['AG3'],['AG4']]});
 rvReal(TOPICS.angle);
 Object.assign(TOPICS.simr,{desc:'그림으로 닮음비 · 대응변 · 넓이의 비 · 부피의 비',
-  stages:[{n:1, name:'대응변의 길이 · 둘레', ex:'그림을 보고 ? cm', gen:genSRt, take:10},
+  stages:[{n:1, name:'대응변의 길이 · 둘레', ex:'3 : 5 = 6 : □', gen:genSRt, take:10},
           {n:2, name:'넓이의 비', ex:'2 : 3 → 4 : □', gen:genSRa2, take:10},
           {n:3, name:'부피의 비', ex:'2 : 3 → 8 : □', gen:genSRa3, take:10},
-          {n:4, name:'닮음비 거꾸로', ex:'넓이 9 : 16 → 3 : □', gen:genSRr, take:10}]});
+          {n:4, name:'넓이·부피에서 닮음비', ex:'9 : 16 → 3 : □', gen:genSRr, take:10}]});
 rvReal(TOPICS.simr);
 ['int','expo','ineq'].forEach(t=>rvReal(TOPICS[t]));
 Object.keys(REAL_CACHE).forEach(k=>delete REAL_CACHE[k]);
@@ -12457,6 +12457,7 @@ function rvNote(t,N,fh){
       ways:(N.ways||[]).filter(w=>!bad.test(w.t)).concat(t==='expo'?[fh('⑵ 지수 찾기','(a□)³ = a¹²',eQ('a',4,3)),fh('⑷ 곱의 거듭제곱','(a²b³)⁴',eB(0,2,3,4,'y')),fh('⑷ 몫의 거듭제곱','(a³/b)²',eR(0,3,1,2,'x'))]:[]),
       miss:(N.miss||[]).filter(m=>!/3a²|유리수|1\/2/.test(m.w))}); }
   if(t==='ineq') return Object.assign({},N,{ways:(N.ways||[]).concat([fh('분수 계수 — 분모를 곱하기','x/2 + 3 > 5',iq4('f',1,2,3,4)),fh('소수 계수 — 10을 곱하기','0.3x − 1.2 < 0.6',iq4('d',0,3,-12,6))])});
+  if(t==='linf') return Object.assign({},N,{sub:'함숫값 · 절편 · 기울기 · 일차함수의 식', ways:(N.ways||[]).filter(w=>!/평행이동/.test(w.t))});
   if(t==='angle') return Object.assign({},N,{sub:'삼각형의 내각과 외각 · 다각형의 대각선 · 다각형의 내각 · 다각형의 외각'});
   return N;
 }
