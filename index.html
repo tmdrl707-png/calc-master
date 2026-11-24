@@ -2322,7 +2322,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.23 23:06';
+const APP_VER='11.24 21:56';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -12517,6 +12517,37 @@ function rvNote(t,N,fh){
   extNote=(t,fh)=>rvNote(t,n0(t,fh),fh);
   qFigOf=f=>f.k==='agT'?agTSVG(f):f.k==='agD'?agDSVG(f):f.k==='agI'?agISVG(f):f.k==='agE'?agESVG(f):(f.k==='srT'||f.k==='srA'||f.k==='srR')?srFig(f):q0(f); }
 
+/* ═══════════════════ 초등 정리 (11.24) ═══════════════════
+   · 분수의 덧셈과 뺄셈 — 대분수 단계 빼기
+   · 100 보수·빠른 암산 — 주제 목록에서 빼기
+   · 분수의 곱셈과 나눗셈 — (분수)×(자연수)·(자연수)×(분수) 한 단계, 나눗셈 한 단계 → 3단계
+   · 초등 학년 묶음 — 1~2학년 · 3~4학년 · 5~6학년                                     */
+{ const A=TOPICS.fadd;
+  A.desc='분모가 같은 분수 · 약분과 통분 · 분모가 다른 분수';
+  A.stages=A.stages.filter(s=>s.gen!==genNA3);
+  A.cats=[['NFs'],['EFe'],['NFa']];
+  A.sv=(A.sv||0)+1;
+  const M=TOPICS.fmul;
+  M.desc='분수와 자연수의 곱셈 · 분수끼리의 곱셈 · 분수의 나눗셈';
+  M.sv=(M.sv||0)+1;   /* 단계 수가 바뀌어 예전 클리어 표시는 새로 시작해요 */
+  M.stages=[
+    {n:1, name:'분수와 자연수의 곱셈', ex:'1/2 × 4', gen:()=>(Math.random()<.5?genNM1:genNM2)(), take:12, old:[1,2]},
+    {n:2, name:'(분수) × (분수)',      ex:'2/3 × 3/4', gen:genNM3, take:10, old:[3]},
+    {n:3, name:'분수의 나눗셈',        ex:'3/4 ÷ 3/8', gen:()=>(Math.random()<.45?genNM4:genNM5)(), take:12, old:[4,5]}
+  ];
+  M.cats=[['NFo','NFmn'],['NFmf'],['NFdn','NFdf','NFdi']];
+  const E=SCHOOLS.find(s=>s.k==='e');
+  E.topics=E.topics.filter(t=>t!=='fast');
+  E.sub='덧셈·뺄셈 · 구구단 · □ 구하기 · 나눗셈 · 소수 · 단위 변환 · 혼합계산 · 분수 · 비와 비율';
+  const GR={addsub:'1~2학년', gugu:'1~2학년', boxq:'1~2학년',
+            div:'3~4학년', dadd:'3~4학년', unit:'3~4학년',
+            mix:'5~6학년', fadd:'5~6학년', fmul:'5~6학년', dmul:'5~6학년', ratio:'5~6학년'};
+  Object.keys(GR).forEach(k=>{ if(TOPICS[k]) TOPICS[k].gr=GR[k]; });
+  const ord=Object.keys(GR); E.topics.sort((a,b)=>ord.indexOf(a)-ord.indexOf(b));
+  TOPIC_ORDER.length=0; TOPIC_ORDER.push(...SCHOOLS.flatMap(s=>s.topics));
+  Object.keys(REAL_CACHE).forEach(k=>delete REAL_CACHE[k]);
+}
+
 /* ═══════════════════ 선생님 모드 ═══════════════════
    학번 칸에 00000, 선생님 비밀번호를 넣으면 들어옵니다.
    비밀번호 자체는 코드에 두지 않고 SHA-256 값만 둡니다. 새로고침해도 이 기기에서는 유지돼요(나가기를 누르면 해제).
@@ -13894,28 +13925,27 @@ const PREQ={
   'addsub:3':[['addsub',1]], 'addsub:4':[['addsub',2]], 'addsub:5':[['addsub',3],['addsub',4]],
   'gugu:9':[['gugu',8],['gugu',6],['gugu',7]], 'gugu:10':[['gugu',1]],
   'boxq:1':[['addsub',3],['addsub',4]], 'boxq:2':[['gugu',9]], 'boxq:3':[['boxq',1],['boxq',2]],
-  'fadd:1':[['addsub',1]], 'fadd:2':[['gugu',9]], 'fadd:3':[['fadd',2]], 'fadd:4':[['fadd',1]], 'int:5':[['int',3],['fmul',3]], 'int:6':[['int',4],['int',3]], 'expo:5':[['expo',2],['expo',3]], 'root:4':[['root',2]], 'root:5':[['root',2],['root',3]], 'ratio:4':[['ratio',1]],
-  'fmul:1':[['gugu',9]], 'fmul:2':[['gugu',9]], 'fmul:3':[['fadd',2]], 'fmul:4':[['fmul',3]], 'fmul:5':[['fmul',3],['fmul',4]],
+  'fadd:1':[['addsub',1]], 'fadd:2':[['gugu',9]], 'fadd:3':[['fadd',2]], 'int:5':[['int',3],['fmul',2]], 'int:6':[['int',4],['int',3]], 'expo:5':[['expo',2],['expo',3]], 'root:4':[['root',2]], 'root:5':[['root',2],['root',3]], 'ratio:4':[['ratio',1]],
+  'fmul:1':[['gugu',9]], 'fmul:2':[['fadd',2]], 'fmul:3':[['fmul',1],['fmul',2]],
   'dadd:1':[['addsub',1],['addsub',2]], 'dadd:2':[['dadd',1]], 'dadd:3':[['addsub',3],['addsub',4]], 'dadd:4':[['boxq',1]],
   'dmul:1':[['gugu',9]], 'dmul:2':[['dmul',1]], 'dmul:3':[['gugu',9]], 'dmul:4':[['dmul',3]],
   'ratio:1':[['gugu',9],['fadd',2]], 'ratio:2':[['gugu',9],['boxq',2]], 'ratio:3':[['ratio',1],['fmul',1]],
   'int:1':[['addsub',3],['addsub',4]], 'int:2':[['int',1]], 'int:3':[['gugu',9]], 'int:4':[['int',3],['power',1]],
   'power:1':[['gugu',9]], 'power:2':[['power',1]], 'power:3':[['power',1]],
-  'lineq:1':[['int',1],['boxq',1]], 'lineq:2':[['boxq',3],['int',3]], 'lineq:3':[['int',2],['lineq',2]], 'lineq:4':[['fadd',2],['fmul',3],['int',3]],
+  'lineq:1':[['int',1],['boxq',1]], 'lineq:2':[['boxq',3],['int',3]], 'lineq:3':[['int',2],['lineq',2]], 'lineq:4':[['fadd',2],['fmul',2],['int',3]],
   'expo:1':[['power',1],['power',2]], 'expo:2':[['expo',1]], 'expo:3':[['expo',2],['gugu',9]], 'expo:4':[['expo',3]],
   'pyth:1':[['power',1]], 'pyth:2':[['power',1],['power',3]], 'pyth:3':[['pyth',1],['gugu',9]],
   'root:1':[['power',1],['power',3]], 'root:2':[['power',1],['root',1]], 'root:3':[['root',2],['gugu',9]],
   'factor:1':[['gugu',9]], 'factor:2':[['power',1]], 'factor:3':[['power',1]], 'factor:4':[['int',3],['gugu',9]], 'factor:5':[['factor',4]],
   'trig:1':[['root',1]], 'trig:2':[['pyth',1],['fadd',2]], 'trig:3':[['trig',1]], 'trig:4':[['trig',1],['root',3]],
   'logx:1':[['expo',1],['root',1]], 'logx:2':[['expo',1],['power',2]], 'logx:3':[['logx',2]], 'logx:4':[['logx',2],['expo',2]],
-  'tfn:1':[['fmul',3]], 'tfn:2':[['trig',1]], 'tfn:3':[['tfn',2],['trig',2]], 'tfn:4':[['tfn',2]], 'tfn:5':[['trig',4],['root',2]],
+  'tfn:1':[['fmul',2]], 'tfn:2':[['trig',1]], 'tfn:3':[['tfn',2],['trig',2]], 'tfn:4':[['tfn',2]], 'tfn:5':[['trig',4],['root',2]],
   'pfac:2':[['pfac',1]], 'pfac:3':[['gugu',9]], 'pfac:4':[['pfac',3]],
   'linf:1':[['int',3]], 'linf:2':[['lineq',1]], 'linf:3':[['int',2]], 'linf:4':[['linf',3],['lineq',2]],
   'angle:2':[['angle',1]], 'angle:3':[['angle',2]],
   'simr:2':[['simr',1],['power',1]], 'simr:3':[['simr',1],['power',2]], 'simr:4':[['simr',2]],
   'comb:1':[['gugu',9]], 'comb:2':[['comb',1]], 'comb:3':[['comb',1],['comb',2]],
   'div:1':[['gugu',9]], 'div:2':[['div',1]], 'div:3':[['div',2]],
-  'fast:1':[['addsub',3],['addsub',4]], 'fast:2':[['fast',1]], 'fast:3':[['gugu',9],['fast',1]],
   'mix:1':[['gugu',9],['div',1]], 'mix:2':[['mix',1]], 'mix:3':[['mix',2]],
   'unit:1':[['dmul',1]], 'unit:2':[['gugu',6],['addsub',3]], 'unit:3':[['dmul',1]],
   'alg:1':[['int',1]], 'alg:2':[['int',3],['alg',1]], 'alg:3':[['alg',2]],
@@ -14475,7 +14505,7 @@ function logout(){
    SS : 계산을 아주 잘하는 친구 · SSS : SS 실력에 운까지 더해져야 닿는 기록(SS × 1.12)
    절대평가 — 학생 기록에 맞추지 않고, 등급별 실력(생각 속도)을 정해 둔 풀이 시간 모의실험으로 정했어요(주제·단계별 생각 시간 + 휴대폰 입력 시간 + 문장은 숫자 위주로 훑어 읽는 시간).
    B 기준에 못 미치면 등급이 없어요. (11.23 저녁 — 34개 주제 전체를 바뀐 문제로 다시 모의실험, 밤에 개편한 7개 주제 다시 모의실험) 선생님 모드 '등급 기준' 탭에서 학생 기록을 참고로 보고 직접 고칠 수 있어요(config/gcut). */
-const GRADE_CUT={addsub:[28,25,21,17,11], gugu:[54,48,42,33,22], fadd:[15,13,11,10,8], fmul:[21,19,15,12,7], ratio:[18,16,13,10,7], factor:[17,15,13,12,7], power:[28,25,20,14,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[20,18,15,12,8], linf:[18,16,14,11,6], angle:[20,18,14,10,7], simr:[19,17,12,9,5], dadd:[22,20,16,12,8], dmul:[22,20,15,11,7], int:[25,22,18,14,8], expo:[29,26,22,17,12], root:[22,20,17,13,9], trig:[26,23,17,11,8], logx:[21,19,15,11,6], tfn:[15,13,12,9,8], comb:[20,18,14,11,7], div:[29,26,21,16,11], fast:[24,21,17,13,9], mix:[19,17,14,11,7], unit:[26,23,19,15,9], alg:[21,19,15,12,9], ineq:[17,15,13,11,8], sys:[18,16,12,9,6], quad:[19,17,14,12,9], cplx:[21,19,15,12,8], rem:[16,14,11,8,6], seq:[19,17,13,10,7]};
+const GRADE_CUT={addsub:[28,25,21,17,11], gugu:[54,48,42,33,22], fadd:[16,14,12,10,8], fmul:[21,19,15,12,7], ratio:[18,16,13,10,7], factor:[17,15,13,12,7], power:[28,25,20,14,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[20,18,15,12,8], linf:[18,16,14,11,6], angle:[20,18,14,10,7], simr:[19,17,12,9,5], dadd:[22,20,16,12,8], dmul:[22,20,15,11,7], int:[25,22,18,14,8], expo:[29,26,22,17,12], root:[22,20,17,13,9], trig:[26,23,17,11,8], logx:[21,19,15,11,6], tfn:[15,13,12,9,8], comb:[20,18,14,11,7], div:[29,26,21,16,11], fast:[24,21,17,13,9], mix:[19,17,14,11,7], unit:[26,23,19,15,9], alg:[21,19,15,12,9], ineq:[17,15,13,11,8], sys:[18,16,12,9,6], quad:[19,17,14,12,9], cplx:[21,19,15,12,8], rem:[16,14,11,8,6], seq:[19,17,13,10,7]};
 const GRADE_DEF=JSON.parse(JSON.stringify(GRADE_CUT));
 function applyGcut(o){ Object.keys(GRADE_DEF).forEach(t=>{ const v=o&&o[t], ok=Array.isArray(v)&&v.length===5&&v.every((x,i)=>x>0&&(i===0||x<v[i-1]));
   GRADE_CUT[t].splice(0,5,...(ok?v.map(Number):GRADE_DEF[t])); }); }
