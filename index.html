@@ -1874,6 +1874,38 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 .cbp.p1 .cbpav{width:104px;height:104px}
 .cbp .cbpav svg{overflow:visible}
 @media(max-width:380px){.cbp .cbpav{width:78px;height:78px}.cbp.p1 .cbpav{width:94px;height:94px}}
+
+.gbadge.g-C{background:#c9ccd3;color:#4a4f5c}
+.rcsum .gbadge.g-C{color:#4a4f5c}
+
+/* 열린 방 목록 (보스전 · 대전) */
+.bsrooms{display:flex;flex-direction:column;gap:8px;margin:12px 0 4px;max-height:46vh;overflow:auto}
+.bsroom{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:#fff;text-align:left;cursor:pointer;font:inherit;color:var(--ink)}
+.bsroom:active{transform:scale(.98)}
+.bsroom .bsri{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.bsroom .bsri b{font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bsroom .bsri small{font-size:12px;color:var(--dim)}
+.bsroom .bsri em{font-style:normal;color:#e8394f;font-weight:700}
+.bsroom .bsrc{font-weight:900;font-size:16px;letter-spacing:1px;color:var(--blue);font-variant-numeric:tabular-nums}
+.bsroom.off{opacity:.55}
+
+/* 홈 하단: 친구와 대전 | 보스전 한 줄 */
+.btwrap{display:grid!important;grid-template-columns:1fr 1fr;gap:10px}
+.btwrap .btbar{margin:0!important;min-width:0;padding:12px 12px!important;gap:10px;justify-content:flex-start}
+.btwrap .btbar .bti{flex:0 0 auto}
+.btwrap .btbar .btt{flex:1;min-width:0}
+.btwrap .btbar .btt b{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 총합제 점수판 */
+.bttot{margin:0 0 8px;padding:10px 12px;border-radius:16px;background:#fff;border:1px solid var(--line)}
+.bttmsg{font-size:14px;font-weight:700;text-align:center;margin-bottom:8px}
+.bttrow{display:grid;grid-template-columns:76px 1fr 38px;align-items:center;gap:8px;margin:5px 0}
+.bttn{font-size:13px;font-weight:800;color:var(--tc);white-space:nowrap}
+.bttn em{font-style:normal;font-size:10.5px;background:var(--tc);color:#fff;border-radius:6px;padding:0 5px;margin-left:2px}
+.bttbar{height:14px;border-radius:8px;background:#eef0f4;overflow:hidden}
+.bttbar i{display:block;height:100%;background:var(--tc);border-radius:8px;transition:width .35s}
+.bttrow>b{font-size:18px;font-weight:900;text-align:right;font-variant-numeric:tabular-nums;color:var(--tc)}
+.bttrow.me .bttbar{box-shadow:0 0 0 2px color-mix(in srgb,var(--tc) 35%,#fff)}
 </style>
 </head>
 <body>
@@ -1952,9 +1984,9 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
   <div id="coopBox"></div>
   <div class="schools" id="schoolList"></div>
   <div class="btwrap"><button class="btbar" onclick="openBattle()"><span class="bti" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M2.8 19c.6-3.4 3.1-5.4 6.2-5.4s5.6 2 6.2 5.4z" fill="currentColor"/><circle cx="16.6" cy="9" r="2.6" fill="currentColor" opacity=".55"/><path d="M14.6 14.2c.6-.2 1.3-.3 2-.3 2.6 0 4.4 1.7 4.9 4.6h-4.6c-.3-1.7-1.1-3.2-2.3-4.3z" fill="currentColor" opacity=".55"/></svg></span>
-        <span class="btt"><b>친구와 대전</b><small>열려 있는 주제 어디서든 · 방 번호로 친구들과 빨리 맞히기</small></span><span class="go" aria-hidden="true">→</span></button>
+        <span class="btt"><b>친구와 대전</b></span></button>
       <button class="btbar bossbtn" onclick="openBossJoin()"><span class="bti" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5 4 6v6c0 5 3.4 9.2 8 10.5 4.6-1.3 8-5.5 8-10.5V6l-8-3.5z" fill="currentColor" opacity=".2"/><path d="M12 3.6 5.2 6.6V12c0 4.3 2.9 7.9 6.8 9.1 3.9-1.2 6.8-4.8 6.8-9.1V6.6L12 3.6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12.2 11.2 14.4 15.5 9.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-        <span class="btt"><b>반 전체 보스전 참가</b><small>선생님이 연 방에 반 친구들과 함께 들어가 목표 문제 수 격파하기</small></span><span class="go" aria-hidden="true">→</span></button></div>
+        <span class="btt"><b>보스전</b></span></button></div>
   <div class="homebar">
     <button class="link" onclick="logout()">다른 학번으로 들어가기</button>
   </div>
@@ -2299,7 +2331,9 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="overlay" id="ovBossJoin" onclick="if(event.target===this)close_('ovBossJoin')">
   <div class="modal">
     <h3>반 전체 보스전 참가</h3>
-    <div class="sub">선생님이 알려 준 방 번호 4자리를 입력하세요.</div>
+    <div class="sub">지금 열려 있는 방을 누르면 바로 들어가요.</div>
+    <div class="bsrooms" id="bsRooms"><div class="btempty">열린 방을 찾는 중…</div></div>
+    <div class="sub" style="margin-top:12px">목록에 없으면 선생님이 알려 준 방 번호 4자리를 입력하세요.</div>
     <input id="bsCodeIn" class="nkin" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="예) 1234" onkeydown="if(event.key==='Enter') joinBossByInput()">
     <div class="err" id="bsJoinErr" style="margin-top:6px;text-align:center"></div>
     <div class="row"><button class="btn" onclick="close_('ovBossJoin')">닫기</button><button class="btn primary" onclick="joinBossByInput()">들어가기</button></div>
@@ -2322,7 +2356,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.24 21:56';
+const APP_VER='11.25 09:52';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -13036,7 +13070,7 @@ let tgEdit='';
 function paintTGrade(){
   const box=el('tBody'), topics=TOPIC_ORDER.filter(t=>GRADE_DEF[t]);
   const rows=topics.map(t=>{ const v=Object.keys(tUsers).map(sid=>+((((tUsers[sid].R||{})[t])||{}).best)||0).filter(x=>x>0);
-    const cnt={SSS:0,SS:0,S:0,A:0,B:0,'-':0}; v.forEach(x=>cnt[gradeOfRec(t,x)||'-']++);
+    const cnt={SSS:0,SS:0,S:0,A:0,B:0,C:0,'-':0}; v.forEach(x=>cnt[gradeOfRec(t,x)||'-']++);
     return {t,v,cur:GRADE_CUT[t].slice(),def:GRADE_DEF[t],cnt,own:!!(CFG.gcut||{})[t],open:topicOpen(t)}; }).sort((a,b)=>(b.open-a.open)||(b.v.length-a.v.length));
   const fmt=c=>c.map(x=>`<b>${x}</b>`).join(' · ');
   const labs=['SSS','SS','S','A','B'];
@@ -13049,7 +13083,7 @@ function paintTGrade(){
     <div class="tg-list">${rows.map(r=>`<div class="tg-row${r.open?'':' off'}">
       <div class="tg-h"><b>${esc(topicOf(r.t).n)}</b>${r.open?'':'<small>잠김</small>'}${r.own?'<small class="own">직접 고친 기준</small>':''}<em>기록 ${r.v.length}명${r.v.length?` · 최고 ${Math.max(...r.v)}개 · 중간 ${Math.round(pctl(r.v,.5))}개`:''}</em></div>
       <div class="tg-c">기준 ${fmt(r.cur)}${r.own?` <span class="dim">(기본 ${r.def.join('·')})</span>`:''}</div>
-      ${r.v.length?`<div class="tg-d">${['SSS','SS','S','A','B','-'].map(g=>`<span>${g==='-'?'등급 없음':gBadge(g)} ${r.cnt[g]}명</span>`).join('')}</div>`:''}
+      ${r.v.length?`<div class="tg-d">${['SSS','SS','S','A','B','C','-'].map(g=>`<span>${g==='-'?'등급 없음':gBadge(g)} ${r.cnt[g]}명</span>`).join('')}</div>`:''}
       ${tgEdit===r.t?`<div class="tg-ed" data-form="${r.t}">
         ${labs.map((lb,idx)=>`<label>${lb}<input type="number" min="1" max="200" data-gi="${idx}" value="${r.cur[idx]}"></label>`).join('')}
         <button class="btn sm primary" data-sv="${r.t}">저장</button>
@@ -13091,7 +13125,7 @@ function paintTGrade(){
    가장 짧은 rt 의 주인을 w/{i} 에 적어요(누가 적어도 한 번만). 통신이 느린 친구도 손해 보지 않게.
    코인 : 2명 이상이 한 판을 끝내면 1위 30 · 2위 20 · 3위 14 · 그 밖 8 (1개 이상 맞혔을 때), 하루 판 수 제한 없음.
    팀전은 팀 순위대로 팀 전원이 받아요(맞힌 개수와 상관없이). */
-const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[30,20,14], BT_COIN_ELSE=8, BT_PEN=1000;   /* 틀리면 1초 멈춤 */
+const BT_MAX=30, BT_RT=10, BT_GAP=1800, BT_JUDGE=800, BT_COIN=[90,60,42], BT_COIN_ELSE=24, BT_PEN=1000;   /* 틀리면 1초 멈춤 */
 const BT_KINDS=[['t','시간제'],['n','개수제'],['s','서바이벌']];
 const BT_VALS={t:range(1,10).map(k=>k*30), n:range(5,30), s:range(2,10)};
 const BT_DEF={t:60, n:10, s:5};
@@ -13100,13 +13134,15 @@ const btValLabel=(kind,v)=>kind==='n'?v+'문제':kind==='s'?v+'개 차이':secLa
 const btKind=room=>['t','n','s'].includes((room||{}).kind)?room.kind:'t';
 const btVal=(room,kind)=>{ kind=kind||btKind(room); const f={t:'sec',n:'nq',s:'gap'}[kind], v=+((room||{})[f]);
   return BT_VALS[kind].includes(v)?v:BT_DEF[kind]; };
-const btLenLabel=room=>{ const k=btKind(room); return (btTeamOn(room)?'팀전 · ':'')+(k==='s'?`서바이벌 · ${btVal(room)}개 차이면 탈락`:`${k==='n'?'개수제':'시간제'} ${btValLabel(k,btVal(room))}`); };
+const btLenLabel=room=>{ const k=btKind(room); return (btTeamOn(room)?(btTotal(room)?'팀 총합제 · ':'팀전 · '):'')+(k==='s'?`서바이벌 · ${btVal(room)}개 차이면 탈락`:`${k==='n'?'개수제':'시간제'} ${btValLabel(k,btVal(room))}`); };
 let BT={code:null, room:null, last:null, off:null, view:'menu', t:null, kind:'t', sec:60, nq:10, gap:5,
         playedRd:0, paid:{}, gain:{}, my:null, busy:false, endT:null, closed:false, swept:false};
 const PEOPLE='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M2.8 19c.6-3.4 3.1-5.4 6.2-5.4s5.6 2 6.2 5.4z" fill="currentColor"/><circle cx="16.6" cy="9" r="2.6" fill="currentColor" opacity=".55"/><path d="M14.6 14.2c.6-.2 1.3-.3 2-.3 2.6 0 4.4 1.7 4.9 4.6h-4.6c-.3-1.7-1.1-3.2-2.3-4.3z" fill="currentColor" opacity=".55"/></svg>';
 
 /* ═══ 점수 ═══ */
-const btWins=(room,sid)=>Object.values((room&&room.w)||{}).filter(x=>x===sid).length;
+/* 총합제 — 팀전의 한 방식: 서로 다른 문제를 각자 풀고, 같은 시간 동안 맞힌 개수를 팀별로 더해 겨뤄요 (p/{학번}/c = 맞힌 개수) */
+const btTotal=room=>!!room&&room.tm===2&&btKind(room)==='t';
+const btWins=(room,sid)=>btTotal(room)?(+(((room.p||{})[sid]||{}).c)||0):Object.values((room&&room.w)||{}).filter(x=>x===sid).length;
 /* 이번 판에 함께한 사람 */
 const btRoster=room=>Object.keys((room&&room.p)||{}).filter(s=>!room.rd||room.st==='wait'||((room.p[s]||{}).rd===room.rd));
 /* 서바이벌 — 먼저 맞힌 기록(w)을 차례로 따라가며, 1등과 gap 개 차이가 나는 순간 탈락 (누가 계산해도 같은 결과) */
@@ -13259,7 +13295,12 @@ async function btResume(){
 function btLevel(kind,len,i,frac){
   return kind==='t'?frac:kind==='n'?i/Math.max(1,len):Math.min(1,i/16);   /* 0 ~ 1 : 얼마나 왔나 */
 }
+/* 랜덤 유형 — 문제마다 대전이 열려 있는 주제 중에서 하나를 무작위로 */
+if(!TOPICS.rand) TOPICS.rand=Object.assign({},TOPICS.addsub,{k:'rand',n:'랜덤',sym:'?',school:'e'});
+TOPIC_SYMH.rand='<span style="font-size:.8em">🎲</span>';
+const btRandPool=()=>{ const L=btAllTopics().filter(t=>modeOpen(t,'b')); return L.length?L:[CUR.topic||'addsub']; };
 function btPickKey(t,prog,used,boost2){
+  if(t==='rand') t=pickOne(btRandPool());
   const S=realStagesOf(t), lv=Math.min(S.length,1+Math.floor(Math.max(0,prog)*S.length));
   const st=S[lv-1], U=new Set(used||[]);
   const ok=f=>f&&!U.has(f.key)&&!(f.k==='mul'&&(f.a===1||f.b===1));   /* × 1 처럼 너무 쉬운 것은 빼요 */
@@ -13318,7 +13359,8 @@ function btGuard(id){ if(BT.code&&id!=='s-battle'&&id!=='s-play') btLeave(); }
 
 /* 주제 고르기 — 초등·중등·고등 묶음으로 */
 function btTopicsHTML(cur,allowCur){
-  return SCHOOLS.map(sc=>`<div class="btsch"><span>${sc.n}</span><div class="chips">${sc.topics.filter(topicSeen).map(t=>modeOpen(t,'b')||(allowCur&&t===cur)
+  const rnd=`<div class="btsch"><span>자동</span><div class="chips"><button class="chip${cur==='rand'?' on':''}" data-t="rand">🎲 랜덤</button></div></div>`;
+  return rnd+SCHOOLS.map(sc=>`<div class="btsch"><span>${sc.n}</span><div class="chips">${sc.topics.filter(topicSeen).map(t=>modeOpen(t,'b')||(allowCur&&t===cur)
     ?`<button class="chip${t===cur?' on':''}" data-t="${t}">${topicOf(t).n}</button>`
     :`<button class="chip chlock" data-lk="${sc.k}" aria-disabled="true">${LOCKI}${topicOf(t).n}</button>`).join('')}</div></div>`).join('');
 }
@@ -13327,10 +13369,10 @@ document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closes
   toast('아직 잠겨 있어요 · 선생님이 열어 주면 고를 수 있어요'); });
 /* 방식과 길이 — 길이는 옆으로 밀어서 고르는 바퀴 */
 const BT_WW=74;
-function btLenHTML(kind,v,team){
+function btLenHTML(kind,v,team,tot){
   const vals=BT_VALS[kind];
   return `<div class="btlab">방식</div>
-    <div class="chips" id="btKinds">${BT_KINDS.filter(([k])=>!(team&&k==='s')).map(([k,n])=>`<button class="chip${k===kind?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>
+    <div class="chips" id="btKinds">${BT_KINDS.filter(([k])=>!(team&&k==='s')&&!(tot&&k!=='t')).map(([k,n])=>`<button class="chip${k===kind?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>
     <div class="btkhelp">${kind==='t'?'정한 시간이 끝났을 때 많이 맞힌 사람이 우승':kind==='n'?'정한 문제를 다 풀었을 때 많이 맞힌 사람이 우승':'1등과 맞힌 개수가 정한 만큼 벌어지면 그 순간 탈락 · 마지막까지 남으면 우승'}</div>
     <div class="btlab">${kind==='t'?'시간':kind==='n'?'문제 수':'탈락 기준 (1등과의 차이)'} <b id="btWv">${btValLabel(kind,v)}</b></div>
     <div class="btwrap"><button class="btarr" data-d="-1" aria-label="작게">‹</button>
@@ -13365,38 +13407,50 @@ function btWheelWire(v,onPick){
     addEventListener('pointermove',mv); addEventListener('pointerup',up); });
 }
 
+const BT_QUICK={t:'rand',kind:'t',sec:60,nq:10,gap:5};
+const btKindName=r=>{ const k=btKind(r); return (btTeamOn(r)?(r.tm===2?'총합제 · ':'팀전 · '):'')+(k==='s'?'서바이벌':k==='n'?'개수제 '+btValLabel('n',btVal(r)):'시간제 '+btValLabel('t',btVal(r))); };
+function btRoomsHTML(L){
+  if(L===null) return '<div class="btempty">열린 방을 찾는 중…</div>';
+  return L.length?L.map(r=>{ const n=Object.keys(r.p||{}).length, T=topicOf(r.t), full=n>=BT_MAX;
+    return `<button class="bsroom${full?' off':''}" data-c="${esc(r.code)}"><span class="tsym sm">${symHTML(T)}</span>
+      <span class="bsri"><b>${esc(T.n)}</b><small>${esc(btKindName(r))} · ${n}명${full?' · 꽉 참':''}</small></span><span class="bsrc">${esc(r.code)}</span></button>`; }).join('')
+    :'<div class="btempty">지금 열린 방이 없어요 · 아래 버튼으로 바로 만들어 보세요</div>';
+}
+async function btLoadRooms(){
+  if(BT.view!=='menu'||!el('s-battle').classList.contains('on')||!el('btRooms')){ clearInterval(BT.rmT); return; }
+  let all={}; try{ all=(await dbGet('battles',{}))||{}; }catch(e){}
+  if(BT.view!=='menu'||!el('btRooms')) return;
+  const now=Date.now();
+  const L=Object.values(all).filter(r=>r&&r.code&&r.host&&r.st==='wait'&&r.made&&now-r.made<3*3600e3&&Object.keys(r.p||{}).length)
+    .sort((a,b)=>b.made-a.made);
+  el('btRooms').innerHTML=btRoomsHTML(L);
+  el('btRooms').querySelectorAll('.bsroom').forEach(b=>b.onclick=()=>btJoin(b.dataset.c));
+}
 function btPaintMenu(){
   el('btBody').innerHTML=`
     <div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>친구와 대전</h2>
-      <p class="sub">모두 같은 문제를 동시에 봐요. <b>가장 먼저 맞힌 사람이 1개</b>, 그 순간 다 같이 다음 문제로! 틀려도 감점은 없지만 <b>1초 동안 멈춰요</b>. 뒤로 갈수록 문제가 어려워져요. <b>팀전</b>은 방을 만든 뒤 대기실에서 고르고, 방장이 팀을 나눠요.</p></div></div>
-    <div class="btgrid">
-      ${ME.guest?'':`<div class="btcard">
-        <h3>방 만들기</h3>
-        <div class="btlab">주제</div>
-        <div id="btTopics">${btTopicsHTML(BT.t)}</div>
-        ${btLenHTML(BT.kind,BT[{t:'sec',n:'nq',s:'gap'}[BT.kind]])}
-        <button class="btn primary btwide" id="btMake">방 만들기</button>
-      </div>`}
-      <div class="btcard">
-        <h3>방 번호로 들어가기</h3>
-        <div class="sub" style="margin-bottom:12px">친구가 알려 준 네 자리 번호를 넣어요.</div>
-        <input type="tel" id="btCode" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="예) 4821">
-        <div class="err" id="btErr"></div>
-        <button class="btn primary btwide" id="btJoin">들어가기</button>
-      </div>
+      <p class="sub">열려 있는 방에 들어가거나, 새 방을 바로 만들어요. 시간·문제 유형·팀전은 <b>방에 들어간 뒤</b> 바꿀 수 있어요.</p></div></div>
+    <div class="btcard">
+      <h3>열려 있는 방</h3>
+      <div class="bsrooms" id="btRooms">${btRoomsHTML(null)}</div>
+      <div class="btrow" style="margin:8px 0 0;justify-content:flex-start"><button class="btn" id="btRefresh">새로고침</button></div>
+    </div>
+    ${ME.guest?'':`<button class="btn primary btwide" id="btMake" style="margin:12px 0">방 만들기 · 1분 · 랜덤 · 시간제</button>`}
+    <div class="btcard">
+      <h3>방 번호로 들어가기</h3>
+      <input type="tel" id="btCode" maxlength="4" inputmode="numeric" autocomplete="off" placeholder="예) 4821">
+      <div class="err" id="btErr"></div>
+      <button class="btn primary btwide" id="btJoin">들어가기</button>
     </div>
     <div class="btnote">${online()?`한 방에 ${BT_MAX}명까지 · 2명 이상이 끝까지 하면 1위 ${BT_COIN[0]} · 2위 ${BT_COIN[1]} · 3위 ${BT_COIN[2]}코인`
       :'지금은 서버에 연결되지 않아 <b>이 기기 안에서만</b> 대전할 수 있어요 (같은 브라우저의 다른 창끼리).'}</div>
     <div class="btrow"><button class="btn" onclick="openSchool()">${ME.guest?'← 나가기':'← 처음으로'}</button></div>`;
-  if(!ME.guest){
-    el('btTopics').querySelectorAll('.chip[data-t]').forEach(b=>b.onclick=()=>{ BT.t=b.dataset.t; btPaintMenu(); });
-    el('btKinds').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{ BT.kind=b.dataset.k; btPaintMenu(); });
-    btWheelWire(BT[{t:'sec',n:'nq',s:'gap'}[BT.kind]],v=>{ BT[{t:'sec',n:'nq',s:'gap'}[BT.kind]]=v; });
-    el('btMake').onclick=btMake;
-  }
-  el('btJoin').onclick=btJoin;
+  if(!ME.guest) el('btMake').onclick=btMake;
+  el('btRefresh').onclick=btLoadRooms;
+  el('btJoin').onclick=()=>btJoin();
   el('btCode').addEventListener('input',e=>{ e.target.value=e.target.value.replace(/\D/g,''); });
   el('btCode').addEventListener('keydown',e=>{ if(e.key==='Enter') btJoin(); });
+  btLoadRooms(); clearInterval(BT.rmT); BT.rmT=setInterval(btLoadRooms,5000);
 }
 
 /* 방 치우기 — 세 시간이 지난 방, 10분이 지났는데 아무도 없는 방 */
@@ -13408,13 +13462,13 @@ async function btSweep(){
 }
 async function btMake(){
   if(ME.guest) return toast('비회원은 방을 만들 수 없어요 — 학번으로 로그인해 주세요');
-  if(!modeOpen(BT.t,'b')) return toast('친구 대전이 아직 잠겨 있어요 — 선생님이 열어 주면 할 수 있어요');
+  if(!btAllTopics().some(t=>modeOpen(t,'b'))) return toast('친구 대전이 아직 잠겨 있어요 — 선생님이 열어 주면 할 수 있어요');
   if(BT.busy) return; BT.busy=true; el('btMake').disabled=true; el('btMake').textContent='방을 만드는 중…';
   await btSweep();
   let code=null;
   for(let i=0;i<10&&!code;i++){
     const c=String(1000+Math.floor(Math.random()*9000));
-    const room={code:c, host:ME.sid, t:BT.t, kind:BT.kind, sec:BT.sec, nq:BT.nq, gap:BT.gap, st:'wait', made:Date.now(), rd:0, p:{[ME.sid]:btMe()}};
+    const room={code:c, host:ME.sid, t:BT_QUICK.t, kind:BT_QUICK.kind, sec:BT_QUICK.sec, nq:BT_QUICK.nq, gap:BT_QUICK.gap, st:'wait', made:Date.now(), rd:0, p:{[ME.sid]:btMe()}};
     const r=await dbTx('battles/'+c, cur=>(cur&&cur.made&&Date.now()-cur.made<3*3600e3)?undefined:room);
     if(r&&r.ok) code=c;
   }
@@ -13422,10 +13476,10 @@ async function btMake(){
   if(!code){ toast('방을 만들지 못했어요. 다시 눌러 주세요'); btPaint(); return; }
   await btEnter(code);
 }
-async function btJoin(){
-  const code=(el('btCode').value||'').replace(/\D/g,''), er=m=>{ el('btErr').textContent=m||''; };
+async function btJoin(c0){
+  const code=(typeof c0==='string'?c0:(el('btCode').value||'')).replace(/\D/g,''), er=m=>{ if(el('btErr')) el('btErr').textContent=m||''; if(m&&typeof c0==='string') toast(m); };
   if(code.length!==4) return er('방 번호 네 자리를 넣어 주세요.');
-  er(''); el('btJoin').disabled=true;
+  er(''); if(el('btJoin')) el('btJoin').disabled=true;
   let room=null; try{ room=await dbGet('battles/'+code,null); }catch(e){}
   if(el('btJoin')) el('btJoin').disabled=false;
   if(!room||!room.host) return er('그런 방이 없어요. 번호를 다시 확인해 주세요.');
@@ -13446,7 +13500,7 @@ async function btEnter(code){
 function btUnsub(){
   close_('ovBQr');
   if(BT.off){ try{ BT.off(); }catch(e){} BT.off=null; }
-  clearInterval(BT.hbT); BT.hbT=null;
+  clearInterval(BT.hbT); BT.hbT=null; clearInterval(BT.rmT);
 }
 async function btLeave(){
   const code=BT.code, room=BT.room;
@@ -13501,7 +13555,7 @@ function btOnRoom(room){
 function btPaintRoom(){
   const room=BT.room;
   if(!room){ el('btBody').innerHTML=`<div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>방에 들어가는 중…</h2></div></div>`; return; }
-  const host=room.host===ME.sid, T=topicOf(room.t), kind=btKind(room), team=btTeamOn(room), n=btTN(room);
+  const host=room.host===ME.sid, T=topicOf(room.t), kind=btKind(room), team=btTeamOn(room), tot=btTotal(room), n=btTN(room);
   const P=btPlayers(room).sort((a,b)=>(b.host-a.host)||a.j-b.j), TM=team?btTeams(room):{};
   const card=p=>`<div class="btp${p.sid===ME.sid?' me':''}${host&&team?' tap':''}" data-sid="${esc(p.sid)}"${team?` style="--tc:${BT_TEAMS[TM[p.sid]].c}"`:''}>
       <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${whoHTML(p.sid,p)}</b>${p.host?'<em>방장</em>':p.sid===ME.sid?'<em class="me">나</em>':''}${p.away&&p.sid!==ME.sid?'<small class="btaway">잠깐 자리 비움</small>':''}</div>`;
@@ -13517,14 +13571,15 @@ function btPaintRoom(){
     <div class="btcode"><span>방 번호</span><b>${room.code}</b></div>
     <button class="qrcard btqr" id="btQr" type="button" aria-label="초대 QR 크게 보기"><span class="qrimg">${qrSVG(btInviteUrl(room.code))}</span>
       <span class="qrtx"><b>QR로 친구 초대</b><small>카메라로 찍으면 방에 바로 들어와요 · 누르면 크게 보여요<br>학번 로그인이 안 된 친구는 닉네임만 써서 비회원으로 참가해요</small></span></button>
-    ${host?`<div class="btlab">대결</div><div class="segs" id="btMode"><button class="sg${team?'':' on'}" data-m="0">개인전</button><button class="sg${team?' on':''}" data-m="1">팀전</button></div>
+    ${host?`<div class="btlab">대결</div><div class="segs" id="btMode"><button class="sg${team?'':' on'}" data-m="0">개인전</button><button class="sg${team&&!tot?' on':''}" data-m="1">팀전</button><button class="sg${tot?' on':''}" data-m="2">팀 총합제</button></div>
+      ${tot?'<div class="btkhelp">총합제 · 모두 <b>서로 다른 문제</b>를 풀어요. 같은 시간 동안 팀 친구들이 맞힌 개수를 더해 팀끼리 겨뤄요.</div>':team?'<div class="btkhelp">팀전 · 모두 같은 문제를 보고 먼저 맞힌 사람이 점수를 얻어요.</div>':''}
       ${team?`<div class="btlab">팀 수</div><div class="segs" id="btTn">${[2,3,4].map(k=>`<button class="sg${n===k?' on':''}" data-n="${k}">${k}팀</button>`).join('')}</div>`:''}
-      <div class="btlab">주제</div><div id="btTopics">${btTopicsHTML(room.t,true)}</div>${btLenHTML(kind,btVal(room),team)}`
+      <div class="btlab">주제</div><div id="btTopics">${btTopicsHTML(room.t,true)}</div>${btLenHTML(kind,btVal(room),team,tot)}`
     :`<div class="btinfo"><span class="tsym sm">${symHTML(T)}</span><b>${T.n}</b><span>${btLenLabel(room)}</span></div>`}
     <div class="btlab">들어온 친구 ${P.length}명${team&&host?' · 친구를 누르면 다음 팀으로 옮겨요':''}</div>
     ${team&&host?`<div class="btrow" style="margin:0 0 10px;justify-content:flex-start"><button class="btn" id="btShuf">골고루 섞기</button></div>`:''}
     ${teamsHTML}
-    ${team?'<div class="btkhelp" style="margin-top:8px">팀 점수 = 팀 친구들이 먼저 맞힌 개수의 합 · 같은 팀끼리도 먼저 맞히기 경쟁이에요</div>':''}
+    ${tot?'<div class="btkhelp" style="margin-top:8px">팀 점수 = 팀 친구들이 각자 맞힌 개수의 합 · 같은 시간 동안 더 많이 푼 팀이 이겨요</div>':team?'<div class="btkhelp" style="margin-top:8px">팀 점수 = 팀 친구들이 먼저 맞힌 개수의 합 · 같은 팀끼리도 먼저 맞히기 경쟁이에요</div>':''}
     <div class="btrow">${host
       ?`<button class="btn" id="btLeave">방 닫기</button>
         <button class="btn primary" id="btGo" ${canGo?'':'disabled'}>${P.length<2?'친구를 기다리는 중…':!canGo?'두 팀 이상에 친구가 있어야 해요':`${P.length}명으로 시작하기`}</button>`
@@ -13534,8 +13589,8 @@ function btPaintRoom(){
   if(host){
     const R='battles/'+room.code;
     el('btGo').onclick=btStart;
-    el('btMode').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ const on=b.dataset.m==='1';
-      dbUpdate(R,on&&kind==='s'?{tm:1,kind:'t'}:{tm:on?1:0}); });
+    el('btMode').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ const m=+b.dataset.m;
+      dbUpdate(R,m===0?{tm:0}:m===2?{tm:2,kind:'t'}:(kind==='s'?{tm:1,kind:'t'}:{tm:1})); });
     if(el('btTn')) el('btTn').querySelectorAll('.sg').forEach(b=>b.onclick=()=>dbUpdate(R,{tn:+b.dataset.n}));
     if(el('btShuf')) el('btShuf').onclick=()=>{ const ids=P.map(p=>p.sid).sort(()=>Math.random()-.5), tg={};
       ids.forEach((sid,i)=>tg[sid]=i%n); dbUpdate(R,{tg}); };
@@ -13553,7 +13608,7 @@ async function btStart(){
   if(btTeamOn(room)&&new Set(Object.values(btTeams(room))).size<2) return toast('두 팀 이상에 친구가 있어야 시작할 수 있어요');
   const upd={st:'run', at, rd:(room.rd||0)+1, cur:{i:0,at,k,u:[k]}, w:null, x:null, a:null};
   if(btTeamOn(room)) upd.tg=btTeams(room);
-  Object.keys(room.p||{}).forEach(s=>{ upd[`p/${s}/rd`]=upd.rd; upd[`p/${s}/done`]=false; });   /* 지금 방에 있는 사람이 이번 판 선수 */
+  Object.keys(room.p||{}).forEach(s=>{ upd[`p/${s}/rd`]=upd.rd; upd[`p/${s}/done`]=false; upd[`p/${s}/c`]=0; });   /* 지금 방에 있는 사람이 이번 판 선수 */
   await dbUpdate('battles/'+room.code,upd);
 }
 
@@ -13566,17 +13621,18 @@ function btStartPlay(room){
   G={mode:'battle', t:room.t, code:room.code, rd:room.rd, at:room.at, kind, v, len:btLenLabel(room),
      sec:kind==='t'?v:60, endAt:kind==='t'?room.at+v*1000:Infinity,
      qi:-1, shown:-1, score:0, ans:0, combo:0, best:0, solved:0, right:0,
+     tot:btTotal(room), mine:0, used:[], nextAt:0,
      phase:'cd', cdS:0, typed:'', clean:true, locked:false, tId:null, rev:-1, out:false, seen:{}, judged:{}};
   if(!((room.p||{})[ME.sid]||{}).rd||room.p[ME.sid].rd!==room.rd) dbUpdate(`battles/${room.code}/p/${ME.sid}`,{rd:room.rd});
   setupHUD(); show('s-play');
   el('keypad').style.display='none'; cardScr(false);
   el('card').innerHTML=btCdHTML(Math.max(1,Math.ceil((G.at-serverNow())/1000)));
   paintBLive();
-  G.tId=setInterval(btTick,80);
+  G.tId=setInterval(G.tot?btTotTick:btTick,80);
 }
 const btCdHTML=s=>`<div class="btcd"><span>${s}</span><p>${topicOf(G.t).n} · ${G.len}</p>
   <small>가장 먼저 맞히면 1개! 틀리면 1초 쉬었다가 다시 쓸 수 있어요.</small></div>`;
-function btQLabel(){ return `${G.qi+1}번째 문제 · 먼저 맞히면 1개${G.kind==='s'?` · ${G.v}개 차이 나면 탈락`:''}`; }
+function btQLabel(){ if(G.tot) return `${G.qi+1}번째 문제 · 맞힐 때마다 우리 팀 +1`; return `${G.qi+1}번째 문제 · 먼저 맞히면 1개${G.kind==='s'?` · ${G.v}개 차이 나면 탈락`:''}`; }
 /* 다음 문제로 — 여러 명이 동시에 눌러도 한 번만 넘어가게, 넘기는 사람이 다음 문항을 뽑아요 */
 function btAdvance(i){
   if(!G||G.mode!=='battle') return;
@@ -13612,7 +13668,7 @@ function btTick(){
     if(G.cdS!==s){ G.cdS=s; el('card').innerHTML=btCdHTML(s); } return; }
   if(cur.i!==G.shown&&now>=cur.at){                            /* 새 문제 */
     G.shown=cur.i; G.qi=cur.i; G.rev=-1; G.shownSrv=serverNow();   /* 내 화면에 문제가 보인 순간 (서버 시계) */
-    const f=factFromKey(cur.k)||realPick(G.t,cur.i+1,[]);
+    const f=factFromKey(cur.k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t,cur.i+1,[]);
     askQ(f); paintBLive();
     if(G.out){ G.phase='out'; G.locked=true; el('keypad').style.display='none';
       const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML='탈락했어요 — 끝까지 친구들을 응원해요'; } }
@@ -13631,6 +13687,24 @@ function btTick(){
     return;
   }
   if(!win&&G.rev!==i&&left<=0){ G.rev=i; btReveal(null,'아무도 못 맞혔어요',A); btAdvance(i); }
+}
+/* 총합제 — 각자 자기 문제를 풀어요. 맞히면 바로 다음 문제, 맞힌 개수는 p/{학번}/c 로 모두에게 */
+function btTotTick(){
+  if(!G||G.mode!=='battle'||!G.tot||G.over) return;
+  const room=BT.room||{}, now=serverNow();
+  if(room.rd&&room.rd!==G.rd) return;
+  G.score=G.mine;
+  if(now>=G.endAt){ btFinish(false); return; }
+  if(now<G.at){ const s=Math.ceil((G.at-now)/1000);
+    if(G.cdS!==s){ G.cdS=s; el('card').innerHTML=btCdHTML(s); } return; }
+  const T=Math.max(0,(G.endAt-now)/1000); el('hTime').innerHTML=`남은 시간 <b>${clock(T)}</b>`; el('hTime').classList.toggle('warn',T<=10);
+  if(G.shown<0||(G.phase==='wait'&&Date.now()>=G.nextAt)){
+    const frac=(now-G.at)/Math.max(1,G.endAt-G.at);
+    const k=btPickKey(G.t,frac,G.used,(G.btSpam||0)>0); if(G.btSpam>0) G.btSpam--;
+    G.used=G.used.concat(k).slice(-60); G.shown=G.qi+1; G.qi=G.shown; G.shownSrv=now;
+    askQ(factFromKey(k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t,G.qi+1,[]));
+    G.locked=false; paintBLive(); }
+  const b=el('tbar').querySelector('i'); if(b) b.style.width=(T/G.sec*100)+'%';
 }
 const btFastest=A=>Object.keys(A).sort((x,y)=>(+A[x])-(+A[y])||x.localeCompare(y))[0];
 async function btJudge(i,A){
@@ -13658,6 +13732,18 @@ function btReveal(win,why,A){
 async function btAnswer(ok,f){
   if(!G||G.phase!=='q') return;
   const i=G.qi; G.ans++;
+  if(G.tot){
+    if(ok){ G.right++; G.mine++; G.score=G.mine; G.phase='wait'; G.locked=true; G.nextAt=Date.now()+380; paintTyped('ok');
+      const m=el('qmsg'); if(m){ m.className='qmsg good'; m.innerHTML='정답! <b>+1</b>'; }
+      dbSet(`battles/${G.code}/p/${ME.sid}/c`,G.mine); paintBLive(); }
+    else{ G.locked=true; paintTyped('no'); document.body.classList.add('btpen');
+      const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML=`틀렸어요 — <b>${BT_PEN/1000}초</b> 쉬었다가 다시 써요`; }
+      setTimeout(()=>{ document.body.classList.remove('btpen');
+        if(!G||G.mode!=='battle'||G.phase!=='q'||G.qi!==i) return;
+        G.typed=''; G.clean=true; G.locked=false; paintTyped('');
+        const m2=el('qmsg'); if(m2){ m2.className='qmsg'; m2.innerHTML=''; } },BT_PEN); }
+    updHUD(); return;
+  }
   if(ok){
     /* 문제가 보인 순간부터 걸린 시간을 올려요 — 판정은 btJudge 가 (가장 짧은 사람) */
     const cur=(BT.room||{}).cur||{}, rt=Math.max(0,Math.round(serverNow()-Math.max(cur.at||0,G.shownSrv||0)));
@@ -13680,6 +13766,7 @@ async function btAnswer(ok,f){
 function btLiveP(){
   const P=BT.room?btPlayers(BT.room).filter(p=>btRoster(BT.room).includes(p.sid)):[];
   if(!P.find(p=>p.sid===ME.sid)) P.push({sid:ME.sid, ch:cleanCh(ME.ch), n:G.score, rk:G.score});
+  if(G.tot){ const me=P.find(p=>p.sid===ME.sid); if(me){ me.n=Math.max(me.n||0,G.mine||0); me.rk=me.n; } }   /* 내 점수는 바로 반영 */
   return P;
 }
 /* 한쪽 칸에 들어갈 캐릭터 크기 — 3줄 안쪽, 높이 약 100px 안에 */
@@ -13690,10 +13777,24 @@ function btAvSize(groups,w){
     if(h<=104) return s; }
   return 16;
 }
+/* 총합제 점수판 — 팀별 합계와 지금 어느 팀이 몇 개 앞서는지 */
+function paintBTot(P){
+  let sb=el('bTot'), box=el('bLive');
+  if(!G||G.mode!=='battle'||!G.tot){ if(sb) sb.style.display='none'; return; }
+  if(!sb){ sb=document.createElement('div'); sb.id='bTot'; box.parentNode.insertBefore(sb,box); }
+  const TS=btTeamScores(BT.room,P), mine=btTeams(BT.room)[ME.sid];
+  const top=TS[0], sec=TS[1], max=Math.max(1,...TS.map(g=>g.sum)), diff=top&&sec?top.sum-sec.sum:0;
+  const msg=!top||top.sum===0?'모두 0개 — 먼저 맞혀서 앞서 가요!':diff===0?`${TS.filter(g=>g.sum===top.sum).map(g=>g.n).join('·')} ${top.sum}개로 동점!`
+    :`<b style="color:${top.c}">${top.n}</b>이 ${top.sum}개로 <b>${diff}개 앞서요</b>${top.i===mine?' 👏':''}`;
+  sb.style.display=''; sb.className='bttot';
+  sb.innerHTML=`<div class="bttmsg">${msg}</div>`+TS.map((g,r)=>`<div class="bttrow${g.i===mine?' me':''}" style="--tc:${g.c}">
+    <span class="bttn">${g.n}${g.i===mine?' <em>우리</em>':''}</span><span class="bttbar"><i style="width:${Math.max(3,g.sum/max*100)}%"></i></span><b>${g.sum}</b></div>`).join('');
+  G.teamSum=(TS.find(g=>g.i===mine)||{sum:0}).sum;
+}
 function paintBLive(){
   const box=el('bLive'); if(!box) return;
-  if(!G||G.mode!=='battle'){ box.style.display='none'; box.innerHTML=''; box.dataset.sig=''; return; }
-  const P=btLiveP();
+  if(!G||G.mode!=='battle'){ box.style.display='none'; box.innerHTML=''; box.dataset.sig=''; const sb=el('bTot'); if(sb) sb.style.display='none'; return; }
+  const P=btLiveP(); paintBTot(P);
   const R=rankList(btSort(P.slice()),p=>p.rk), RK={}; R.forEach(x=>RK[x.r.sid]=x.rank);
   G.rank=RK[ME.sid]||1; G.nP=P.length;
   box.style.display=''; box.className='blive arena';
@@ -13747,7 +13848,7 @@ async function btFinish(quit){
   if(!G||G.mode!=='battle'||G.over) return;
   G.over=true; stopTimer();
   const code=G.code, rd=G.rd, room=BT.room||{};
-  BT.my={n:btWins(room,ME.sid), a:G.ans, rd, t:G.t, len:G.len, kind:G.kind, v:G.v, endAt:G.kind==='t'?G.endAt:serverNow(), quit:!!quit};
+  BT.my={n:(G.tot?G.mine:btWins(room,ME.sid)), a:G.ans, rd, t:G.t, len:G.len, kind:G.kind, v:G.v, endAt:G.kind==='t'?G.endAt:serverNow(), quit:!!quit};
   BT.view='result';
   show('s-battle'); btPaint();
   try{ await dbUpdate(`battles/${code}/p/${ME.sid}`,{rd,done:true}); }catch(e){}
@@ -13834,8 +13935,8 @@ const weekOf=k=>{ const d=dOf(k), w=(d.getDay()+6)%7; d.setDate(d.getDate()-w); 
 /* 앞 등교일 — 토·일은 건너뛰어요 (금요일에 오고 월요일에 와도 연속) */
 function prevSchoolDay(k){ let p=addDay(k,-1); while([0,6].includes(dOf(p).getDay())) p=addDay(p,-1); return p; }
 
-/* ═══ ① 출석 — 하루 처음 들어오면 20코인, 연속 3일째 +30 · 5일째 +50 · 7일째 +100 (7일마다 다시) ═══ */
-const ATT_COIN=20, ATT_BONUS={3:30,5:50,7:100};
+/* ═══ ① 출석 — 하루 처음 들어오면 60코인, 연속 3일째 +90 · 5일째 +150 · 7일째 +300 (7일마다 다시) ═══ */
+const ATT_COIN=60, ATT_BONUS={3:90,5:150,7:300};   /* 11.25 3배 */
 const attPos=s=>((s-1)%7)+1;
 function checkAttendance(){
   if(!ME) return;
@@ -13855,8 +13956,8 @@ function checkAttendance(){
   openM('ovAtt');
 }
 
-/* ═══ ② 지난주보다 성장 — 실전 기록이 지난주 그 주제 최고보다 높으면 주제마다 한 주에 한 번 30코인 ═══ */
-const GROW_COIN=30;
+/* ═══ ② 지난주보다 성장 — 실전 기록이 지난주 그 주제 최고보다 높으면 주제마다 한 주에 한 번 90코인 ═══ */
+const GROW_COIN=90;
 function weeklyGrowth(t,score){
   if(!ME||!(score>0)) return null;
   const d=todayKey(), w=weekOf(d), pw=addDay(w,-7), r=rec(t);
@@ -13965,8 +14066,8 @@ const hasStage=(t,n)=>!!(TOPICS[t]&&TOPICS[t].stages.some(s=>s.n===n));
    ③ 실전          : 실전 한 판 · 실전 목표 개수 넘기기
    ④ 오늘의 도전   : 한 번도 안 틀리고 클리어 · 연습 3개 클리어 · 내 최고 기록 깨기 · 친구 대전 한 판 (날마다 하나)
    미션마다 코인이 달라요(m.c). 네 개를 다 하면 보너스. 학생·날짜로 섞어서 친구마다, 날마다 달라요.               */
-const MS_COIN=25, MS_ALL=60, MS_V=2;
-const MS_C={pre:30,weak:30,new:30,again:25,first:40,firstR:40,real:25,realN:35,perfect:35,multi:35,speed:35,battle:35};
+const MS_COIN=75, MS_ALL=180, MS_V=3;
+const MS_C={pre:90,weak:90,new:90,again:75,first:120,firstR:120,real:75,realN:105,perfect:105,multi:105,speed:105,battle:105};
 /* 요즘 하는 주제 — 최근 14일 실전 횟수 + 계산 기록 수가 많은 순 */
 function busyTopics(){
   const fs=ME.fs||{}, from=addDay(todayKey(),-14), sc={};
@@ -14194,13 +14295,13 @@ const classLabel=c=>c.length===3?`${c[0]}학년 ${+c.slice(1)}반`:c;
 const symHTML=T=>TOPIC_SYMH[T.k]||T.sym;
 
 /* ═══════════════════ 규칙 · 코인 ═══════════════════
-   실전 : 1분 무실수. 판마다 맞힌 문항마다 3코인,
+   실전 : 1분 무실수. 판마다 맞힌 문항마다 9코인,
           내 최고 기록을 깨면 넘어선 문항은 한 번 더(그 부분 2배).
-   연습 : 아직 클리어하지 않은 스테이지에서 맞힌 문제마다 1코인(스테이지 문항 수까지) + 처음 클리어하면 보너스 30코인.
+   연습 : 아직 클리어하지 않은 스테이지에서 맞힌 문제마다 3코인(스테이지 문항 수까지) + 처음 클리어하면 보너스 90코인.
           이미 클리어한 스테이지를 다시 하면 코인은 없어요.
-   실전 : 1분을 틀리지 않고 다 채우면 보너스 15코인.
-   오답노트 : 다시 풀어 통과한 문항마다 5코인.                                 */
-const REAL_SEC=60, COIN_PER=3, CLEAR_FIRST=30, PRAC_Q=1, REAL_FULL=15, NOTE_COIN=5;
+   실전 : 1분을 틀리지 않고 다 채우면 보너스 45코인.
+   오답노트 : 다시 풀어 통과한 문항마다 15코인.   (11.25 모든 보상 3배)                                 */
+const REAL_SEC=60, COIN_PER=9, CLEAR_FIRST=90, PRAC_Q=1, PRAC_QC=3, REAL_FULL=45, NOTE_COIN=15;   /* 11.25 코인 3배 (PRAC_Q는 문항 세기, PRAC_QC는 문항당 코인) */
 /* 바르게 다 쓰면 '확인'을 누르지 않아도 넘어갑니다.
    단, 지우기를 한 번이라도 누른 문항은 '확인'을 눌러야 합니다 —
    숫자를 바꿔 가며 넣어 보는 것으로 답을 맞히지 못하게.                  */
@@ -14504,25 +14605,26 @@ function logout(){
    B : 이 정도면 기초를 갖췄다 · A : 계산을 잘한다고 할 만하다 · S : 반의 계산 에이스
    SS : 계산을 아주 잘하는 친구 · SSS : SS 실력에 운까지 더해져야 닿는 기록(SS × 1.12)
    절대평가 — 학생 기록에 맞추지 않고, 등급별 실력(생각 속도)을 정해 둔 풀이 시간 모의실험으로 정했어요(주제·단계별 생각 시간 + 휴대폰 입력 시간 + 문장은 숫자 위주로 훑어 읽는 시간).
-   B 기준에 못 미치면 등급이 없어요. (11.23 저녁 — 34개 주제 전체를 바뀐 문제로 다시 모의실험, 밤에 개편한 7개 주제 다시 모의실험) 선생님 모드 '등급 기준' 탭에서 학생 기록을 참고로 보고 직접 고칠 수 있어요(config/gcut). */
+   B 기준에 못 미치면 C 등급이에요(11.25). (11.23 저녁 — 34개 주제 전체를 바뀐 문제로 다시 모의실험, 밤에 개편한 7개 주제 다시 모의실험) 선생님 모드 '등급 기준' 탭에서 학생 기록을 참고로 보고 직접 고칠 수 있어요(config/gcut). */
 const GRADE_CUT={addsub:[28,25,21,17,11], gugu:[54,48,42,33,22], fadd:[16,14,12,10,8], fmul:[21,19,15,12,7], ratio:[18,16,13,10,7], factor:[17,15,13,12,7], power:[28,25,20,14,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[20,18,15,12,8], linf:[18,16,14,11,6], angle:[20,18,14,10,7], simr:[19,17,12,9,5], dadd:[22,20,16,12,8], dmul:[22,20,15,11,7], int:[25,22,18,14,8], expo:[29,26,22,17,12], root:[22,20,17,13,9], trig:[26,23,17,11,8], logx:[21,19,15,11,6], tfn:[15,13,12,9,8], comb:[20,18,14,11,7], div:[29,26,21,16,11], fast:[24,21,17,13,9], mix:[19,17,14,11,7], unit:[26,23,19,15,9], alg:[21,19,15,12,9], ineq:[17,15,13,11,8], sys:[18,16,12,9,6], quad:[19,17,14,12,9], cplx:[21,19,15,12,8], rem:[16,14,11,8,6], seq:[19,17,13,10,7]};
 const GRADE_DEF=JSON.parse(JSON.stringify(GRADE_CUT));
 function applyGcut(o){ Object.keys(GRADE_DEF).forEach(t=>{ const v=o&&o[t], ok=Array.isArray(v)&&v.length===5&&v.every((x,i)=>x>0&&(i===0||x<v[i-1]));
   GRADE_CUT[t].splice(0,5,...(ok?v.map(Number):GRADE_DEF[t])); }); }
 function gradeCuts(t){ const c=GRADE_CUT[t]; if(!c) return null;
   return [['SSS',c[0]],['SS',c[1]],['S',c[2]],['A',c[3]],['B',c[4]||1]]; }
-function gradeOfRec(t,n){ const C=gradeCuts(t); if(!C||!(n>0)) return null; for(const [g,c] of C) if(n>=c) return g; return null; }
+function gradeOfRec(t,n){ const C=gradeCuts(t); if(!C||!(n>0)) return null; for(const [g,c] of C) if(n>=c) return g; return 'C'; }   /* B에 못 미치면 C */
 function gradeBadge(t){ const n=(rec(t).best)||0, g=gradeOfRec(t,n); if(!gradeCuts(t)) return '';
+  if(g==='C'){ const C0=gradeCuts(t); return `<span class="gbadge g-C" title="실전 최고 ${n}개 · B까지 ${C0[4][1]-n}개 더">C</span>`; }
   if(!g){ const C0=gradeCuts(t); return `<span class="gbadge g-none" title="${n>0?`실전 최고 ${n}개 · B까지 ${C0[4][1]-n}개 더`:'실전 모드 기록이 생기면 등급이 붙어요'}">-</span>`; }
   const C=gradeCuts(t), i=C.findIndex(x=>x[0]===g), nx=i>0?C[i-1]:null;
   return `<span class="gbadge g-${g}" title="실전 최고 ${n}개${nx?` · ${nx[0]}까지 ${nx[1]-n}개 더`:''}">${g}</span>`; }
 /* 연습 스테이지 등급 — 스테이지 최고 시간을 문항 수로 나눈 '문항당 초'로 매깁니다.
-   실전 기준 개수 c 를 1분에 푸는 속도(60 ÷ c 초)와 같으면 그 등급. 클리어만 해도 B. */
+   실전 기준 개수 c 를 1분에 푸는 속도(60 ÷ c 초)와 같으면 그 등급. B 속도보다 느리면 C. */
 const stageCount=(t,n)=>{ const s=stageOf(t,n), N=Math.min(PRAC_N,s.take); return s.facts?Math.min(N,s.facts().length):N; };
 function stageGrade(t,n){ return stageGradeP(prog(t),t,n); }
 function stageGradeP(p,t,n){ const c=GRADE_CUT[t], bt=p&&p.bt&&p.bt['s'+n]; if(!c||!bt) return null;
   const spq=bt/stageCount(t,n), names=['SSS','SS','S','A'];
-  for(let i=0;i<4;i++) if(spq<=60/c[i]) return names[i]; return 'B'; }
+  for(let i=0;i<4;i++) if(spq<=60/c[i]) return names[i]; return spq<=60/(c[4]||1)?'B':'C'; }   /* B 속도에 못 미치면 C */
 const gBadge=g=>g?`<span class="gbadge g-${g}">${g}</span>`:'';
 const TL_DEF=['addsub','gugu'];   /* 처음에는 이 두 주제만 열려 있고 나머지는 선생님이 열어 줄 때까지 잠겨 있음 */
 const MODES=[['p','연습'],['r','실전'],['b','대전']];   /* 주제마다 연습·실전·친구 대전을 따로 열고 잠급니다 */
@@ -14694,7 +14796,7 @@ function renderStages(){
   el('stNote').onclick=()=>openBook(t);
   el('stTitle').textContent=`${T.n} · 연습 스테이지`;
   el('stSub').innerHTML=`스테이지의 문항을 <b>모두 맞히면 클리어</b>예요. 답을 쓰고 <b>[확인]</b>을 눌러야 채점해요. 틀린 문항은 풀이를 보고 조금 뒤에 다시 나와요.<br>
-    미클리어 스테이지는 <b>맞힌 문제마다 ${PRAC_Q}코인 + 클리어 ${CLEAR_FIRST}코인</b> · 클리어 후에도 <b>등급 승급(A~SSS)</b>·<b>첫 100% 달성</b> 시 추가 보너스가 있어요.`;
+    미클리어 스테이지는 <b>맞힌 문제마다 ${PRAC_QC}코인 + 클리어 ${CLEAR_FIRST}코인</b> · 클리어 후에도 <b>등급 승급(A~SSS)</b>·<b>첫 100% 달성</b> 시 추가 보너스가 있어요.`;
   el('stBar').innerHTML=T.stages.map(s=>`<i class="${p.c.includes(s.n)?'done':''}"></i>`).join('');
   el('stageList').innerHTML=T.stages.map(s=>{
     const done=p.c.includes(s.n), td=today.includes(t+s.n), bt=p.bt['s'+s.n];
@@ -14818,7 +14920,7 @@ function updHUD(){
     el('hAcc').textContent=`맞힌 문항 ${G.score}개`;
   }else if(G.mode==='battle'){
     el('hLv').textContent=`${T.n} · 친구 대전`;
-    el('hAcc').textContent=`${G.score}개${G.nP>1?` · ${G.nP}명 중 ${G.rank}위`:''}`;
+    el('hAcc').textContent=G.tot?`나 ${G.score}개 · 우리 팀 ${G.teamSum==null?G.score:G.teamSum}개`:`${G.score}개${G.nP>1?` · ${G.nP}명 중 ${G.rank}위`:''}`;
   }else if(G.mode==='boss'){
     el('hLv').textContent=`${T.n} · 반 보스전`;
     el('hAcc').textContent=`내 기여 ${G.score}개`;
@@ -14985,7 +15087,7 @@ function practiceAnswer(ok,f){
     G.right++; G.combo++; G.best=Math.max(G.best,G.combo); G.mastered.add(f.key);
     /* 아직 클리어 못 한 스테이지만 — 맞힌 문제마다 코인, 그 스테이지 문항 수까지(그만두고 다시 해도 더 늘지 않아요) */
     if(!prog(G.t).c.includes(G.st)){ const P=ME.pq||(ME.pq={}), k=G.t+G.st;
-      if((P[k]||0)<stageCount(G.t,G.st)){ P[k]=(P[k]||0)+PRAC_Q; ME.coin+=PRAC_Q; G.qc=(G.qc||0)+PRAC_Q; paintMe(); } }
+      if((P[k]||0)<stageCount(G.t,G.st)){ P[k]=(P[k]||0)+PRAC_Q; ME.coin+=PRAC_QC; G.qc=(G.qc||0)+PRAC_QC; paintMe(); } }
     flashOk(); updHUD(); setTimeout(()=>{ if(G&&G.mode==='practice'&&!G.frozen) next(); },330);
     return;
   }
@@ -15096,7 +15198,7 @@ async function stageClear(){
   if(newBt) p.bt['s'+n]=+sec.toFixed(1);
   /* 등급이 처음 오를 때 — 오른 그 등급 보너스 하나만 (A:+5 · S:+8 · SS:+10 · SSS:+12), 한 번에 SSS가 나와도 SSS 보너스만.
      처음 100%(노미스) +5. (2026-11 선생님 결정: 총량 절반, 단계를 건너뛰어도 합산하지 않음) */
-  const GR_ORD=['B','A','S','SS','SSS'], GR_PAY={A:5,S:8,SS:10,SSS:12};
+  const GR_ORD=['B','A','S','SS','SSS'], GR_PAY={A:15,S:24,SS:30,SSS:36};
   p.bg=p.bg||{}; p.nm=p.nm||{};
   const nowGr=stageGrade(t,n), prevGr=p.bg['s'+n]||(prevBt?'B':'');
   let upCoin=0, upLabel='', nmCoin=0;
@@ -15106,7 +15208,7 @@ async function stageClear(){
     if(upCoin) upLabel=`${nowGr} 등급 첫 달성 +${upCoin}`;
   }
   const isNoMiss=G.wrongOnce.size===0;
-  if(isNoMiss&&!p.nm['s'+n]){ p.nm['s'+n]=1; nmCoin=5; ME.nmN=(ME.nmN||0)+1; }
+  if(isNoMiss&&!p.nm['s'+n]){ p.nm['s'+n]=1; nmCoin=15; ME.nmN=(ME.nmN||0)+1; }
   const extraClear=upCoin+nmCoin;
   ME.coin+=coin+extraClear;
   const ms=markMission('stage',t,n,{perfect:isNoMiss,sec:+sec.toFixed(1)});
@@ -15176,7 +15278,7 @@ async function finish(timeUp){
   el('endTitle').textContent = G.quit?`${T.n} · 중간에 그만두었어요 · 맞힌 문항`
     : full?`${T.n} · ${REAL_SEC/60}분 무실수 완주! · 맞힌 문항`
     : `${T.n} · ${REAL_SEC/60}분 도전 완료 · 맞힌 문항`;
-  el('endScore').innerHTML=score+'개'+(gradeCuts(t)&&gradeOfRec(t,score)?gBadge(gradeOfRec(t,score)):'');
+  el('endScore').innerHTML=score+'개'+(gradeCuts(t)?gBadge(gradeOfRec(t,score)||'C'):'');
   el('endScore').style.color=beat?'var(--o)':'';
   el('statBox').innerHTML=`
     <div class="stat"><b>${score}</b><span>맞힌 문항</span></div>
@@ -16993,10 +17095,10 @@ let BOSS={code:'',room:null,off:null,tId:null,host:false,rewarded:''};
 const BOSS_SEC=120, BOSS_GRS=['A','S','SS','SSS'];
 /* 기본 공격 = 쉬운 문제(cap 까지만) · 보스 반격 = 어려운 방어 문제(def) — aw 초 안에 못 막으면 부상(그 판이 끝날 때까지 대미지 절반 · 전원이 부상이면 패배), gap 초마다 반격 */
 const BOSS_GR={
-  A  :{ci:3, st:0,   cap:.35, gain:.12, def:.55, aw:15, gap:34, win:30, fail:10, desc:'가볍게 · 반격이 느리고 방어 문제도 무난해요'},
-  S  :{ci:2, st:.1,  cap:.45, gain:.15, def:.7,  aw:13, gap:30, win:45, fail:14, desc:'보통 · 반격이 조금 더 잦아요'},
-  SS :{ci:1, st:.2,  cap:.55, gain:.18, def:.85, aw:11, gap:26, win:60, fail:18, desc:'도전 · 방어 문제가 어렵고 시간이 짧아요'},
-  SSS:{ci:0, st:.3,  cap:.65, gain:.2,  def:1,   aw:10, gap:22, win:80, fail:22, desc:'최고 난이도 · 가장 어려운 방어 문제를 10초 안에!'}};
+  A  :{ci:3, st:0,   cap:.35, gain:.12, def:.55, aw:15, gap:34, win:90, fail:30, desc:'가볍게 · 반격이 느리고 방어 문제도 무난해요'},
+  S  :{ci:2, st:.1,  cap:.45, gain:.15, def:.7,  aw:13, gap:30, win:135, fail:42, desc:'보통 · 반격이 조금 더 잦아요'},
+  SS :{ci:1, st:.2,  cap:.55, gain:.18, def:.85, aw:11, gap:26, win:180, fail:54, desc:'도전 · 방어 문제가 어렵고 시간이 짧아요'},
+  SSS:{ci:0, st:.3,  cap:.65, gain:.2,  def:1,   aw:10, gap:22, win:240, fail:66, desc:'최고 난이도 · 가장 어려운 방어 문제를 10초 안에!'}};
 const BOSS_ATK_AT=30;   /* 남은 시간이 이 초 이하일 때부터 보스가 반격 */
 /* 보스 HP 비율에 따른 분노 — gap: 반격과 반격 사이 쉬는 초(등급 기준 30초 분), k: 노리는 인원 비율 */
 const bossRage=ratio=>ratio>.6?{gap:6,k:.3}:ratio>.3?{gap:4,k:.45}:ratio>.15?{gap:2,k:.65}:{gap:.5,k:.9};
@@ -17268,8 +17370,22 @@ ${r.state==='win'||r.state==='fail'?`<div class="raid-next top">
 function openBossJoin(){
   if(!ME) return;
   el('bsCodeIn').value=''; el('bsJoinErr').textContent='';
-  openM('ovBossJoin');
-  setTimeout(()=>{ try{ el('bsCodeIn').focus(); }catch(e){} },80);
+  openM('ovBossJoin'); paintBossRooms();
+}
+/* 열려 있는 보스전 방 — 3시간 안에 만들어졌고 아직 끝나지 않은 방 */
+async function paintBossRooms(){
+  const box=el('bsRooms'); if(!box) return;
+  let all={}; try{ all=(await dbGet('bosses',{}))||{}; }catch(e){}
+  const now=Date.now();
+  const L=Object.values(all).filter(r=>r&&r.code&&r.createdAt&&now-(+r.createdAt)<3*3600e3&&r.state!=='win'&&r.state!=='fail'&&topicOf(r.t))
+    .sort((a,b)=>(+b.createdAt)-(+a.createdAt));
+  if(!el('ovBossJoin').classList.contains('on')&&!el('ovBossJoin').classList.contains('show')&&getComputedStyle(el('ovBossJoin')).display==='none') return;
+  box.innerHTML=L.length?L.map(r=>{ const n=Object.keys(r.p||{}).length;
+      return `<button class="bsroom" data-c="${esc(r.code)}"><span class="tsym sm">${symHTML(topicOf(r.t))}</span>
+        <span class="bsri"><b>${esc(r.bossName||'보스')}</b><small>${esc(topicOf(r.t).n)} · ${r.grade||''}등급 · ${n}명 참가${r.state==='play'?' · <em>진행 중</em>':''}</small></span>
+        <span class="bsrc">${esc(r.code)}</span></button>`; }).join('')
+    :'<div class="btempty">지금 열린 방이 없어요 · 선생님이 방을 열면 여기에 보여요</div>';
+  box.querySelectorAll('.bsroom').forEach(b=>b.onclick=()=>{ close_('ovBossJoin'); joinBossRoom(b.dataset.c); });
 }
 function joinBossByInput(){
   const c=(el('bsCodeIn').value||'').replace(/\D/g,'');
@@ -17442,7 +17558,7 @@ async function finishBossPlay(r){
   if(BOSS.rewarded!==rk&&!ME.coopC[rk]&&myN>0){
     BOSS.rewarded=rk; ME.coopC[rk]=1;
     const gg=BOSS_GR[bossGrOf(r)];
-    reward=win?(gg.win+Math.min(25,myN)):Math.min(gg.fail,myN);
+    reward=win?(gg.win+3*Math.min(25,myN)):Math.min(gg.fail,3*myN);
     ME.coin+=reward;
     if(win) ME.bossW=(ME.bossW||0)+1;
     checkAch();
