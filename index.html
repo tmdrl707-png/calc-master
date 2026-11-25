@@ -1906,6 +1906,69 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 .bttbar i{display:block;height:100%;background:var(--tc);border-radius:8px;transition:width .35s}
 .bttrow>b{font-size:18px;font-weight:900;text-align:right;font-variant-numeric:tabular-nums;color:var(--tc)}
 .bttrow.me .bttbar{box-shadow:0 0 0 2px color-mix(in srgb,var(--tc) 35%,#fff)}
+
+/* ═══ 팀 총합제 무대 — 대전(VS)과 다른 '팀 레이스' ═══ */
+.tt{margin:0 0 8px;padding:10px 12px 8px;border-radius:18px;background:linear-gradient(135deg,#fff8ec,#f3f0ff);border:1.5px solid #f1dcb4;position:relative;overflow:hidden}
+.tt-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+.tt-mode{font-size:11.5px;font-weight:800;color:#a0621a;background:#fff;border:1px solid #f1dcb4;border-radius:999px;padding:2px 9px}
+.tt-streak{font-size:12px;font-weight:900;color:#fff;background:linear-gradient(90deg,#ff7a2f,#ff3d6e);border-radius:999px;padding:2px 9px;animation:ttFlame .6s ease-in-out infinite alternate}
+@keyframes ttFlame{from{transform:scale(1)}to{transform:scale(1.07)}}
+.tt-msg{font-size:14px;font-weight:700;text-align:center;margin:2px 0 8px;color:var(--ink)}
+.tt-msg b{color:#e8394f}
+.tt-lanes{display:flex;flex-direction:column;gap:6px}
+.tt-lane{display:grid;grid-template-columns:62px 1fr 46px;align-items:center;gap:8px;transition:transform .3s}
+.tt-lane.dead{opacity:.42;filter:grayscale(.8)}
+.tt-ln{display:flex;flex-direction:column;line-height:1.1}
+.tt-ln b{font-size:12.5px;font-weight:900;color:var(--tc);white-space:nowrap}
+.tt-ln em{font-style:normal;font-size:10px;font-weight:800;color:#fff;background:var(--tc);border-radius:6px;padding:0 5px;align-self:flex-start;margin-top:2px}
+.tt-ln small{font-size:10px;color:var(--dim)}
+.tt-track{position:relative;height:26px;border-radius:13px;background:#fff;box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);overflow:visible}
+.tt-lane.me .tt-track{box-shadow:inset 0 0 0 2px var(--tc)}
+.tt-fill{position:absolute;left:0;top:0;bottom:0;border-radius:13px;background:linear-gradient(90deg,var(--ts),var(--tc));transition:width .45s cubic-bezier(.3,1.4,.5,1)}
+.tt-run{position:absolute;top:50%;transform:translate(-100%,-50%);display:flex;transition:left .45s cubic-bezier(.3,1.4,.5,1);pointer-events:none}
+.tt-av{width:24px;height:24px;margin-left:-9px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--tc);display:block;overflow:hidden}
+.tt-av:first-child{margin-left:0}
+.tt-av svg{width:100%;height:100%}
+.tt-goal{position:absolute;right:-4px;top:50%;transform:translateY(-50%);font-size:16px}
+.tt-line{position:absolute;top:-3px;bottom:-3px;width:0;border-left:2.5px dashed #e8394f;transition:left .45s}
+.tt-line::after{content:'탈락선';position:absolute;top:-13px;left:-14px;font-size:9px;font-weight:800;color:#e8394f;white-space:nowrap}
+.tt-sum{font-size:20px;font-weight:900;text-align:right;color:var(--tc);font-variant-numeric:tabular-nums}
+.tt-sum small{font-size:11px;color:var(--dim);font-weight:700}
+.tt-lane.lead .tt-ln b::after{content:' 👑'}
+.tt-lane.bump .tt-track{animation:ttBump .45s}
+@keyframes ttBump{30%{transform:scaleY(1.25)}}
+.tt-mates{display:flex;flex-wrap:wrap;gap:6px;margin:9px 0 6px;padding-top:8px;border-top:1px dashed #ecd9b6}
+.tt-mate{position:relative;display:flex;align-items:center;gap:5px;padding:3px 9px 3px 3px;border-radius:999px;background:#fff;box-shadow:0 0 0 1.5px var(--tc)}
+.tt-mate.me{background:var(--tc);color:#fff}
+.tt-mate i{width:24px;height:24px;border-radius:50%;overflow:hidden;background:#fff;display:block}
+.tt-mate i svg{width:100%;height:100%}
+.tt-mate b{font-size:11.5px;font-weight:800;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tt-mate em{font-style:normal;font-size:13px;font-weight:900;font-variant-numeric:tabular-nums}
+.tt-mate.pop{animation:ttPop .5s}
+@keyframes ttPop{35%{transform:scale(1.18)}}
+.tt-plus{position:absolute;left:50%;top:-4px;transform:translateX(-50%);font-size:15px;font-weight:900;color:#12a05c;pointer-events:none;animation:ttUp .9s ease-out forwards}
+@keyframes ttUp{to{transform:translate(-50%,-26px);opacity:0}}
+.tt-feed{display:flex;gap:6px;flex-wrap:wrap;min-height:22px}
+.tt-ev{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:var(--ink);background:rgba(255,255,255,.75);border-radius:999px;padding:2px 9px}
+.tt-ev i{width:8px;height:8px;border-radius:50%;background:var(--tc)}
+.tt-ev b{color:var(--tc)}
+.tt-ev.new{animation:ttIn .4s}
+.tt-ev.idle{color:var(--dim)}
+@keyframes ttIn{from{transform:translateY(-6px);opacity:0}}
+.tt-orb{position:fixed;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#ffb020 60%,#ff7a2f);box-shadow:0 0 14px #ffb020;z-index:80;pointer-events:none;transition:transform .45s cubic-bezier(.5,0,.3,1),opacity .45s}
+.tt-outcard{display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 10px;font-size:34px}
+.tt-outcard b{font-size:18px}
+.tt-outcard span{font-size:13px;color:var(--dim)}
+/* 총합제일 때 문제 카드도 다르게 — 따뜻한 테두리 */
+#s-play.tot #card{box-shadow:0 0 0 2px #f1dcb4,0 6px 18px rgba(240,170,60,.12);background:linear-gradient(180deg,#fffdf8,#fff)}
+#s-play.tot .qlab{color:#a0621a;font-weight:800}
+.segs .sg.tot.on{background:linear-gradient(90deg,#ffb020,#ff7a2f);color:#fff}
+.bttst{font-size:11px;color:var(--dim);font-weight:700;margin-left:6px}
+.tt-line::after{top:auto;bottom:-12px}
+.tt-lanes{padding-bottom:4px}
+.bttst{display:block;margin:-2px 0 6px 2px;font-size:11.5px}
+.bttrh b{white-space:nowrap}
+.tt-lane:not(.me) .tt-line::after{display:none}
 </style>
 </head>
 <body>
@@ -2356,7 +2419,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.25 12:36';
+const APP_VER='11.25 22:47';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -13822,14 +13885,16 @@ const btValLabel=(kind,v)=>kind==='n'?v+'문제':kind==='s'?v+'개 차이':secLa
 const btKind=room=>['t','n','s'].includes((room||{}).kind)?room.kind:'t';
 const btVal=(room,kind)=>{ kind=kind||btKind(room); const f={t:'sec',n:'nq',s:'gap'}[kind], v=+((room||{})[f]);
   return BT_VALS[kind].includes(v)?v:BT_DEF[kind]; };
-const btLenLabel=room=>{ const k=btKind(room); return (btTeamOn(room)?(btTotal(room)?'팀 총합제 · ':'팀전 · '):'')+(k==='s'?`서바이벌 · ${btVal(room)}개 차이면 탈락`:`${k==='n'?'개수제':'시간제'} ${btValLabel(k,btVal(room))}`); };
+const btLenLabel=room=>{ const k=btKind(room), tot=btTotal(room), team=btTeamOn(room);
+  return (team?(tot?'팀 총합제 · ':'팀전 · '):'')+(k==='s'?`서바이벌 · ${team?'1등 팀과 ':''}${btVal(room)}개 차이면 탈락`
+    :k==='n'?(tot?`개수제 · 팀 목표 1인당 ${btVal(room)}개`:`개수제 ${btValLabel(k,btVal(room))}`):`시간제 ${btValLabel(k,btVal(room))}`); };
 let BT={code:null, room:null, last:null, off:null, view:'menu', t:null, kind:'t', sec:60, nq:10, gap:5,
         playedRd:0, paid:{}, gain:{}, my:null, busy:false, endT:null, closed:false, swept:false};
 const PEOPLE='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2" fill="currentColor"/><path d="M2.8 19c.6-3.4 3.1-5.4 6.2-5.4s5.6 2 6.2 5.4z" fill="currentColor"/><circle cx="16.6" cy="9" r="2.6" fill="currentColor" opacity=".55"/><path d="M14.6 14.2c.6-.2 1.3-.3 2-.3 2.6 0 4.4 1.7 4.9 4.6h-4.6c-.3-1.7-1.1-3.2-2.3-4.3z" fill="currentColor" opacity=".55"/></svg>';
 
 /* ═══ 점수 ═══ */
 /* 총합제 — 팀전의 한 방식: 서로 다른 문제를 각자 풀고, 같은 시간 동안 맞힌 개수를 팀별로 더해 겨뤄요 (p/{학번}/c = 맞힌 개수) */
-const btTotal=room=>!!room&&room.tm===2&&btKind(room)==='t';
+const btTotal=room=>!!room&&room.tm===2;
 const btWins=(room,sid)=>btTotal(room)?(+(((room.p||{})[sid]||{}).c)||0):Object.values((room&&room.w)||{}).filter(x=>x===sid).length;
 /* 이번 판에 함께한 사람 */
 const btRoster=room=>Object.keys((room&&room.p)||{}).filter(s=>!room.rd||room.st==='wait'||((room.p[s]||{}).rd===room.rd));
@@ -13838,13 +13903,27 @@ function btSurv(room){
   const gap=btVal(room,'s'), ids=btRoster(room), sc={}, out={};
   ids.forEach(s=>sc[s]=0);
   const W=(room&&room.w)||{}, last=Math.max(-1,...Object.keys(W).map(Number));
+  /* 팀전 서바이벌 — 팀 점수(먼저 맞힌 개수의 합)가 1등 팀과 gap 개 벌어지면 그 팀 전원 탈락 */
+  if(btTeamOn(room)&&!btTotal(room)){
+    const TM=btTeams(room), ts={}, tout={};
+    ids.forEach(s=>ts[TM[s]]=0);
+    for(let i=0;i<=last;i++){
+      const s=W[i]; if(s==null||!(s in sc)||(TM[s] in tout)) continue;
+      sc[s]++; ts[TM[s]]++;
+      const al=Object.keys(ts).filter(t=>!(t in tout)), top=Math.max(...al.map(t=>ts[t]));
+      al.forEach(t=>{ if(top-ts[t]>=gap) tout[t]=i+1; });
+    }
+    ids.forEach(s=>{ if(TM[s] in tout) out[s]=tout[TM[s]]; });
+    return {sc, out, tout, alive:ids.filter(x=>!(x in out)), units:Object.keys(ts).filter(t=>!(t in tout)).length};
+  }
   for(let i=0;i<=last;i++){
     const s=W[i]; if(s==null||!(s in sc)||s in out) continue;
     sc[s]++;
     const top=Math.max(...ids.filter(x=>!(x in out)).map(x=>sc[x]));
     ids.forEach(x=>{ if(!(x in out)&&top-sc[x]>=gap) out[x]=i+1; });   /* i+1 번째 문제가 끝났을 때 탈락 */
   }
-  return {sc, out, alive:ids.filter(x=>!(x in out))};
+  const alive=ids.filter(x=>!(x in out));
+  return {sc, out, tout:{}, alive, units:alive.length};
 }
 
 /* ═══ 팀전 ═══
@@ -13852,7 +13931,7 @@ function btSurv(room){
    자료 : tm(팀전이면 1) · tn(팀 수) · tg/{학번}=팀 번호(0부터). 정해지지 않은 사람은 들어온 순서대로 사람이 적은 팀에 넣어요.
    팀 점수 = 그 팀 친구들이 먼저 맞힌 개수의 합. 서바이벌은 개인전만 돼요.                                             */
 const BT_TEAMS=[{n:'파랑 팀',c:'#2f5bea',s:'#eef2fe'},{n:'빨강 팀',c:'#e8394f',s:'#fff0f2'},{n:'초록 팀',c:'#12a05c',s:'#eaf8f0'},{n:'주황 팀',c:'#e8790c',s:'#fff4e6'}];
-const btTeamOn=room=>!!(room&&room.tm)&&btKind(room)!=='s';
+const btTeamOn=room=>!!(room&&room.tm);
 const btTN=room=>Math.min(4,Math.max(2,+((room||{}).tn)||2));
 function btTeams(room){
   const P=(room&&room.p)||{}, n=btTN(room), tg=(room&&room.tg)||{}, out={}, cnt=Array(n).fill(0);
@@ -13861,11 +13940,21 @@ function btTeams(room){
   ids.forEach(sid=>{ if(sid in out) return; let k=0; for(let i=1;i<n;i++) if(cnt[i]<cnt[k]) k=i; out[sid]=k; cnt[k]++; });
   return out;
 }
-/* 팀별 점수 — 사람이 있는 팀만, 점수 높은 순 */
+/* 팀 순위 기준 — 서바이벌은 늦게 탈락할수록 · 총합제 개수제는 목표를 먼저 채운 팀이 1등 · 그 밖은 팀 점수 */
+function btTeamRk(room,g,S){
+  const k=btKind(room);
+  if(k==='s'){ if(btTotal(room)){ const o=((room&&room.ox)||{})[g.i]; return o?o.k*1000+g.sum:1e6+g.sum; }
+    const o=(S||btSurv(room)).tout[g.i]; return o!=null?o*1000+g.sum:1e6+g.sum; }
+  if(k==='n'&&btTotal(room)){ const f=room&&room.fin; return (f&&f.t===g.i?1e6:0)+g.sum; }
+  return g.sum;
+}
+const btTotTarget=(room,g)=>btVal(room,'n')*Math.max(1,g.mem.length);
+/* 팀별 점수 — 사람이 있는 팀만, 순위 높은 순 */
 function btTeamScores(room,P){
   const T=btTeams(room), n=btTN(room), L=Array.from({length:n},(_,i)=>Object.assign({i,sum:0,mem:[]},BT_TEAMS[i]));
   (P||btPlayers(room)).forEach(p=>{ const g=L[T[p.sid]]; if(g){ g.sum+=p.n||0; g.mem.push(p); } });
-  return L.filter(g=>g.mem.length).map(g=>{ g.mem.sort((a,b)=>b.n-a.n||a.sid.localeCompare(b.sid)); return g; }).sort((a,b)=>b.sum-a.sum||a.i-b.i);
+  const S=btKind(room)==='s'&&!btTotal(room)?btSurv(room):null;
+  return L.filter(g=>g.mem.length).map(g=>{ g.mem.sort((a,b)=>b.n-a.n||a.sid.localeCompare(b.sid)); g.rk=btTeamRk(room,g,S); return g; }).sort((a,b)=>b.rk-a.rk||a.i-b.i);
 }
 const btMe=()=>({nk:ME.nk||'', ch:{s:ME.ch.s,c:ME.ch.c,items:(ME.ch.items||[]).slice()}, rd:0, done:false, j:Date.now(), hb:serverNow()});
 /* ═══ QR 초대 · 비회원 참가 ═══
@@ -14031,8 +14120,9 @@ function btPickKey(t,prog,used,boost2){
 }
 
 function btPlayers(room){
-  const P=(room&&room.p)||{}, kind=btKind(room), S=kind==='s'?btSurv(room):null;
-  return Object.keys(P).map(sid=>{ const p=P[sid]||{}, n=btWins(room,sid), o=S?S.out[sid]:undefined;
+  const P=(room&&room.p)||{}, kind=btKind(room), tot=btTotal(room), S=kind==='s'&&!tot?btSurv(room):null;
+  const TM=tot&&kind==='s'?btTeams(room):null, OX=(room&&room.ox)||{};
+  return Object.keys(P).map(sid=>{ const p=P[sid]||{}, n=btWins(room,sid), o=S?S.out[sid]:TM&&OX[TM[sid]]?OX[TM[sid]].k:undefined;
     return {sid, nk:nkOf(sid,p), ch:cleanCh(p.ch), n, out:o, rk:S?(o?o*1000:1e6)+n:n, host:sid===room.host, j:p.j||0, away:btAway(p)}; });
 }
 const btSort=P=>P.sort((a,b)=>b.rk-a.rk||a.sid.localeCompare(b.sid));
@@ -14066,12 +14156,20 @@ document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closes
   toast('아직 잠겨 있어요 · 선생님이 열어 주면 고를 수 있어요'); });
 /* 방식과 길이 — 길이는 옆으로 밀어서 고르는 바퀴 */
 const BT_WW=74;
+function btKindHelp(kind,team,tot){
+  if(tot) return kind==='t'?'정한 시간 동안 팀 친구들이 각자 맞힌 개수를 모두 더해요 · 합계가 많은 팀 우승'
+    :kind==='n'?'팀 목표 = 1인당 개수 × 팀원 수 · 목표를 <b>먼저 채운 팀</b>이 우승 (모자란 문제는 친구가 대신 채워 줄 수 있어요)'
+    :'1등 팀과 팀 합계가 정한 만큼 벌어지면 그 팀은 탈락 · 마지막까지 남은 팀 우승 (최대 5분)';
+  if(team) return kind==='t'?'정한 시간이 끝났을 때 팀 점수가 많은 팀 우승':kind==='n'?'정한 문제를 다 풀었을 때 팀 점수가 많은 팀 우승'
+    :'1등 팀과 팀 점수가 정한 만큼 벌어지면 그 순간 그 팀 전원 탈락 · 마지막까지 남은 팀 우승';
+  return kind==='t'?'정한 시간이 끝났을 때 많이 맞힌 사람이 우승':kind==='n'?'정한 문제를 다 풀었을 때 많이 맞힌 사람이 우승':'1등과 맞힌 개수가 정한 만큼 벌어지면 그 순간 탈락 · 마지막까지 남으면 우승';
+}
 function btLenHTML(kind,v,team,tot){
   const vals=BT_VALS[kind];
   return `<div class="btlab">방식</div>
-    <div class="chips" id="btKinds">${BT_KINDS.filter(([k])=>!(team&&k==='s')&&!(tot&&k!=='t')).map(([k,n])=>`<button class="chip${k===kind?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>
-    <div class="btkhelp">${kind==='t'?'정한 시간이 끝났을 때 많이 맞힌 사람이 우승':kind==='n'?'정한 문제를 다 풀었을 때 많이 맞힌 사람이 우승':'1등과 맞힌 개수가 정한 만큼 벌어지면 그 순간 탈락 · 마지막까지 남으면 우승'}</div>
-    <div class="btlab">${kind==='t'?'시간':kind==='n'?'문제 수':'탈락 기준 (1등과의 차이)'} <b id="btWv">${btValLabel(kind,v)}</b></div>
+    <div class="chips" id="btKinds">${BT_KINDS.map(([k,n])=>`<button class="chip${k===kind?' on':''}" data-k="${k}">${n}</button>`).join('')}</div>
+    <div class="btkhelp">${btKindHelp(kind,team,tot)}</div>
+    <div class="btlab">${kind==='t'?'시간':kind==='n'?(tot?'팀 목표 (1인당 맞힐 개수)':'문제 수'):team?'탈락 기준 (1등 팀과의 차이)':'탈락 기준 (1등과의 차이)'} <b id="btWv">${tot&&kind==='n'?'1인당 '+v+'개':btValLabel(kind,v)}</b></div>
     <div class="btwrap"><button class="btarr" data-d="-1" aria-label="작게">‹</button>
     <div class="btwheel" id="btWheel" data-kind="${kind}">${vals.map((x,i)=>`<button class="btw${x===v?' on':''}" data-i="${i}">${kind==='t'?secLabel(x).replace(' ','<br>'):x}</button>`).join('')}</div>
     <button class="btarr" data-d="1" aria-label="크게">›</button></div>
@@ -14080,11 +14178,11 @@ function btLenHTML(kind,v,team,tot){
 /* 바퀴 움직이기 — 멈춘 자리의 값을 onPick 으로 */
 function btWheelWire(v,onPick){
   const w=el('btWheel'); if(!w) return;
-  const kind=w.dataset.kind, vals=BT_VALS[kind];
+  const kind=w.dataset.kind, vals=BT_VALS[kind], per=BT.room&&btTotal(BT.room)&&kind==='n';
   const idx=Math.max(0,vals.indexOf(v));
   w.scrollLeft=idx*BT_WW;
   let tm=null;
-  const mark=i=>{ w.querySelectorAll('.btw').forEach((b,j)=>b.classList.toggle('on',j===i)); el('btWv').textContent=btValLabel(kind,vals[i]); };
+  const mark=i=>{ w.querySelectorAll('.btw').forEach((b,j)=>b.classList.toggle('on',j===i)); el('btWv').textContent=per?'1인당 '+vals[i]+'개':btValLabel(kind,vals[i]); };
   w.addEventListener('scroll',()=>{ BT.wheelAt=Date.now(); const i=Math.max(0,Math.min(vals.length-1,Math.round(w.scrollLeft/BT_WW))); mark(i);
     clearTimeout(tm); tm=setTimeout(()=>onPick(vals[i]),260); },{passive:true});
   w.querySelectorAll('.btw').forEach(b=>b.onclick=()=>{ if(w._drag) return; w.scrollTo({left:+b.dataset.i*BT_WW,behavior:'smooth'}); });
@@ -14105,7 +14203,7 @@ function btWheelWire(v,onPick){
 }
 
 const BT_QUICK={t:'rand',kind:'t',sec:60,nq:10,gap:5};
-const btKindName=r=>{ const k=btKind(r); return (btTeamOn(r)?(r.tm===2?'총합제 · ':'팀전 · '):'')+(k==='s'?'서바이벌':k==='n'?'개수제 '+btValLabel('n',btVal(r)):'시간제 '+btValLabel('t',btVal(r))); };
+const btKindName=r=>{ const k=btKind(r); return (btTeamOn(r)?(r.tm===2?'🤝 총합제 · ':'팀전 · '):'')+(k==='s'?'서바이벌':k==='n'?'개수제 '+(r.tm===2?'1인당 '+btVal(r)+'개':btValLabel('n',btVal(r))):'시간제 '+btValLabel('t',btVal(r))); };
 function btRoomsHTML(L){
   if(L===null) return '<div class="btempty">열린 방을 찾는 중…</div>';
   return L.length?L.map(r=>{ const n=Object.keys(r.p||{}).length, T=topicOf(r.t), full=n>=BT_MAX;
@@ -14268,15 +14366,16 @@ function btPaintRoom(){
     <div class="btcode"><span>방 번호</span><b>${room.code}</b></div>
     <button class="qrcard btqr" id="btQr" type="button" aria-label="초대 QR 크게 보기"><span class="qrimg">${qrSVG(btInviteUrl(room.code))}</span>
       <span class="qrtx"><b>QR로 친구 초대</b><small>카메라로 찍으면 방에 바로 들어와요 · 누르면 크게 보여요<br>학번 로그인이 안 된 친구는 닉네임만 써서 비회원으로 참가해요</small></span></button>
-    ${host?`<div class="btlab">대결</div><div class="segs" id="btMode"><button class="sg${team?'':' on'}" data-m="0">개인전</button><button class="sg${team&&!tot?' on':''}" data-m="1">팀전</button><button class="sg${tot?' on':''}" data-m="2">팀 총합제</button></div>
-      ${tot?'<div class="btkhelp">총합제 · 모두 <b>서로 다른 문제</b>를 풀어요. 같은 시간 동안 팀 친구들이 맞힌 개수를 더해 팀끼리 겨뤄요.</div>':team?'<div class="btkhelp">팀전 · 모두 같은 문제를 보고 먼저 맞힌 사람이 점수를 얻어요.</div>':''}
+    ${host?`<div class="btlab">대결</div><div class="segs" id="btMode"><button class="sg${team?'':' on'}" data-m="0">개인전</button><button class="sg${team&&!tot?' on':''}" data-m="1">팀전</button><button class="sg tot${tot?' on':''}" data-m="2">🤝 팀 총합제</button></div>
+      <div class="btkhelp">${tot?'🤝 <b>팀 총합제</b> · 모두 <b>서로 다른 문제</b>를 각자 풀어요. 팀 친구들이 맞힌 개수를 모두 더해 팀끼리 겨뤄요.'
+        :team?'<b>팀전</b> · 모두 <b>같은 문제</b>를 보고 먼저 맞힌 사람이 우리 팀에 1점을 보태요.':'<b>개인전</b> · 모두 <b>같은 문제</b>를 보고 가장 먼저 맞힌 사람이 1점.'}</div>
       ${team?`<div class="btlab">팀 수</div><div class="segs" id="btTn">${[2,3,4].map(k=>`<button class="sg${n===k?' on':''}" data-n="${k}">${k}팀</button>`).join('')}</div>`:''}
       <div class="btlab">주제</div><div id="btTopics">${btTopicsHTML(room.t,true)}</div>${btLenHTML(kind,btVal(room),team,tot)}`
     :`<div class="btinfo"><span class="tsym sm">${symHTML(T)}</span><b>${T.n}</b><span>${btLenLabel(room)}</span></div>`}
     <div class="btlab">들어온 친구 ${P.length}명${team&&host?' · 친구를 누르면 다음 팀으로 옮겨요':''}</div>
     ${team&&host?`<div class="btrow" style="margin:0 0 10px;justify-content:flex-start"><button class="btn" id="btShuf">골고루 섞기</button></div>`:''}
     ${teamsHTML}
-    ${tot?'<div class="btkhelp" style="margin-top:8px">팀 점수 = 팀 친구들이 각자 맞힌 개수의 합 · 같은 시간 동안 더 많이 푼 팀이 이겨요</div>':team?'<div class="btkhelp" style="margin-top:8px">팀 점수 = 팀 친구들이 먼저 맞힌 개수의 합 · 같은 팀끼리도 먼저 맞히기 경쟁이에요</div>':''}
+    ${tot?'<div class="btkhelp" style="margin-top:8px">팀 점수 = 팀 친구들이 각자 맞힌 개수의 합 · 팀 인원을 비슷하게 맞추면 공평해요</div>':team?'<div class="btkhelp" style="margin-top:8px">팀 점수 = 팀 친구들이 먼저 맞힌 개수의 합 · 같은 팀끼리도 먼저 맞히기 경쟁이에요</div>':''}
     <div class="btrow">${host
       ?`<button class="btn" id="btLeave">방 닫기</button>
         <button class="btn primary" id="btGo" ${canGo?'':'disabled'}>${P.length<2?'친구를 기다리는 중…':!canGo?'두 팀 이상에 친구가 있어야 해요':`${P.length}명으로 시작하기`}</button>`
@@ -14287,7 +14386,7 @@ function btPaintRoom(){
     const R='battles/'+room.code;
     el('btGo').onclick=btStart;
     el('btMode').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ const m=+b.dataset.m;
-      dbUpdate(R,m===0?{tm:0}:m===2?{tm:2,kind:'t'}:(kind==='s'?{tm:1,kind:'t'}:{tm:1})); });
+      dbUpdate(R,{tm:m}); });
     if(el('btTn')) el('btTn').querySelectorAll('.sg').forEach(b=>b.onclick=()=>dbUpdate(R,{tn:+b.dataset.n}));
     if(el('btShuf')) el('btShuf').onclick=()=>{ const ids=P.map(p=>p.sid).sort(()=>Math.random()-.5), tg={};
       ids.forEach((sid,i)=>tg[sid]=i%n); dbUpdate(R,{tg}); };
@@ -14303,7 +14402,7 @@ async function btStart(){
   el('btGo').disabled=true;
   const at=serverNow()+4200, k=btPickKey(room.t,0,[]);
   if(btTeamOn(room)&&new Set(Object.values(btTeams(room))).size<2) return toast('두 팀 이상에 친구가 있어야 시작할 수 있어요');
-  const upd={st:'run', at, rd:(room.rd||0)+1, cur:{i:0,at,k,u:[k]}, w:null, x:null, a:null};
+  const upd={st:'run', at, rd:(room.rd||0)+1, cur:{i:0,at,k,u:[k]}, w:null, x:null, a:null, ox:null, fin:null};
   if(btTeamOn(room)) upd.tg=btTeams(room);
   Object.keys(room.p||{}).forEach(s=>{ upd[`p/${s}/rd`]=upd.rd; upd[`p/${s}/done`]=false; upd[`p/${s}/c`]=0; });   /* 지금 방에 있는 사람이 이번 판 선수 */
   await dbUpdate('battles/'+room.code,upd);
@@ -14316,12 +14415,12 @@ function btStartPlay(room){
   stopTimer();
   const kind=btKind(room), v=btVal(room);
   G={mode:'battle', t:room.t, code:room.code, rd:room.rd, at:room.at, kind, v, len:btLenLabel(room),
-     sec:kind==='t'?v:60, endAt:kind==='t'?room.at+v*1000:Infinity,
+     sec:kind==='t'?v:60, endAt:kind==='t'?room.at+v*1000:btTotal(room)?room.at+(kind==='s'?300:600)*1000:Infinity,
      qi:-1, shown:-1, score:0, ans:0, combo:0, best:0, solved:0, right:0,
-     tot:btTotal(room), mine:0, used:[], nextAt:0,
+     team:btTeamOn(room), tot:btTotal(room), mine:0, used:[], nextAt:0, lastC:{}, ev:[], qAt:0, oxSent:{},
      phase:'cd', cdS:0, typed:'', clean:true, locked:false, tId:null, rev:-1, out:false, seen:{}, judged:{}};
   if(!((room.p||{})[ME.sid]||{}).rd||room.p[ME.sid].rd!==room.rd) dbUpdate(`battles/${room.code}/p/${ME.sid}`,{rd:room.rd});
-  setupHUD(); show('s-play');
+  setupHUD(); show('s-play'); el('s-play').classList.toggle('tot',G.tot);
   el('keypad').style.display='none'; cardScr(false);
   el('card').innerHTML=btCdHTML(Math.max(1,Math.ceil((G.at-serverNow())/1000)));
   paintBLive();
@@ -14329,7 +14428,7 @@ function btStartPlay(room){
 }
 const btCdHTML=s=>`<div class="btcd"><span>${s}</span><p>${topicOf(G.t).n} · ${G.len}</p>
   <small>가장 먼저 맞히면 1개! 틀리면 1초 쉬었다가 다시 쓸 수 있어요.</small></div>`;
-function btQLabel(){ if(G.tot) return `${G.qi+1}번째 문제 · 맞힐 때마다 우리 팀 +1`; return `${G.qi+1}번째 문제 · 먼저 맞히면 1개${G.kind==='s'?` · ${G.v}개 차이 나면 탈락`:''}`; }
+function btQLabel(){ if(G.tot) return `🤝 나만의 ${G.qi+1}번째 문제 · 맞히면 우리 팀 +1`; return `${G.qi+1}번째 문제 · 모두 같은 문제 · 먼저 맞히면 ${G.team?'우리 팀 ':''}+1${G.kind==='s'?` · ${G.team?'1등 팀과 ':''}${G.v}개 차이 나면 탈락`:''}`; }
 /* 다음 문제로 — 여러 명이 동시에 눌러도 한 번만 넘어가게, 넘기는 사람이 다음 문항을 뽑아요 */
 function btAdvance(i){
   if(!G||G.mode!=='battle') return;
@@ -14354,8 +14453,8 @@ function btTick(){
     el('hTime').innerHTML=`<b>${Math.min(cur.i+1,G.v)}</b> / ${G.v}번`;
   }else if(G.kind==='s'){
     const S=btSurv(room); G.out=ME.sid in S.out;
-    if((S.alive.length<=1&&btRoster(room).length>1&&now>=cur.at)||cur.i>=150){ btFinish(false); return; }
-    el('hTime').innerHTML=`남은 사람 <b>${S.alive.length}</b>명`;
+    if((S.units<=1&&btRoster(room).length>1&&now>=cur.at)||cur.i>=150){ btFinish(false); return; }
+    el('hTime').innerHTML=btTeamOn(room)?`남은 팀 <b>${S.units}</b>팀`:`남은 사람 <b>${S.alive.length}</b>명`;
   }else{
     if(now>=G.endAt){ btFinish(false); return; }
     const T=Math.max(0,(G.endAt-now)/1000); el('hTime').innerHTML=`남은 시간 <b>${clock(T)}</b>`; el('hTime').classList.toggle('warn',T<=10);
@@ -14368,7 +14467,7 @@ function btTick(){
     const f=factFromKey(cur.k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t,cur.i+1,[]);
     askQ(f); paintBLive();
     if(G.out){ G.phase='out'; G.locked=true; el('keypad').style.display='none';
-      const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML='탈락했어요 — 끝까지 친구들을 응원해요'; } }
+      const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML=btTeamOn(room)?'우리 팀이 탈락했어요 — 끝까지 친구들을 응원해요':'탈락했어요 — 끝까지 친구들을 응원해요'; } }
   }
   const i=G.shown; if(i<0) return;
   const win=(room.w||{})[i], A=((room.a||{})[i])||{};
@@ -14385,23 +14484,55 @@ function btTick(){
   }
   if(!win&&G.rev!==i&&left<=0){ G.rev=i; btReveal(null,'아무도 못 맞혔어요',A); btAdvance(i); }
 }
-/* 총합제 — 각자 자기 문제를 풀어요. 맞히면 바로 다음 문제, 맞힌 개수는 p/{학번}/c 로 모두에게 */
+/* 총합제 — 각자 자기 문제를 풀어요. 맞히면 바로 다음 문제, 맞힌 개수는 p/{학번}/c 로 모두에게.
+   시간제: 시간이 끝나면 합계 비교 · 개수제: 팀 목표(1인당 v개 × 팀원 수)를 먼저 채운 팀이 fin 에 기록 ·
+   서바이벌: 1등 팀과 v개 벌어진 팀을 ox/{팀}={k:탈락 순서} 로 기록 (방장 한 사람만 써요, 방장이 없으면 남은 사람 중 첫 번째) */
+const btTotWriter=room=>{ const L=btRoster(room); return L.includes(room.host)?room.host:L.slice().sort()[0]; };
+function btTotNext(){
+  const now=serverNow(), frac=G.kind==='t'?(now-G.at)/Math.max(1,G.endAt-G.at):Math.min(1,G.qi/40);
+  const k=btPickKey(G.t,frac,G.used,(G.btSpam||0)>0); if(G.btSpam>0) G.btSpam--;
+  G.used=G.used.concat(k).slice(-60); G.shown=G.qi+1; G.qi=G.shown; G.shownSrv=now; G.qAt=Date.now();
+  askQ(factFromKey(k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t,G.qi+1,[]));
+  G.locked=false; paintBLive();
+}
 function btTotTick(){
   if(!G||G.mode!=='battle'||!G.tot||G.over) return;
-  const room=BT.room||{}, now=serverNow();
+  const room=BT.room||{}, now=serverNow(), kind=G.kind;
   if(room.rd&&room.rd!==G.rd) return;
   G.score=G.mine;
+  const P=btLiveP(), TS=btTeamScores(room,P), myT=btTeams(room)[ME.sid], mine=TS.find(g=>g.i===myT)||{sum:G.mine,mem:[]};
+  /* 끝났나? */
   if(now>=G.endAt){ btFinish(false); return; }
+  if(kind==='n'){
+    if(room.fin){ btFinish(false); return; }
+    const hit=now>=G.at&&TS.find(g=>g.sum>=btTotTarget(room,g));
+    if(hit&&!G.finSent){ G.finSent=1; dbTx(`battles/${G.code}/fin`,c=>c?undefined:{t:hit.i,at:now}); }
+  }else if(kind==='s'){
+    const OX=room.ox||{}, alive=TS.filter(g=>!(g.i in OX));
+    if(now>=G.at&&alive.length<=1&&TS.length>1){ btFinish(false); return; }
+    if(now>=G.at&&btTotWriter(room)===ME.sid&&alive.length>1){
+      const top=Math.max(...alive.map(g=>g.sum)), k=Object.keys(OX).length+1;
+      alive.filter(g=>top-g.sum>=G.v&&!G.oxSent[g.i]).forEach(g=>{ G.oxSent[g.i]=1; dbSet(`battles/${G.code}/ox/${g.i}`,{k,at:now,n:g.sum}); }); }
+    const out=myT in OX;
+    if(out&&!G.out){ G.out=true; G.phase='out'; G.locked=true; el('keypad').style.display='none';
+      el('card').innerHTML=`<div class="qwrap"><div class="tt-outcard">💔<b>우리 팀이 탈락했어요</b><span>남은 팀이 끝날 때까지 점수판으로 응원해요</span></div></div>`; paintBLive(); }
+  }
   if(now<G.at){ const s=Math.ceil((G.at-now)/1000);
     if(G.cdS!==s){ G.cdS=s; el('card').innerHTML=btCdHTML(s); } return; }
-  const T=Math.max(0,(G.endAt-now)/1000); el('hTime').innerHTML=`남은 시간 <b>${clock(T)}</b>`; el('hTime').classList.toggle('warn',T<=10);
-  if(G.shown<0||(G.phase==='wait'&&Date.now()>=G.nextAt)){
-    const frac=(now-G.at)/Math.max(1,G.endAt-G.at);
-    const k=btPickKey(G.t,frac,G.used,(G.btSpam||0)>0); if(G.btSpam>0) G.btSpam--;
-    G.used=G.used.concat(k).slice(-60); G.shown=G.qi+1; G.qi=G.shown; G.shownSrv=now;
-    askQ(factFromKey(k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t,G.qi+1,[]));
-    G.locked=false; paintBLive(); }
-  const b=el('tbar').querySelector('i'); if(b) b.style.width=(T/G.sec*100)+'%';
+  /* 위쪽 정보 · 막대 */
+  const bar=el('tbar').querySelector('i');
+  if(kind==='t'){ const T=Math.max(0,(G.endAt-now)/1000); el('hTime').innerHTML=`남은 시간 <b>${clock(T)}</b>`; el('hTime').classList.toggle('warn',T<=10);
+    if(bar) bar.style.width=(T/G.sec*100)+'%'; }
+  else if(kind==='n'){ const tg=btTotTarget(room,mine); el('hTime').innerHTML=`우리 팀 목표까지 <b>${Math.max(0,tg-mine.sum)}</b>개`;
+    if(bar) bar.style.width=Math.min(100,mine.sum/Math.max(1,tg)*100)+'%'; }
+  else{ const al=TS.filter(g=>!((room.ox||{})[g.i])).length; el('hTime').innerHTML=`남은 팀 <b>${al}</b>팀`;
+    if(bar&&G.phase==='q') bar.style.width=Math.max(0,100-(Date.now()-G.qAt)/(BT_RT*10))+'%'; }
+  if(G.out) return;
+  /* 다음 문제 · 한 문제에 10초가 지나면 넘어가요 */
+  if(G.shown<0||(G.phase==='wait'&&Date.now()>=G.nextAt)){ btTotNext(); return; }
+  if(G.phase==='q'&&!G.locked&&Date.now()-G.qAt>BT_RT*1000){
+    G.phase='wait'; G.locked=true; G.nextAt=Date.now()+900; paintTyped('');
+    const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML=`시간 초과 — 정답 <b>${MI(G.ask.ans)}</b> · 다음 문제로`; } }
 }
 const btFastest=A=>Object.keys(A).sort((x,y)=>(+A[x])-(+A[y])||x.localeCompare(y))[0];
 async function btJudge(i,A){
@@ -14431,9 +14562,11 @@ async function btAnswer(ok,f){
   const i=G.qi; G.ans++;
   if(G.tot){
     if(ok){ G.right++; G.mine++; G.score=G.mine; G.phase='wait'; G.locked=true; G.nextAt=Date.now()+380; paintTyped('ok');
-      const m=el('qmsg'); if(m){ m.className='qmsg good'; m.innerHTML='정답! <b>+1</b>'; }
-      dbSet(`battles/${G.code}/p/${ME.sid}/c`,G.mine); paintBLive(); }
-    else{ G.locked=true; paintTyped('no'); document.body.classList.add('btpen');
+      G.combo++; G.best=Math.max(G.best,G.combo);
+      const m=el('qmsg'); if(m){ m.className='qmsg good'; m.innerHTML=`정답! 우리 팀 <b>+1</b>${G.combo>=3?` · 🔥 ${G.combo}연속`:''}`; }
+      G.lastC[ME.sid]=G.mine; btTotEvent(ME.sid,1);
+      dbSet(`battles/${G.code}/p/${ME.sid}/c`,G.mine); paintBLive(); btTotOrb(); }
+    else{ G.locked=true; G.combo=0; paintTyped('no'); document.body.classList.add('btpen');
       const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML=`틀렸어요 — <b>${BT_PEN/1000}초</b> 쉬었다가 다시 써요`; }
       setTimeout(()=>{ document.body.classList.remove('btpen');
         if(!G||G.mode!=='battle'||G.phase!=='q'||G.qi!==i) return;
@@ -14474,24 +14607,90 @@ function btAvSize(groups,w){
     if(h<=104) return s; }
   return 16;
 }
-/* 총합제 점수판 — 팀별 합계와 지금 어느 팀이 몇 개 앞서는지 */
+/* ═══ 총합제 무대 — 대전(VS)과 다르게 '팀 레이스' 모양 ═══
+   · 팀마다 한 줄 트랙: 맞힌 합계만큼 앞으로 (개수제는 목표 깃발, 서바이벌은 탈락선)
+   · 우리 팀 친구 칩: 친구가 맞히면 그 칩에서 +1 이 튀어 올라요 → 서로 다른 문제를 풀어도 함께 뛰는 느낌
+   · 실시간 소식: 누가 몇 개째 맞혔는지 · 팀 연속 득점 · 역전/탈락선 알림                               */
+function btTotEvent(sid,d){
+  const TM=btTeams(BT.room||{}), t=TM[sid]; if(t==null) return;
+  G.ev.unshift({sid,t,d,at:Date.now()}); G.ev=G.ev.slice(0,24);
+  G.evNew=(G.evNew||[]).concat({sid,t,d});
+}
+/* 친구 점수가 바뀌었는지 — 방 정보가 올 때마다 */
+function btTotDiff(P){
+  P.forEach(p=>{ if(p.sid===ME.sid) return; const was=G.lastC[p.sid];
+    if(was!=null&&(p.n||0)>was) btTotEvent(p.sid,(p.n||0)-was);
+    G.lastC[p.sid]=p.n||0; });
+}
+function btTotOrb(){
+  const c=el('card'), lane=document.querySelector('#bTot .tt-lane.me .tt-fill'); if(!c||!lane) return;
+  const a=c.getBoundingClientRect(), b=lane.getBoundingClientRect(), o=document.createElement('div'), root=document.fullscreenElement||document.body;
+  o.className='tt-orb'; o.style.left=(a.left+a.width/2-10)+'px'; o.style.top=(a.top+a.height*0.45-10)+'px'; root.appendChild(o);
+  requestAnimationFrame(()=>{ o.style.transform=`translate(${b.right-(a.left+a.width/2)}px,${b.top+b.height/2-(a.top+a.height*0.45)}px) scale(.55)`; o.style.opacity='.9'; });
+  setTimeout(()=>o.remove(),480);
+}
 function paintBTot(P){
-  let sb=el('bTot'), box=el('bLive');
+  let sb=el('bTot'); const box=el('bLive');
   if(!G||G.mode!=='battle'||!G.tot){ if(sb) sb.style.display='none'; return; }
   if(!sb){ sb=document.createElement('div'); sb.id='bTot'; box.parentNode.insertBefore(sb,box); }
-  const TS=btTeamScores(BT.room,P), mine=btTeams(BT.room)[ME.sid];
-  const top=TS[0], sec=TS[1], max=Math.max(1,...TS.map(g=>g.sum)), diff=top&&sec?top.sum-sec.sum:0;
-  const msg=!top||top.sum===0?'모두 0개 — 먼저 맞혀서 앞서 가요!':diff===0?`${TS.filter(g=>g.sum===top.sum).map(g=>g.n).join('·')} ${top.sum}개로 동점!`
-    :`<b style="color:${top.c}">${top.n}</b>이 ${top.sum}개로 <b>${diff}개 앞서요</b>${top.i===mine?' 👏':''}`;
-  sb.style.display=''; sb.className='bttot';
-  sb.innerHTML=`<div class="bttmsg">${msg}</div>`+TS.map((g,r)=>`<div class="bttrow${g.i===mine?' me':''}" style="--tc:${g.c}">
-    <span class="bttn">${g.n}${g.i===mine?' <em>우리</em>':''}</span><span class="bttbar"><i style="width:${Math.max(3,g.sum/max*100)}%"></i></span><b>${g.sum}</b></div>`).join('');
-  G.teamSum=(TS.find(g=>g.i===mine)||{sum:0}).sum;
+  const room=BT.room||{}, kind=G.kind, TS=btTeamScores(room,P), TM=btTeams(room), myT=TM[ME.sid], OX=room.ox||{};
+  btTotDiff(P);
+  const mine=TS.find(g=>g.i===myT)||{sum:G.mine,mem:[],i:myT,n:'우리 팀',c:'#2f5bea'};
+  const alive=TS.filter(g=>!(g.i in OX)), top=Math.max(0,...(kind==='s'?alive:TS).map(g=>g.sum));
+  /* 트랙 길이 */
+  const span=g=>kind==='n'?btTotTarget(room,g):Math.max(top+(kind==='t'?3:0),kind==='s'?G.v:5,1);
+  const pct=g=>Math.max(2,Math.min(100,g.sum/span(g)*100));
+  /* 한 줄 소식 */
+  const lead=TS[0], second=TS.find(g=>g!==lead), meLead=lead&&lead.i===myT, d=lead&&second?lead.sum-second.sum:0;
+  let msg;
+  if(kind==='n'){ const need=Math.max(0,btTotTarget(room,mine)-mine.sum), others=TS.filter(g=>g.i!==myT).map(g=>btTotTarget(room,g)-g.sum), oMin=others.length?Math.max(0,Math.min(...others)):0;
+    msg=need===0?'🎉 우리 팀 목표 달성!':`우리 팀 목표까지 <b>${need}개</b> · 가장 빠른 상대는 ${oMin}개 남음${need<oMin?' — 우리가 앞서요!':need>oMin?' — 서둘러요!':''}`; }
+  else if(kind==='s'){ if(myT in OX) msg='💔 우리 팀 탈락 — 남은 팀을 응원해요';
+    else{ const gapTop=top-mine.sum, safe=G.v-gapTop;
+      msg=gapTop===0?`👑 우리 팀 선두! ${second&&!(second.i in OX)?`${second.n} 탈락까지 ${Math.max(0,G.v-(mine.sum-second.sum))}개`:''}`:`⚠️ 탈락선까지 <b>${safe}개</b> 여유 — 1등과 ${gapTop}개 차이`; } }
+  else msg=!lead||lead.sum===0?'모두 0개 — 맞힐 때마다 우리 팀 트랙이 앞으로 가요!':d===0?'동점! 한 문제가 승부를 가려요':
+    meLead?`👑 우리 팀이 <b>${d}개</b> 앞서요 — 지켜요!`:`역전까지 <b>${(lead.sum-mine.sum)+1}개</b>!`;
+  /* 팀 연속 득점 — 4초 안에 3번 이상 */
+  const nowT=Date.now(), streak=G.ev.filter(e=>e.t===myT&&nowT-e.at<4000).reduce((a,e)=>a+e.d,0);
+  const sig=TS.map(g=>g.i+':'+g.mem.map(p=>p.sid).join(',')).join('|')+'#'+kind;
+  if(sb.dataset.sig!==sig){
+    sb.dataset.sig=sig; sb.className='tt'; sb.style.display='';
+    sb.innerHTML=`<div class="tt-head"><span class="tt-mode">🤝 팀 총합제 · 각자 다른 문제</span><span class="tt-streak" hidden></span></div>
+      <div class="tt-msg"></div>
+      <div class="tt-lanes">${TS.map(g=>`<div class="tt-lane${g.i===myT?' me':''}" data-i="${g.i}" style="--tc:${g.c};--ts:${g.s}">
+        <div class="tt-ln"><b>${g.n}</b>${g.i===myT?'<em>우리</em>':''}<small>${g.mem.length}명</small></div>
+        <div class="tt-track"><i class="tt-fill"></i>${kind==='n'?'<span class="tt-goal">🏁</span>':''}${kind==='s'?'<span class="tt-line" title="탈락선"></span>':''}
+          <span class="tt-run">${g.mem.slice(0,3).map(p=>`<span class="tt-av">${avatarSVG(p.ch,{tight:true})}</span>`).join('')}</span></div>
+        <strong class="tt-sum">0</strong></div>`).join('')}</div>
+      <div class="tt-mates" style="--tc:${mine.c}">${(mine.mem||[]).map(p=>`<span class="tt-mate${p.sid===ME.sid?' me':''}" data-sid="${esc(p.sid)}">
+        <i>${avatarSVG(p.ch,{tight:true})}</i><b>${p.sid===ME.sid?'나':esc(whoPlain(p.sid,p))}</b><em>0</em></span>`).join('')}</div>
+      <div class="tt-feed" aria-live="polite"></div>`;
+  }
+  sb.querySelector('.tt-msg').innerHTML=msg;
+  const st=sb.querySelector('.tt-streak'); st.hidden=streak<3; if(streak>=3) st.textContent=`🔥 우리 팀 ${streak}연속!`;
+  TS.forEach((g,r)=>{ const L=sb.querySelector(`.tt-lane[data-i="${g.i}"]`); if(!L) return;
+    L.style.order=r; L.classList.toggle('lead',r===0&&g.sum>0); L.classList.toggle('dead',g.i in OX);
+    L.querySelector('.tt-fill').style.width=pct(g)+'%'; L.querySelector('.tt-run').style.left=`calc(${pct(g)}% - 6px)`;
+    const sm=L.querySelector('.tt-sum'); sm.innerHTML=kind==='n'?`${g.sum}<small>/${btTotTarget(room,g)}</small>`:g.sum;
+    const ln=L.querySelector('.tt-line'); if(ln) ln.style.left=Math.max(0,(top-G.v)/span(g)*100)+'%'; });
+  (mine.mem||[]).forEach(p=>{ const e=sb.querySelector(`.tt-mate[data-sid="${CSS.escape(p.sid)}"] em`); if(e) e.textContent=p.n||0; });
+  /* 새 소식 — 칩에서 +1, 트랙 출렁, 소식 줄 */
+  (G.evNew||[]).forEach(e=>{
+    const L=sb.querySelector(`.tt-lane[data-i="${e.t}"]`); if(L){ L.classList.remove('bump'); void L.offsetWidth; L.classList.add('bump'); }
+    const c=sb.querySelector(`.tt-mate[data-sid="${CSS.escape(e.sid)}"]`);
+    if(c){ c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
+      const f=document.createElement('span'); f.className='tt-plus'; f.textContent='+'+e.d; c.appendChild(f); setTimeout(()=>f.remove(),900); }
+  });
+  G.evNew=[];
+  const feed=sb.querySelector('.tt-feed'), whoN=sid=>sid===ME.sid?'나':whoPlain(sid,(room.p||{})[sid]||{});
+  feed.innerHTML=G.ev.slice(0,3).map((e,k)=>{ const g=BT_TEAMS[e.t]||{}; return `<span class="tt-ev${k===0&&Date.now()-e.at<1200?' new':''}" style="--tc:${g.c}"><i></i>${esc(whoN(e.sid))} <b>+${e.d}</b>${e.t===myT&&e.sid!==ME.sid?' · 고마워!':''}</span>`; }).join('')||'<span class="tt-ev idle">팀 친구가 맞히면 여기에 바로 떠요</span>';
+  G.teamSum=mine.sum; G.tRank=Math.max(1,TS.findIndex(g=>g.i===myT)+1); G.nT=TS.length;
 }
 function paintBLive(){
   const box=el('bLive'); if(!box) return;
   if(!G||G.mode!=='battle'){ box.style.display='none'; box.innerHTML=''; box.dataset.sig=''; const sb=el('bTot'); if(sb) sb.style.display='none'; return; }
   const P=btLiveP(); paintBTot(P);
+  if(G.tot){ box.style.display='none'; box.dataset.sig=''; return; }
   const R=rankList(btSort(P.slice()),p=>p.rk), RK={}; R.forEach(x=>RK[x.r.sid]=x.rank);
   G.rank=RK[ME.sid]||1; G.nP=P.length;
   box.style.display=''; box.className='blive arena';
@@ -14500,6 +14699,7 @@ function paintBLive(){
   let L,Rg;
   if(team){ const TS=btTeamScores(BT.room,P), mine=TM[ME.sid];
     L=TS.filter(g=>g.i===mine); Rg=TS.filter(g=>g.i!==mine);
+    G.teamSum=(L[0]||{sum:0}).sum; G.tRank=Math.max(1,TS.findIndex(g=>g.i===mine)+1); G.nT=TS.length;
     if(!L.length) L=[{n:'',mem:[]}]; }
   else{ L=[{mem:[P.find(p=>p.sid===ME.sid)]}]; Rg=[{mem:P.filter(p=>p.sid!==ME.sid).sort(byRk)}]; }
   const sig=[team?1:0, box.clientWidth, L.concat(Rg).map(g=>(g.i==null?'':g.i)+':'+g.mem.map(p=>p.sid+(p.out?'x':'')).join(',')).join('|')].join('#');
@@ -14543,7 +14743,7 @@ function btAttackFx(win){
 }
 async function btFinish(quit){
   if(!G||G.mode!=='battle'||G.over) return;
-  G.over=true; stopTimer();
+  G.over=true; stopTimer(); el('s-play').classList.remove('tot'); { const sb=el('bTot'); if(sb){ sb.style.display='none'; sb.dataset.sig=''; } }
   const code=G.code, rd=G.rd, room=BT.room||{};
   BT.my={n:(G.tot?G.mine:btWins(room,ME.sid)), a:G.ans, rd, t:G.t, len:G.len, kind:G.kind, v:G.v, endAt:G.kind==='t'?G.endAt:serverNow(), quit:!!quit};
   BT.view='result';
@@ -14563,22 +14763,24 @@ function btPaintResult(){
   if(!P.find(p=>p.sid===ME.sid)) P.push({sid:ME.sid,ch:cleanCh(ME.ch),n:my.n,rk:my.n});
   btSort(P);
   const curI=((room.cur||{}).i)||0;
-  const final=my.quit||serverNow()>my.endAt+2500||(my.kind==='n'&&curI>=my.v);
+  const final=my.quit||serverNow()>my.endAt+2500||(my.kind==='n'&&!btTotal(R0)&&curI>=my.v);
   const R=rankList(P,p=>p.rk), mr=R.find(x=>x.r.sid===ME.sid).rank, T=topicOf(my.t);
-  const team=btTeamOn(R0), TS=team?btTeamScores(R0,P):null, TR=team?rankList(TS,g=>g.sum):null, TM=team?btTeams(R0):{};
+  const team=btTeamOn(R0), tot=btTotal(R0), TS=team?btTeamScores(R0,P):null, TR=team?rankList(TS,g=>g.rk):null, TM=team?btTeams(R0):{};
   const myTR=team?(TR.find(x=>x.r.mem.some(p=>p.sid===ME.sid))||{rank:TR.length}).rank:0;
   if(final&&!BT.paid[my.rd]){ BT.paid[my.rd]=1; BT.gain[my.rd]=team?btReward(myTR,TS.length,my.n,Object.assign({team:1},my)):btReward(mr,P.length,my.n,my); }
   const gain=BT.gain[my.rd];
   const host=live&&BT.room.host===ME.sid;
-  const sub=p=>my.kind==='s'?(p.out?`${p.out}번째 문제에서 탈락 · 맞힌 문제 ${p.n}개`:`끝까지 살아남음 · 맞힌 문제 ${p.n}개`):`맞힌 문제 ${p.n}개`;
+  const sub=p=>tot?`각자 다른 문제로 맞힌 ${p.n}개`:my.kind==='s'?(p.out?`${p.out}번째 문제에서 탈락 · 맞힌 문제 ${p.n}개`:`끝까지 살아남음 · 맞힌 문제 ${p.n}개`):`맞힌 문제 ${p.n}개`;
+  const tStat=g=>{ if(my.kind==='s'){ const o=tot?((R0.ox||{})[g.i]||{}).k:(btSurv(R0).tout[g.i]); return o?(tot?`${o}번째로 탈락`:`${o}번째 문제에서 탈락`):'끝까지 생존'; }
+    if(tot&&my.kind==='n') return (R0.fin&&R0.fin.t===g.i)?'🏁 목표를 가장 먼저 채웠어요':`목표 ${btTotTarget(R0,g)}개 중 ${g.sum}개`; return ''; };
   const teamHTML=team?`<div class="btteamres">${TR.map(({r:g,rank})=>`<div class="bttr${final&&rank===1?' win':''}${g.mem.some(p=>p.sid===ME.sid)?' me':''}" style="--tc:${g.c};--ts:${g.s}">
-      <div class="bttrh"><span class="medal ${final&&rank<=3?'m'+rank:''}">${final?rank:'·'}</span><b>${g.n}</b>${final&&rank===1?'<em>우승</em>':''}<strong>${g.sum}<small>개</small></strong></div>
+      <div class="bttrh"><span class="medal ${final&&rank<=3?'m'+rank:''}">${final?rank:'·'}</span><b>${g.n}</b>${final&&rank===1?'<em>우승</em>':''}<strong>${g.sum}<small>개</small></strong></div>${tStat(g)?`<div class="bttst">${tStat(g)}</div>`:''}
       <div class="bttrm">${g.mem.map((p,j)=>`<span class="bttm${j===0&&p.n>0?' mvp':''}"><i>${avatarSVG(p.ch,{tight:true})}</i><b>${whoHTML(p.sid,p)}</b><em>${p.n}</em></span>`).join('')}</div></div>`).join('')}</div>`:'';
   const pod=!team&&final&&P.length>=2?`<div class="cbpod btpod">${[1,0,2].filter(i=>R[i]).map(i=>{ const {r:p,rank}=R[i];
       return `<div class="cbp p${Math.min(rank,3)}${p.sid===ME.sid?' me':''}"><div class="cbpav">${avatarSVG(p.ch)}</div>
         <span class="medal m${Math.min(rank,3)}">${rank}</span><b>${whoHTML(p.sid,p)}</b><em>${p.n}개</em><i style="height:${[0,64,46,34][Math.min(rank,3)]}px"></i></div>`; }).join('')}</div>`:'';
   el('btBody').innerHTML=`
-    <div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>${final?(team?(myTR===1?'우리 팀 우승!':'팀전 결과'):(mr===1&&P.length>1?'우승!':'대전 결과')):'친구들이 끝나기를 기다리는 중…'}</h2>
+    <div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>${final?(team?(myTR===1?'우리 팀 우승!':tot?'팀 총합제 결과':'팀전 결과'):(mr===1&&P.length>1?'우승!':'대전 결과')):'친구들이 끝나기를 기다리는 중…'}</h2>
       <p class="sub">${T.n} · ${my.len} · 방 ${room.code}</p></div></div>
     ${teamHTML}${pod}
     ${team?'<div class="btlab" style="margin-top:14px">개인 기록</div>':''}
@@ -15482,7 +15684,7 @@ function paintSide(){
   const p=el('pSide'); if(!p||!ME) return;
   let fig='';
   if(G&&G.mode==='real') fig=`<div class="sfig"><b>${rec(G.t).best||0}</b><span>내 최고 기록</span></div>`;
-  else if(G&&G.mode==='battle') fig=`<div class="sfig"><b>${G.rank||1}위</b><span>${G.nP||1}명 가운데 지금 순위</span></div>`;
+  else if(G&&G.mode==='battle') fig=G.team?`<div class="sfig"><b>${G.tRank||1}위</b><span>${G.nT||2}팀 가운데 우리 팀 순위 · 우리 팀 ${G.teamSum||0}개${G.tot?` (나 ${G.mine||0}개)`:''}</span></div>`:`<div class="sfig"><b>${G.rank||1}위</b><span>${G.nP||1}명 가운데 지금 순위</span></div>`;
   else if(G&&G.mode==='boss') fig=`<div class="sfig"><b>${G.score||0}</b><span>내가 격파에 기여한 문제</span></div>`;
   else if(G&&G.mode==='note') fig=`<div class="sfig"><b>${Math.max(0,G.need-G.done)}</b><span>남은 오답</span></div>`;
   else if(G&&G.mode==='practice'){ const bt=prog(G.t).bt['s'+G.st];
@@ -15604,7 +15806,7 @@ function setTopicVars(t){ const T=topicOf(t), w=document.querySelector('.wrap');
 /* 문제는 어두운 계산기 화면, 풀이·미리보기는 밝은 종이 */
 const cardScr=on=>el('card').classList.toggle('scr',!!on);
 /* ═══ HUD ═══ */
-function setupHUD(){
+function setupHUD(){ { const sp=el("s-play"); if(sp) sp.classList.remove("tot"); }
   const real=G.mode==='real'||G.mode==='battle'||G.mode==='boss';
   el('s-play').classList.toggle('realmode',real);
   el('hTime').style.display=real?'':'none';
@@ -15626,7 +15828,7 @@ function updHUD(){
     el('hAcc').textContent=`맞힌 문항 ${G.score}개`;
   }else if(G.mode==='battle'){
     el('hLv').textContent=`${T.n} · 친구 대전`;
-    el('hAcc').textContent=G.tot?`나 ${G.score}개 · 우리 팀 ${G.teamSum==null?G.score:G.teamSum}개`:`${G.score}개${G.nP>1?` · ${G.nP}명 중 ${G.rank}위`:''}`;
+    el('hAcc').textContent=G.team?`나 ${G.score}개 · 우리 팀 ${G.teamSum==null?G.score:G.teamSum}개 · ${G.tRank||1}위`:`${G.score}개${G.nP>1?` · ${G.nP}명 중 ${G.rank}위`:''}`;
   }else if(G.mode==='boss'){
     el('hLv').textContent=`${T.n} · 반 보스전`;
     el('hAcc').textContent=`내 기여 ${G.score}개`;
@@ -15682,7 +15884,7 @@ function askQ(f){
   G.ask=f; G.phase='q'; G.typed=''; G.clean=true; G.locked=false; G.qDels=0; G.q1Dels=0;
   el('keypad').style.display=''; cardScr(true);
   /* 보기에서 고르는 문항(예: 예각·직각·둔각)은 숫자판 대신 보기 단추 */
-  if(f.pick) pickPad(f.pick); else if(KP_NEG==='pick'){ KP_NEG=null; buildKeypad(kpMode(G.t)); }
+  if(f.pick) pickPad(f.pick); else{ if(KP_NEG==='pick') KP_NEG=null; buildKeypad(kpQ(f)); }
   el('card').innerHTML=`<div class="qwrap">
       <div class="qlab">${qLabel()}</div>
       ${f.fig?`<div class="qfig">${qFigOf(f)}</div>`:''}
@@ -15720,6 +15922,8 @@ let KP_AT=-1e9;
   document.addEventListener('click',e=>{ if(performance.now()-KP_AT<600&&!(e.target.closest&&e.target.closest('#keypad'))){ e.stopPropagation(); e.preventDefault(); } },true);
 })();
 const kpMode=t=>{ const T=topicOf(t); return T.neg?'neg':T.dec?'dec':false; };
+/* 문항마다 숫자판 — 랜덤 대전은 여러 주제가 섞이므로 언제나 − 단추를 (소수 답이면 소수점 단추) */
+const kpQ=f=>G&&G.t==='rand'?(Number.isInteger(+f.ans)?'neg':'dec'):kpMode(G.t);
 function buildKeypad(mode){
   mode=mode||false; if(KP_NEG===mode) return; KP_NEG=mode; el('keypad').classList.remove('pickpad');
   const neg=!!mode, sp=mode==='dec'?'dot':'neg';
@@ -15754,12 +15958,12 @@ function press(k){
     return;
   }
   if(k==='ok'){ if(/\d/.test(G.typed)) submit(); return; }
-  if(k==='neg'){ if(!topicOf(G.t).neg) return;
+  if(k==='neg'){ if(KP_NEG!=='neg') return;
     G.typed=G.typed[0]==='-'?G.typed.slice(1):'-'+G.typed; paintTyped();
     if(autoOk()&&G.typed===String(G.ask.ans)) submit(); return; }
-  if(k==='dot'){ if(!topicOf(G.t).dec||G.typed.includes('.')) return;
+  if(k==='dot'){ if(KP_NEG!=='dec'||G.typed.includes('.')) return;
     G.typed=(G.typed===''||G.typed==='-'?G.typed+'0':G.typed)+'.'; paintTyped(); return; }
-  if(G.typed.replace(/[-.]/g,'').length>=(topicOf(G.t).dec?6:4)) return;
+  if(G.typed.replace(/[-.]/g,'').length>=(KP_NEG==='dec'?6:4)) return;
   if(G.typed==='0') G.typed=''; if(G.typed==='-0') G.typed='-';
   G.typed+=k; paintTyped();
   if(autoOk()&&G.typed===String(G.ask.ans)) submit();
