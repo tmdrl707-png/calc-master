@@ -1969,6 +1969,33 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 .bttst{display:block;margin:-2px 0 6px 2px;font-size:11.5px}
 .bttrh b{white-space:nowrap}
 .tt-lane:not(.me) .tt-line::after{display:none}
+
+/* 11.25 검토 — 휴대폰에서 위쪽 막대가 두 줄로 밀리지 않게 (랭킹 단추가 아래로 떨어지던 문제) */
+@media(max-width:430px){
+  .mebar{flex-wrap:nowrap;gap:5px}
+  .mebar .mnbtn{padding:7px 9px;font-size:12.5px;white-space:nowrap;flex:none}
+  .mebtn{gap:6px;padding-right:8px;min-width:0}
+  .mebtn .av{width:32px;height:32px}
+  .mebtn .coin{font-size:13px}
+  .mebtn .shoplab{font-size:12.5px;padding-left:6px}
+}
+@media(max-width:370px){ .mebtn .shoplab{display:none!important} }
+/* 한국어는 낱말 중간에서 줄이 바뀌지 않게 (제곱수·세 / 제곱수, 정 / 리 노트) */
+body{word-break:keep-all;overflow-wrap:break-word}
+/* 고등 과목 탭(공통수학1·2 …)이 두 줄로 깨지지 않게 */
+.gtabs .sg,.grtabs .sg,#hGrade .sg,#gradeTabs .sg{white-space:nowrap}
+.grtab{white-space:nowrap}
+@media(max-width:600px){.grtabs:has(.grtab:nth-child(4)) .grtab{font-size:13.5px;padding-left:4px;padding-right:4px;letter-spacing:-.2px}}
+.tlrow{grid-template-columns:minmax(0,1fr) 64px 64px 64px}
+.tlrow .cn{min-width:0;font-size:14px;line-height:1.3}
+@media(max-width:430px){.tlrow{grid-template-columns:minmax(0,1fr) 58px 58px 58px;gap:6px}}
+/* 정리 노트 위 요약 칸 — 4개가 한 줄에 (3칸 격자라 '자주 하는 실수'만 아래로 떨어지던 문제) */
+.nbtoc{grid-template-columns:repeat(var(--n,4),minmax(0,1fr))!important}
+.nbtoc button span{font-size:11px;white-space:nowrap;letter-spacing:-.3px}
+@media(max-width:370px){.nbtoc button span{font-size:10px}}
+/* 컴퓨터 화면에서는 주제 카드를 두 줄로 (한 줄이면 오른쪽 절반이 비어 보였어요) */
+@media(min-width:760px){ #s-home .topics{grid-template-columns:repeat(2,minmax(0,1fr));max-width:none} #s-home .grtabs{max-width:none} }
+.homegrid2{grid-template-columns:minmax(0,1fr)!important}
 </style>
 </head>
 <body>
@@ -2419,7 +2446,7 @@ body.bsdef .qlab{color:#e11d48;font-weight:900}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.25 22:47';
+const APP_VER='11.25 23:26';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -12161,7 +12188,7 @@ const PF_ALL=()=>Object.keys(PF_LIM).flatMap(b=>range(1,PF_LIM[b]).map(e=>[+b,e]
 const PFA=()=>PF_ALL().filter(([b,e])=>e>=2||b<=3).map(([b,e])=>pfa(b,e));
 const PFB=()=>PF_ALL().filter(([,e])=>e>=2).map(([b,e])=>pfb(b,e));
 const pfOk=(n,lo,hi)=>{ const fs=factorize(n); return n>=lo&&n<=hi&&fs.length>=2&&fs.every(([p])=>p<=7); };
-const PFC=()=>range(10,400).filter(n=>pfOk(n,10,400)&&factorize(n).some(([,e])=>e>=2)&&factorize(n).length<=3).map(pfc);
+const PFC=()=>range(10,200).filter(n=>pfOk(n,10,200)&&factorize(n).some(([,e])=>e>=2)&&factorize(n).length<=3).map(pfc);
 function genPF4n(){ const L=range(12,400).filter(n=>pfOk(n,12,400)&&factorize(n).some(([,e])=>e>=2));
   const n=pickOne(L), big=factorize(n).filter(([,e])=>e>=2); return pf1(n,pickOne(big)[0]); }
 const pfChain=(b,e)=>range(1,e).map(k=>Math.pow(b,k));
@@ -12358,7 +12385,7 @@ function genSRt(){ const [m,n]=pickOne(SR_R()), r=Math.random(), w=r<.2?'r':r<.5
 const srA=(p,m,n,q,k)=>F({key:'SRa'+p+'_'+m+'_'+n+'_'+q+'_'+k, sk:'SR'+p, t:'simr', k:'srA', p, m, n, q, kk:k, fig:true, cb:true,
   cond:k?'':p===2?'넓이의 비':'부피의 비', eq:k?['?',{u:p===2?'cm²':'cm³'}]:[Math.pow(m,p),':','?'], ans:k?Math.pow(n,p)*k:Math.pow(n,p)});
 const genSRa2=()=>{ const [m,n]=pickOne(SR_R().filter(([,n])=>n<=5)); return srA(2,m,n,ri(1,3),Math.random()<.4?0:ri(2,5)); };
-const genSRa3=()=>{ const [m,n]=pickOne(SR_R().filter(([,n])=>n<=4)); return srA(3,m,n,ri(1,2),Math.random()<.45?0:ri(1,3)); };
+const genSRa3=()=>{ const [m,n]=pickOne(SR_R().filter(([,n])=>n<=4)); let k=Math.random()<.45?0:ri(1,3); while(k&&n*n*n*k>64) k--; return srA(3,m,n,ri(1,2),k); };   /* 큰 쪽 부피 64 이하 */
 /* 거꾸로 : r 넓이(부피)를 보고 닮음비 · e 넓이(부피)와 큰 변을 보고 작은 변 */
 const srR=(p,m,n,k)=>F({key:'SRr'+p+'_'+m+'_'+n+'_'+k, sk:'SR4', t:'simr', k:'srR', p, m, n, kk:k, fig:true, cb:true,
   cond:k?'':'닮음비', eq:k?['?',{u:'cm'}]:[m,':','?'], ans:k?m*k:n});
@@ -12670,12 +12697,13 @@ const mhFactor=v=>v>0?`x − ${v}`:`x + ${-v}`;
 
 /* ── 1. 부채꼴·입체도형 □π (solid, 중1, fig:true) ── */
 const SL_ARC=[];
-[3,4,6,8,9,10,12,15,18].forEach(r=>[30,45,60,90,120,135,150,180,210,240,270,300].forEach(th=>{
-  if((2*r*th)%360===0){ const v=2*r*th/360; if(v>=2&&v<=30) SL_ARC.push([r,th]); }
+/* 암산 부담을 줄여서 — 반지름 12 이하, 자주 쓰는 각만, 답 2~12 */
+[2,3,4,6,8,9,12].forEach(r=>[30,45,60,90,120,150,180,240,270].forEach(th=>{
+  if((2*r*th)%360===0){ const v=2*r*th/360; if(v>=2&&v<=12) SL_ARC.push([r,th]); }
 }));
 const SL_AREA=[];
-[4,6,8,9,10,12].forEach(r=>[30,45,60,90,120,135,150,180,240,270].forEach(th=>{
-  if((r*r*th)%360===0){ const v=r*r*th/360; if(v>=4&&v<=108) SL_AREA.push([r,th]); }
+[2,3,4,6,8,9,10,12].forEach(r=>[30,45,60,90,120,180,270].forEach(th=>{
+  if((r*r*th)%360===0){ const v=r*r*th/360; if(v>=2&&v<=24) SL_AREA.push([r,th]); }
 }));
 const sl1=(r,th)=>F({key:`SL1_${r}_${th}`, sk:'SL1', t:'solid', k:'sl1', r, th, fig:true,
   cond:`반지름 ${r}, 중심각 ${th}° → 호의 길이`, cb:true, eq:['?',{u:'π'}], ans:2*r*th/360});
@@ -12688,11 +12716,11 @@ const sl4=(w,r)=>F({key:`SL4${w}_${r}`, sk:'SL4', t:'solid', k:'sl4', w, r, fig:
 const genSL1=()=>{ const [r,th]=pickOne(SL_ARC); return sl1(r,th); };
 const genSL2=()=>{ const [r,th]=pickOne(SL_AREA); return sl2(r,th); };
 function genSL3(){
-  if(Math.random()<.5){ const r=ri(2,6), h=ri(3,10); if(r*r*h<=250) return sl3('c',r,h); return sl3('c',4,5); }
-  for(let g=0;g<40;g++){ const r=ri(2,6), h=pickOne([3,4,6,9,12]); if((r*r*h)%3===0&&r*r*h/3<=144) return sl3('n',r,h); }
+  if(Math.random()<.5){ for(let g=0;g<40;g++){ const r=ri(1,4), h=ri(2,6); if(r*r*h<=64) return sl3('c',r,h); } return sl3('c',2,5); }
+  for(let g=0;g<40;g++){ const r=ri(1,4), h=pickOne([3,6,9]), v=r*r*h/3; if(Number.isInteger(v)&&v<=36) return sl3('n',r,h); }
   return sl3('n',3,8);
 }
-const genSL4=()=>Math.random()<.6?sl4('s',ri(2,10)):sl4('v',pickOne([3,6,9]));
+const genSL4=()=>Math.random()<.65?sl4('s',ri(1,6)):sl4('v',Math.random()<.75?3:6);   /* 겉넓이 4r² (r≤6) · 부피 36π(r=3) 위주 */
 
 function solidSVG(f){
   const tx=(x,y,s,c,sz)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="${sz||13}" font-weight="800" fill="${c||'#1f2433'}" font-family="${FONT}">${s}</text>`;
@@ -12798,8 +12826,8 @@ function dc4(w,p,q){
   return F({key:`DC4${w}_${lo}_${hi}`, sk:'DC4', t:'disc', k:'dc4', w, p:lo, q:hi,
     cond:`${poly([[1,'x²'],[-(lo+hi),'x'],[lo*hi,'']])} ${sym} 0 → 정수 개수`, cb:true, eq:['?',{u:'개'}], ans:w==='o'?hi-lo-1:hi-lo+1});
 }
-function genDC1(){ for(let g=0;g<40;g++){ const a=pickOne([1,1,2,3]), b=mmNz(-9,9), c=mmNz(-6,8), D=b*b-4*a*c;
-  if(Math.abs(D)<=99) return dc1(a,b,c); } return dc1(1,-6,5); }
+function genDC1(){ for(let g=0;g<40;g++){ const a=pickOne([1,1,1,2,3]), b=mmNz(-8,8), c=mmNz(-5,6), D=b*b-4*a*c;
+  if(Math.abs(D)<=64&&Math.abs(4*a*c)<=48) return dc1(a,b,c); } return dc1(1,-6,5); }
 function genDC2(){ for(let g=0;g<40;g++){ const a=pickOne([1,1,2,3]), m=mmNz(-8,8); if(Math.abs(2*a*m)<=24&&a*m*m<=64) return dc2(a,m); } return dc2(1,-4); }
 function genDC3(){
   if(Math.random()<.28) return dc3('s',ri(3,10),0);
@@ -12923,7 +12951,7 @@ function fn4(w,N,p,d,inv){
     cond:`f(x) = √(${poly([[N,'x'],[b,'']])})`, cb:true, eq:[inv?`f⁻¹(${m})`:`f(${MI(p)})`,'=','?'], ans:inv?p:m});
 }
 function genFN1(){ for(let g=0;g<40;g++){ const a1=mmNz(-4,5), b1=ri(-8,8), a2=mmNz(-3,4), b2=ri(-7,7), x0=ri(-3,6);
-  const ans=a1*(a2*x0+b2)+b1; if(Math.abs(ans)<=60&&Math.abs(a2*x0+b2)<=18) return fn1(a1,b1,a2,b2,x0); } return fn1(3,-2,1,5,3); }
+  const ans=a1*(a2*x0+b2)+b1; if(Math.abs(ans)<=36&&Math.abs(a2*x0+b2)<=10) return fn1(a1,b1,a2,b2,x0); } return fn1(3,-2,1,5,3); }
 function genFN2(){ for(let g=0;g<40;g++){ const a=pickOne([-4,-3,-2,2,3,4,5]), b=mmNz(-12,12), k=mmNz(-12,15);
   if(Math.abs(a*k+b)<=60) return fn2(a,b,k); } return fn2(3,-5,7); }
 function genFN3(){ for(let g=0;g<40;g++){ const a1=pickOne([-3,-2,2,3,4]), b1=ri(-8,8), a2=pickOne([-2,-1,1,2,3]), b2=ri(-8,8), k=mmNz(-8,12);
@@ -12963,15 +12991,15 @@ function lm4(w,p,v){
     cond:`x → ${MI(p)} 수렴 · (x² + ax ${c<0?'−':'+'} ${Math.abs(c)}) / (${mhFactor(p)})`, cb:true, eq:['a','=','?']});
 }
 function genLM1(){
-  if(Math.random()<.6){ const C=ri(1,4), k=mmNz(-12,16); return lm1('q',C*k,mmNz(-9,9),C,mmNz(-7,7)); }
+  if(Math.random()<.6){ const C=ri(1,4), k=mmNz(-9,10); return lm1('q',C*k,mmNz(-9,9),C,mmNz(-7,7)); }
   return lm1('p',ri(2,6),mmNz(-5,5),ri(2,6),mmNz(-5,5));
 }
 function genLM2(){
-  if(Math.random()<.42) return lm2('d',ri(3,18),0);
-  for(let g=0;g<40;g++){ const p=mmNz(-8,12), q=mmNz(-8,12); if(p!==q&&p+q!==0&&Math.abs(p*q)<=60) return lm2('f',p,q); }
+  if(Math.random()<.42) return lm2('d',ri(2,12),0);
+  for(let g=0;g<40;g++){ const p=mmNz(-7,8), q=mmNz(-7,8); if(p!==q&&p+q!==0&&Math.abs(p*q)<=36) return lm2('f',p,q); }
   return lm2('f',2,5);
 }
-function genLM3(){ const deg=Math.random()<.6?1:2, C=ri(1,4), k=mmNz(-14,16); return lm3(deg,mmNz(-6,7),C*k,C); }
+function genLM3(){ const deg=Math.random()<.6?1:2, C=ri(1,4), k=mmNz(-10,10); return lm3(deg,mmNz(-6,7),C*k,C); }
 function genLM4(){
   if(Math.random()<.55){ const p=mmNz(-5,6), b=mmNz(-7,7); return lm4('c',p,b); }
   for(let g=0;g<40;g++){ const p=mmNz(-4,5), a=mmNz(-12,14); const c=-(p*p+a*p); if(c!==0&&Math.abs(c)<=60) return lm4('m',p,a); }
@@ -12994,14 +13022,14 @@ function df3(w,a,b,c,k){
 const df4=(a,b,p,q)=>F({key:`DF4_${a}_${b}_${p}_${q}`, sk:'DF4', t:'diff', k:'df4', a, b, p, q,
   cond:`f(x) = ${poly([[a,'x²'],[b,'x']])} · [${MI(p)}, ${MI(q)}] 평균변화율`, cb:true, eq:['?'], ans:a*(p+q)+b});
 const genDF1=()=>df1(mmNz(-8,9),ri(2,7));
-function genDF2(){ for(let g=0;g<40;g++){ const a=ri(-2,3), b=mmNz(-5,6), c=ri(-8,9), d=ri(-7,7), k=mmNz(-3,3);
-  const v=3*a*k*k+2*b*k+c; if(Math.abs(v)<=80) return df2(a,b,c,d,k); } return df2(1,-3,5,0,2); }
+function genDF2(){ for(let g=0;g<40;g++){ const a=pickOne([-1,0,1,1,2]), b=mmNz(-4,4), c=ri(-6,6), d=ri(-7,7), k=mmNz(-2,2);
+  const v=3*a*k*k+2*b*k+c; if(Math.abs(v)<=36) return df2(a,b,c,d,k); } return df2(1,-3,5,0,2); }
 function genDF3(){ const r=Math.random();
-  if(r<.45){ const a=pickOne([-1,1,2]), b=mmNz(-5,5), c=ri(-6,6), k=mmNz(-3,3); return df3('t',a,b,c,k); }
-  if(r<.72) return df3('r',ri(2,12),ri(-5,8),0,0);
-  return df3('z',ri(2,14),ri(-5,8),0,0);
+  if(r<.45){ for(let g=0;g<40;g++){ const a=pickOne([-1,1,2]), b=mmNz(-4,4), c=ri(-6,6), k=mmNz(-2,2); if(Math.abs(3*a*k*k+2*b*k+c)<=30) return df3('t',a,b,c,k); } return df3('t',1,-2,3,2); }
+  if(r<.72) return df3('r',ri(1,6),ri(-5,8),0,0);   /* y = x³ − 3a²x : 3a² ≤ 108 */
+  return df3('z',ri(1,8),ri(-5,8),0,0);
 }
-function genDF4(){ const a=pickOne([1,1,2,3]), b=ri(-7,8), p=ri(-2,6), q=p+ri(2,6); return df4(a,b,p,q); }
+function genDF4(){ const a=pickOne([1,1,2,3]), b=ri(-6,6), p=ri(-2,4), q=p+ri(1,5); return df4(a,b,p,q); }
 
 /* ── 9. 다항함수 정적분 (integ, 미적분Ⅰ, neg:true) ── */
 const ig1=(k,n)=>F({key:`IG1_${k}_${n}`, sk:'IG1', t:'integ', k:'ig1', kk:k, n,
@@ -13017,13 +13045,19 @@ function ig4(w,a,b,m,k){
     cond:`[${a}, ${m}] + [${m}, ${b}] 정적분 합`, cb:true, eq:[`∫ ${poly([[2*k,'x']])} dx`,'=','?'], ans:k*(b*b-a*a)});
 }
 const genIG1=()=>ig1(mmNz(-14,16),ri(1,5));
-function genIG2(){ for(let g=0;g<40;g++){ const a=pickOne([2,2,3]), p=ri(-2,3), q=mmNz(-4,5), r=ri(-5,6);
-  const v=p*a*a*a+q*a*a+r*a; if(Math.abs(v)<=120) return ig2(p,q,r,a); } return ig2(1,2,0,2); }
-function genIG3(){ for(let g=0;g<40;g++){ const a=pickOne([2,2,3]), u=mmNz(-5,6), p=mmNz(-2,3), v=mmNz(-7,7), r=ri(-4,5);
-  const ans=2*(p*a*a*a+r*a); if(Math.abs(ans)<=120) return ig3(u,p,v,r,a); } return ig3(5,1,-7,1,2); }
+/* 두 항만 (x²·x·상수 중 두 개) · 구간 [0, 1~3] · 답 30 이하 — 암산으로 F(a) 한 번 */
+function genIG2(){ for(let g=0;g<60;g++){ const a=pickOne([1,2,2,3]), drop=ri(0,2);
+  let p=mmNz(-2,2), q=mmNz(-3,3), r=mmNz(-4,4); if(drop===0) p=0; else if(drop===1) q=0; else r=0;
+  if(a===3&&Math.abs(p)>1) continue;
+  const v=p*a*a*a+q*a*a+r*a; if(Math.abs(v)<=30) return ig2(p,q,r,a); } return ig2(1,0,2,2); }
+/* 세 항 이하 — 사라지는 홀수 항 하나(x³ 또는 x) + 남는 짝수 항(x²·상수) · 구간 [−1,1]~[−3,3] · 답 40 이하 */
+function genIG3(){ for(let g=0;g<60;g++){ const a=pickOne([1,2,2,3]), odd3=Math.random()<.5;
+  const u=odd3?mmNz(-5,5):0, v=odd3?0:mmNz(-6,6); let p=a===3?0:mmNz(-2,2), r=mmNz(-4,4);
+  if(a!==3&&Math.random()<.3) r=0;
+  const ans=2*(p*a*a*a+r*a); if(ans!==0&&Math.abs(ans)<=40) return ig3(u,p,v,r,a); } return ig3(2,1,0,1,2); }
 function genIG4(){
-  if(Math.random()<.55){ const a=ri(-4,5), b=a+ri(2,8), k=mmNz(-12,14); return ig4('c',a,b,0,k); }
-  const a=ri(0,3), m=ri(4,6), b=ri(m+1,10), k=pickOne([1,2]); return ig4('j',a,b,m,k);
+  if(Math.random()<.55){ const a=ri(-3,4), b=a+ri(2,6), k=mmNz(-9,9); return ig4('c',a,b,0,k); }
+  const a=ri(0,2), m=ri(a+1,4), b=ri(m+1,5), k=pickOne([1,1,2]); return ig4('j',a,b,m,k);   /* k(b²−a²) ≤ 50 */
 }
 
 /* ── 열쇠 → 문항 ── */
@@ -13827,7 +13861,7 @@ function paintTGrade(){
   const labs=['SSS','SS','S','A','B'];
   box.innerHTML=`<div class="tgrade">
     <h3 style="margin:0 0 4px">실전 등급 기준 (절대평가)</h3>
-    <div class="sub" style="margin-bottom:10px">기준 개수는 <b>SSS · SS · S · A · B</b> 순서(실전 1분에 맞힌 개수)예요. B에 못 미치면 등급이 없어요.<br>
+    <div class="sub" style="margin-bottom:10px">기준 개수는 <b>SSS · SS · S · A · B</b> 순서(실전 1분에 맞힌 개수)예요. B에 못 미치면 <b>C등급</b>이에요.<br>
       B 기초를 갖춤 · A 계산을 잘함 · S 계산 에이스 · SS 아주 잘함 · SSS SS 실력에 운까지.<br>
       학생 기록은 <b>참고용</b>이에요 — 몇 명이 어느 등급인지 보고, 기준이 이상하면 '직접 입력'으로 고쳐요. 보스전 HP도 이 기준을 따라요.</div>
     <div style="margin-bottom:10px"><button class="btn" id="tgReset">모두 기본값으로</button></div>
@@ -15514,7 +15548,7 @@ function logout(){
    SS : 계산을 아주 잘하는 친구 · SSS : SS 실력에 운까지 더해져야 닿는 기록(SS × 1.12)
    절대평가 — 학생 기록에 맞추지 않고, 등급별 실력(생각 속도)을 정해 둔 풀이 시간 모의실험으로 정했어요(주제·단계별 생각 시간 + 휴대폰 입력 시간 + 문장은 숫자 위주로 훑어 읽는 시간).
    B 기준에 못 미치면 C 등급이에요(11.25). (11.23 저녁 — 34개 주제 전체를 바뀐 문제로 다시 모의실험, 밤에 개편한 7개 주제 다시 모의실험) 선생님 모드 '등급 기준' 탭에서 학생 기록을 참고로 보고 직접 고칠 수 있어요(config/gcut). */
-const GRADE_CUT={addsub:[28,25,21,17,11], gugu:[54,48,42,33,22], fadd:[16,14,12,10,8], fmul:[21,19,15,12,7], ratio:[18,16,13,10,7], factor:[17,15,13,12,7], power:[28,25,20,14,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[20,18,15,12,8], linf:[18,16,14,11,6], angle:[20,18,14,10,7], simr:[19,17,12,9,5], dadd:[22,20,16,12,8], dmul:[22,20,15,11,7], int:[25,22,18,14,8], expo:[29,26,22,17,12], root:[22,20,17,13,9], trig:[26,23,17,11,8], logx:[21,19,15,11,6], tfn:[15,13,12,9,8], comb:[20,18,14,11,7], div:[29,26,21,16,11], fast:[24,21,17,13,9], mix:[19,17,14,11,7], unit:[26,23,19,15,9], alg:[21,19,15,12,9], ineq:[17,15,13,11,8], sys:[18,16,12,9,6], quad:[19,17,14,12,9], cplx:[21,19,15,12,8], rem:[16,14,11,8,6], seq:[19,17,13,10,7], solid:[20,18,14,11,7], circ:[23,20,16,12,8], disc:[18,16,13,10,6], abs:[21,19,15,11,7], mat:[19,17,13,10,6], fn:[18,16,13,10,6], lim:[20,18,14,11,7], diff:[20,18,14,11,7], integ:[18,16,13,10,6]};
+const GRADE_CUT={addsub:[28,25,21,17,11], gugu:[54,48,42,33,22], fadd:[16,14,12,10,8], fmul:[21,19,15,12,7], ratio:[18,16,13,10,7], factor:[17,15,13,12,7], power:[28,25,20,14,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[20,18,15,12,8], linf:[18,16,14,11,6], angle:[20,18,14,10,7], simr:[19,17,12,9,5], dadd:[22,20,16,12,8], dmul:[22,20,15,11,7], int:[25,22,18,14,8], expo:[29,26,22,17,12], root:[22,20,17,13,9], trig:[26,23,17,11,8], logx:[21,19,15,11,6], tfn:[15,13,12,9,8], comb:[20,18,14,11,7], div:[29,26,21,16,11], fast:[24,21,17,13,9], mix:[19,17,14,11,7], unit:[26,23,19,15,9], alg:[21,19,15,12,9], ineq:[17,15,13,11,8], sys:[18,16,12,9,6], quad:[19,17,14,12,9], cplx:[21,19,15,12,8], rem:[16,14,11,8,6], seq:[19,17,13,10,7], solid:[22,20,16,12,8], circ:[23,20,16,12,8], disc:[18,16,13,10,6], abs:[21,19,15,11,7], mat:[19,17,13,10,6], fn:[18,16,13,10,6], lim:[20,18,14,11,7], diff:[21,19,15,12,8], integ:[20,18,14,11,7]};
 const GRADE_DEF=JSON.parse(JSON.stringify(GRADE_CUT));
 function applyGcut(o){ Object.keys(GRADE_DEF).forEach(t=>{ const v=o&&o[t], ok=Array.isArray(v)&&v.length===5&&v.every((x,i)=>x>0&&(i===0||x<v[i-1]));
   GRADE_CUT[t].splice(0,5,...(ok?v.map(Number):GRADE_DEF[t])); }); }
@@ -15706,12 +15740,14 @@ function renderStages(){
   el('stSub').innerHTML=`스테이지의 문항을 <b>모두 맞히면 클리어</b>예요. 답을 쓰고 <b>[확인]</b>을 눌러야 채점해요. 틀린 문항은 풀이를 보고 조금 뒤에 다시 나와요.<br>
     미클리어 스테이지는 <b>맞힌 문제마다 ${PRAC_QC}코인 + 클리어 ${CLEAR_FIRST}코인</b> · 클리어 후에도 <b>등급 승급(A~SSS)</b>·<b>첫 100% 달성</b> 시 추가 보너스가 있어요.`;
   el('stBar').innerHTML=T.stages.map(s=>`<i class="${p.c.includes(s.n)?'done':''}"></i>`).join('');
+  /* 예시 글자 크기는 주제 안에서 한 가지로 — 가장 긴 예시에 맞춰요 (짧은 예시만 커 보이지 않게) */
+  const exLen=x=>x.replace(/(\d+|□)\/(\d+|□)/g,'F').length, exMax=Math.max(...T.stages.map(s=>exLen(s.ex||''))), exCls=exMax>13?' exs':exMax>9?' exm':'';
   el('stageList').innerHTML=T.stages.map(s=>{
     const done=p.c.includes(s.n), td=today.includes(t+s.n), bt=p.bt['s'+s.n];
     const cnt=stageCount(t,s.n);
     return `<button class="st ${done?'done':''}" onclick="startStage('${t}',${s.n})">
       <div class="stamp">✓</div><div class="no">${s.n}</div>
-      <div class="ex${(n=>n>13?' exs':n>9?' exm':'')(s.ex.replace(/(\d+|□)\/(\d+|□)/g,'F').length)}">${mfmt(/<sup>□<\/sup>/.test(s.ex)?s.ex:esc(s.ex))}</div>
+      <div class="ex${exCls}">${mfmt(/<sup>□<\/sup>/.test(s.ex)?s.ex:esc(s.ex))}</div>
       <div class="nm">${s.name}${gBadge(stageGrade(t,s.n))}</div>
       <div class="cn">${cnt}문항${bt?` · 최고 ${bt.toFixed(1)}초`:''}${td?' · 오늘 ✓':''}</div></button>`;
   }).join('');
@@ -16352,7 +16388,7 @@ function openMineRepaint(){
   el('mpSid').innerHTML=(myTtl?`<span class="ttltag">${esc(myTtl)}</span>`:'')+esc(ME.nk||ME.sid)+(ME.nk?`<small class="nsid">${esc(ME.sid)}</small>`:'');
   el('mpChips').innerHTML=`
     <span class="mpchip coinchip"><span class="coin"><i></i>${ME.coin}</span></span>
-    <span class="mpchip">${classLabel(classOf(ME.sid))}</span>
+    <span class="mpchip">${isTestSid(ME.sid)?'시험용 계정':String(ME.sid)===TEACHER_ID?'선생님':ME.guest?'비회원':classLabel(classOf(ME.sid))}</span>
     <span class="mpchip">가진 것 ${ownItems().length+ownShapes().length+ownColors().length}개</span>
     <span class="mpchip">친구 대전 ${ME.bw||0}승 ${Math.max(0,(ME.bp||0)-(ME.bw||0))}패</span>`;
   paintMine(); paintMineBattle(); paintMineOwn(); paintMineGrowth();
@@ -17770,7 +17806,7 @@ function buildBookHTML(t,isModal){
       <div class="nbtop"><span class="tsym sm">${symHTML(T)}</span>
         <div class="nbtt"><span class="nbkind">정리 노트${T.gr?` · ${T.gr}`:''}</span><h2>${T.n}</h2></div></div>
       <p class="nbsub">${N.sub}</p>
-      <div class="nbtoc">${toc.map(([k,n,c])=>`<button data-go="${k}">${BK_IC[k==='why'?'ways':k]}<b>${c}</b><span>${n}</span></button>`).join('')}</div>
+      <div class="nbtoc" style="--n:${toc.length}">${toc.map(([k,n,c])=>`<button data-go="${k}">${BK_IC[k==='why'?'ways':k]}<b>${c}</b><span>${n}</span></button>`).join('')}</div>
     </div>
     ${whyList.length?`<section class="nbsec" data-sec="why" id="${isModal?'mb':'nb'}-why"><h3>${BK_IC.ways}그림으로 이해하기 · 왜 그럴까?</h3>
       <div class="nbwhy-list">${whyList.map(w=>`<div class="nbwhy"><h4><span class="wbadge">${esc(w.tag||'원리')}</span>${mfmt(w.h)}</h4>
@@ -18240,7 +18276,7 @@ function paintTBoss(){
   let gr='S';
   const pv=()=>{ const t=el('tbTopic').value, per=bossPerHPof(t,gr), G_=BOSS_GR[gr], c=bossCut(t);
     el('tbPrev').innerHTML=`<div class="bsav big">${bossAv(t)}</div><b>${esc(bossLookOf(t).n)}</b><small>${esc(topicOf(t).n)} 보스 · ${gr}등급</small>`;
-    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>보스 HP = 참여 인원 × 1인당 HP <b>${per}</b> (실전 1분 ${gr} 기준 ${c[BOSS_GR[gr].ci]}개 × ${BOSS_MIN}분 × 그 속도의 평균 대미지 ${bossDmgAvg(t,60/c[BOSS_GR[gr].ci]*.85).toFixed(1)}) · <b>${gr}등급</b> 실력의 반이 딱 깰 만큼 · 제한 시간 <b>${clock(BOSS_SEC)}</b> (격파하면 걸린 시간도 기록돼요)<br>보스 반격 : <b>HP 70% · 40% · 15% 도달 시</b> 또는 남은 시간 <b>${BOSS_ATK_AT}초</b>부터 발동! → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 <b>끝까지 부상(대미지 절반)</b> · 전원이 부상이면 패배<br>격파 보상 <b>${G_.win}코인 + 기여 최대 25</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
+    el('tbGrInfo').innerHTML=`<b>${gr}등급</b> · ${G_.desc}<br>보스 HP = 참여 인원 × 1인당 HP <b>${per}</b> (실전 1분 ${gr} 기준 ${c[BOSS_GR[gr].ci]}개 × ${BOSS_MIN}분 × 그 속도의 평균 대미지 ${bossDmgAvg(t,60/c[BOSS_GR[gr].ci]*.85).toFixed(1)}) · <b>${gr}등급</b> 실력의 반이 딱 깰 만큼 · 제한 시간 <b>${clock(BOSS_SEC)}</b> (격파하면 걸린 시간도 기록돼요)<br>보스 반격 : <b>HP 70% · 40% · 15% 도달 시</b> 또는 남은 시간 <b>${BOSS_ATK_AT}초</b>부터 발동! → <b>${G_.aw}초</b> 안에 방어 문제를 못 풀면 <b>끝까지 부상(대미지 절반)</b> · 전원이 부상이면 패배<br>격파 보상 <b>${G_.win}코인 + 기여 1문제당 3코인(최대 75)</b> · 실패해도 최대 <b>${G_.fail}코인</b>`;
     el('tbGr').querySelectorAll('.sg').forEach(b=>b.classList.toggle('on',b.dataset.g===gr)); };
   el('tbTopic').onchange=pv;
   el('tbGr').querySelectorAll('.sg').forEach(b=>b.onclick=()=>{ gr=b.dataset.g; pv(); });
