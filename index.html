@@ -2460,7 +2460,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.28 09:55';
+const APP_VER='11.28 11:30';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -6087,22 +6087,15 @@ const TOPICS={
       {n:4, name:'빈칸 채우기',         ex:'□ + 26 = 61',gen:genB, take:10, old:[6]}
     ]},
   gugu:{k:'gugu', n:'구구단', sym:'×', school:'e', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'2단부터 9단, 거꾸로 찾기까지',
+    desc:'2·3단 · 4·5단 · 6·7단 · 8·9단 · 빈칸 채우기',
+    /* 11-28 선생님 요청: 두 단씩 묶어 네 단계 + 빈칸 채우기 (1단과 0의 곱은 뺌) */
     stages:[
-      {n:1, name:'2단', ex:'2 × 7', facts:()=>DAN([2]), take:9, pv:2},
-      {n:2, name:'3단', ex:'3 × 7', facts:()=>DAN([3]), take:9, pv:3},
-      {n:3, name:'4단', ex:'4 × 7', facts:()=>DAN([4]), take:9, pv:4},
-      {n:4, name:'5단', ex:'5 × 7', facts:()=>DAN([5]), take:9, pv:5},
-      {n:5, name:'6단', ex:'6 × 7', facts:()=>DAN([6]), take:9, pv:6},
-      {n:6, name:'7단', ex:'7 × 7', facts:()=>DAN([7]), take:9, pv:7},
-      {n:7, name:'8단', ex:'8 × 7', facts:()=>DAN([8]), take:9, pv:8},
-      {n:8, name:'9단', ex:'9 × 7', facts:()=>DAN([9]), take:9, pv:9},
-      {n:9, name:'거꾸로 찾기', ex:'7 × □ = 56', facts:DANR, take:15, old:[6]},
-      /* 교과서 2학년 곱셈구구 — 1단과 0의 곱 */
-      {n:10, name:'1단과 0의 곱', ex:'1 × 6 · 0 × 4', take:10,
-       facts:()=>range(1,9).flatMap(b=>[mul(1,b),mul(0,b),mul(b,0)]).concat([mul(0,0)]),
-       pick:l=>sampleN(l.filter(f=>f.a===1),4).concat(sampleN(l.filter(f=>f.a!==1),6))}
-    ], sv:1,
+      {n:1, name:'2단 · 3단', ex:'3 × 7', facts:()=>DAN([2,3]), take:12, pick:l=>[2,3].flatMap(a=>sampleN(l.filter(f=>f.a===a&&f.b>=2),3))},
+      {n:2, name:'4단 · 5단', ex:'4 × 8', facts:()=>DAN([4,5]), take:12, pick:l=>[4,5].flatMap(a=>sampleN(l.filter(f=>f.a===a&&f.b>=2),3))},
+      {n:3, name:'6단 · 7단', ex:'7 × 6', facts:()=>DAN([6,7]), take:12, pick:l=>[6,7].flatMap(a=>sampleN(l.filter(f=>f.a===a&&f.b>=2),3))},
+      {n:4, name:'8단 · 9단', ex:'8 × 7', facts:()=>DAN([8,9]), take:12, pick:l=>[8,9].flatMap(a=>sampleN(l.filter(f=>f.a===a&&f.b>=2),3))},
+      {n:5, name:'빈칸 채우기', ex:'7 × □ = 56', facts:DANR, take:15, old:[6]}
+    ], sv:2, mig:{from:3, map:{1:[1,2],2:[3,4],3:[5,6],4:[7,8],5:[9]}, same:[5]},
     realStages:[
       {n:1, name:'2단 ~ 5단',  ex:'4 × 7', facts:()=>DAN([2,3,4,5]), take:18, old:[1,2],
        pick:l=>sampleN(l.filter(f=>f.b>=3),14).concat(sampleN(l.filter(f=>f.b<3),4))},
@@ -6604,9 +6597,10 @@ function noteSheet(title,items,cols,kind){
     <div class="ngrid">${items.map(x=>`<div class="ncell">${x}</div>`).join('')}</div></div>`; }
 function stagePreview(t,n){
   const st=stageOf(t,n);
-  if(st&&st.pv&&t==='gugu'){ const a=st.pv;
-    return {tip:`${a}단은 ${a}씩 커져요.`,
-      body:noteSheet(`${a}단`, range(1,9).map(b=>`${a} × ${b} = <b>${a*b}</b>`), 3, 'gugu')}; }
+  if(st&&typeof st.pvf==='function') return st.pvf();
+  if(st&&st.pv&&t==='gugu'){ const D=[].concat(st.pv);
+    return {tip:D.map(a=>`${a}단은 ${a}씩`).join(', ')+' 커져요.',
+      body:D.map(a=>noteSheet(`${a}단`, range(1,9).map(b=>`${a} × ${b} = <b>${a*b}</b>`), 3, 'gugu')).join('')}; }
   if(t==='power'){
     if(n===1) return {tip:'1² ~ 20² 를 먼저 외우고, 21² ~ 25² 와 몇십의 제곱(30² = 900 …)까지 넓혀요.',
       body:noteSheet('제곱수', range(1,25).map(k=>`${k}² = <b>${k*k}</b>`), 4, 'sq')+
@@ -7888,24 +7882,26 @@ Object.assign(TOPICS,{
           ['변의 길이',sk=>/^tS/.test(sk)],['특수각의 계산',sk=>/^tC/.test(sk)]]},
   logx:{k:'logx', n:'지수와 로그', sym:'log', school:'h', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'거듭제곱근 · 유리수 지수 · 로그의 값과 성질',
+    /* 11-28: 거듭제곱근과 유리수 지수를 다시 나눠 한 단계에 한 유형만 */
     stages:[
-      {n:1, name:'거듭제곱근·유리수 지수', ex:'∛27 = □', facts:()=>LR_ALL().concat(LQ_ALL()), take:12, old:[1,2],
-       pick:l=>byPre(l,[[/^lR/,6],[/^lQ/,6]])},
-      {n:2, name:'로그의 값',          ex:'log₂ 32 = □',      facts:LL_ALL, take:12, old:[3]},
-      {n:3, name:'로그의 성질',        ex:'log₂ 12 − log₂ 3', facts:()=>LPROP.map((_,i)=>lP(i)), take:10, old:[4]},
-      {n:4, name:'지수·로그 방정식',   ex:'2ˣ⁺¹ = 16',        facts:()=>LEQ.map((_,i)=>lE(i)), take:10, old:[5]}
-    ],
+      {n:1, name:'거듭제곱근',         ex:'∛27 = □',          facts:LR_ALL, take:12, old:[1]},
+      {n:2, name:'유리수 지수',        ex:'8²ᐟ³ = □',          facts:LQ_ALL, take:12, old:[2]},
+      {n:3, name:'로그의 값',          ex:'log₂ 32 = □',      facts:LL_ALL, take:12, old:[3]},
+      {n:4, name:'로그의 성질',        ex:'log₂ 12 − log₂ 3', facts:()=>LPROP.map((_,i)=>lP(i)), take:10, old:[4]},
+      {n:5, name:'지수·로그 방정식',   ex:'2ˣ⁺¹ = 16',        facts:()=>LEQ.map((_,i)=>lE(i)), take:10, old:[5]}
+    ], sv:1, mig:{from:2, map:{1:[1],2:[1],3:[2],4:[3],5:[4]}, same:[3,4,5]},
     cats:[['거듭제곱근',sk=>/^lR/.test(sk)],['유리수 지수',sk=>/^lQ/.test(sk)],['로그의 값',sk=>/^lL/.test(sk)],
           ['로그의 성질',sk=>/^lP/.test(sk)],['지수·로그 방정식',sk=>/^lE/.test(sk)]]},
   comb:{k:'comb', n:'순열과 조합', sym:'ₙCᵣ', school:'h', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'팩토리얼 · 순열 · 조합 · 상황 속 경우의 수',
+    /* 11-28: 팩토리얼 → 순열 → 조합 → n 구하기 → 상황 속 경우의 수, 한 단계에 한 유형 */
     stages:[
-      {n:1, name:'팩토리얼과 순열',    ex:'₆P₃ = □',          facts:()=>CF_ALL().concat(CP_ALL()), take:12, old:[1,2],
-       pick:l=>byPre(l,[[/^c[FG]/,5],[/^cP/,7]])},
-      {n:2, name:'조합 · n 구하기',     ex:'₇C₃ = □',    facts:()=>CC_ALL().concat(CN_ALL()), take:12, old:[3,4],
-       pick:l=>byPre(l,[[/^cC/,7],[/^c[NS]/,5]])},
-      {n:3, name:'상황 속 경우의 수',  ex:'6명 중 대표 2명',   facts:CW_ALL, take:10, old:[5]}
-    ],
+      {n:1, name:'팩토리얼 n!',        ex:'5! = □ · 7!/5!',   facts:CF_ALL, take:12, old:[1]},
+      {n:2, name:'순열 ₙPᵣ',           ex:'₆P₃ = □',          facts:CP_ALL, take:12, old:[2]},
+      {n:3, name:'조합 ₙCᵣ',           ex:'₇C₃ = □',          facts:CC_ALL, take:12, old:[3]},
+      {n:4, name:'n 구하기 · 조합의 성질', ex:'ₙC₂ = 28 → n',  facts:CN_ALL, take:12, old:[4]},
+      {n:5, name:'상황 속 경우의 수',  ex:'6명 중 대표 2명',   facts:CW_ALL, take:10, old:[5]}
+    ], sv:1, mig:{from:2, map:{1:[1],2:[1],3:[2],4:[2],5:[3]}, same:[5]},
     cats:[['팩토리얼',sk=>/^c[FG]/.test(sk)],['순열',sk=>/^cP/.test(sk)],['조합',sk=>/^cC/.test(sk)],
           ['n 찾기 · 조합의 성질',sk=>/^c[NS]/.test(sk)],['상황 속 경우의 수',sk=>/^cW/.test(sk)]]}
 });
@@ -7947,11 +7943,11 @@ function hsVariant(f){
     case 'tB': return tB(f.fn,f.d,f.f1);
     case 'tR': return tR(f.a,f.b,{s:'c',c:'t',t:'s'}[f.fn]);
     case 'tS': return tS(f.d,f.c,f.side==='o'?'j':'o');
-    case 'cG': return cP(f.n,f.n-f.kk);
-    case 'cP': return f.r===2?cN('P',f.n,2):f;
+    case 'cG': return pickOne(CF_ALL().filter(x=>x.k==='cG'&&x.key!==f.key))||f;   /* 11-28: 단계가 유형별로 나뉘어 같은 유형 안에서 */
+    case 'cP': return pickOne(CP_ALL().filter(x=>x.r===f.r&&x.key!==f.key))||f;
     case 'cC': return f.r*2!==f.n&&nCr(f.n,f.n-f.r)<=9999?cC(f.n,f.n-f.r):f;
-    case 'cS': return cC(f.n,f.r);
-    case 'cN': return f.ty==='P'?cP(f.n,f.r):cC(f.n,f.r);
+    case 'cS': return pickOne(CN_ALL().filter(x=>x.k==='cS'&&x.key!==f.key))||f;
+    case 'cN': return pickOne(CN_ALL().filter(x=>x.k==='cN'&&x.ty===f.ty&&x.key!==f.key))||f;
   }
   return null;
 }
@@ -8378,20 +8374,24 @@ const FV_ALL=()=>VANG.flatMap(d=>['s','c','t'].filter(fn=>exactOf(fn,d)).map(fn=
 const FR_ALL=()=>RELF.map((_,i)=>fR(i));
 const FG_ALL=()=>GRF.map((_,i)=>fG(i));
 const FL_ALL=()=>LAWF.map((_,i)=>fL(i));
+const FL_TR=()=>LAWF.map((_,i)=>i).filter(i=>/각 변환/.test(LAWF[i][0])).map(fL);   /* 각 변환 (π ± θ) */
+const FL_LW=()=>LAWF.map((_,i)=>i).filter(i=>!/각 변환/.test(LAWF[i][0])).map(fL);   /* 사인법칙 · 넓이 */
 
 TOPICS.tfn={k:'tfn', n:'삼각함수', sym:'sin x', school:'h', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-  desc:'호도법 · 부채꼴 · 값 · 그래프 · 사인법칙 · 넓이 · 각 변환',
+  desc:'호도법 · 부채꼴 · 삼각함수의 값 · 사이의 관계 · 그래프 · 사인법칙과 넓이',
+  /* 11-28: 호도법과 부채꼴을 나누고, 각 변환(π ± θ)은 '삼각함수의 값'으로, 사인법칙·넓이는 마지막 단계로 */
   stages:[
-    {n:1, name:'호도법과 부채꼴',        ex:'60° = π/□', facts:()=>RAD_ALL().concat(SEC_ALL()), take:12, old:[1,2],
-     pick:l=>byPre(l,[[/^f[DE]/,6],[/^f[ASTU]/,6]])},
-    {n:2, name:'삼각함수의 값',          ex:'cos 2π/3 = □/2',  facts:FV_ALL, take:12, old:[3],
-     pick:l=>sampleN(l.filter(f=>!/√/.test(f.v)),8).concat(sampleN(l.filter(f=>/√/.test(f.v)),4))},
-    {n:3, name:'삼각함수 사이의 관계',   ex:'sin θ = 3/5 → cos θ', facts:FR_ALL, take:10, old:[4]},
-    {n:4, name:'그래프 — 주기·최대·최소', ex:'y = 3 sin 2x + 1', facts:FG_ALL, take:10, old:[5]},
-    {n:5, name:'사인법칙 · 넓이 · 각 변환', ex:'a = 10, A = 30° → R', facts:FL_ALL, take:10, old:[6]}
-  ],
-  cats:[['호도법',sk=>/^f[DE]/.test(sk)],['부채꼴',sk=>/^f[ASTU]/.test(sk)],['삼각함수의 값',sk=>/^fV/.test(sk)],
-        ['삼각함수 사이의 관계',sk=>/^fR/.test(sk)],['그래프',sk=>/^fG/.test(sk)],['사인법칙·넓이·각 변환',sk=>/^fL/.test(sk)]]};
+    {n:1, name:'호도법',                 ex:'60° = π/□', facts:RAD_ALL, take:12},
+    {n:2, name:'부채꼴의 호와 넓이',     ex:'r = 6, θ = π/3 → 호 □π', facts:SEC_ALL, take:12},
+    {n:3, name:'삼각함수의 값',          ex:'cos 2π/3 = □/2',  facts:()=>FV_ALL().concat(FL_TR()), take:12,
+     pick:l=>sampleN(l.filter(f=>f.k==='fV'&&!/√/.test(f.v)),6).concat(sampleN(l.filter(f=>f.k==='fV'&&/√/.test(f.v)),3),sampleN(l.filter(f=>f.k==='fL'),3))},
+    {n:4, name:'삼각함수 사이의 관계',   ex:'sin θ = 3/5 → cos θ', facts:FR_ALL, take:10},
+    {n:5, name:'그래프 — 주기·최대·최소', ex:'y = 3 sin 2x + 1', facts:FG_ALL, take:10},
+    {n:6, name:'사인법칙 · 삼각형의 넓이', ex:'a = 10, A = 30° → R', facts:FL_LW, take:10,
+     pick:l=>sampleN(l.filter(f=>f.i<16),3).concat(sampleN(l.filter(f=>f.i>=16),2))}
+  ], sv:1, mig:{from:2, map:{1:[1],2:[1],3:[2],4:[3],5:[4],6:[5]}, same:[4,5]},
+  cats:[['호도법',sk=>/^f[DE]/.test(sk)],['부채꼴',sk=>/^f[ASTU]/.test(sk)],['삼각함수의 값',sk=>/^fV/.test(sk)],['각 변환 (π ± θ)',sk=>/^fL(2[6-9]|3\d)$/.test(sk)],
+        ['삼각함수 사이의 관계',sk=>/^fR/.test(sk)],['그래프',sk=>/^fG/.test(sk)],['사인법칙',sk=>/^fL([0-9]|1[0-5])$/.test(sk)],['삼각형의 넓이',sk=>/^fL(1[6-9]|2[0-5])$/.test(sk)]]};
 TOPIC_SYMH.tfn='<span style="font-size:.6em;font-style:italic">sin x</span>';
 
 /* ═══ 그림 ═══ */
@@ -8511,13 +8511,16 @@ function tfnHint(f){
 function tfnPreview(t,n){
   const H=(f,tip,extra)=>{ const h=hintOf(f); return Object.assign({tip, lines:h.lines, svg:h.svg},extra||{}); };
   const neg='<div class="hl" style="font-size:14px;margin-top:10px;color:var(--dim)">음수 답은 숫자판의 <b>−</b> 단추를 눌러요 (컴퓨터는 − 키).</div>';
-  if(n===1) return H(fD(60),'180° = π. 도는 × π/180, 라디안은 π 에 180° 를 넣어요. 부채꼴은 l = rθ, S = ½ r²θ.',
-    {body:chipList(['30° = π/6','45° = π/4','60° = π/3','90° = π/2','l = rθ','S = ½ r²θ'])});
-  if(n===2) return H(fV('c',120),'단위원 위의 점 P(cos θ, sin θ). 사분면으로 부호를 정하고, 기준각으로 크기를 찾아요.',{body:neg});
-  if(n===3) return H(fR(0),'sin²θ + cos²θ = 1, tan θ = sin θ ÷ cos θ. 사분면으로 부호를 정해요.',{body:neg});
-  if(n===4) return H(fG(4),'y = a sin bx + c : 최댓값 |a| + c, 최솟값 −|a| + c, 주기 2π ÷ |b| (tan 은 π ÷ |b|).',{body:neg});
-  if(n===5) return H(fL(0),'사인법칙(a ÷ sin A = 2R), 삼각형 넓이(½ bc sin A), 각 변환 공식을 빠르게 써요.',
-    {body:chipList(['a ÷ sin A = 2R','넓이 = ½ bc sin A','sin(π − θ) = sin θ','cos(π − θ) = −cos θ'])+neg});
+  if(n===1) return H(fD(60),'180° = π. 도에는 π/180 을 곱하고, 라디안은 π 자리에 180° 를 넣어요.',
+    {body:chipList(['30° = π/6','45° = π/4','60° = π/3','90° = π/2','180° = π'])});
+  if(n===2) return H(fA(6,60),'반지름 r, 중심각 θ(라디안)인 부채꼴: 호의 길이 l = rθ, 넓이 S = ½ r²θ = ½ rl.',
+    {body:chipList(['l = rθ','S = ½ r²θ','S = ½ rl'])});
+  if(n===3) return H(fV('c',120),'단위원 위의 점 P(cos θ, sin θ). 사분면으로 부호를 정하고, 기준각으로 크기를 찾아요. π ± θ 꼴도 같은 방법이에요.',
+    {body:chipList(['sin(π − θ) = sin θ','cos(π − θ) = −cos θ','sin(π + θ) = −sin θ'])+neg});
+  if(n===4) return H(fR(0),'sin²θ + cos²θ = 1, tan θ = sin θ ÷ cos θ. 사분면으로 부호를 정해요.',{body:neg});
+  if(n===5) return H(fG(4),'y = a sin bx + c : 최댓값 |a| + c, 최솟값 −|a| + c, 주기 2π ÷ |b| (tan 은 π ÷ |b|).',{body:neg});
+  if(n===6) return H(fL(0),'사인법칙 a ÷ sin A = 2R, 삼각형의 넓이 ½ bc sin A.',
+    {body:chipList(['a ÷ sin A = 2R','a = 2R sin A','넓이 = ½ bc sin A'])+neg});
   return {tip:'삼각함수 전체가 섞여 나와요.', body:chipList(['l = rθ','sin²θ + cos²θ = 1','주기 2π/|b|','a/sin A = 2R','넓이 = ½ bc sin A'])+neg};
 }
 
@@ -8850,7 +8853,7 @@ function elemNote(t,fromHint){
 
 const LQT=['lineq'];
 Object.assign(SK_EXT,{
-  LQ1:{t:'lineq',n:'한 번에 풀기 (x + a = b · ax = b)'}, LQ2:{t:'lineq',n:'ax + b = c'},
+  LQ1:{t:'lineq',n:'ax = b'}, LQ2:{t:'lineq',n:'ax + b = c'},
   LQ3:{t:'lineq',n:'양변에 x 가 있는 식'}, LQ4:{t:'lineq',n:'괄호·분수가 있는 식'}
 });
 /* x 를 a 로 나눈 꼴 — 작은 분수로 */
@@ -8904,6 +8907,8 @@ function genLQ1(){
   if(form==='t') return lq1('t',ri(2,9),ri(2,12));
   const a=ri(2,6), q=ri(2,9); return lq1('d',a,a*q);
 }
+/* 1단계 ax = b — 양변을 x의 계수로 나누기만 (11-28: x + a = b 꼴은 초등 □ 구하기와 겹쳐 뺌) */
+function genLQ1t(){ const a=ri(2,9), x=Math.random()<.25?-ri(2,8):ri(2,12); return lq1('t',a,x); }
 function genLQ2(){
   for(let g=0;g<40;g++){
     const a=ri(2,9), x=xPick(Math.random()<.3), b=Math.random()<.5?ri(1,15):-ri(1,15);
@@ -8933,7 +8938,7 @@ function genLQ4(){
 TOPICS.lineq={k:'lineq', n:'일차방정식', sym:'x=?', school:'m', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
   desc:'이항과 등식의 성질로 x 구하기 — 암산으로',
   stages:[
-    {n:1, name:'한 번에 풀기',      ex:'x + 7 = 15 · 3x = 21', gen:genLQ1, take:12},
+    {n:1, name:'ax = b',            ex:'3x = 21', gen:genLQ1t, take:12},
     {n:2, name:'ax + b = c',        ex:'2x + 3 = 11', gen:genLQ2, take:12},
     {n:3, name:'양변에 x 가 있는 식', ex:'5x − 3 = 2x + 9', gen:genLQ3, take:10},
     {n:4, name:'괄호·분수가 있는 식', ex:'2(x + 3) = 14', gen:genLQ4, take:10}
@@ -8973,8 +8978,8 @@ function lineqHint(f){
 function lineqPreview(t,n){
   const H=(f,tip,extra)=>{ const h=hintOf(f); return Object.assign({tip, lines:h.lines, svg:''},extra||{}); };
   const neg='<div class="hl" style="font-size:14px;margin-top:10px;color:var(--dim)">음수 답은 숫자판의 <b>−</b> 단추를 눌러요.</div>';
-  if(n===1) return H(lq1('p',7,8),'이항: 항을 등호 건너편으로 넘기면 부호가 바뀌어요. x 앞에 수가 있으면 나누고, 분모가 있으면 곱해요.',
-    {body:chipList(['+ a → − a','− a → + a','× a → ÷ a','÷ a → × a'])});
+  if(n===1) return H(lq1('t',3,7),'등식의 성질: 양변을 같은 수로 나누어도 등식은 그대로예요. x 앞의 수(계수)로 양변을 나눠요.',
+    {body:chipList(['3x = 21 → x = 21 ÷ 3','5x = −20 → x = −20 ÷ 5'])+neg});
   if(n===2) return H(lq2(2,3,4),'상수항을 먼저 넘기고, 그다음 x 앞의 수로 나눠요.',{body:neg});
   if(n===3) return H(lq3(5,-3,2,4),'x 가 있는 항은 왼쪽, 수는 오른쪽으로 모아요.',{body:neg});
   return H(lq4('b',2,3,4),'괄호 앞의 수로 양변을 나누거나, 분수면 양변에 분모를 곱해요.',{body:neg});
@@ -11467,22 +11472,21 @@ const KM_NOTE={
     return Object.assign({},N,{sub:(N.sub||'')+A.sub, ways:(N.ways||[]).concat(A.ways), miss:(N.miss||[]).concat(A.miss)}); }; }
 
 /* ═══════════════════ 암산 대결 11개 핵심 주제 확장 (초등 4 · 중등 4 · 고등 3) ═══════════════════
-   초등: div(기초 나눗셈) · fast(100 보수·빠른 암산) · mix(자연수의 혼합계산) · unit(단위 변환 스피드)
+   초등: div(기초 나눗셈) · mix(자연수의 혼합계산) · unit(단위 변환 스피드)   (fast 100 보수는 11-28 선생님 요청으로 뺌)
    중등: alg(문자식·일차식) · ineq(일차부등식) · sys(암산 연립방정식) · quad(곱셈공식·이차방정식)
    고등: cplx(복소수 i 계산) · rem(나머지정리·식의 변형) · seq(등차·등비수열)                          */
 
-const MM_T=['div','fast','mix','unit','alg','ineq','sys','quad','cplx','rem','seq'];
+const MM_T=['div','mix','unit','alg','ineq','sys','quad','cplx','rem','seq'];
 Object.assign(SK_EXT,{
   MD1:{t:'div',n:'나눗셈 구구'}, MD2:{t:'div',n:'두 자리 ÷ 한 자리'}, MD3:{t:'div',n:'몫과 나머지'},
-  MF1:{t:'fast',n:'100 · 1000 만들기'}, MF2:{t:'fast',n:'가까운 수 암산'}, MF3:{t:'fast',n:'곱셈 짝꿍 암산'},
   MX1:{t:'mix',n:'곱셈·나눗셈 먼저'}, MX2:{t:'mix',n:'괄호가 있는 식'}, MX3:{t:'mix',n:'사칙 혼합 암산'},
   MU1:{t:'unit',n:'길이 단위 변환'}, MU2:{t:'unit',n:'시간 단위 변환'}, MU3:{t:'unit',n:'들이·무게 단위 변환'},
   MA1:{t:'alg',n:'동류항 계산'}, MA2:{t:'alg',n:'분배법칙'}, MA3:{t:'alg',n:'일차식의 덧셈·뺄셈'},
   MI1:{t:'ineq',n:'한 번에 푸는 부등식'}, MI2:{t:'ineq',n:'ax + b > c 풀기'}, MI3:{t:'ineq',n:'음수 나눗셈 · 부등호 방향'},
   MS1:{t:'sys',n:'합과 차 연립방정식'}, MS2:{t:'sys',n:'바로 더하고 빼기'}, MS3:{t:'sys',n:'대입·배수 소거'},
   MQ1:{t:'quad',n:'완전제곱·합차 전개'}, MQ2:{t:'quad',n:'(x+a)(x+b) 전개'}, MQ3:{t:'quad',n:'이차방정식의 근'}, MQ4:{t:'quad',n:'두 근의 합과 곱'},
-  MC1:{t:'cplx',n:'iⁿ 거듭제곱'}, MC2:{t:'cplx',n:'복소수 덧셈·뺄셈'}, MC3:{t:'cplx',n:'켤레곱과 제곱'},
-  MR1:{t:'rem',n:'나머지정리 P(a)'}, MR2:{t:'rem',n:'곱셈공식 변형'}, MR3:{t:'rem',n:'이차방정식 α²+β²'},
+  MC0:{t:'cplx',n:'iⁿ 의 값'}, MC1:{t:'cplx',n:'iⁿ 이 들어간 식'}, MC2:{t:'cplx',n:'복소수 덧셈·뺄셈'}, MC3:{t:'cplx',n:'켤레복소수의 곱'}, MC4:{t:'cplx',n:'복소수의 제곱'},
+  MR1:{t:'rem',n:'나머지정리 P(a)'}, MRF:{t:'rem',n:'인수정리 (P(a) = 0)'}, MR2:{t:'rem',n:'곱셈공식 변형'}, MR3:{t:'rem',n:'이차방정식 α²+β²'},
   MQS1:{t:'seq',n:'수열 규칙 빈칸'}, MQS2:{t:'seq',n:'등차수열 일반항·중항'}, MQS3:{t:'seq',n:'등비수열 일반항'}, MQS4:{t:'seq',n:'간단한 수열의 합 Σ'}
 });
 
@@ -11508,32 +11512,6 @@ function genDV3(){
   const b=ri(3,9), q=ri(3,11), r=ri(1,b-1); return dv3('a',b,q,r);
 }
 
-/* ── 2. 100 보수·빠른 암산 (fast) ── */
-function fa1(w,a){
-  if(w==='s') return F({key:`MF1s_${a}`, sk:'MF1', t:'fast', k:'fa1', w, a, eq:[100,'−',a,'=','?'], ans:100-a});
-  if(w==='b') return F({key:`MF1b_${a}`, sk:'MF1', t:'fast', k:'fa1', w, a, eq:['?','+',a,'=',100], ans:100-a});
-  return F({key:`MF1t_${a}`, sk:'MF1', t:'fast', k:'fa1', w, a, eq:[1000,'−',a,'=','?'], ans:1000-a});
-}
-function fa2(w,a,b){
-  if(w==='a') return F({key:`MF2a_${a}_${b}`, sk:'MF2', t:'fast', k:'fa2', w, a, b, eq:[a,'+',b,'=','?'], ans:a+b});
-  if(w==='s') return F({key:`MF2s_${a}_${b}`, sk:'MF2', t:'fast', k:'fa2', w, a, b, eq:[a,'−',b,'=','?'], ans:a-b});
-  return F({key:`MF2m_${a}_${b}`, sk:'MF2', t:'fast', k:'fa2', w, a, b, eq:[a,'×',b,'=','?'], ans:a*b});
-}
-const fa3=(a,b)=>F({key:`MF3_${a}_${b}`, sk:'MF3', t:'fast', k:'fa3', a, b, eq:[a,'×',b,'=','?'], ans:a*b});
-function genFA1(){ const r=Math.random();
-  if(r<.42) return fa1('s',ri(11,89));
-  if(r<.75) return fa1('b',ri(11,89));
-  return fa1('t',ri(11,89)*10);
-}
-function genFA2(){ const r=Math.random();
-  if(r<.38){ const a=pickOne([99,98,97,101,102,103,49,51]), b=ri(14,78); return fa2('a',a,b); }
-  if(r<.68){ const b=pickOne([99,98,97,49,39,29]), a=ri(b+15,b+85); return fa2('s',a,b); }
-  const a=pickOne([19,21,29,31,49,51,99,101]), b=ri(3,a>=99?9:8); return fa2('m',a,b);
-}
-const FA3_POOL=[[25,4],[25,8],[25,12],[25,16],[25,20],[25,24],[25,32],[25,36],
-  [125,4],[125,8],[125,12],[125,16],[5,14],[5,16],[5,18],[5,24],[5,26],[5,28],[5,36],[5,48],
-  [15,4],[15,6],[15,8],[15,12],[15,14],[15,16],[50,14],[50,18],[50,24],[45,2],[35,4],[35,6]];
-const genFA3=()=>{ const [a,b]=pickOne(FA3_POOL); return Math.random()<.7?fa3(a,b):fa3(b,a); };
 
 /* ── 3. 자연수의 혼합계산 (mix) ── */
 function mx1(w,a,b,c){
@@ -11766,6 +11744,21 @@ const CP1_ITEMS=[
   ['16 − 4i²',20,'16 − (−4) = 20'],['30i⁴ + 12i²',18,'30 − 12 = 18']
 ];
 const cp1=i=>F({key:'MC1_'+i, sk:'MC1', t:'cplx', k:'cp1', i, eq:[CP1_ITEMS[i][0],'=','?'], ans:CP1_ITEMS[i][1]});
+/* iⁿ 의 값만 — 11-28 선생님 요청: 'iⁿ'이라는 단계에는 정말 iⁿ 하나만 나오게.
+   답이 1 · i · −1 · −i 넷뿐이라 숫자판 대신 보기 단추로 골라요(1과 − 만 번갈아 눌러 맞히는 찍기도 막아요). */
+const CP0_N=[...range(2,24),27,30,35,40,50,51,63,99,100,101,102];
+const CP0_PICK=['1','i','−1','−i'];
+const cp0=n=>F({key:'MC0_'+n, sk:'MC0', t:'cplx', k:'cp0', n, eq:['i'+sup(n),'=','?'], pick:CP0_PICK, ans:n%4+1});
+const genCP0=()=>cp0(pickOne(CP0_N));
+/* iⁿ 이 들어간 식 — 계수가 붙거나 두 항을 더하고 빼요 (짝수 지수만이라 답은 정수) */
+const cpV=n=>n%4===0?1:-1;
+function cp1g(a,n,o,b,m){
+  const ans=o==='+'?a*cpV(n)+b*cpV(m):a*cpV(n)-b*cpV(m);
+  return F({key:`MC1g_${a}_${n}_${o==='+'?'p':'m'}_${b}_${m}`, sk:'MC1', t:'cplx', k:'cp1g', a, n, o, b, m,
+    eq:[`${a}i${sup(n)} ${o==='+'?'+':'−'} ${b}i${sup(m)}`,'=','?'], ans}); }
+function genCP1(){ if(Math.random()<.35) return cp1(ri(8,CP1_ITEMS.length-1));
+  for(let g=0;g<30;g++){ const n=pickOne([2,4,6,8,10,12]), m=pickOne([2,4,6,8]); if(n===m) continue;
+    return cp1g(ri(2,15),n,Math.random()<.5?'+':'-',ri(2,12),m); } return cp1g(10,4,'-',4,2); }
 const cpTxt=(a,b)=>`${MI(a)} ${b<0?'−':'+'} ${Math.abs(b)===1?'':Math.abs(b)}i`;
 function cp2(op,a,b,c,d,ask){
   const re=op==='+'?a+c:a-c, im=op==='+'?b+d:b-d;
@@ -11775,13 +11768,15 @@ function cp2(op,a,b,c,d,ask){
 function cp3(w,a,b){
   if(w==='c') return F({key:`MC3c_${a}_${b}`, sk:'MC3', t:'cplx', k:'cp3', w, a, b,
     eq:[`(${cpTxt(a,b)})(${cpTxt(a,-b)})`,'=','?'], ans:a*a+b*b});
-  if(w==='r') return F({key:`MC3r_${a}_${b}`, sk:'MC3', t:'cplx', k:'cp3', w, a, b,
+  if(w==='r') return F({key:`MC3r_${a}_${b}`, sk:'MC4', t:'cplx', k:'cp3', w, a, b,
     cond:`(${cpTxt(a,b)})² = a + bi`, cb:true, eq:['a','=','?'], ans:a*a-b*b});
-  return F({key:`MC3i_${a}_${b}`, sk:'MC3', t:'cplx', k:'cp3', w, a, b,
+  return F({key:`MC3i_${a}_${b}`, sk:'MC4', t:'cplx', k:'cp3', w, a, b,
     cond:`(${cpTxt(a,b)})² = a + bi`, cb:true, eq:['b','=','?'], ans:2*a*b});
 }
 function genCP2(){ const op=Math.random()<.5?'+':'-', a=mmNz(-9,12), b=mmNz(-9,12), c=mmNz(-9,12), d=mmNz(-9,12);
   return cp2(op,a,b,c,d,Math.random()<.5?'r':'i'); }
+const genCP3c=()=>cp3('c',ri(1,8),ri(1,7));   /* 켤레복소수의 곱 */
+const genCP3s=()=>{ const a=ri(1,7), b=mmSgn()*ri(1,6); return cp3(Math.random()<.5?'r':'i',a,b); };   /* 복소수의 제곱 */
 function genCP3(){ const r=Math.random();
   if(r<.45) return cp3('c',ri(2,8),ri(1,7));
   const a=ri(2,7), b=mmSgn()*ri(1,6); return cp3(r<.72?'r':'i',a,b);
@@ -11807,6 +11802,17 @@ function rm3(w,s,p){
   return F({key:`MR3${w}_${s}_${p}`, sk:'MR3', t:'rem', k:'rm3', w, s, p,
     cond:`${eqs} = 0 · 두 근 α, β`, cb:true, eq:[w==='s'?'α² + β²':'(α − β)²','=','?'], ans:w==='s'?s*s-2*p:s*s-4*p});
 }
+/* 인수정리 — P(x)가 (x − r)로 나누어떨어지면 P(r) = 0 → 미지 계수 k (11-28 추가) */
+function rmF(w,a,r,s0){
+  const b=-a*(r+s0), c=a*r*s0, X=a===1?'x²':a+'x²', div=`x\u00a0${r>0?'−':'+'}\u00a0${Math.abs(r)}`;
+  const tx=v=>v===0?'':` ${v<0?'−':'+'} ${Math.abs(v)===1?'':Math.abs(v)}x`, tc=v=>v===0?'':` ${v<0?'−':'+'} ${Math.abs(v)}`;
+  const P=w==='b'?`${X} + kx${tc(c)}`:`${X}${tx(b)} + k`;
+  return F({key:`MRF${w}_${a}_${r}_${s0}`, sk:'MRF', t:'rem', k:'rmF', w, a, r, s0, b, c,
+    cond:`(${div})로 나누어떨어지는 P(x) = ${P}`, cb:true, eq:['k','=','?'], ans:w==='b'?b:c});
+}
+function genRMF(){ for(let g=0;g<50;g++){ const a=pickOne([1,1,1,2]), r=mmNz(-4,4), s0=mmNz(-6,6), w=Math.random()<.5?'b':'c';
+    if(s0===r) continue; const b=-a*(r+s0), c=a*r*s0; if(b===0||c===0) continue;   /* 답 k = 0 이거나 항이 빠지는 식은 빼요 */
+    if(Math.abs(w==='b'?b:c)<=24&&Math.abs(a*r*r)<=32) return rmF(w,a,r,s0); } return rmF('b',1,2,-3); }
 function genRM1(){ return rm1(ri(1,3),ri(-5,6),ri(-8,10),mmNz(-3,4)); }
 function genRM2(){ const w=pickOne(['p','m','d']);
   /* a, b 가 실수가 되게: a + b = s 이면 ab ≤ s²/4, a − b = s 이면 ab ≥ −s²/4 */
@@ -11880,9 +11886,6 @@ function mmFact(key){ let m; const R=p=>key.match(new RegExp('^'+p+'$'));
   if(m=R('MD1_(\\d+)_(\\d+)')) return dv1(+m[1],+m[2]);
   if(m=R('MD2_(\\d+)_(\\d+)')) return dv2(+m[1],+m[2]);
   if(m=R('MD3([qra])_(\\d+)_(\\d+)_(\\d+)')) return dv3(m[1],+m[2],+m[3],+m[4]);
-  if(m=R('MF1([sbt])_(\\d+)')) return fa1(m[1],+m[2]);
-  if(m=R('MF2([asm])_(\\d+)_(\\d+)')) return fa2(m[1],+m[2],+m[3]);
-  if(m=R('MF3_(\\d+)_(\\d+)')) return fa3(+m[1],+m[2]);
   if(m=R('MX1(am|sm|ad|sd)_(\\d+)_(\\d+)_(\\d+)')) return mx1(m[1],+m[2],+m[3],+m[4]);
   if(m=R('MX2(pm|mm|pd|dp)_(\\d+)_(\\d+)_(\\d+)')) return mx2(m[1],+m[2],+m[3],+m[4]);
   if(m=R('MX3(mm|ms|pm)_(\\d+)_(\\d+)_(\\d+)_(\\d+)')) return mx3(m[1],+m[2],+m[3],+m[4],+m[5]);
@@ -11906,6 +11909,9 @@ function mmFact(key){ let m; const R=p=>key.match(new RegExp('^'+p+'$'));
   if(m=R('MC2_([pm])_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_([ri])')) return cp2(m[1]==='p'?'+':'-',+m[2],+m[3],+m[4],+m[5],m[6]);
   if(m=R('MC3([cri])_(-?\\d+)_(-?\\d+)')) return cp3(m[1],+m[2],+m[3]);
   if(m=R('MR1_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)')) return rm1(+m[1],+m[2],+m[3],+m[4]);
+  if(m=R('MRF([bc])_(\\d+)_(-?\\d+)_(-?\\d+)')) return rmF(m[1],+m[2],+m[3],+m[4]);
+  if(m=R('MC0_(\\d+)')) return +m[1]>=2?cp0(+m[1]):null;
+  if(m=R('MC1g_(\\d+)_(\\d+)_([pm])_(\\d+)_(\\d+)')) return cp1g(+m[1],+m[2],m[3]==='p'?'+':'-',+m[4],+m[5]);
   if(m=R('MR2([pmd])_(-?\\d+)_(-?\\d+)')) return rm2(m[1],+m[2],+m[3]);
   if(m=R('MR3([sd])_(-?\\d+)_(-?\\d+)')) return rm3(m[1],+m[2],+m[3]);
   if(m=R('MQS1([ag])_(-?\\d+)_(-?\\d+)_(\\d)')) return sq1(m[1],+m[2],+m[3],+m[4]);
@@ -11924,11 +11930,6 @@ function mmHint(f){
     case 'dv2': return {t:'십의 자리와 일의 자리로 나누기', lines:[`${f.a*f.q} = ${f.a*Math.floor(f.q/10)*10} + ${f.a*(f.q%10)}`, `${Math.floor(f.q/10)*10} + ${f.q%10} = ${mmB(f.q)}`]};
     case 'dv3': return f.w==='a'?{t:'(나누어지는 수) = (나누는 수) × 몫 + 나머지', lines:[`${f.b} × ${f.q} + ${f.r} = ${f.b*f.q} + ${f.r} = ${mmB(f.a)}`]}
       :{t:'나머지는 항상 나누는 수보다 작아요', lines:[`${f.a} = ${f.b} × ${f.q} + ${f.r}`, `${f.w==='q'?'몫':'나머지'} = ${mmB(f.ans)}`]};
-    case 'fa1': return f.w==='t'?{t:'1000 보수: 백의 자리 9, 십의 자리 10', lines:[`1000 − ${f.a} = ${mmB(f.ans)}`, mmTip('앞자리는 합이 9, 마지막 0이 아닌 자리는 합이 10')] }
-      :{t:'100 보수: 십의 자리 합 9, 일의 자리 합 10', lines:[`${Math.floor(f.a/10)} + ${Math.floor((100-f.a)/10)} = 9, ${f.a%10} + ${(100-f.a)%10} = 10`, `→ ${mmB(f.ans)}`]};
-    case 'fa2': return f.w==='m'?{t:'가까운 몇십으로 먼저 곱하고 보정해요', lines:[`${f.a} × ${f.b} = (${Math.round(f.a/10)*10} ${f.a>Math.round(f.a/10)*10?'+':'−'} ${Math.abs(f.a-Math.round(f.a/10)*10)}) × ${f.b}`, `= ${mmB(f.ans)}`]}
-      :{t:'100이나 몇십에 가까운 수로 바꿔 계산', lines:[`${f.a} ${f.w==='a'?'+':'−'} ${f.b} = ${mmB(f.ans)}`, mmTip('99는 100으로 계산한 뒤 1만큼 보정하면 1초 컷!')]};
-    case 'fa3': return {t:'곱셈 짝꿍: 25×4=100, 125×8=1000, 5×2=10', lines:[`${f.a} × ${f.b} = ${mmB(f.ans)}`, mmTip('짝수를 2나 4로 쪼개서 100·1000을 먼저 만들어요')]};
     case 'mx1': return {t:'곱셈·나눗셈을 먼저 계산해요', lines:[`먼저: ${f.b} ${f.w.endsWith('m')?'×':'÷'} ${f.c} = ${f.w.endsWith('m')?f.b*f.c:f.b/f.c}`, `${f.a} ${f.w[0]==='a'?'+':'−'} ${f.w.endsWith('m')?f.b*f.c:f.b/f.c} = ${mmB(f.ans)}`]};
     case 'mx2': return {t:'괄호 ( ) 안을 가장 먼저 계산해요', lines:[`괄호 먼저 계산한 뒤 ${f.w.endsWith('m')?'곱셈':'나눗셈'}`, `= ${mmB(f.ans)}`]};
     case 'mx3': return {t:'괄호 → × ÷ → + − 순서로', lines:[f.w==='pm'?`(${f.a} + ${f.b}) ÷ ${f.c} × ${f.d} = ${(f.a+f.b)/f.c} × ${f.d}`:`${f.a*f.b} ${f.w==='mm'?'+':'−'} ${f.c*f.d}`, `= ${mmB(f.ans)}`]};
@@ -11954,6 +11955,16 @@ function mmHint(f){
     case 'cp2': return {t:'실수부는 실수부끼리, 허수부는 허수부끼리', lines:[`실수부: ${MI(f.a)} ${f.op==='+'?'+':'−'} ${PV(f.c)} = ${MI(f.re)}`, `허수부: ${MI(f.b)} ${f.op==='+'?'+':'−'} ${PV(f.d)} = ${MI(f.im)}`, `답: ${mmB(f.ans)}`]};
     case 'cp3': return f.w==='c'?{t:'켤레복소수의 곱: (a+bi)(a−bi) = a² + b²', lines:[`${f.a}² + ${f.b}² = ${f.a*f.a} + ${f.b*f.b} = ${mmB(f.ans)}`]}
       :{t:'(a + bi)² = (a² − b²) + 2abi', lines:[`실수부 a² − b² = ${MI(f.a*f.a-f.b*f.b)}`, `허수부 2ab = ${MI(2*f.a*f.b)}`, `답: ${mmB(f.ans)}`]};
+    case 'cp0':{ const r=f.n%4, q=Math.floor(f.n/4), val=['1','i','−1','−i'][r];
+      return {t:'i, −1, −i, 1 이 4개마다 되풀이돼요 — 지수를 4로 나눈 나머지를 봐요',
+        lines:[r?`${f.n} = 4 × ${q} + ${r}`:`${f.n} = 4 × ${q}`, `i${sup(f.n)} = ${r?'i'+sup(r):'(i⁴)'+sup(q)} = ${mmB(val)}`]}; }
+    case 'cp1g':{ const vn=cpV(f.n), vm=cpV(f.m);
+      return {t:'i² = −1, i⁴ = 1 로 바꾼 뒤 계산해요', lines:[`i${sup(f.n)} = ${MI(vn)}, i${sup(f.m)} = ${MI(vm)}`,
+        `${f.a} × (${MI(vn)}) ${f.o==='+'?'+':'−'} ${f.b} × (${MI(vm)}) = ${MI(f.a*vn)} ${f.o==='+'?'+':'−'} ${PV(f.b*vm)} = ${mmB(f.ans)}`]}; }
+    case 'rmF':{ const r=f.r, ar2=f.a*r*r;
+      return f.w==='b'?{t:'인수정리: (x − r)로 나누어떨어지면 P(r) = 0', lines:[`P(${MI(r)}) = ${ar2} ${r<0?'−':'+'} ${Math.abs(r)===1?'':Math.abs(r)}k ${f.c<0?'−':'+'} ${Math.abs(f.c)} = 0`,
+          `${MI(r)}k = ${MI(-(ar2+f.c))} → k = ${mmB(f.ans)}`]}
+        :{t:'인수정리: (x − r)로 나누어떨어지면 P(r) = 0', lines:[`P(${MI(r)}) = ${ar2} ${f.b*r<0?'−':'+'} ${Math.abs(f.b*r)} + k = 0`, `k = ${mmB(f.ans)}`]}; }
     case 'rm1': return {t:'나머지정리: (x − k)로 나눈 나머지 = P(k)', lines:[`x = ${MI(f.kk)} 대입`, `${f.a}×(${MI(f.kk)})² + ${MI(f.b)}×(${MI(f.kk)}) + ${MI(f.c)} = ${mmB(f.ans)}`]};
     case 'rm2': return f.w==='p'?{t:'a² + b² = (a + b)² − 2ab', lines:[`${f.s}² − 2 × ${PV(f.p)} = ${f.s*f.s} − ${PV(2*f.p)} = ${mmB(f.ans)}`]}
       :f.w==='m'?{t:'a² + b² = (a − b)² + 2ab', lines:[`${f.s}² + 2 × ${PV(f.p)} = ${f.s*f.s} + ${PV(2*f.p)} = ${mmB(f.ans)}`]}
@@ -11971,11 +11982,12 @@ function mmHint(f){
 }
 
 const mmVariant=f=>{
-  const map={dv1:genDV1,dv2:genDV2,dv3:genDV3,fa1:genFA1,fa2:genFA2,fa3:genFA3,mx1:genMX1,mx2:genMX2,mx3:genMX3,
+  const map={dv1:genDV1,dv2:genDV2,dv3:genDV3,mx1:genMX1,mx2:genMX2,mx3:genMX3,
     unF:()=>unF(ri(0,UN_ITEMS.length-1)),al1:genAL1,al2:genAL2,al3:genAL3,iq1:genIQ1,iq2:genIQ2,iq3:genIQ3,
     sy1:genSY1,sy2:genSY2,sy3:genSY3,qd1:genQD1,qd2:genQD2,qd3:genQD3,qd4:genQD4,
-    cp1:()=>cp1(ri(0,CP1_ITEMS.length-1)),cp2:genCP2,cp3:genCP3,rm1:genRM1,rm2:genRM2,rm3:genRM3,
+    cp0:genCP0,cp1:genCP1,cp1g:genCP1,cp2:genCP2,cp3:genCP3,rmF:genRMF,rm1:genRM1,rm2:genRM2,rm3:genRM3,
     sq1:genSQ1,sq2:genSQ2,sq3:genSQ3,sq4:()=>sq4(ri(0,SQ4_ITEMS.length-1))};
+  if(f.k==='cp3') return f.w==='c'?genCP3c():genCP3s();
   return map[f.k]?map[f.k]():f;
 };
 
@@ -11988,13 +12000,6 @@ Object.assign(TOPICS,{
       {n:2, name:'두 자리 ÷ 한 자리', ex:'75 ÷ 5 = □', gen:genDV2, take:12},
       {n:3, name:'몫과 나머지', ex:'47 ÷ 4 의 몫', gen:genDV3, take:10}
     ], cats:[['MD1'],['MD2'],['MD3']]},
-  fast:{k:'fast', n:'100 보수·빠른 암산', sym:'100', school:'e', gr:'저학년 · 1~3학년', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'100·1000 보수 · 가까운 수 보정 · 곱셈 짝꿍(25×4, 125×8)',
-    stages:[
-      {n:1, name:'100 · 1000 만들기', ex:'100 − 37 = □', gen:genFA1, take:12},
-      {n:2, name:'가까운 수 암산', ex:'99 + 46 = □', gen:genFA2, take:12},
-      {n:3, name:'곱셈 짝꿍 암산', ex:'25 × 8 = □', gen:genFA3, take:12}
-    ], cats:[['MF1'],['MF2'],['MF3']]},
   mix:{k:'mix', n:'자연수의 혼합계산', sym:'( )', school:'e', gr:'고학년 · 4~6학년', col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'곱셈·나눗셈 먼저 · 괄호가 있는 식 · 사칙 혼합 암산',
     stages:[
@@ -12039,19 +12044,22 @@ Object.assign(TOPICS,{
       {n:4, name:'두 근의 합과 곱', ex:'x² − 13x + 36 = 0 → 합', gen:genQD4, take:10}
     ], cats:[['MQ1'],['MQ2'],['MQ3'],['MQ4']]},
   cplx:{k:'cplx', n:'복소수 i 계산', sym:'i²', school:'h', gr:'공통수학1', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'iⁿ 순환 거듭제곱 · 복소수 덧셈·뺄셈 · 켤레곱과 제곱',
+    desc:'iⁿ 의 값 · iⁿ 이 들어간 식 · 덧셈·뺄셈 · 켤레복소수의 곱 · 복소수의 제곱',
     stages:[
-      {n:1, name:'iⁿ 거듭제곱', ex:'10i⁴ − 4i² = □', facts:()=>CP1_ITEMS.map((_,i)=>cp1(i)), take:12},
-      {n:2, name:'복소수 덧셈·뺄셈', ex:'(7+3i) + (8+5i) → 실수부', gen:genCP2, take:12},
-      {n:3, name:'켤레곱과 제곱', ex:'(3 + 4i)(3 − 4i) = □', gen:genCP3, take:12}
-    ], cats:[['MC1'],['MC2'],['MC3']]},
+      {n:1, name:'iⁿ 의 값', ex:'i¹⁰ = □', gen:genCP0, take:12},
+      {n:2, name:'iⁿ 이 들어간 식', ex:'10i⁴ − 4i² = □', gen:genCP1, take:12},
+      {n:3, name:'복소수 덧셈·뺄셈', ex:'(7+3i) + (8+5i) → 실수부', gen:genCP2, take:12},
+      {n:4, name:'켤레복소수의 곱', ex:'(3 + 4i)(3 − 4i) = □', gen:genCP3c, take:12},
+      {n:5, name:'복소수의 제곱', ex:'(2 + 3i)² = a + bi', gen:genCP3s, take:12}
+    ], sv:1, mig:{from:2, map:{1:[1],2:[1],3:[2],4:[3],5:[3]}, same:[3]}, cats:[['MC0'],['MC1'],['MC2'],['MC3'],['MC4']]},
   rem:{k:'rem', n:'나머지정리·식의 변형', sym:'P(a)', school:'h', gr:'공통수학1', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'나머지정리 P(a) · 곱셈공식 변형 · 이차방정식 α²+β²',
+    desc:'나머지정리 P(a) · 인수정리 · 곱셈공식 변형 · 이차방정식 α²+β²',
     stages:[
       {n:1, name:'나머지정리 P(a)', ex:'P(x)=x²+3x+5, (x−2) 나머지', gen:genRM1, take:12},
-      {n:2, name:'곱셈공식 변형', ex:'a+b=7, ab=10 → a²+b²', gen:genRM2, take:12},
-      {n:3, name:'이차방정식 α²+β²', ex:'x²−6x+5=0 → α²+β²', gen:genRM3, take:12}
-    ], cats:[['MR1'],['MR2'],['MR3']]},
+      {n:2, name:'인수정리', ex:'(x−2)로 나누어떨어짐 → k', gen:genRMF, take:12},
+      {n:3, name:'곱셈공식 변형', ex:'a+b=7, ab=10 → a²+b²', gen:genRM2, take:12},
+      {n:4, name:'이차방정식 α²+β²', ex:'x²−6x+5=0 → α²+β²', gen:genRM3, take:12}
+    ], sv:1, mig:{from:2, map:{1:[1],3:[2],4:[3]}, same:[1,3,4]}, cats:[['MR1'],['MRF'],['MR2'],['MR3']]},
   seq:{k:'seq', n:'등차·등비수열', sym:'aₙ', school:'h', gr:'대수', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'수열 규칙 빈칸 · 등차·등비 일반항과 중항 · 간단한 합 Σ',
     stages:[
@@ -12062,7 +12070,7 @@ Object.assign(TOPICS,{
     ], cats:[['MQS1'],['MQS2'],['MQS3'],['MQS4']]}
 });
 Object.assign(TOPIC_SYMH,{
-  div:'÷', fast:'<span style="font-size:.66em;letter-spacing:-.5px">100</span>',
+  div:'÷',
   mix:'<span style="font-size:.76em">( )</span>', unit:'<span style="font-size:.66em">km</span>',
   alg:'<span style="font-size:.72em;font-style:italic">3x</span>', ineq:'&gt;',
   sys:'<span style="font-size:.76em">{ }</span>', quad:'<span style="font-size:.6em">x²=0</span>',
@@ -12077,15 +12085,18 @@ function mmPreview(t,n){
   const dec='<div class="hl" style="font-size:14px;margin-top:10px;color:var(--dim)">소수 답은 숫자판의 <b>.</b> 단추를 눌러요.</div>';
   const P={
     div:[()=>H(dv1(7,8),'곱셈구구를 거꾸로 떠올려요: 7 × □ = 56.'),()=>H(dv2(5,15),'십의 자리와 일의 자리로 나누어 생각하면 빨라요: 75 = 50 + 25.'),()=>H(dv3('q',4,11,3),'나누는 수 × 몫 + 나머지 = 나누어지는 수. 나머지는 나누는 수보다 작아요.')],
-    fast:[()=>H(fa1('s',37),'100 보수: 십의 자리는 합이 9, 일의 자리는 합이 10이 되게 채워요.'),()=>H(fa2('a',99,46),'99는 100으로 계산하고 1을 빼요. 19 × 5는 20 × 5 − 5!'),()=>H(fa3(25,8),'25 × 4 = 100, 125 × 8 = 1000, 5 × 2 = 10 짝꿍을 먼저 만들어요.')],
     mix:[()=>H(mx1('am',12,4,7),'덧셈·뺄셈보다 곱셈·나눗셈을 먼저 계산해요.'),()=>H(mx2('pm',8,4,3),'괄호 ( ) 안을 가장 먼저 계산한 뒤 바깥을 계산해요.'),()=>H(mx3('mm',3,8,4,5),'괄호 → × ÷ → + − 순서를 지켜서 암산해요.')],
     unit:[()=>H(unF(1),'1 m = 100 cm, 1 km = 1000 m, 1 cm = 10 mm.',{body:dec}),()=>H(unF(20),'1시간 = 60분, 1분 = 60초. 0.5시간 = 30분!',{body:dec}),()=>H(unF(38),'1 L = 1000 mL, 1 kg = 1000 g, 1 t = 1000 kg.',{body:dec})],
     alg:[()=>H(al1('x',7,5,0),'문자와 차수가 같은 동류항끼리 계수를 더하고 빼요.',{body:neg}),()=>H(al2('x',3,4,-5,'a'),'괄호 앞의 수를 안의 모든 항에 빠짐없이 곱해요.',{body:neg}),()=>H(al3('x','+',5,7,6,8,'a'),'괄호 앞에 −가 있으면 안의 모든 부호를 바꿔요.',{body:neg})],
     ineq:[()=>H(iq1('a',1,5,13),'이항하거나 양수로 나누어도 부등호 방향은 그대로예요.',{body:neg}),()=>H(iq2(1,2,-5,12),'상수항을 이항한 뒤 x의 계수로 나눠요.',{body:neg}),()=>H(iq3('v',1,-3,0,-4),'양변을 음수로 곱하거나 나눌 때만 부등호 방향이 반대로 바뀌어요!',{body:neg})],
     sys:[()=>H(sy1(15,11,'x'),'두 식을 더하면 2x = 합+차, 빼면 2y = 합−차!',{body:neg}),()=>H(sy2(2,1,12,7,'x'),'부호가 반대인 항끼리 바로 더해 한 문자를 없애요.',{body:neg}),()=>H(sy3('s',2,12,24,'x'),'y = 2x를 대입하거나 두 식을 빼서 x를 먼저 구해요.',{body:neg})],
     quad:[()=>H(qd1('s',7,'m'),'(x + a)² = x² + 2ax + a², (x + a)(x − a) = x² − a².',{body:neg}),()=>H(qd2(6,7,'p'),'(x + a)(x + b) = x² + (a+b)x + ab. 합이 일차항, 곱이 상수항!',{body:neg}),()=>H(qd3('b',2,12),'인수분해해 각 괄호가 0이 되는 x 값을 찾아요.',{body:neg}),()=>H(qd4('s',4,9),'x² + bx + c = 0 에서 두 근의 합 = −b, 두 근의 곱 = c.',{body:neg})],
-    cplx:[()=>H(cp1(12),'i² = −1, i⁴ = 1. 지수를 4로 나눈 나머지로 바로 구해요.',{body:neg}),()=>H(cp2('+',7,3,8,5,'r'),'실수부는 실수부끼리, 허수부는 허수부끼리 계산해요.',{body:neg}),()=>H(cp3('c',3,4),'(a + bi)(a − bi) = a² + b², (a + bi)² = (a² − b²) + 2abi.',{body:neg})],
-    rem:[()=>H(rm1(1,3,5,2),'P(x)를 (x − a)로 나눈 나머지는 x = a를 대입한 P(a)예요.',{body:neg}),()=>H(rm2('p',7,10),'a² + b² = (a + b)² − 2ab = (a − b)² + 2ab.',{body:neg}),()=>H(rm3('s',6,5),'먼저 α+β와 αβ를 읽고, α² + β² = (α+β)² − 2αβ에 넣어요.',{body:neg})],
+    cplx:[()=>H(cp0(7),'i, −1, −i, 1 이 4개마다 되풀이돼요. 지수를 4로 나눈 나머지만 보면 돼요. 답은 보기(1 · i · −1 · −i)에서 골라요.',{body:neg}),
+          ()=>H(cp1(12),'i² = −1, i⁴ = 1 로 바꾼 다음 계산해요.',{body:neg}),
+          ()=>H(cp2('+',7,3,8,5,'r'),'실수부는 실수부끼리, 허수부는 허수부끼리 계산해요.',{body:neg}),
+          ()=>H(cp3('c',3,4),'켤레복소수의 곱: (a + bi)(a − bi) = a² + b² — 답은 언제나 양수예요.',{body:neg}),
+          ()=>H(cp3('r',2,3),'(a + bi)² = (a² − b²) + 2abi. 실수부는 a² − b², 허수부는 2ab 예요.',{body:neg})],
+    rem:[()=>H(rm1(1,3,5,2),'P(x)를 (x − a)로 나눈 나머지는 x = a를 대입한 P(a)예요.',{body:neg}),()=>H(rmF('b',1,2,-3),'인수정리: P(x)가 (x − a)로 나누어떨어지면 P(a) = 0 이에요.',{body:neg}),()=>H(rm2('p',7,10),'a² + b² = (a + b)² − 2ab = (a − b)² + 2ab.',{body:neg}),()=>H(rm3('s',6,5),'먼저 α+β와 αβ를 읽고, α² + β² = (α+β)² − 2αβ에 넣어요.',{body:neg})],
     seq:[()=>H(sq1('a',3,4,3),'이웃한 항의 차(등차)나 비(등비)를 먼저 찾아요.',{body:neg}),()=>H(sq2('n',3,4,5),'등차수열 aₙ = a₁ + (n−1)d, 등차중항 = 양옆의 평균.',{body:neg}),()=>H(sq3('n',2,3,4),'등비수열 aₙ = a₁·rⁿ⁻¹, 등비중항² = 양옆의 곱.',{body:neg}),()=>H(sq4(0),'1~n의 합은 n(n+1)/2, 홀수 n개의 합은 n²!',{body:neg})]
   };
   return (P[t]&&(P[t][n-1]||P[t][0]))();
@@ -12098,10 +12109,6 @@ function mmNote(t,fh){
       memo:[{h:'핵심 원리', html:tb(['a ÷ b = □ 는 <b>b × □ = a</b> 와 같아요','두 자리 ÷ 한 자리: 십의 자리 몫 + 일의 자리 몫','검산: <b>(나누는 수) × 몫 + 나머지 = 나누어지는 수</b> (나머지 < 나누는 수)'])}],
       ways:[fh('나눗셈 구구','56 ÷ 7',dv1(7,8)),fh('쪼개서 나누기','75 ÷ 5',dv2(5,15)),fh('몫과 나머지','47 ÷ 4',dv3('q',4,11,3))],
       miss:[{w:'23 ÷ 4 = 몫 4, 나머지 7', r:'몫 5, 나머지 3', y:'나머지는 항상 나누는 수(4)보다 작아야 해요.'}]},
-    fast:{sub:'100·1000 보수 · 가까운 수 보정 · 곱셈 짝꿍',
-      memo:[{h:'암산 치트키', html:chipList(['25 × 4 = <b>100</b>','125 × 8 = <b>1000</b>','5 × 2 = <b>10</b>','99 + a = <b>a + 100 − 1</b>','19 × n = <b>20n − n</b>'])}],
-      ways:[fh('100 보수','100 − 37',fa1('s',37)),fh('가까운 수','99 + 46',fa2('a',99,46)),fh('곱셈 짝꿍','25 × 8',fa3(25,8))],
-      miss:[{w:'100 − 37 = 73', r:'63', y:'일의 자리에서 받아내림이 있으므로 십의 자리는 합이 9(3+6=9)예요.'}]},
     mix:{sub:'곱셈·나눗셈 먼저 · 괄호 먼저 · 사칙 혼합',
       memo:[{h:'계산 순서', html:tb(['<b>1순위</b>: 괄호 ( ) 안','<b>2순위</b>: 곱셈(×) · 나눗셈(÷) (앞에서부터)','<b>3순위</b>: 덧셈(+) · 뺄셈(−) (앞에서부터)'])}],
       ways:[fh('곱셈 먼저','12 + 4 × 7',mx1('am',12,4,7)),fh('괄호 먼저','(14 − 6) × 4',mx2('mm',14,6,4)),fh('사칙 혼합','3 × 8 + 4 × 5',mx3('mm',3,8,4,5))],
@@ -12126,13 +12133,13 @@ function mmNote(t,fh){
       memo:[{h:'필수 공식', html:chipList(['(x+a)² = x² + 2ax + a²','(x+a)(x−a) = x² − a²','(x+a)(x+b) = x² + (a+b)x + ab','합 = −b/a, 곱 = c/a'])}],
       ways:[fh('완전제곱','(x + 7)²',qd1('s',7,'m')),fh('일차식 곱','(x + 6)(x + 7)',qd2(6,7,'p')),fh('근 구하기','x² − 14x + 24 = 0',qd3('b',2,12)),fh('근과 계수','x² − 13x + 36 = 0',qd4('s',4,9))],
       miss:[{w:'x² − 7x + 12 = 0 → 두 근의 합은 −7', r:'7', y:'x² + bx + c = 0에서 두 근의 합은 −b = −(−7) = +7이에요.'}]},
-    cplx:{sub:'iⁿ 순환 거듭제곱 · 복소수 사칙 · 켤레곱과 제곱',
+    cplx:{sub:'iⁿ 의 값 · iⁿ 이 들어간 식 · 덧셈·뺄셈 · 켤레복소수의 곱 · 복소수의 제곱',
       memo:[{h:'핵심 공식', html:chipList(['i² = <b>−1</b>','i³ = −i','i⁴ = <b>1</b>','(a+bi)(a−bi) = <b>a² + b²</b>','(a+bi)² = (a²−b²) + 2abi'])}],
       ways:[fh('iⁿ 계산','10i⁴ − 4i²',cp1(12)),fh('덧셈·뺄셈','(7+3i)+(8+5i)',cp2('+',7,3,8,5,'r')),fh('켤레곱','(3+4i)(3−4i)',cp3('c',3,4))],
       miss:[{w:'(3 + 4i)(3 − 4i) = 9 − 16 = −7', r:'9 + 16 = 25', y:'−16i² = −16(−1) = +16! 켤레곱은 a² − b²가 아니라 a² + b²예요.'}]},
-    rem:{sub:'나머지정리 P(a) · 곱셈공식 변형 · α² + β²',
-      memo:[{h:'핵심 공식', html:chipList(['(x − a)로 나눈 나머지 = <b>P(a)</b>','a² + b² = (a+b)² − 2ab','a² + b² = (a−b)² + 2ab','(a−b)² = (a+b)² − 4ab'])}],
-      ways:[fh('나머지정리','P(x)=x²+3x+5, x−2',rm1(1,3,5,2)),fh('곱셈공식 변형','a+b=7, ab=10',rm2('p',7,10)),fh('α² + β²','x²−6x+5=0',rm3('s',6,5))],
+    rem:{sub:'나머지정리 P(a) · 인수정리 · 곱셈공식 변형 · α² + β²',
+      memo:[{h:'핵심 공식', html:chipList(['(x − a)로 나눈 나머지 = <b>P(a)</b>','(x − a)로 나누어떨어지면 <b>P(a) = 0</b>','a² + b² = (a+b)² − 2ab','a² + b² = (a−b)² + 2ab','(a−b)² = (a+b)² − 4ab'])}],
+      ways:[fh('나머지정리','P(x)=x²+3x+5, x−2',rm1(1,3,5,2)),fh('인수정리','x²+kx−6, x−2',rmF('b',1,2,-3)),fh('곱셈공식 변형','a+b=7, ab=10',rm2('p',7,10)),fh('α² + β²','x²−6x+5=0',rm3('s',6,5))],
       miss:[{w:'(x + 2)로 나눈 나머지 = P(2)', r:'P(−2)', y:'나누는 식 x + 2 = 0이 되는 x = −2를 대입해야 해요.'}]},
     seq:{sub:'규칙 빈칸 · 등차수열 · 등비수열 · 간단한 합 Σ',
       memo:[{h:'필수 공식', html:chipList(['등차: aₙ = a₁ + (n−1)d','등차중항: (a+c)/2','등비: aₙ = a₁·rⁿ⁻¹','1~n 합: n(n+1)/2','홀수 n개 합: n²'])}],
@@ -12151,7 +12158,7 @@ function mmNote(t,fh){
   extNote=(t,fh)=>MM_T.includes(t)?mmNote(t,fh):n0(t,fh);
   const sc=k=>SCHOOLS.find(s=>s.k===k);
   const E=sc('e'), M=sc('m'), H=sc('h');
-  E.topics=['addsub','fast','gugu','div','boxq','mix','fadd','fmul','dadd','dmul','ratio','unit'];
+  E.topics=['addsub','gugu','div','boxq','mix','fadd','fmul','dadd','dmul','ratio','unit'];
   E.sub='덧셈·뺄셈 · 빠른 암산 · 구구단 · 나눗셈 · □ 구하기 · 혼합계산 · 분수 · 소수 · 비와 비율 · 단위 변환';
   M.topics=['pfac','int','power','alg','lineq','angle','expo','ineq','sys','linf','simr','pyth','root','factor','quad','trig'];
   M.sub='소인수분해 · 정수 · 제곱수 · 문자식 · 일차방정식 · 각 · 지수 · 부등식 · 연립 · 함수 · 닮음 · 피타고라스 · 제곱근 · 인수분해 · 이차 · 삼각비';
@@ -12160,7 +12167,7 @@ function mmNote(t,fh){
     H.sub='나머지정리 · 복소수 · 순열과 조합 · 지수와 로그 · 삼각함수 · 등차·등비수열';
   }
   const GR={
-    addsub:'저학년 · 1~3학년', fast:'저학년 · 1~3학년', gugu:'저학년 · 1~3학년', div:'저학년 · 1~3학년', boxq:'저학년 · 1~3학년',
+    addsub:'저학년 · 1~3학년', gugu:'저학년 · 1~3학년', div:'저학년 · 1~3학년', boxq:'저학년 · 1~3학년',
     mix:'고학년 · 4~6학년', fadd:'고학년 · 4~6학년', fmul:'고학년 · 4~6학년', dadd:'고학년 · 4~6학년', dmul:'고학년 · 4~6학년', ratio:'고학년 · 4~6학년', unit:'고학년 · 4~6학년',
     pfac:'1학년', int:'1학년', power:'1학년', alg:'1학년', lineq:'1학년', angle:'1학년',
     expo:'2학년', ineq:'2학년', sys:'2학년', linf:'2학년', simr:'2학년', pyth:'2학년',
@@ -12670,16 +12677,19 @@ function rvNote(t,N,fh){
   A.cats=[['NFs'],['EFe'],['NFa']];
   A.sv=(A.sv||0)+1;
   const M=TOPICS.fmul;
-  M.desc='분수와 자연수의 곱셈 · 분수끼리의 곱셈 · 분수의 나눗셈';
+  M.desc='(분수) × (자연수) · (분수) × (분수) · (분수) ÷ (자연수) · (분수) ÷ (분수)';
   M.sv=(M.sv||0)+1;   /* 단계 수가 바뀌어 예전 클리어 표시는 새로 시작해요 */
+  /* 11-28 선생님 요청: 곱셈처럼 나눗셈도 ÷ (자연수)와 ÷ (분수)로 나눠 네 단계. 예전 판(v=STAGE_V+sv−1)의 클리어는 옮겨요 */
+  M.mig={from:2+M.sv, map:{1:[1],2:[2],3:[3],4:[3]}, same:[1,2]};   /* 2 = STAGE_V (아래에서 정의) */
+  M.sv++;
   M.stages=[
-    {n:1, name:'분수와 자연수의 곱셈', ex:'1/2 × 4', gen:()=>(Math.random()<.5?genNM1:genNM2)(), take:12, old:[1,2]},
-    {n:2, name:'(분수) × (분수)',      ex:'2/3 × 3/4', gen:genNM3, take:10, old:[3]},
-    {n:3, name:'분수의 나눗셈',        ex:'3/4 ÷ 3/8', gen:()=>(Math.random()<.45?genNM4:genNM5)(), take:12, old:[4,5]}
+    {n:1, name:'(분수) × (자연수)', ex:'1/2 × 4', gen:()=>(Math.random()<.5?genNM1:genNM2)(), take:12, old:[1,2]},
+    {n:2, name:'(분수) × (분수)',   ex:'2/3 × 3/4', gen:genNM3, take:10, old:[3]},
+    {n:3, name:'(분수) ÷ (자연수)', ex:'3/4 ÷ 3', gen:genNM4, take:12, old:[4]},
+    {n:4, name:'(분수) ÷ (분수)',   ex:'3/4 ÷ 3/8', gen:genNM5, take:12, old:[5]}
   ];
-  M.cats=[['NFo','NFmn'],['NFmf'],['NFdn','NFdf','NFdi']];
+  M.cats=[['NFo','NFmn'],['NFmf'],['NFdn'],['NFdf','NFdi']];
   const E=SCHOOLS.find(s=>s.k==='e');
-  E.topics=E.topics.filter(t=>t!=='fast');
   E.sub='덧셈·뺄셈 · 구구단 · □ 구하기 · 나눗셈 · 소수 · 단위 변환 · 혼합계산 · 분수 · 비와 비율';
   const GR={addsub:'1~2학년', gugu:'1~2학년', boxq:'1~2학년',
             div:'3~4학년', dadd:'3~4학년', unit:'3~4학년',
@@ -12700,12 +12710,12 @@ Object.assign(SK_EXT,{
   SL1:{t:'solid',n:'부채꼴 호의 길이'}, SL2:{t:'solid',n:'부채꼴 넓이'}, SL3:{t:'solid',n:'원기둥·원뿔 부피'}, SL4:{t:'solid',n:'구의 겉넓이·부피'},
   CR1:{t:'circ',n:'중심각과 원주각'}, CR2:{t:'circ',n:'지름과 원주각(90°)'}, CR3:{t:'circ',n:'내접사각형·접현각'}, CR4:{t:'circ',n:'원과 현의 길이'},
   DC1:{t:'disc',n:'판별식 D = b²−4ac'}, DC2:{t:'disc',n:'중근 조건 (D = 0)'}, DC3:{t:'disc',n:'이차부등식 정수해(인수분해)'}, DC4:{t:'disc',n:'이차부등식 정수해(전개형)'},
-  AB1:{t:'abs',n:'절댓값 식의 값'}, AB2:{t:'abs',n:'절댓값 방정식 |ax+b|=c'}, AB3:{t:'abs',n:'절댓값 부등식 정수해'},
-  MT1:{t:'mat',n:'행렬의 실수배·덧셈·뺄셈'}, MT2:{t:'mat',n:'2×2 행렬식 ad−bc'}, MT3:{t:'mat',n:'2×2 행렬곱 성분'}, MT4:{t:'mat',n:'단위행렬·거듭제곱'},
+  AB1:{t:'abs',n:'절댓값 식의 값'}, AB2:{t:'abs',n:'절댓값 방정식 |ax+b|=c'}, AB3:{t:'abs',n:'절댓값 부등식의 해 (가장 큰·작은 정수)'}, AB4:{t:'abs',n:'절댓값 부등식 정수해의 개수'},
+  MT0:{t:'mat',n:'행렬의 성분 aᵢⱼ'}, MT1:{t:'mat',n:'행렬의 실수배·덧셈·뺄셈'}, MT2:{t:'mat',n:'2×2 행렬식 ad−bc'}, MT3:{t:'mat',n:'2×2 행렬곱 성분'}, MT4:{t:'mat',n:'단위행렬·거듭제곱'},
   FN1:{t:'fn',n:'합성함수 (f∘g)(a)'}, FN2:{t:'fn',n:'역함수 f⁻¹(a)'}, FN3:{t:'fn',n:'합성·역함수 연계'}, FN4:{t:'fn',n:'유리·무리 함숫값'},
   LM1:{t:'lim',n:'∞/∞ 최고차항 계수비'}, LM2:{t:'lim',n:'0/0 인수분해 약분'}, LM3:{t:'lim',n:'x→0 약분 극한'}, LM4:{t:'lim',n:'0/0 수렴 미정계수'},
-  DF1:{t:'diff',n:'거듭제곱 도함수 계수'}, DF2:{t:'diff',n:'미분계수 f′(a)'}, DF3:{t:'diff',n:'접선 기울기·극값 x'}, DF4:{t:'diff',n:'평균변화율 Δy/Δx'},
-  IG1:{t:'integ',n:'부정적분 계수 역산'}, IG2:{t:'integ',n:'∫₀ᵃ 정수 정적분'}, IG3:{t:'integ',n:'대칭구간 우·기함수 소거'}, IG4:{t:'integ',n:'정적분 성질·상수 적분'}
+  DF1:{t:'diff',n:'거듭제곱 도함수 계수'}, DF2:{t:'diff',n:'미분계수 f′(a)'}, DF3:{t:'diff',n:'접선의 기울기'}, DF5:{t:'diff',n:'극값을 갖는 x'}, DF4:{t:'diff',n:'평균변화율 Δy/Δx'},
+  IG1:{t:'integ',n:'부정적분 계수 역산'}, IG2:{t:'integ',n:'∫₀ᵃ 정수 정적분'}, IG3:{t:'integ',n:'대칭구간 우·기함수 소거'}, IG4:{t:'integ',n:'상수함수의 정적분'}, IG5:{t:'integ',n:'이어진 구간 합치기'}
 });
 
 const mhB=v=>`<b>${MI(v)}</b>`, mhTip=s=>`<span class="tip">${s}</span>`;
@@ -12871,8 +12881,8 @@ function ab2(a,m,d,ask){
 }
 function ab3(w,a,b){
   const expr=a===0?'|x|':`|x ${a<0?'+':'−'} ${Math.abs(a)}|`;
-  if(w==='o') return F({key:`AB3o_${a}_${b}`, sk:'AB3', t:'abs', k:'ab3', w, a, b, cond:`${expr} < ${b} → 정수 개수`, cb:true, eq:['?',{u:'개'}], ans:2*b-1});
-  if(w==='c') return F({key:`AB3c_${a}_${b}`, sk:'AB3', t:'abs', k:'ab3', w, a, b, cond:`${expr} ≤ ${b} → 정수 개수`, cb:true, eq:['?',{u:'개'}], ans:2*b+1});
+  if(w==='o') return F({key:`AB3o_${a}_${b}`, sk:'AB4', t:'abs', k:'ab3', w, a, b, cond:`${expr} < ${b} → 정수 개수`, cb:true, eq:['?',{u:'개'}], ans:2*b-1});
+  if(w==='c') return F({key:`AB3c_${a}_${b}`, sk:'AB4', t:'abs', k:'ab3', w, a, b, cond:`${expr} ≤ ${b} → 정수 개수`, cb:true, eq:['?',{u:'개'}], ans:2*b+1});
   if(w==='m') return F({key:`AB3m_${a}_${b}`, sk:'AB3', t:'abs', k:'ab3', w, a, b, cond:`${expr} ≤ ${b} → 가장 작은 정수`, cb:true, eq:['?'], ans:a-b});
   return F({key:`AB3M_${a}_${b}`, sk:'AB3', t:'abs', k:'ab3', w, a, b, cond:`${expr} < ${b} → 가장 큰 정수`, cb:true, eq:['?'], ans:a+b-1});
 }
@@ -12883,6 +12893,8 @@ function genAB1(){ const r=Math.random();
 }
 function genAB2(){ const a=pickOne([1,1,2,3]), m=mmNz(-6,9), d=ri(3,10); return ab2(a,m,d,pickOne(['b','b','s','h'])); }
 function genAB3(){ return ab3(pickOne(['o','c','m','M']),ri(-8,10),ri(4,12)); }
+const genAB3b=()=>ab3(pickOne(['m','M']),ri(-8,10),ri(3,12));   /* 해의 끝 — 가장 큰·작은 정수 */
+const genAB3n=()=>ab3(pickOne(['o','c']),ri(-8,10),ri(3,12));   /* 정수해의 개수 */
 
 /* ── 5. 행렬의 연산 (mat, 공통수학1, neg:true, fig:true) ── */
 function mt1(k,op,A,B,rc){
@@ -12909,6 +12921,16 @@ function mt4(w,A,n,rc){
   return F({key:`MT4s_${A.join('_')}`, sk:'MT4', t:'mat', k:'mt4', w, A, n:2, rc:1, fig:true,
     cond:'A² 의 (1, 2) 성분', cb:true, eq:['?'], ans:A[0]*A[1]+A[1]*A[3]});
 }
+/* 행렬의 성분 aᵢⱼ — 식으로 정한 2×2 행렬 (11-28: 교육과정 [10공수1-04] 행렬의 뜻·성분. 행렬식 ad−bc 는 교육과정 밖이라 단계에서 뺌) */
+function mt0(w,p,q,r,rc){
+  const fx=poly([[p,'i'],[q,'j'],[r,'']]), ent=(i,j)=>p*i+q*j+r;
+  if(w==='s') return F({key:`MT0s_${p}_${q}_${r}`, sk:'MT0', t:'mat', k:'mt0', w, p, q, r, rc:0,
+    cond:`2×2 행렬 A의 (i, j) 성분 aᵢⱼ = ${fx} · 모든 성분의 합`, cb:true, eq:['?'], ans:ent(1,1)+ent(1,2)+ent(2,1)+ent(2,2)});
+  const i=(rc>>1)+1, j=(rc&1)+1;
+  return F({key:`MT0e_${p}_${q}_${r}_${rc}`, sk:'MT0', t:'mat', k:'mt0', w:'e', p, q, r, rc,
+    cond:`2×2 행렬 A의 (i, j) 성분 aᵢⱼ = ${fx} 일 때`, cb:true, eq:[`a${subN(i)}${subN(j)}`,'=','?'], ans:ent(i,j)});
+}
+const genMT0=()=>mt0(Math.random()<.72?'e':'s',pickOne([1,1,2,3]),pickOne([-2,-1,1,1,2,3]),pickOne([0,0,-1,1,-2,2,3]),ri(0,3));
 const rMat=(lo,hi)=>[ri(lo,hi),ri(lo,hi),ri(lo,hi),ri(lo,hi)];
 const genMT1=()=>mt1(pickOne([2,3]),Math.random()<.5?'+':'-',rMat(-5,7),rMat(-6,7),ri(0,3));
 const genMT2=()=>mt2(rMat(-5,8));
@@ -12971,8 +12993,8 @@ function genFN1(){ for(let g=0;g<40;g++){ const a1=mmNz(-4,5), b1=ri(-8,8), a2=m
   const ans=a1*(a2*x0+b2)+b1; if(Math.abs(ans)<=36&&Math.abs(a2*x0+b2)<=10) return fn1(a1,b1,a2,b2,x0); } return fn1(3,-2,1,5,3); }
 function genFN2(){ for(let g=0;g<40;g++){ const a=pickOne([-4,-3,-2,2,3,4,5]), b=mmNz(-12,12), k=mmNz(-12,15);
   if(Math.abs(a*k+b)<=60) return fn2(a,b,k); } return fn2(3,-5,7); }
-function genFN3(){ for(let g=0;g<40;g++){ const a1=pickOne([-3,-2,2,3,4]), b1=ri(-8,8), a2=pickOne([-2,-1,1,2,3]), b2=ri(-8,8), k=mmNz(-8,12);
-  if(Math.abs(a1*k+b1)<=48&&Math.abs(a2*k+b2)<=48) return fn3(Math.random()<.5?'i':'j',a1,b1,a2,b2,k); } return fn3('i',2,1,1,-4,9); }
+function genFN3(){ for(let g=0;g<40;g++){ const a1=pickOne([-3,-2,2,3,4]), b1=ri(-8,8), a2=pickOne([-2,-1,1,2,3]), b2=ri(-8,8), k=mmNz(-6,9);
+  if(Math.abs(a1*k+b1)<=36&&Math.abs(a2*k+b2)<=36) return fn3(Math.random()<.5?'i':'j',a1,b1,a2,b2,k); } return fn3('i',2,1,1,-4,9); }
 function genFN4(){
   if(Math.random()<.55){ const N=pickOne([12,18,24,30,36,48]), ds=range(2,N).filter(x=>N%x===0&&x<=12&&N/x<=16), d=pickOne(ds), p=mmNz(-6,8);
     return fn4('r',N,p,d,Math.random()<.5?1:0); }
@@ -13031,9 +13053,9 @@ const df2=(a,b,c,d,k)=>F({key:`DF2_${a}_${b}_${c}_${d}_${k}`, sk:'DF2', t:'diff'
 function df3(w,a,b,c,k){
   if(w==='t') return F({key:`DF3t_${a}_${b}_${c}_${k}`, sk:'DF3', t:'diff', k:'df3', w, a, b, c, kk:k,
     cond:`y = ${poly([[a,'x³'],[b,'x²'],[c,'x']])} · x = ${MI(k)} 접선 기울기`, cb:true, eq:['?'], ans:3*a*k*k+2*b*k+c});
-  if(w==='r') return F({key:`DF3r_${a}_${b}`, sk:'DF3', t:'diff', k:'df3', w, a, b,
+  if(w==='r') return F({key:`DF3r_${a}_${b}`, sk:'DF5', t:'diff', k:'df3', w, a, b,
     cond:`y = ${poly([[1,'x³'],[-3*a*a,'x'],[b,'']])} · 양수 극값 x`, cb:true, eq:['x','=','?'], ans:a});
-  return F({key:`DF3z_${a}_${b}`, sk:'DF3', t:'diff', k:'df3', w, a, b,
+  return F({key:`DF3z_${a}_${b}`, sk:'DF5', t:'diff', k:'df3', w, a, b,
     cond:`y = ${poly([[1,'x³'],[-3*a,'x²'],[b,'']])} · 0 아닌 극값 x`, cb:true, eq:['x','=','?'], ans:2*a});
 }
 const df4=(a,b,p,q)=>F({key:`DF4_${a}_${b}_${p}_${q}`, sk:'DF4', t:'diff', k:'df4', a, b, p, q,
@@ -13046,6 +13068,8 @@ function genDF3(){ const r=Math.random();
   if(r<.72) return df3('r',ri(1,6),ri(-5,8),0,0);   /* y = x³ − 3a²x : 3a² ≤ 108 */
   return df3('z',ri(1,8),ri(-5,8),0,0);
 }
+const genDF3t=()=>{ for(let g=0;g<40;g++){ const a=pickOne([-1,1,2]), b=mmNz(-4,4), c=ri(-6,6), k=mmNz(-2,2); if(Math.abs(3*a*k*k+2*b*k+c)<=30) return df3('t',a,b,c,k); } return df3('t',1,-2,3,2); };
+const genDF3e=()=>Math.random()<.5?df3('r',ri(1,6),ri(-5,8),0,0):df3('z',ri(1,8),ri(-5,8),0,0);   /* 극값을 갖는 x */
 function genDF4(){ const a=pickOne([1,1,2,3]), b=ri(-6,6), p=ri(-2,4), q=p+ri(1,5); return df4(a,b,p,q); }
 
 /* ── 9. 다항함수 정적분 (integ, 미적분Ⅰ, neg:true) ── */
@@ -13058,7 +13082,7 @@ const ig3=(u,p,v,r,a)=>F({key:`IG3_${u}_${p}_${v}_${r}_${a}`, sk:'IG3', t:'integ
 function ig4(w,a,b,m,k){
   if(w==='c') return F({key:`IG4c_${a}_${b}_${k}`, sk:'IG4', t:'integ', k:'ig4', w, a, b, kk:k,
     cond:`구간 [${MI(a)}, ${MI(b)}] 상수 정적분`, cb:true, eq:[`∫ ${MI(k)} dx`,'=','?'], ans:k*(b-a)});
-  return F({key:`IG4j_${a}_${m}_${b}_${k}`, sk:'IG4', t:'integ', k:'ig4', w, a, m, b, kk:k,
+  return F({key:`IG4j_${a}_${m}_${b}_${k}`, sk:'IG5', t:'integ', k:'ig4', w, a, m, b, kk:k,
     cond:`[${a}, ${m}] + [${m}, ${b}] 정적분 합`, cb:true, eq:[`∫ ${poly([[2*k,'x']])} dx`,'=','?'], ans:k*(b*b-a*a)});
 }
 const genIG1=()=>ig1(mmNz(-14,16),ri(1,5));
@@ -13072,6 +13096,8 @@ function genIG3(){ for(let g=0;g<60;g++){ const a=pickOne([1,2,2,3]), odd3=Math.
   const u=odd3?mmNz(-5,5):0, v=odd3?0:mmNz(-6,6); let p=a===3?0:mmNz(-2,2), r=mmNz(-4,4);
   if(a!==3&&Math.random()<.3) r=0;
   const ans=2*(p*a*a*a+r*a); if(ans!==0&&Math.abs(ans)<=40) return ig3(u,p,v,r,a); } return ig3(2,1,0,1,2); }
+const genIG4c=()=>{ const a=ri(-3,4), b=a+ri(2,6), k=mmNz(-9,9); return ig4('c',a,b,0,k); };   /* 상수함수의 정적분 */
+const genIG4j=()=>{ const a=ri(0,2), m=ri(a+1,4), b=ri(m+1,5), k=pickOne([1,1,2]); return ig4('j',a,b,m,k); };   /* 이어진 구간 합치기 */
 function genIG4(){
   if(Math.random()<.55){ const a=ri(-3,4), b=a+ri(2,6), k=mmNz(-9,9); return ig4('c',a,b,0,k); }
   const a=ri(0,2), m=ri(a+1,4), b=ri(m+1,5), k=pickOne([1,1,2]); return ig4('j',a,b,m,k);   /* k(b²−a²) ≤ 50 */
@@ -13099,6 +13125,8 @@ function mh9Fact(key){ let m; const R=p=>key.match(new RegExp('^'+p+'$'));
   if(m=R('MT1_(\\d+)_([pm])_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(\\d)'))
     return mt1(+m[1],m[2]==='p'?'+':'-',[+m[3],+m[4],+m[5],+m[6]],[+m[7],+m[8],+m[9],+m[10]],+m[11]);
   if(m=R('MT2_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)')) return mt2([+m[1],+m[2],+m[3],+m[4]]);
+  if(m=R('MT0e_(-?\\d+)_(-?\\d+)_(-?\\d+)_(\\d)')) return mt0('e',+m[1],+m[2],+m[3],+m[4]);
+  if(m=R('MT0s_(-?\\d+)_(-?\\d+)_(-?\\d+)')) return mt0('s',+m[1],+m[2],+m[3],0);
   if(m=R('MT3_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(\\d)'))
     return mt3([+m[1],+m[2],+m[3],+m[4]],[+m[5],+m[6],+m[7],+m[8]],+m[9]);
   if(m=R('MT4([ed])_(-?\\d+)_(-?\\d+)_(-?\\d+)_(-?\\d+)_(\\d+)_(\\d)'))
@@ -13150,6 +13178,12 @@ function mh9Hint(f){
     case 'ab3': return {t:'|x − a| < b ⇔ a − b < x < a + b', lines:[`범위: ${MI(f.a-f.b)} ${f.w==='o'||f.w==='M'?'<':'≤'} x ${f.w==='o'||f.w==='M'?'<':'≤'} ${MI(f.a+f.b)}`, `답 = ${mhB(f.ans)}`]};
     case 'mt1': return {t:'같은 위치 성분끼리 계산해요', lines:[`${f.kk} × ${PV(f.A[f.rc])} ${f.op==='+'?'+':'−'} ${PV(f.B[f.rc])} = ${mhB(f.ans)}`]};
     case 'mt2': return {t:'행렬식 = (주대각 곱) − (부대각 곱)', lines:[`${PV(f.A[0])} × ${PV(f.A[3])} − ${PV(f.A[1])} × ${PV(f.A[2])}`, `= ${MI(f.A[0]*f.A[3])} − ${PV(f.A[1]*f.A[2])} = ${mhB(f.ans)}`]};
+    case 'mt0':{ const ent=(i,j)=>f.p*i+f.q*j+f.r, sub=(i,j)=>{ const a=f.p*i, b=f.q*j;
+        return `${MI(a)} ${b<0?'−':'+'} ${Math.abs(b)}${f.r?` ${f.r<0?'−':'+'} ${Math.abs(f.r)}`:''}`; };
+      if(f.w==='s') return {t:'i(행)와 j(열)에 1, 2를 넣어 네 성분을 모두 구해 더해요',
+        lines:[`a₁₁ = ${MI(ent(1,1))}, a₁₂ = ${MI(ent(1,2))}, a₂₁ = ${MI(ent(2,1))}, a₂₂ = ${MI(ent(2,2))}`, `합 = ${mhB(f.ans)}`]};
+      const i=(f.rc>>1)+1, j=(f.rc&1)+1;
+      return {t:`aᵢⱼ 는 i행 j열의 성분 — i = ${i}, j = ${j} 를 대입해요`, lines:[`a${subN(i)}${subN(j)} = ${sub(i,j)}`, `= ${mhB(f.ans)}`]}; }
     case 'mt3':{ const r=f.rc>>1, c=f.rc&1;
       return {t:`A의 ${r+1}행 × B의 ${c+1}열 내적`, lines:[`${PV(f.A[r*2])}×${PV(f.B[c])} + ${PV(f.A[r*2+1])}×${PV(f.B[2+c])}`, `= ${MI(f.A[r*2]*f.B[c])} + ${PV(f.A[r*2+1]*f.B[2+c])} = ${mhB(f.ans)}`]}; }
     case 'mt4': return f.w==='e'?{t:'단위행렬 E는 주대각이 1, 나머지 0', lines:[`${MI(f.A[f.rc])} + ${f.n} × 1 = ${mhB(f.ans)}`]}
@@ -13188,6 +13222,10 @@ const mh9Variant=f=>{
     mt1:genMT1,mt2:genMT2,mt3:genMT3,mt4:genMT4,fn1:genFN1,fn2:genFN2,fn3:genFN3,fn4:genFN4,
     lm1:genLM1,lm2:genLM2,lm3:genLM3,lm4:genLM4,df1:genDF1,df2:genDF2,df3:genDF3,df4:genDF4,
     ig1:genIG1,ig2:genIG2,ig3:genIG3,ig4:genIG4};
+  if(f.k==='ab3') return /[oc]/.test(f.w)?genAB3n():genAB3b();
+  if(f.k==='df3') return f.w==='t'?genDF3t():genDF3e();
+  if(f.k==='ig4') return f.w==='c'?genIG4c():genIG4j();
+  if(f.k==='mt0') return genMT0();
   return map[f.k]?map[f.k]():f;
 };
 
@@ -13218,52 +13256,54 @@ Object.assign(TOPICS,{
       {n:4, name:'전개형 이차부등식', ex:'x²−10x+9≤0', gen:genDC4, take:10}
     ], cats:[['DC1'],['DC2'],['DC3'],['DC4']]},
   abs:{k:'abs', n:'절댓값 방정식·부등식', sym:'|x|', school:'h', gr:'공통수학1', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'절댓값 계산 · |ax+b|=c 방정식 · |x−a|<b 정수해 개수와 경계',
+    desc:'절댓값 식의 값 · |ax+b|=c 방정식 · |x−a|<b 의 해 · 정수해의 개수',
     stages:[
       {n:1, name:'절댓값 식의 값', ex:'|−12| − |−7|', gen:genAB1, take:12},
       {n:2, name:'|ax + b| = c 방정식', ex:'|2x−6|=14 → 큰 근', gen:genAB2, take:12},
-      {n:3, name:'|x − a| < b 정수해', ex:'|x−3|<7 → □개', gen:genAB3, take:12}
-    ], cats:[['AB1'],['AB2'],['AB3']]},
+      {n:3, name:'|x − a| < b 의 해', ex:'|x−3|<7 → 가장 큰 정수', gen:genAB3b, take:12},
+      {n:4, name:'정수해의 개수', ex:'|x−3|<7 → □개', gen:genAB3n, take:12}
+    ], sv:1, mig:{from:2, map:{1:[1],2:[2],3:[3],4:[3]}, same:[1,2]}, cats:[['AB1'],['AB2'],['AB3'],['AB4']]},
   mat:{k:'mat', n:'행렬의 연산', sym:'[A]', school:'h', gr:'공통수학1', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'2×2 행렬 실수배·덧뺄셈 · 행렬식 ad−bc · 행렬곱 성분 · 단위행렬',
+    desc:'행렬의 성분 · 실수배·덧셈·뺄셈 · 행렬의 곱셈 · 단위행렬·거듭제곱',
     stages:[
-      {n:1, name:'실수배·덧셈·뺄셈', ex:'2A − B 성분', gen:genMT1, take:12},
-      {n:2, name:'2×2 행렬식 ad−bc', ex:'ad − bc = □', gen:genMT2, take:12},
-      {n:3, name:'2×2 행렬곱 성분', ex:'AB 의 (1,1) 성분', gen:genMT3, take:12},
+      {n:1, name:'행렬의 성분 aᵢⱼ', ex:'aᵢⱼ = 2i − j → a₂₁', gen:genMT0, take:12},
+      {n:2, name:'실수배·덧셈·뺄셈', ex:'2A − B 성분', gen:genMT1, take:12},
+      {n:3, name:'행렬의 곱셈', ex:'AB 의 (1,1) 성분', gen:genMT3, take:12},
       {n:4, name:'단위행렬·거듭제곱', ex:'A+3E · A³ 성분', gen:genMT4, take:10}
-    ], cats:[['MT1'],['MT2'],['MT3'],['MT4']]},
+    ], sv:1, mig:{from:2, map:{2:[1],3:[3],4:[4]}, same:[2,3,4]}, cats:[['MT0'],['MT1'],['MT3'],['MT4']]},
   fn:{k:'fn', n:'합성함수·역함수', sym:'f∘g', school:'h', gr:'공통수학2', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
     desc:'합성함수 (f∘g)(a) · 역함수 f⁻¹(a) · 합성·역함수 연계 · 유리·무리 함숫값',
     stages:[
       {n:1, name:'합성함수 (f∘g)(a)', ex:'f(g(3)) = □', gen:genFN1, take:12},
       {n:2, name:'역함수 f⁻¹(a)', ex:'f⁻¹(16) = □', gen:genFN2, take:12},
-      {n:3, name:'합성·역함수 연계', ex:'(f∘g⁻¹)(5) = □', gen:genFN3, take:12},
-      {n:4, name:'유리·무리 함숫값', ex:'12/(x−2) · √(2x+7)', gen:genFN4, take:10}
-    ], cats:[['FN1'],['FN2'],['FN3'],['FN4']]},
+      {n:3, name:'유리·무리 함숫값', ex:'12/(x−2) · √(2x+7)', gen:genFN4, take:10},
+      {n:4, name:'합성·역함수 연계', ex:'(f∘g⁻¹)(5) = □', gen:genFN3, take:12}
+    ], sv:1, mig:{from:2, map:{1:[1],2:[2],3:[4],4:[3]}, same:[1,2,3,4]}, cats:[['FN1'],['FN2'],['FN4'],['FN3']]},
   lim:{k:'lim', n:'함수의 극한', sym:'lim', school:'h', gr:'미적분Ⅰ', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'∞/∞ 최고차항 계수비 · 0/0 인수분해 약분 · x→0 약분 · 수렴 미정계수',
+    desc:'∞/∞ 최고차항 계수비 · x→0 약분 · 0/0 인수분해 약분 · 수렴 미정계수',
     stages:[
       {n:1, name:'∞/∞ 최고차항 계수비', ex:'(12x²+5x)/(3x²−1)', gen:genLM1, take:12},
-      {n:2, name:'0/0 인수분해 약분', ex:'(x²−36)/(x−6)', gen:genLM2, take:12},
-      {n:3, name:'x → 0 약분 극한', ex:'(5x²+14x)/(2x)', gen:genLM3, take:12},
+      {n:2, name:'x → 0 약분 극한', ex:'(5x²+14x)/(2x)', gen:genLM3, take:12},
+      {n:3, name:'0/0 인수분해 약분', ex:'(x²−36)/(x−6)', gen:genLM2, take:12},
       {n:4, name:'0/0 수렴 미정계수', ex:'분자=0 → a=□', gen:genLM4, take:10}
-    ], cats:[['LM1'],['LM2'],['LM3'],['LM4']]},
+    ], sv:1, mig:{from:2, map:{1:[1],2:[3],3:[2],4:[4]}, same:[1,2,3,4]}, cats:[['LM1'],['LM3'],['LM2'],['LM4']]},
   diff:{k:'diff', n:'다항함수 미분', sym:'f′(x)', school:'h', gr:'미적분Ⅰ', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'거듭제곱 도함수 · 미분계수 f′(a) · 접선 기울기·극값 · 평균변화율',
+    desc:'거듭제곱 도함수 · 미분계수와 접선의 기울기 · 평균변화율 · 극값을 갖는 x',
     stages:[
       {n:1, name:'거듭제곱 도함수', ex:'(4x⁵)′ = □x⁴', gen:genDF1, take:12},
-      {n:2, name:'미분계수 f′(a)', ex:'f′(2) = □', gen:genDF2, take:12},
-      {n:3, name:'접선 기울기·극값 x', ex:'f′(x)=0 → x', gen:genDF3, take:12},
-      {n:4, name:'평균변화율 Δy/Δx', ex:'[1, 5] 평균변화율', gen:genDF4, take:10}
-    ], cats:[['DF1'],['DF2'],['DF3'],['DF4']]},
+      {n:2, name:'미분계수 · 접선의 기울기', ex:'f′(2) = □', gen:()=>Math.random()<.65?genDF2():genDF3t(), take:12},
+      {n:3, name:'평균변화율 Δy/Δx', ex:'[1, 5] 평균변화율', gen:genDF4, take:10},
+      {n:4, name:'극값을 갖는 x', ex:'f′(x)=0 → x', gen:genDF3e, take:12}
+    ], sv:1, mig:{from:2, map:{1:[1],2:[2],3:[4],4:[3]}, same:[1,3]}, cats:[['DF1'],['DF2'],['DF3'],['DF4'],['DF5']]},
   integ:{k:'integ', n:'다항함수 정적분', sym:'∫dx', school:'h', gr:'미적분Ⅰ', neg:true, col:'#2f5bea', soft:'#eef2fe', lit:'#2f5bea',
-    desc:'부정적분 계수 · ∫₀ᵃ 정수 정적분 · 대칭구간 우·기함수 소거 · 구간 성질',
+    desc:'부정적분 계수 · 상수함수의 정적분 · ∫₀ᵃ 정적분 · 이어진 구간 합치기 · 대칭구간 우·기함수',
     stages:[
       {n:1, name:'부정적분 계수 역산', ex:'∫12x³dx = □x⁴+C', gen:genIG1, take:12},
-      {n:2, name:'∫₀ᵃ 정수 정적분', ex:'∫₀² (3x²+4x) dx', gen:genIG2, take:12},
-      {n:3, name:'대칭구간 우·기함수', ex:'∫₋₂² 홀수차 소거', gen:genIG3, take:12},
-      {n:4, name:'정적분 성질·상수', ex:'∫₂⁷ 5 dx = □', gen:genIG4, take:10}
-    ], cats:[['IG1'],['IG2'],['IG3'],['IG4']]}
+      {n:2, name:'상수함수의 정적분', ex:'∫₂⁷ 5 dx = □', gen:genIG4c, take:10},
+      {n:3, name:'∫₀ᵃ 정수 정적분', ex:'∫₀² (3x²+4x) dx', gen:genIG2, take:12},
+      {n:4, name:'이어진 구간 합치기', ex:'∫₁³ + ∫₃⁴ = ∫₁⁴', gen:genIG4j, take:10},
+      {n:5, name:'대칭구간 우·기함수', ex:'∫₋₂² 홀수차 소거', gen:genIG3, take:12}
+    ], sv:1, mig:{from:2, map:{1:[1],2:[4],3:[2],4:[4],5:[3]}, same:[1,3,5]}, cats:[['IG1'],['IG4'],['IG2'],['IG5'],['IG3']]}
 });
 Object.assign(TOPIC_SYMH,{
   solid:'<span style="font-size:.72em">□π</span>', circ:'<span style="font-size:.82em">⊙</span>',
@@ -13291,27 +13331,29 @@ function mh9Preview(t,n){
           ()=>H(dc4('c',1,9),'먼저 인수분해해 두 경계를 구한 뒤 정수 개수를 세요.',{body:neg})],
     abs:[()=>H(ab1('s',-12,-7),'절댓값 |a|는 0까지의 거리라 항상 0 이상이에요.',{body:neg}),
          ()=>H(ab2(2,3,7,'b'),'|ax + b| = c 는 ax + b = ±c 두 경우로 바로 풀어요.',{body:neg}),
-         ()=>H(ab3('o',3,7),'|x − a| < b 는 a − b < x < a + b (정수 2b − 1개)!',{body:neg})],
-    mat:[()=>H(mt1(2,'-',[3,-2,4,5],[1,6,-2,3],1),'행렬의 덧셈·뺄셈·실수배는 같은 자리 성분끼리만 계산해요.',{body:neg}),
-         ()=>H(mt2([4,3,2,5]),'2×2 행렬식 = ad − bc (주대각 곱 − 부대각 곱).',{body:neg}),
+         ()=>H(ab3('M',3,7),'|x − a| < b 는 a − b < x < a + b. 양 끝 a − b, a + b 는 등호가 없으면 빠져요.',{body:neg}),
+         ()=>H(ab3('o',3,7),'|x − a| < b 의 정수는 2b − 1개, |x − a| ≤ b 는 2b + 1개예요.',{body:neg})],
+    mat:[()=>H(mt0('e',2,-1,0,2),'aᵢⱼ 는 i행 j열에 있는 성분이에요. i(행 번호), j(열 번호)를 식에 넣어요.',{body:neg}),
+         ()=>H(mt1(2,'-',[3,-2,4,5],[1,6,-2,3],1),'행렬의 덧셈·뺄셈·실수배는 같은 자리 성분끼리만 계산해요.',{body:neg}),
          ()=>H(mt3([2,3,1,4],[5,-1,2,3],0),'AB의 (i, j) 성분 = A의 i행과 B의 j열을 짝지어 곱해 더해요.',{body:neg}),
          ()=>H(mt4('d',[3,0,0,-2],3,0),'단위행렬 E는 주대각만 1, 대각행렬의 거듭제곱은 대각성분만 거듭제곱!',{body:neg})],
     fn:[()=>H(fn1(3,-2,1,5,3),'합성함수 (f ∘ g)(a) = f(g(a)). 안쪽 g(a)부터 계산해 f에 넣어요.',{body:neg}),
         ()=>H(fn2(3,-5,7),'f⁻¹(y) = k 는 f(k) = y 와 같아요. 방정식을 거꾸로 풀어요.',{body:neg}),
-        ()=>H(fn3('i',2,1,1,-4,9),'안쪽 역함수 값부터 구한 뒤 바깥 함수에 대입해요.',{body:neg}),
-        ()=>H(fn4('r',12,2,3,0),'유리함수는 분모 약분, 무리함수는 근호 안 제곱수를 빠르게 읽어요.',{body:neg})],
+        ()=>H(fn4('r',12,2,3,0),'유리함수는 분모 약분, 무리함수는 근호 안 제곱수를 빠르게 읽어요.',{body:neg}),
+        ()=>H(fn3('i',2,1,1,-4,9),'안쪽 역함수 값부터 구한 뒤 바깥 함수에 대입해요.',{body:neg})],
     lim:[()=>H(lm1('q',12,5,3,-1),'x → ∞ 의 (다항식)/(다항식) 극한은 최고차항 계수의 비예요.',{body:neg}),
-         ()=>H(lm2('d',6,0),'0/0 꼴은 분자를 인수분해해 0이 되는 인수를 약분한 뒤 대입해요.',{body:neg}),
          ()=>H(lm3(1,5,14,2),'x → 0 에서는 가장 낮은 차수로 약분하고 x = 0 을 넣어요.',{body:neg}),
+         ()=>H(lm2('d',6,0),'0/0 꼴은 분자를 인수분해해 0이 되는 인수를 약분한 뒤 대입해요.',{body:neg}),
          ()=>H(lm4('c',3,-1),'분모가 0으로 가는데 수렴하면 분자도 반드시 0으로 가야 해요.',{body:neg})],
     diff:[()=>H(df1(4,5),'거듭제곱 미분: (axⁿ)′ = anxⁿ⁻¹. 지수를 앞으로 내려 곱해요.',{body:neg}),
-          ()=>H(df2(1,-3,5,0,2),'항마다 미분해 f′(x)를 구한 뒤 x 값을 대입해요.',{body:neg}),
-          ()=>H(df3('t',1,-6,0,3),'접선의 기울기는 f′(a), 극값 위치는 f′(x) = 0 의 해예요.',{body:neg}),
-          ()=>H(df4(1,3,1,5),'이차함수 ax²+bx 의 [p, q] 평균변화율은 a(p+q)+b 로 2초 컷!',{body:neg})],
+          ()=>H(df2(1,-3,5,0,2),'항마다 미분해 f′(x)를 구한 뒤 x 값을 대입해요. x = a 에서 접선의 기울기도 f′(a)예요.',{body:neg}),
+          ()=>H(df4(1,3,1,5),'이차함수 ax²+bx 의 [p, q] 평균변화율은 a(p+q)+b 로 2초 컷!',{body:neg}),
+          ()=>H(df3('z',3,2,0,0),'극값을 갖는 x 는 f′(x) = 0 의 해예요. 공통인수 x 로 묶으면 빨라요.',{body:neg})],
     integ:[()=>H(ig1(3,3),'부정적분: 지수에 1을 더하고, 계수를 (지수 + 1)로 나눠요.',{body:neg}),
+           ()=>H(ig4('c',2,7,0,5),'상수함수의 정적분은 높이 × 구간의 길이예요.',{body:neg}),
            ()=>H(ig2(1,2,0,2),'아래끝이 0이면 원시함수 F(a)만 계산하면 끝!',{body:neg}),
-           ()=>H(ig3(5,1,-7,1,2),'대칭구간 [−a, a]에서 홀수차(x³, x)는 0으로 사라지고, 짝수차만 2배!',{body:neg}),
-           ()=>H(ig4('c',2,7,0,5),'상수 적분은 높이 × 구간길이, 이어진 구간은 하나로 합쳐 계산해요.',{body:neg})]
+           ()=>H(ig4('j',1,4,3,1),'끝과 처음이 이어진 두 구간은 하나로 합쳐 한 번에 계산해요.',{body:neg}),
+           ()=>H(ig3(5,1,-7,1,2),'대칭구간 [−a, a]에서 홀수차(x³, x)는 0으로 사라지고, 짝수차만 2배!',{body:neg})]
   };
   return (P[t]&&(P[t][n-1]||P[t][0]))();
 }
@@ -13331,27 +13373,27 @@ function mh9Note(t,fh){
       memo:[{h:'핵심 공식', html:chipList(['D = <b>b² − 4ac</b>','중근 ⇔ <b>D = 0</b>','a < x < b 정수: <b>b − a − 1</b>','a ≤ x ≤ b 정수: <b>b − a + 1</b>'])}],
       ways:[fh('판별식 D','x²−6x+5=0',dc1(1,-6,5)),fh('중근 k','x²−8x+k=0',dc2(1,-4)),fh('정수 개수','(x−2)(x−9)<0',dc3('o',2,9))],
       miss:[{w:'(x−2)(x−9) < 0 → 9 − 2 = 7개', r:'6개', y:'양 끝 2와 9가 포함되지 않으므로 9 − 2 − 1 = 6개예요.'}]},
-    abs:{sub:'절댓값 식 · |ax+b|=c 방정식 · |x−a|<b 부등식',
+    abs:{sub:'절댓값 식 · |ax+b|=c 방정식 · |x−a|<b 의 해 · 정수해의 개수',
       memo:[{h:'핵심 성질', html:tb(['|A| = c ⇔ <b>A = c 또는 A = −c</b>','|x − a| < b ⇔ a − b < x < a + b (정수 <b>2b − 1</b>개)','|x − a| ≤ b ⇔ a − b ≤ x ≤ a + b (정수 <b>2b + 1</b>개)'])}],
       ways:[fh('절댓값 뺄셈','|−12| − |−7|',ab1('s',-12,-7)),fh('절댓값 방정식','|2x−6|=14',ab2(2,3,7,'b')),fh('정수 개수','|x−3|<7',ab3('o',3,7))],
       miss:[{w:'|−12| − |−7| = −5', r:'5', y:'|−12| = 12, |−7| = 7 이므로 12 − 7 = 5예요.'}]},
-    mat:{sub:'2×2 행렬 실수배·덧뺄셈 · 행렬식 ad−bc · 행렬곱 · 단위행렬',
-      memo:[{h:'핵심 공식', html:tb(['<b>행렬식</b>: ad − bc','<b>행렬곱 AB의 (i, j) 성분</b>: A의 i행 × B의 j열 내적','<b>단위행렬 E</b>: 주대각 1, 나머지 0 · 대각행렬 거듭제곱은 대각성분만 거듭제곱'])}],
-      ways:[fh('실수배·뺄셈','2A − B (1,2)',mt1(2,'-',[3,-2,4,5],[1,6,-2,3],1)),fh('행렬식','ad − bc',mt2([4,3,2,5])),fh('행렬곱','AB (1,1)',mt3([2,3,1,4],[5,-1,2,3],0))],
+    mat:{sub:'행렬의 성분 · 실수배·덧뺄셈 · 행렬의 곱셈 · 단위행렬',
+      memo:[{h:'핵심 공식', html:tb(['<b>성분 aᵢⱼ</b>: i행 j열에 있는 수','<b>행렬곱 AB의 (i, j) 성분</b>: A의 i행 × B의 j열 내적','<b>단위행렬 E</b>: 주대각 1, 나머지 0 · 대각행렬 거듭제곱은 대각성분만 거듭제곱'])}],
+      ways:[fh('실수배·뺄셈','2A − B (1,2)',mt1(2,'-',[3,-2,4,5],[1,6,-2,3],1)),fh('성분','aᵢⱼ = 2i − j → a₂₁',mt0('e',2,-1,0,2)),fh('행렬곱','AB (1,1)',mt3([2,3,1,4],[5,-1,2,3],0))],
       miss:[{w:'AB의 (1,1) 성분 = a₁₁ × b₁₁', r:'a₁₁b₁₁ + a₁₂b₂₁', y:'행렬곱은 같은 자리끼리 곱하는 게 아니라 1행과 1열의 내적이에요!'}]},
     fn:{sub:'합성함수 (f∘g)(a) · 역함수 f⁻¹(a) · 유리·무리 함숫값',
       memo:[{h:'핵심 공식', html:tb(['<b>(f ∘ g)(a) = f(g(a))</b> (오른쪽 함수부터 계산!)','<b>f⁻¹(y) = k ⇔ f(k) = y</b> (방정식을 거꾸로 풀기)'])}],
       ways:[fh('합성함수','(f∘g)(3)',fn1(3,-2,1,5,3)),fh('역함수','f⁻¹(16)',fn2(3,-5,7)),fh('연계','(f∘g⁻¹)(5)',fn3('i',2,1,1,-4,9))],
       miss:[{w:'(f∘g)(a) = g(f(a))', r:'f(g(a))', y:'합성함수는 뒤쪽(안쪽) g(a)부터 먼저 계산해서 f에 넣어요.'}]},
-    lim:{sub:'∞/∞ 계수비 · 0/0 인수분해 약분 · x→0 약분 · 수렴 미정계수',
+    lim:{sub:'∞/∞ 계수비 · x→0 약분 · 0/0 인수분해 약분 · 수렴 미정계수',
       memo:[{h:'부정형 2초 컷 규칙', html:tb(['<b>∞/∞</b>: 분모·분자 차수가 같으면 최고차항 계수비','<b>0/0</b>: 0을 만드는 인수를 약분한 뒤 대입','<b>수렴 조건</b>: 분모 → 0 이면 분자도 → 0'])}],
       ways:[fh('∞/∞ 계수비','(12x²+5x)/(3x²−1)',lm1('q',12,5,3,-1)),fh('0/0 약분','(x²−36)/(x−6)',lm2('d',6,0)),fh('수렴 조건','x→3 분자=0',lm4('c',3,-1))],
       miss:[{w:'lim(x→6) (x²−36)/(x−6) = 6', r:'12', y:'약분하면 x + 6 이 남으므로 6 + 6 = 12예요.'}]},
-    diff:{sub:'거듭제곱 도함수 · 미분계수 f′(a) · 접선·극값 · 평균변화율',
+    diff:{sub:'거듭제곱 도함수 · 미분계수와 접선의 기울기 · 평균변화율 · 극값을 갖는 x',
       memo:[{h:'핵심 공식', html:chipList(['(xⁿ)′ = <b>nxⁿ⁻¹</b>','(상수)′ = <b>0</b>','접선 기울기 = <b>f′(a)</b>','극값 ⇔ <b>f′(x) = 0</b>','이차 평균변화율 = <b>a(p+q)+b</b>'])}],
       ways:[fh('도함수','(4x⁵)′',df1(4,5)),fh('미분계수','f′(2)',df2(1,-3,5,0,2)),fh('극값 x','x³−12x+1',df3('r',2,1,0,0)),fh('평균변화율','[1, 5]',df4(1,3,1,5))],
       miss:[{w:'(4x⁵)′ = 4x⁴', r:'20x⁴', y:'지수 5를 앞으로 내려 기존 계수 4와 곱해야 해요: 4 × 5 = 20.'}]},
-    integ:{sub:'부정적분 계수 · ∫₀ᵃ 정수 정적분 · 대칭구간 우·기함수 · 성질',
+    integ:{sub:'부정적분 계수 · 상수함수 · ∫₀ᵃ 정적분 · 구간 합치기 · 대칭구간 우·기함수',
       memo:[{h:'핵심 공식', html:chipList(['∫ axⁿ dx = <b>(a/(n+1))xⁿ⁺¹ + C</b>','대칭구간 홀수차 = <b>0</b>','대칭구간 짝수차 = <b>2 × ∫₀ᵃ</b>','∫ₐᵇ k dx = <b>k(b − a)</b>'])}],
       ways:[fh('부정적분','∫ 12x³ dx',ig1(3,3)),fh('0부터 적분','∫₀² (3x²+4x) dx',ig2(1,2,0,2)),fh('대칭구간 소거','∫₋₂²',ig3(5,1,-7,1,2)),fh('구간 합치기','[1,4]+[4,5]',ig4('j',1,5,4,1))],
       miss:[{w:'∫ 12x³ dx = 36x⁴ + C', r:'3x⁴ + C', y:'미분은 곱하고, 적분은 새 지수(3+1 = 4)로 나눠요: 12 ÷ 4 = 3.'}]}
@@ -13499,8 +13541,7 @@ function paintTRank(rows){
 function openTStudent(sid){ tTab='stu'; tOpen=sid; tClass=''; paintTeacher();
   setTimeout(()=>{ const e=document.querySelector('.stu.open'); if(e) e.scrollIntoView({behavior:'smooth',block:'start'}); },60); }
 /* 학생 한 명의 주제별 연습·실전 한눈에 */
-function tPracOf(u,t){ const T=topicOf(t), V=STAGE_V+(T.sv||0), P=(u.P||{})[t];
-  return P&&P.v===V?P:{c:[],bt:{}}; }
+function tPracOf(u,t){ const P=(u.P||{})[t]; return P&&TOPICS[t]?progNorm(t,P):{c:[],bt:{}}; }
 function tOverview(u){
   const tops=TOPIC_ORDER.filter(t=>topicOpen(t)||((u.R||{})[t]&&(u.R[t].best||0)>0)||((u.P||{})[t]&&((u.P[t].c||[]).length)));
   if(!tops.length) return '<div class="hint">아직 기록이 없습니다.</div>';
@@ -14975,47 +15016,47 @@ function strongStages(fs){
    예) 피타고라스 수에서 막히면 제곱수부터 · 일차방정식의 분수 계수에서 막히면 분수의 통분·곱셈부터          */
 const PREQ={
   'addsub:3':[['addsub',1]], 'addsub:4':[['addsub',2]], 'addsub:5':[['addsub',3],['addsub',4]],
-  'gugu:9':[['gugu',8],['gugu',6],['gugu',7]], 'gugu:10':[['gugu',1]],
-  'boxq:1':[['addsub',3],['addsub',4]], 'boxq:2':[['gugu',9]], 'boxq:3':[['boxq',1],['boxq',2]],
-  'fadd:1':[['addsub',1]], 'fadd:2':[['gugu',9]], 'fadd:3':[['fadd',2]], 'int:5':[['int',4],['int',3]], 'expo:5':[['expo',2],['expo',3]], 'root:4':[['root',2]], 'root:5':[['root',2],['root',3]], 'ratio:4':[['ratio',1]],
-  'fmul:1':[['gugu',9]], 'fmul:2':[['fadd',2]], 'fmul:3':[['fmul',1],['fmul',2]],
+  'gugu:2':[['gugu',1]], 'gugu:3':[['gugu',2]], 'gugu:4':[['gugu',3]], 'gugu:5':[['gugu',4],['gugu',3]],
+  'boxq:1':[['addsub',3],['addsub',4]], 'boxq:2':[['gugu',5]], 'boxq:3':[['boxq',1],['boxq',2]],
+  'fadd:1':[['addsub',1]], 'fadd:2':[['gugu',5]], 'fadd:3':[['fadd',2]], 'int:5':[['int',4],['int',3]], 'expo:5':[['expo',2],['expo',3]], 'root:4':[['root',2]], 'root:5':[['root',2],['root',3]], 'ratio:4':[['ratio',1]],
+  'fmul:1':[['gugu',5]], 'fmul:2':[['fadd',2]], 'fmul:3':[['fmul',1]], 'fmul:4':[['fmul',2],['fmul',3]],
   'dadd:1':[['addsub',1],['addsub',2]], 'dadd:2':[['dadd',1]], 'dadd:3':[['addsub',3],['addsub',4]], 'dadd:4':[['boxq',1]],
-  'dmul:1':[['gugu',9]], 'dmul:2':[['dmul',1]], 'dmul:3':[['gugu',9]], 'dmul:4':[['dmul',3]],
-  'ratio:1':[['gugu',9],['fadd',2]], 'ratio:2':[['gugu',9],['boxq',2]], 'ratio:3':[['ratio',1],['fmul',1]],
-  'int:1':[['addsub',3],['addsub',4]], 'int:2':[['int',1]], 'int:3':[['gugu',9]], 'int:4':[['int',3],['power',1]],
-  'power:1':[['gugu',9]], 'power:2':[['power',1]], 'power:3':[['power',1]],
+  'dmul:1':[['gugu',5]], 'dmul:2':[['dmul',1]], 'dmul:3':[['gugu',5]], 'dmul:4':[['dmul',3]],
+  'ratio:1':[['gugu',5],['fadd',2]], 'ratio:2':[['gugu',5],['boxq',2]], 'ratio:3':[['ratio',1],['fmul',1]],
+  'int:1':[['addsub',3],['addsub',4]], 'int:2':[['int',1]], 'int:3':[['gugu',5]], 'int:4':[['int',3],['power',1]],
+  'power:1':[['gugu',5]], 'power:2':[['power',1]], 'power:3':[['power',1]],
   'lineq:1':[['int',1],['boxq',1]], 'lineq:2':[['boxq',3],['int',3]], 'lineq:3':[['int',2],['lineq',2]], 'lineq:4':[['fadd',2],['fmul',2],['int',3]],
-  'expo:1':[['power',1],['power',2]], 'expo:2':[['expo',1]], 'expo:3':[['expo',2],['gugu',9]], 'expo:4':[['expo',3]],
-  'pyth:1':[['power',1]], 'pyth:2':[['power',1],['power',3]], 'pyth:3':[['pyth',1],['gugu',9]],
-  'root:1':[['power',1],['power',3]], 'root:2':[['power',1],['root',1]], 'root:3':[['root',2],['gugu',9]],
-  'factor:1':[['gugu',9]], 'factor:2':[['power',1]], 'factor:3':[['power',1]], 'factor:4':[['int',3],['gugu',9]], 'factor:5':[['factor',4]],
+  'expo:1':[['power',1],['power',2]], 'expo:2':[['expo',1]], 'expo:3':[['expo',2],['gugu',5]], 'expo:4':[['expo',3]],
+  'pyth:1':[['power',1]], 'pyth:2':[['power',1],['power',3]], 'pyth:3':[['pyth',1],['gugu',5]],
+  'root:1':[['power',1],['power',3]], 'root:2':[['power',1],['root',1]], 'root:3':[['root',2],['gugu',5]],
+  'factor:1':[['gugu',5]], 'factor:2':[['power',1]], 'factor:3':[['power',1]], 'factor:4':[['int',3],['gugu',5]], 'factor:5':[['factor',4]],
   'trig:1':[['root',1]], 'trig:2':[['pyth',1],['fadd',2]], 'trig:3':[['trig',1]], 'trig:4':[['trig',1],['root',3]],
-  'logx:1':[['expo',1],['root',1]], 'logx:2':[['expo',1],['power',2]], 'logx:3':[['logx',2]], 'logx:4':[['logx',2],['expo',2]],
-  'tfn:1':[['fmul',2]], 'tfn:2':[['trig',1]], 'tfn:3':[['tfn',2],['trig',2]], 'tfn:4':[['tfn',2]], 'tfn:5':[['trig',4],['root',2]],
-  'pfac:2':[['pfac',1]], 'pfac:3':[['gugu',9]], 'pfac:4':[['pfac',3]],
+  'logx:1':[['expo',1],['root',1]], 'logx:2':[['logx',1],['expo',2]], 'logx:3':[['expo',1],['power',2]], 'logx:4':[['logx',3]], 'logx:5':[['logx',3],['expo',2]],
+  'tfn:1':[['fmul',2]], 'tfn:2':[['tfn',1],['solid',1]], 'tfn:3':[['trig',1]], 'tfn:4':[['tfn',3],['trig',2]], 'tfn:5':[['tfn',3]], 'tfn:6':[['trig',4],['root',2]],
+  'pfac:2':[['pfac',1]], 'pfac:3':[['gugu',5]], 'pfac:4':[['pfac',3]],
   'linf:1':[['int',3]], 'linf:2':[['lineq',1]], 'linf:3':[['int',2]], 'linf:4':[['linf',3],['lineq',2]],
   'angle:2':[['angle',1]], 'angle:3':[['angle',2]],
   'simr:2':[['simr',1],['power',1]], 'simr:3':[['simr',1],['power',2]], 'simr:4':[['simr',2]],
-  'comb:1':[['gugu',9]], 'comb:2':[['comb',1]], 'comb:3':[['comb',1],['comb',2]],
-  'div:1':[['gugu',9]], 'div:2':[['div',1]], 'div:3':[['div',2]],
-  'mix:1':[['gugu',9],['div',1]], 'mix:2':[['mix',1]], 'mix:3':[['mix',2]],
-  'unit:1':[['dmul',1]], 'unit:2':[['gugu',6],['addsub',3]], 'unit:3':[['dmul',1]],
+  'comb:1':[['gugu',5]], 'comb:2':[['comb',1]], 'comb:3':[['comb',2]], 'comb:4':[['comb',2],['comb',3]], 'comb:5':[['comb',2],['comb',3]],
+  'div:1':[['gugu',5]], 'div:2':[['div',1]], 'div:3':[['div',2]],
+  'mix:1':[['gugu',5],['div',1]], 'mix:2':[['mix',1]], 'mix:3':[['mix',2]],
+  'unit:1':[['dmul',1]], 'unit:2':[['gugu',3],['addsub',3]], 'unit:3':[['dmul',1]],
   'alg:1':[['int',1]], 'alg:2':[['int',3],['alg',1]], 'alg:3':[['alg',2]],
   'ineq:1':[['lineq',1]], 'ineq:2':[['lineq',2],['ineq',1]], 'ineq:3':[['int',3],['ineq',2]],
   'sys:1':[['int',1]], 'sys:2':[['sys',1],['alg',3]], 'sys:3':[['sys',2],['lineq',2]],
   'quad:1':[['power',1],['alg',2]], 'quad:2':[['quad',1]], 'quad:3':[['factor',4]], 'quad:4':[['quad',3]],
-  'cplx:1':[['int',4]], 'cplx:2':[['alg',1]], 'cplx:3':[['quad',1],['cplx',1]],
-  'rem:1':[['int',4],['linf',1]], 'rem:2':[['quad',1]], 'rem:3':[['quad',4],['rem',2]],
-  'seq:1':[['addsub',3],['gugu',9]], 'seq:2':[['seq',1],['int',3]], 'seq:3':[['expo',1]], 'seq:4':[['seq',2]],
-  'solid:1':[['fmul',1],['angle',1]], 'solid:2':[['solid',1],['power',1]], 'solid:3':[['power',1],['gugu',9]], 'solid:4':[['power',2]],
+  'cplx:1':[['int',4]], 'cplx:2':[['cplx',1],['int',5]], 'cplx:3':[['alg',1]], 'cplx:4':[['quad',1],['cplx',1]], 'cplx:5':[['quad',1],['cplx',2]],
+  'rem:1':[['int',4],['linf',1]], 'rem:2':[['rem',1],['lineq',2]], 'rem:3':[['quad',1]], 'rem:4':[['quad',4],['rem',3]],
+  'seq:1':[['addsub',3],['gugu',5]], 'seq:2':[['seq',1],['int',3]], 'seq:3':[['expo',1]], 'seq:4':[['seq',2]],
+  'solid:1':[['fmul',1],['angle',1]], 'solid:2':[['solid',1],['power',1]], 'solid:3':[['power',1],['gugu',5]], 'solid:4':[['power',2]],
   'circ:1':[['angle',1]], 'circ:2':[['circ',1]], 'circ:3':[['circ',1],['angle',1]], 'circ:4':[['pyth',1]],
   'disc:1':[['power',1],['int',5]], 'disc:2':[['disc',1],['factor',2]], 'disc:3':[['ineq',1]], 'disc:4':[['factor',4],['disc',3]],
-  'abs:1':[['int',1]], 'abs:2':[['lineq',2],['abs',1]], 'abs:3':[['ineq',1],['abs',1]],
-  'mat:1':[['int',5]], 'mat:2':[['int',3],['int',1]], 'mat:3':[['mat',2]], 'mat:4':[['power',2],['mat',1]],
-  'fn:1':[['linf',1]], 'fn:2':[['lineq',2],['fn',1]], 'fn:3':[['fn',1],['fn',2]], 'fn:4':[['root',1],['fn',2]],
-  'lim:1':[['div',1]], 'lim:2':[['factor',4],['rem',1]], 'lim:3':[['div',1]], 'lim:4':[['rem',1],['lineq',1]],
-  'diff:1':[['gugu',9],['expo',1]], 'diff:2':[['diff',1],['rem',1]], 'diff:3':[['diff',2],['quad',3]], 'diff:4':[['linf',3],['diff',1]],
-  'integ:1':[['div',1],['diff',1]], 'integ:2':[['integ',1],['power',2]], 'integ:3':[['integ',2]], 'integ:4':[['integ',2]]
+  'abs:1':[['int',1]], 'abs:2':[['lineq',2],['abs',1]], 'abs:3':[['ineq',1],['abs',1]], 'abs:4':[['abs',3]],
+  'mat:1':[['int',5]], 'mat:2':[['int',3],['int',1]], 'mat:3':[['mat',2]], 'mat:4':[['power',2],['mat',3]],
+  'fn:1':[['linf',1]], 'fn:2':[['lineq',2],['fn',1]], 'fn:3':[['root',1],['fn',2]], 'fn:4':[['fn',1],['fn',2]],
+  'lim:1':[['div',1]], 'lim:2':[['div',1]], 'lim:3':[['factor',4],['rem',1]], 'lim:4':[['rem',1],['lineq',1]],
+  'diff:1':[['gugu',5],['expo',1]], 'diff:2':[['diff',1],['rem',1]], 'diff:3':[['linf',3],['diff',1]], 'diff:4':[['diff',2],['quad',3]],
+  'integ:1':[['div',1],['diff',1]], 'integ:2':[['int',3]], 'integ:3':[['integ',1],['power',2]], 'integ:4':[['integ',3]], 'integ:5':[['integ',3]]
 };
 const stName=(t,n)=>{ const s=(TOPICS[t]&&TOPICS[t].stages||[]).find(x=>x.n===n); return s?s.name:''; };
 const hasStage=(t,n)=>!!(TOPICS[t]&&TOPICS[t].stages.some(s=>s.n===n));
@@ -15308,12 +15349,15 @@ function nickErr(s){ s=String(s||'').trim();
   if(/^[\d ]+$/.test(s)) return '숫자만으로는 지을 수 없어요 (학번과 헷갈려요).';
   const z=s.replace(/[ _]/g,'').toLowerCase(); if(NICK_BAD.some(w=>z.includes(w))) return '쓸 수 없는 낱말이 들어 있어요.';
   return ''; }
+/* 불러올 때 — 단계를 다시 짠 주제의 예전 판 기록만 바로 새 단계로 옮겨요(나머지는 그대로) */
+function migP(P){ const o=Object.assign({},P||{});
+  Object.keys(o).forEach(t=>{ const T=TOPICS[t], p=o[t]; if(T&&T.mig&&p&&p.v===T.mig.from) o[t]=progNorm(t,p); }); return o; }
 function meFrom(sid,u){
   const ownS=arr(u.ownS).filter(k=>CH_SHAPES.some(x=>x.k===k));
   const ownC=arr(u.ownC).filter(k=>CH_COLORS.some(x=>x.k===k));
   return {sid, ch:Object.assign(cleanCh(u.ch),{cl:shortCls(sid)}), coin:u.coin||0, own:arr(u.own).filter(id=>ITEM(id)),
           ownS:ownS.length?ownS:null, ownC:ownC.length?ownC:null,
-          sc:u.sc||'', boxN:u.boxN||0, R:u.R||{}, P:u.P||{}, pc:u.pc||null, W:u.W||{}, fs:u.fs||{},
+          sc:u.sc||'', boxN:u.boxN||0, R:u.R||{}, P:migP(u.P), pc:u.pc||null, W:u.W||{}, fs:u.fs||{},
           hu:u.hu||0, bt:u.bt||null, bw:u.bw||0, bp:u.bp||0, bh:arr(u.bh), h:u.h||'', cu:Object.assign({},u.cu||{}),
           att:u.att||null, ms:u.ms||null, gw:u.gw||null, wk:u.wk||{}, pq:u.pq||{}, nk:nkOf(sid,u), nkt:u.nkt||0,
           ach:Object.assign({},u.ach||{}), ttl:u.ttl||'', coopC:Object.assign({},u.coopC||{}),
@@ -15322,8 +15366,25 @@ function meFrom(sid,u){
 function rec(t){ const R=ME.R||(ME.R={}); const r=R[t]||(R[t]={best:0,hist:[]});
   if(!Array.isArray(r.hist)) r.hist=[]; return r; }
 const STAGE_V=2;   /* 연습 스테이지를 3~5개로 줄인 판 — 예전 스테이지 번호로 남은 클리어 기록은 새로 시작해요 */
+/* 단계를 다시 짠 주제 — 예전 판의 클리어 기록을 새 단계로 옮겨요 (11-28)
+   T.mig = {from: 예전 판 번호, map: {새 단계: [예전 단계…]}, same: [내용이 그대로인 새 단계]}
+   · 새 단계는 이어 붙는 예전 단계를 모두 깼으면 '클리어'로 옮겨요(다음 단계가 그대로 열려 있게).
+   · 내용이 그대로인 단계만 최고 시간·등급·첫 100% 기록까지 옮기고, 합쳐지거나 바뀐 단계는 새로 시작해요. */
+function progNorm(t,p){
+  const T=TOPICS[t], V=STAGE_V+((T&&T.sv)||0);
+  if(!p||typeof p!=='object') return {c:[],bt:{},v:V};
+  if(p.v===V) return p;
+  const M=T&&T.mig; if(!M||p.v!==M.from) return {c:[],bt:{},v:V};
+  const oc=arr(p.c), q={c:[],bt:{},v:V,bg:{},nm:{}}, same=M.same||[];
+  Object.keys(M.map).forEach(k=>{ const n=+k, os=M.map[k]||[];
+    if(!os.length||!os.every(o=>oc.includes(o))) return;
+    q.c.push(n);
+    if(same.includes(n)&&os.length===1){ const a='s'+os[0], b='s'+n;
+      if(p.bt&&p.bt[a]!=null) q.bt[b]=p.bt[a]; if(p.bg&&p.bg[a]) q.bg[b]=p.bg[a]; if(p.nm&&p.nm[a]) q.nm[b]=1; } });
+  q.c.sort((a,b)=>a-b); return q;
+}
 function prog(t){ const V=STAGE_V+((TOPICS[t]&&TOPICS[t].sv)||0), P=ME.P||(ME.P={}); let p=P[t]||(P[t]={c:[],bt:{},v:V});
-  if(p.v!==V){ p=P[t]={c:[],bt:{},v:V}; }
+  if(p.v!==V){ p=P[t]=progNorm(t,p); }
   if(!Array.isArray(p.c)) p.c=[]; if(!p.bt||typeof p.bt!=='object') p.bt={}; return p; }
 function wrongOf(t){ const W=ME.W||(ME.W={}); if(!Array.isArray(W[t])) W[t]=[]; return W[t]; }
 function pracDay(){ const d=todayKey();
@@ -15357,7 +15418,8 @@ function mergeFrom(u){
     const key=h=>`${h.d}|${h.n}|${h.ts||''}`, seen=new Set(arr(a.hist).map(key));
     a.hist=arr(a.hist).concat(arr(b.hist).filter(h=>h&&!seen.has(key(h)))).sort((x,y)=>(x.ts||0)-(y.ts||0)).slice(-120);
     a.best=Math.max(a.best||0,b.best||0); });
-  if(u.P&&typeof u.P==='object') Object.keys(u.P).forEach(t=>{ const b=u.P[t]; if(!b) return; const P=ME.P||(ME.P={}), a=P[t];
+  if(u.P&&typeof u.P==='object') Object.keys(u.P).forEach(t=>{ let b=u.P[t]; if(!b) return; const P=ME.P||(ME.P={}); let a=P[t];
+    if(TOPICS[t]){ b=progNorm(t,b); if(a) a=P[t]=progNorm(t,a); }
     if(!a){ P[t]=b; return; } if(a.v!==b.v) return;
     a.c=uniq(a.c,b.c).sort((x,y)=>x-y); a.bt=a.bt||{};
     Object.keys(b.bt||{}).forEach(k=>{ if(!(a.bt[k]<=b.bt[k])) a.bt[k]=b.bt[k]; });
@@ -15566,7 +15628,7 @@ function logout(){
    SS : 계산을 아주 잘하는 친구 · SSS : SS 실력에 운까지 더해져야 닿는 기록(SS × 1.12)
    절대평가 — 학생 기록에 맞추지 않고, 등급별 실력(생각 속도)을 정해 둔 풀이 시간 모의실험으로 정했어요(주제·단계별 생각 시간 + 휴대폰 입력 시간 + 문장은 숫자 위주로 훑어 읽는 시간).
    B 기준에 못 미치면 C 등급이에요(11.25). (11.23 저녁 — 34개 주제 전체를 바뀐 문제로 다시 모의실험, 밤에 개편한 7개 주제 다시 모의실험) 선생님 모드 '등급 기준' 탭에서 학생 기록을 참고로 보고 직접 고칠 수 있어요(config/gcut). */
-const GRADE_CUT={addsub:[28,25,21,17,11], gugu:[54,48,42,33,22], fadd:[16,14,12,10,8], fmul:[21,19,15,12,7], ratio:[18,16,13,10,7], factor:[17,15,13,12,7], power:[28,25,20,14,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[20,18,15,12,8], linf:[18,16,14,11,6], angle:[20,18,14,10,7], simr:[19,17,12,9,5], dadd:[22,20,16,12,8], dmul:[22,20,15,11,7], int:[25,22,18,14,8], expo:[29,26,22,17,12], root:[22,20,17,13,9], trig:[26,23,17,11,8], logx:[21,19,15,11,6], tfn:[15,13,12,9,8], comb:[20,18,14,11,7], div:[29,26,21,16,11], fast:[24,21,17,13,9], mix:[19,17,14,11,7], unit:[26,23,19,15,9], alg:[21,19,15,12,9], ineq:[17,15,13,11,8], sys:[18,16,12,9,6], quad:[19,17,14,12,9], cplx:[21,19,15,12,8], rem:[16,14,11,8,6], seq:[19,17,13,10,7], solid:[22,20,16,12,8], circ:[23,20,16,12,8], disc:[18,16,13,10,6], abs:[21,19,15,11,7], mat:[19,17,13,10,6], fn:[18,16,13,10,6], lim:[20,18,14,11,7], diff:[21,19,15,12,8], integ:[20,18,14,11,7]};
+const GRADE_CUT={addsub:[28,25,21,17,11], gugu:[54,48,42,33,22], fadd:[16,14,12,10,8], fmul:[21,19,15,12,7], ratio:[18,16,13,10,7], factor:[17,15,13,12,7], power:[28,25,20,14,9], pyth:[18,16,13,10,7], lineq:[19,17,14,11,8], boxq:[16,14,12,10,8], pfac:[20,18,15,12,8], linf:[18,16,14,11,6], angle:[20,18,14,10,7], simr:[19,17,12,9,5], dadd:[22,20,16,12,8], dmul:[22,20,15,11,7], int:[25,22,18,14,8], expo:[29,26,22,17,12], root:[22,20,17,13,9], trig:[26,23,17,11,8], logx:[21,19,15,11,6], tfn:[15,13,12,9,8], comb:[20,18,14,11,7], div:[29,26,21,16,11],  mix:[19,17,14,11,7], unit:[26,23,19,15,9], alg:[21,19,15,12,9], ineq:[17,15,13,11,8], sys:[18,16,12,9,6], quad:[19,17,14,12,9], cplx:[21,19,15,12,8], rem:[16,14,11,8,6], seq:[19,17,13,10,7], solid:[22,20,16,12,8], circ:[23,20,16,12,8], disc:[18,16,13,10,6], abs:[21,19,15,11,7], mat:[19,17,13,10,6], fn:[18,16,13,10,6], lim:[20,18,14,11,7], diff:[21,19,15,12,8], integ:[20,18,14,11,7]};
 const GRADE_DEF=JSON.parse(JSON.stringify(GRADE_CUT));
 function applyGcut(o){ Object.keys(GRADE_DEF).forEach(t=>{ const v=o&&o[t], ok=Array.isArray(v)&&v.length===5&&v.every((x,i)=>x>0&&(i===0||x<v[i-1]));
   GRADE_CUT[t].splice(0,5,...(ok?v.map(Number):GRADE_DEF[t])); }); }
@@ -17575,21 +17637,6 @@ const NOTE_PLUS={
       p:'나눗셈은 똑같이 나누는 계산이라 곱셈을 거꾸로 떠올리면 바로 풀려요. 두 자리 ÷ 한 자리는 <b>75 ÷ 5 = (50 + 25) ÷ 5 = 10 + 5 = 15</b>처럼 쪼개면 암산이 쉬워요.'}],
     miss:[{w:'23 ÷ 4 = 몫 4, 나머지 7', r:'몫 5, 나머지 3', y:'나머지는 언제나 나누는 수(4)보다 작아야 해요. 7 안에 4가 한 번 더 들어가요!'}]
   },
-  fast:{
-    why:[{h:'100 보수와 곱셈 짝꿍으로 1초 암산하기', tag:'수 감각 치트키',
-      svg:`<svg viewBox="0 0 360 104" width="360" height="104" aria-label="100 보수와 곱셈 짝꿍">
-        <rect x="14" y="14" width="156" height="74" rx="10" fill="#eef2fe" stroke="#2f5bea"/>
-        <text x="92" y="38" text-anchor="middle" font-size="14" font-weight="900" fill="#2f5bea">100 − 37 = 63</text>
-        <text x="92" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="#111">십의 자리 합 9 (3+6)</text>
-        <text x="92" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#111">일의 자리 합 10 (7+3)</text>
-        <rect x="190" y="14" width="156" height="74" rx="10" fill="#ebfbee" stroke="#12a05c"/>
-        <text x="268" y="38" text-anchor="middle" font-size="14" font-weight="900" fill="#12a05c">25 × 8 = 200</text>
-        <text x="268" y="58" text-anchor="middle" font-size="12" font-weight="700" fill="#111">25 × 4 = 100 짝꿍!</text>
-        <text x="268" y="76" text-anchor="middle" font-size="12" font-weight="700" fill="#111">100 × 2 = 200</text>
-      </svg>`,
-      p:'<b>25×4 = 100</b>, <b>125×8 = 1000</b>, <b>5×2 = 10</b>을 먼저 만들고, <code>99 + 46</code>은 <code>100 + 46 − 1</code>로 바꾸면 세로셈 없이 1초 만에 답이 나와요.'}],
-    miss:[{w:'100 − 37 = 73', r:'63', y:'일의 자리에서 10을 빌려오므로 십의 자리는 10−3이 아니라 9−3 = 6이에요.'}]
-  },
   mix:{
     why:[{h:'왜 덧셈보다 곱셈과 괄호를 먼저 계산할까?', tag:'연산 우선순위 피라미드',
       svg:`<svg viewBox="0 0 360 104" width="360" height="104" aria-label="혼합계산 순서">
@@ -17796,7 +17843,7 @@ const NOTE_PLUS={
         <text x="172" y="36" text-anchor="middle" font-size="13" font-weight="700" fill="#94a3b8">f</text>
         <text x="172" y="64" text-anchor="middle" font-size="13" font-weight="700" fill="#94a3b8">h</text>
         <text x="274" y="38" text-anchor="middle" font-size="13.5" font-weight="900" fill="#111">(1,1) 성분 = ae + bg</text>
-        <text x="274" y="64" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f5bea">행렬식 = ad − bc</text>
+        <text x="274" y="64" text-anchor="middle" font-size="12.5" font-weight="800" fill="#2f5bea">(1,2) 성분 = af + bh</text>
         <text x="274" y="86" text-anchor="middle" font-size="11.5" font-weight="700" fill="#495057">앞 행렬의 행, 뒤 행렬의 열!</text>
       </svg>`,
       p:'행렬의 덧셈·뺄셈은 같은 자리끼리 하지만, 곱셈 <code>AB</code>의 <code>(i, j)</code> 성분은 <b>A의 i행과 B의 j열</b>을 짝지어 곱한 뒤 더해요.'}],
@@ -18202,7 +18249,6 @@ const BOSS_LOOK={
   tfn:   {n:'사인 코사인 용왕',s:'theta',c:'neon',i:['hDemon','fBoss','bxSineWing','fxTrig','nArmor']},
   comb:  {n:'순열 조합 대마왕',s:'fact',c:'holo',i:['bxDiceCrown','fBoss','hdCards','bkPhoenix','bxRuneFrame']},
   div:   {n:'나눗셈 분쇄왕',s:'divide',c:'cherry',i:['hDemon','fBoss','hdSaber','cape','fxAura']},
-  fast:  {n:'번개 암산 마왕',s:'plus',c:'gold',i:['crown','fBoss','wand','bkPhoenix','fxAura']},
   mix:   {n:'괄호 혼돈 군주',s:'equal',c:'night',i:['hDemon','fBoss','nArmor','bkDragon','bxRuneFrame']},
   unit:  {n:'단위 변환 거신',s:'pct',c:'silver',i:['crown','fBoss','ruler','shield','nArmor']},
   alg:   {n:'문자식 그림자왕',s:'minus',c:'neon',i:['wizard','fBoss','wand','bkDragon','fxAura']},
