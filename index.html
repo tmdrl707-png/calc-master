@@ -2460,7 +2460,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.28 13:50';
+const APP_VER='11.28 15:45';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -14177,8 +14177,19 @@ function btRandPool(){
   const L=btAllTopics().filter(t=>(CFG.tl.b||[]).includes(t)&&ok(t));
   return L.length?L:[CUR.topic||'addsub'];
 }
+/* 11-28 선생님 요청
+   · 🎲 랜덤 = 판을 시작할 때 주제 하나를 무작위로 뽑아 그 판은 그 주제로만 (room.rt 에 적어요)
+   · 주제를 여러 개 고르면(room.t='multi', room.ts=[…]) 문제마다 고른 주제 중 하나에서 섞어 내요 */
+if(!TOPICS.multi) TOPICS.multi=Object.assign({},TOPICS.addsub,{k:'multi',n:'여러 주제 섞기',sym:'+',school:'e'});   /* 'mix' 는 자연수의 혼합계산 열쇠라 'multi' */
+TOPIC_SYMH.multi='<span style="font-size:.8em">🧩</span>';
+const btSel=room=>room&&room.t==='multi'?arr(room.ts).filter(t=>TOPICS[t]&&t!=='multi'&&t!=='rand'):room&&room.t&&room.t!=='rand'?[room.t]:[];
+function btMixPool(){ const L=btSel(BT.room); return L.length?L:btRandPool(); }
+const btPlayT=room=>room.t==='rand'?(room.rt&&TOPICS[room.rt]?room.rt:'rand'):room.t;
+function btTName(room){ if(!room) return ''; if(room.t==='multi'){ const L=btSel(room); return L.length>2?`${topicOf(L[0]).n} 외 ${L.length-1}개 섞기`:L.map(t=>topicOf(t).n).join(' + '); }
+  if(room.t==='rand') return room.rt&&TOPICS[room.rt]?'🎲 '+topicOf(room.rt).n:'🎲 랜덤 주제'; return topicOf(room.t).n; }
 function btPickKey(t,prog,used,boost2){
   if(t==='rand') t=pickOne(btRandPool());
+  if(t==='multi') t=pickOne(btMixPool());
   const S=realStagesOf(t), lv=Math.min(S.length,1+Math.floor(Math.max(0,prog)*S.length));
   const st=S[lv-1], U=new Set(used||[]);
   const ok=f=>f&&!U.has(f.key)&&!(f.k==='mul'&&(f.a===1||f.b===1));   /* × 1 처럼 너무 쉬운 것은 빼요 */
@@ -14237,10 +14248,12 @@ function btPaint(){
 function btGuard(id){ if(BT.code&&id!=='s-battle'&&id!=='s-play') btLeave(); }
 
 /* 주제 고르기 — 초등·중등·고등 묶음으로 */
-function btTopicsHTML(cur,allowCur){
-  const rnd=`<div class="btsch"><span>자동</span><div class="chips"><button class="chip${cur==='rand'?' on':''}" data-t="rand">🎲 랜덤</button></div></div>`;
+function btTopicsHTML(cur,allowCur,sel){
+  const S=sel||[cur], isOn=t=>S.includes(t);
+  const rnd=`<div class="btsch"><span>자동</span><div class="chips"><button class="chip${cur==='rand'?' on':''}" data-t="rand">🎲 랜덤</button></div></div>`
+    +(sel?`<div class="btkhelp" style="margin:2px 0 8px">🎲 랜덤은 시작할 때 주제 <b>하나</b>를 뽑아요 · 주제를 <b>여러 개</b> 누르면 고른 주제들이 섞여 나와요${sel.length>1?` (지금 ${sel.length}개)`:''}</div>`:'');
   return rnd+SCHOOLS.filter(sc=>sc.topics.some(topicSeen)).map(sc=>`<div class="btsch"><span>${sc.n}</span><div class="chips">${sc.topics.filter(topicSeen).map(t=>modeOpen(t,'b')||(allowCur&&t===cur)
-    ?`<button class="chip${t===cur?' on':''}" data-t="${t}">${topicOf(t).n}</button>`
+    ?`<button class="chip${isOn(t)?' on':''}" data-t="${t}">${topicOf(t).n}</button>`
     :`<button class="chip chlock" data-lk="${sc.k}" aria-disabled="true">${LOCKI}${topicOf(t).n}</button>`).join('')}</div></div>`).join('');
 }
 /* 잠긴 주제를 누르면 왜 잠겼는지 알려 줘요 */
@@ -14300,7 +14313,7 @@ function btRoomsHTML(L){
   if(L===null) return '<div class="btempty">열린 방을 찾는 중…</div>';
   return L.length?L.map(r=>{ const n=Object.keys(r.p||{}).length, T=topicOf(r.t), full=n>=BT_MAX;
     return `<button class="bsroom${full?' off':''}" data-c="${esc(r.code)}"><span class="tsym sm">${symHTML(T)}</span>
-      <span class="bsri"><b>${esc(T.n)}</b><small>${esc(btKindName(r))} · ${n}명${full?' · 꽉 참':''}</small></span><span class="bsrc">${esc(r.code)}</span></button>`; }).join('')
+      <span class="bsri"><b>${esc(btTName(r))}</b><small>${esc(btKindName(r))} · ${n}명${full?' · 꽉 참':''}</small></span><span class="bsrc">${esc(r.code)}</span></button>`; }).join('')
     :'<div class="btempty">지금 열린 방이 없어요 · 아래 버튼으로 바로 만들어 보세요</div>';
 }
 async function btLoadRooms(){
@@ -14476,8 +14489,8 @@ function btPaintRoom(){
       <div class="btkhelp">${tot?'🤝 <b>팀 총합제</b> · 모두 <b>서로 다른 문제</b>를 각자 풀어요. 팀 친구들이 맞힌 개수를 모두 더해 팀끼리 겨뤄요.'
         :team?'<b>팀전</b> · 모두 <b>같은 문제</b>를 보고 먼저 맞힌 사람이 우리 팀에 1점을 보태요.':'<b>개인전</b> · 모두 <b>같은 문제</b>를 보고 가장 먼저 맞힌 사람이 1점.'}</div>
       ${team?`<div class="btlab">팀 수</div><div class="segs" id="btTn">${[2,3,4].map(k=>`<button class="sg${n===k?' on':''}" data-n="${k}">${k}팀</button>`).join('')}</div>`:''}
-      <div class="btlab">주제</div><div id="btTopics">${btTopicsHTML(room.t,true)}</div>${btLenHTML(kind,btVal(room),team,tot)}`
-    :`<div class="btinfo"><span class="tsym sm">${symHTML(T)}</span><b>${T.n}</b><span>${btLenLabel(room)}</span></div>`}
+      <div class="btlab">주제</div><div id="btTopics">${btTopicsHTML(room.t,true,btSel(room))}</div>${btLenHTML(kind,btVal(room),team,tot)}`
+    :`<div class="btinfo"><span class="tsym sm">${symHTML(T)}</span><b>${esc(btTName(room))}</b><span>${btLenLabel(room)}</span></div>`}
     ${(()=>{ const old=P.filter(p=>p.sid!==ME.sid&&btAvOld(room,p.sid)); return old.length?`<div class="btkhelp" style="background:#fde8e8;color:#9b1c22;margin:0 0 10px"><b>⚠ 예전 화면으로 들어온 친구 ${old.length}명</b> — 그 기기에서 새로고침(앱을 닫았다 다시 열기)해야 모두 같은 문제·같은 속도로 겨룰 수 있어요.</div>`:''; })()}
     <div class="btlab">들어온 친구 ${P.length}명${team&&host?' · 친구를 누르면 다음 팀으로 옮겨요':''}</div>
     ${team&&host?`<div class="btrow" style="margin:0 0 10px;justify-content:flex-start"><button class="btn" id="btShuf">골고루 섞기</button></div>`:''}
@@ -14498,7 +14511,13 @@ function btPaintRoom(){
     if(el('btShuf')) el('btShuf').onclick=()=>{ const ids=P.map(p=>p.sid).sort(()=>Math.random()-.5), tg={};
       ids.forEach((sid,i)=>tg[sid]=i%n); dbUpdate(R,{tg}); };
     if(team) el('btBody').querySelectorAll('.btp.tap').forEach(b=>b.onclick=()=>{ const sid=b.dataset.sid; dbSet(`${R}/tg/${sid}`,(TM[sid]+1)%n); });
-    el('btTopics').querySelectorAll('.chip[data-t]').forEach(b=>b.onclick=()=>{ if(b.dataset.t!==room.t) dbUpdate(R,{t:b.dataset.t}); });
+    el('btTopics').querySelectorAll('.chip[data-t]').forEach(b=>b.onclick=()=>{ const t=b.dataset.t;
+      if(t==='rand'){ BT.selL=null; if(room.t!=='rand') dbUpdate(R,{t:'rand',ts:null,rt:null}); return; }
+      let L=Date.now()-(BT.selAt||0)<2000&&BT.selL?BT.selL.slice():btSel(room);   /* 빠르게 여러 번 눌러도 앞의 선택이 살아 있게 */
+      L=L.includes(t)?L.filter(x=>x!==t):L.concat(t);
+      if(!L.length) return toast('주제를 하나 이상 골라 주세요');
+      BT.selL=L; BT.selAt=Date.now(); b.classList.toggle('on',L.includes(t));
+      dbUpdate(R,L.length===1?{t:L[0],ts:null,rt:null}:{t:'multi',ts:L,rt:null}); });
     el('btKinds').querySelectorAll('.chip').forEach(b=>b.onclick=()=>dbUpdate(R,{kind:b.dataset.k}));
     btWheelWire(btVal(room),v=>{ if(BT.room&&v!==btVal(BT.room)) dbUpdate(R,{[{t:'sec',n:'nq',s:'gap'}[kind]]:v}); });
   }
@@ -14507,9 +14526,10 @@ async function btStart(){
   const room=BT.room; if(!room||room.host!==ME.sid) return;
   if(Object.keys(room.p||{}).length<2) return toast('친구가 한 명 이상 들어와야 시작할 수 있어요');
   el('btGo').disabled=true;
-  const at=serverNow()+4200, k=btPickKey(room.t,0,[]);
+  const rt=room.t==='rand'?pickOne(btRandPool()):null;   /* 🎲 이번 판의 주제 하나 */
+  const at=serverNow()+4200, k=btPickKey(rt||room.t,0,[]);
   if(btTeamOn(room)&&new Set(Object.values(btTeams(room))).size<2) return toast('두 팀 이상에 친구가 있어야 시작할 수 있어요');
-  const upd={st:'run', at, rd:(room.rd||0)+1, cur:{i:0,at,k,u:[k]}, w:null, x:null, a:null, ox:null, fin:null};
+  const upd={st:'run', at, rd:(room.rd||0)+1, cur:{i:0,at,k,u:[k]}, w:null, x:null, a:null, ox:null, fin:null, rt};
   if(btTeamOn(room)) upd.tg=btTeams(room);
   Object.keys(room.p||{}).forEach(s=>{ upd[`p/${s}/rd`]=upd.rd; upd[`p/${s}/done`]=false; upd[`p/${s}/c`]=0; });   /* 지금 방에 있는 사람이 이번 판 선수 */
   await dbUpdate('battles/'+room.code,upd);
@@ -14521,7 +14541,7 @@ function btStartPlay(room){
   BT.playedRd=room.rd; BT.view='play'; BT.my=null;
   stopTimer();
   const kind=btKind(room), v=btVal(room);
-  G={mode:'battle', t:room.t, code:room.code, rd:room.rd, at:room.at, kind, v, len:btLenLabel(room),
+  G={mode:'battle', t:btPlayT(room), code:room.code, rd:room.rd, at:room.at, kind, v, len:btLenLabel(room),
      sec:kind==='t'?v:60, endAt:kind==='t'?room.at+v*1000:btTotal(room)?room.at+(kind==='s'?300:600)*1000:Infinity,
      qi:-1, shown:-1, score:0, ans:0, combo:0, best:0, solved:0, right:0,
      team:btTeamOn(room), tot:btTotal(room), mine:0, used:[], nextAt:0, lastC:{}, ev:[], qAt:0, oxSent:{},
@@ -14533,7 +14553,7 @@ function btStartPlay(room){
   paintBLive();
   G.tId=setInterval(G.tot?btTotTick:btTick,80);
 }
-const btCdHTML=s=>`<div class="btcd"><span>${s}</span><p>${topicOf(G.t).n} · ${G.len}</p>
+const btCdHTML=s=>`<div class="btcd"><span>${s}</span><p>${BT.room&&BT.room.t==='rand'?'🎲 이번 주제는 ':''}${BT.room?esc(btTName(BT.room)).replace('🎲 ',''):topicOf(G.t).n} · ${G.len}</p>
   <small>가장 먼저 맞히면 1개! 틀리면 1초 쉬었다가 다시 쓸 수 있어요.</small></div>`;
 function btQLabel(){ if(G.tot) return `🤝 나만의 ${G.qi+1}번째 문제 · 맞히면 우리 팀 +1`; return `${G.qi+1}번째 문제 · 모두 같은 문제 · 먼저 맞히면 ${G.team?'우리 팀 ':''}+1${G.kind==='s'?` · ${G.team?'1등 팀과 ':''}${G.v}개 차이 나면 탈락`:''}`; }
 /* 다음 문제로 — 여러 명이 동시에 눌러도 한 번만 넘어가게, 넘기는 사람이 다음 문항을 뽑아요 */
@@ -14571,7 +14591,7 @@ function btTick(){
     if(G.cdS!==s){ G.cdS=s; el('card').innerHTML=btCdHTML(s); } return; }
   if(cur.i!==G.shown&&now>=cur.at){                            /* 새 문제 */
     G.shown=cur.i; G.qi=cur.i; G.rev=-1; G.shownSrv=serverNow();   /* 내 화면에 문제가 보인 순간 (서버 시계) */
-    const f=factFromKey(cur.k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t,cur.i+1,[]);
+    const f=factFromKey(cur.k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t==='multi'?pickOne(btMixPool()):G.t,cur.i+1,[]);
     askQ(f); paintBLive();
     if(G.out){ G.phase='out'; G.locked=true; el('keypad').style.display='none';
       const m=el('qmsg'); if(m){ m.className='qmsg bad'; m.innerHTML=btTeamOn(room)?'우리 팀이 탈락했어요 — 끝까지 친구들을 응원해요':'탈락했어요 — 끝까지 친구들을 응원해요'; } }
@@ -14599,7 +14619,7 @@ function btTotNext(){
   const now=serverNow(), frac=G.kind==='t'?(now-G.at)/Math.max(1,G.endAt-G.at):Math.min(1,G.qi/40);
   const k=btPickKey(G.t,frac,G.used,(G.btSpam||0)>0); if(G.btSpam>0) G.btSpam--;
   G.used=G.used.concat(k).slice(-60); G.shown=G.qi+1; G.qi=G.shown; G.shownSrv=now; G.qAt=Date.now();
-  askQ(factFromKey(k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t,G.qi+1,[]));
+  askQ(factFromKey(k)||realPick(G.t==='rand'?pickOne(btRandPool()):G.t==='multi'?pickOne(btMixPool()):G.t,G.qi+1,[]));
   G.locked=false; paintBLive();
 }
 function btTotTick(){
@@ -16079,7 +16099,7 @@ let KP_AT=-1e9;
 })();
 const kpMode=t=>{ const T=topicOf(t); return T.neg?'neg':T.dec?'dec':false; };
 /* 문항마다 숫자판 — 랜덤 대전은 여러 주제가 섞이므로 언제나 − 단추를 (소수 답이면 소수점 단추) */
-const kpQ=f=>G&&G.t==='rand'?(Number.isInteger(+f.ans)?'neg':'dec'):kpMode(G.t);
+const kpQ=f=>G&&(G.t==='rand'||G.t==='multi')?(Number.isInteger(+f.ans)?'neg':'dec'):kpMode(G.t);
 function buildKeypad(mode){
   mode=mode||false; if(KP_NEG===mode) return; KP_NEG=mode; el('keypad').classList.remove('pickpad');
   const neg=!!mode, sp=mode==='dec'?'dot':'neg';
