@@ -2460,7 +2460,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.28 11:30';
+const APP_VER='11.28 13:50';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -14427,6 +14427,10 @@ function btOnRoom(room){
     return;
   }
   BT.room=room; BT.last=room;
+  /* 앱 버전 맞추기 (11-28) — 예전 화면을 열어 둔 기기가 섞이면 문제가 서로 달라지고 판정이 늦어져요.
+     내 버전을 방에 적어 두고, 더 새 버전이 방에 있으면 새로고침을 권해요. */
+  if(((room.p[ME.sid]||{}).av)!==APP_VER&&BT.avSent!==room.code+APP_VER){ BT.avSent=room.code+APP_VER; dbUpdate(`battles/${room.code}/p/${ME.sid}`,{av:APP_VER}); }
+  btVerCheck(room);
   if(room.st==='wait'&&!room.p[room.host]){
     const first=Object.keys(room.p).sort((x,y)=>((room.p[x]||{}).j||0)-((room.p[y]||{}).j||0))[0];
     if(first===ME.sid) dbUpdate('battles/'+room.code,{host:ME.sid});
@@ -14439,13 +14443,23 @@ function btOnRoom(room){
 }
 
 /* ═══ 대기실 ═══ */
+const btAvOld=(room,sid)=>{ const v=((room.p||{})[sid]||{}).av; return !v||v<APP_VER; };
+function btVerCheck(room){
+  const newest=Object.values(room.p||{}).map(q=>(q&&q.av)||'').sort().pop()||'';
+  if(newest>APP_VER&&!el('btVerBar')){
+    const d=document.createElement('div'); d.id='btVerBar';
+    d.style.cssText='position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:9999;background:#e5484d;color:#fff;font-weight:800;padding:10px 14px;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);display:flex;gap:10px;align-items:center;max-width:94vw;font-size:14px';
+    d.innerHTML='이 기기는 예전 화면이에요 — 새로고침해야 친구들과 같은 문제가 나와요 <button style="background:#fff;color:#e5484d;border:0;border-radius:10px;padding:6px 10px;font-weight:900">새로고침</button>';
+    d.querySelector('button').onclick=()=>location.reload(); document.body.appendChild(d);
+  }
+}
 function btPaintRoom(){
   const room=BT.room;
   if(!room){ el('btBody').innerHTML=`<div class="bthead"><span class="bti">${PEOPLE}</span><div><h2>방에 들어가는 중…</h2></div></div>`; return; }
   const host=room.host===ME.sid, T=topicOf(room.t), kind=btKind(room), team=btTeamOn(room), tot=btTotal(room), n=btTN(room);
   const P=btPlayers(room).sort((a,b)=>(b.host-a.host)||a.j-b.j), TM=team?btTeams(room):{};
   const card=p=>`<div class="btp${p.sid===ME.sid?' me':''}${host&&team?' tap':''}" data-sid="${esc(p.sid)}"${team?` style="--tc:${BT_TEAMS[TM[p.sid]].c}"`:''}>
-      <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${whoHTML(p.sid,p)}</b>${p.host?'<em>방장</em>':p.sid===ME.sid?'<em class="me">나</em>':''}${p.away&&p.sid!==ME.sid?'<small class="btaway">잠깐 자리 비움</small>':''}</div>`;
+      <span class="av">${avatarSVG(p.ch,{tight:true})}</span><b>${whoHTML(p.sid,p)}</b>${p.host?'<em>방장</em>':p.sid===ME.sid?'<em class="me">나</em>':''}${p.sid!==ME.sid&&btAvOld(room,p.sid)?'<small class="btaway" style="background:#fde8e8;color:#c8323a">예전 화면 · 새로고침</small>':''}${p.away&&p.sid!==ME.sid?'<small class="btaway">잠깐 자리 비움</small>':''}</div>`;
   const teamsHTML=team?`<div class="btteams">${range(0,n-1).map(i=>{ const L=P.filter(p=>TM[p.sid]===i), t=BT_TEAMS[i];
       return `<div class="btteam" style="--tc:${t.c};--ts:${t.s}"><h4><i></i>${t.n}<small>${L.length}명</small></h4>
         <div class="btplayers">${L.map(card).join('')||'<div class="btempty">아직 없어요</div>'}</div></div>`; }).join('')}</div>`
@@ -14464,6 +14478,7 @@ function btPaintRoom(){
       ${team?`<div class="btlab">팀 수</div><div class="segs" id="btTn">${[2,3,4].map(k=>`<button class="sg${n===k?' on':''}" data-n="${k}">${k}팀</button>`).join('')}</div>`:''}
       <div class="btlab">주제</div><div id="btTopics">${btTopicsHTML(room.t,true)}</div>${btLenHTML(kind,btVal(room),team,tot)}`
     :`<div class="btinfo"><span class="tsym sm">${symHTML(T)}</span><b>${T.n}</b><span>${btLenLabel(room)}</span></div>`}
+    ${(()=>{ const old=P.filter(p=>p.sid!==ME.sid&&btAvOld(room,p.sid)); return old.length?`<div class="btkhelp" style="background:#fde8e8;color:#9b1c22;margin:0 0 10px"><b>⚠ 예전 화면으로 들어온 친구 ${old.length}명</b> — 그 기기에서 새로고침(앱을 닫았다 다시 열기)해야 모두 같은 문제·같은 속도로 겨룰 수 있어요.</div>`:''; })()}
     <div class="btlab">들어온 친구 ${P.length}명${team&&host?' · 친구를 누르면 다음 팀으로 옮겨요':''}</div>
     ${team&&host?`<div class="btrow" style="margin:0 0 10px;justify-content:flex-start"><button class="btn" id="btShuf">골고루 섞기</button></div>`:''}
     ${teamsHTML}
