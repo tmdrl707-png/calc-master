@@ -798,6 +798,15 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
 .keypad.neg .kb.zero{grid-column:span 3}
 /* 확인 단추가 두 칸 높이가 되도록 — 뒤쪽의 고정 높이(.kb{height:…})보다 먼저 이기게 */
 .keypad.neg .kb.okk,#s-play .keypad.neg .kb.okk{height:auto!important;align-self:stretch}
+/* 화면 높이에 맞추기(fitPlay) — 가로 태블릿·대전 막대가 있을 때 숫자판이 화면 밖으로 나가지 않게 */
+#s-play .keypad.fit{gap:8px;margin-top:8px}
+#s-play .keypad.fit .kb{height:var(--kbh)!important}
+#s-play .keypad.fit.neg .kb.okk{height:auto!important}
+#s-play.tight .tt .tt-mates,#s-play.tight .tt .tt-feed,#s-play.tight .tt .tt-head{display:none!important}
+#s-play.tight .tt{padding-top:6px;padding-bottom:6px}
+#s-play.tight .tt .tt-msg{margin:0 0 4px}
+#s-play.tight .hud{margin-bottom:4px}
+#s-play.tight .timerbar{margin-bottom:6px}
 .kb.negk{font-size:34px;color:var(--blue);background:#fff;border:1px solid var(--line)}
 .eq.eqs{font-size:52px;gap:9px}
 .eq.eqxs{font-size:42px;gap:7px;letter-spacing:-1.5px}
@@ -1059,6 +1068,7 @@ kbd{border:1px solid var(--line);border-bottom-width:2px}
   #s-play .hud .pill b{font-size:15px}
   #s-play #hMe{display:none!important}
   #s-play #hLv{min-width:0;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
+  #s-play #hAcc{min-width:0;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
   #s-play .hud .spacer{flex:1 0 0}
   #s-play .hud .btn{padding:6px 10px;font-size:12.5px;white-space:nowrap;flex:none;min-height:34px}
   #s-play .timerbar{margin-bottom:8px}
@@ -2450,7 +2460,7 @@ body{word-break:keep-all;overflow-wrap:break-word}
 <div class="toast" id="toast"></div>
 
 <script>
-const APP_VER='11.28 02:10';
+const APP_VER='11.28 09:55';
 /* ═══════════════════════════════════════════════════════════════════
    Firebase 설정  —  콘솔의 웹 앱 설정을 그대로 붙여 넣으세요.
 
@@ -14727,7 +14737,8 @@ function paintBTot(P){
   feed.innerHTML=G.ev.slice(0,3).map((e,k)=>{ const g=BT_TEAMS[e.t]||{}; return `<span class="tt-ev${k===0&&Date.now()-e.at<1200?' new':''}" style="--tc:${g.c}"><i></i>${esc(whoN(e.sid))} <b>+${e.d}</b>${e.t===myT&&e.sid!==ME.sid?' · 고마워!':''}</span>`; }).join('')||'<span class="tt-ev idle">팀 친구가 맞히면 여기에 바로 떠요</span>';
   G.teamSum=mine.sum; G.tRank=Math.max(1,TS.findIndex(g=>g.i===myT)+1); G.nT=TS.length;
 }
-function paintBLive(){
+function paintBLive(){ paintBLive0(); fitPlayIfBar(); }
+function paintBLive0(){
   const box=el('bLive'); if(!box) return;
   if(!G||G.mode!=='battle'){ box.style.display='none'; box.innerHTML=''; box.dataset.sig=''; const sb=el('bTot'); if(sb) sb.style.display='none'; return; }
   const P=btLiveP(); paintBTot(P);
@@ -15871,7 +15882,7 @@ function updHUD(){
     el('hAcc').textContent=`맞힌 문항 ${G.score}개`;
   }else if(G.mode==='battle'){
     el('hLv').textContent=`${T.n} · 친구 대전`;
-    el('hAcc').textContent=G.team?`나 ${G.score}개 · 우리 팀 ${G.teamSum==null?G.score:G.teamSum}개 · ${G.tRank||1}위`:`${G.score}개${G.nP>1?` · ${G.nP}명 중 ${G.rank}위`:''}`;
+    el('hAcc').textContent=G.team?(window.innerWidth<=520?`나 ${G.score} · 팀 ${G.teamSum==null?G.score:G.teamSum} · ${G.tRank||1}위`:`나 ${G.score}개 · 우리 팀 ${G.teamSum==null?G.score:G.teamSum}개 · ${G.tRank||1}위`):`${G.score}개${G.nP>1?` · ${G.nP}명 중 ${G.rank}위`:''}`;
   }else if(G.mode==='boss'){
     el('hLv').textContent=`${T.n} · 반 보스전`;
     el('hAcc').textContent=`내 기여 ${G.score}개`;
@@ -15934,7 +15945,7 @@ function askQ(f){
       <div class="eq${eqSize(f)}" id="eq" aria-label="답을 넣는 식">${eqHTML(f,'','')}</div>
       <div class="qmsg" id="qmsg" role="status" aria-live="polite"></div>
     </div>`;
-  fitEq(); G.qStart=performance.now(); updHUD(); srSay('문제. '+eqSpeak());
+  fitEq(); G.qStart=performance.now(); updHUD(); srSay('문제. '+eqSpeak()); fitPlaySoon();
 }
 /* 휴대폰에서 식이 화면보다 넓으면 글씨를 한 단계씩 줄여 한 줄로 */
 /* 식이 화면보다 길면 글자를 한 단계씩 줄여요.
@@ -16005,6 +16016,39 @@ function buildKeypad(mode){
     if(e.button>0) return; e.preventDefault(); KP_AT=performance.now(); press(b.dataset.k);
     b.classList.add('down'); setTimeout(()=>b.classList.remove('down'),110); }));
 }
+/* ═══ 화면 높이에 맞추기 (11-28) ═══
+   가로로 놓은 태블릿·노트북에서 대전 막대나 팀 레이스 판이 위에 붙으면 숫자판 아래쪽(− · 0 · 확인)이
+   화면 밖으로 밀려나 누를 수 없었어요. 숫자판 맨 아래가 화면 안에 들어올 때까지
+   ① 문제 칸 높이 → ② 숫자 단추 높이 → ③ 팀 레이스 판의 덧붙은 줄 순서로 줄여요. */
+let FP_RAF=0, FP_SIG='';
+function fitPlay(){
+  FP_RAF=0;
+  const S=el('s-play'), card=el('card'), kp=el('keypad');
+  if(!S||!S.classList.contains('on')||!card||!kp||kp.style.display==='none'||!kp.children.length) return;
+  card.style.minHeight=''; kp.classList.remove('fit'); kp.style.removeProperty('--kbh'); S.classList.remove('tight');
+  const H=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
+  const over=()=>kp.getBoundingClientRect().bottom+(window.scrollY||0)+10-H;
+  let o=over(); if(o<=0) return;
+  const ch=card.getBoundingClientRect().height;
+  card.style.minHeight=Math.max(96,Math.round(ch-o))+'px';
+  o=over(); if(o<=0) return;
+  const keys=[...kp.querySelectorAll('.kb')], rows=new Set(keys.map(b=>Math.round(b.offsetTop))).size||4;
+  const kh=keys.length?keys[0].getBoundingClientRect().height:66;
+  const setK=()=>{ kp.classList.remove('fit'); const d=over(); if(d<=0) return;
+    kp.style.setProperty('--kbh',Math.max(42,Math.floor(kh-d/rows-2))+'px'); kp.classList.add('fit'); };
+  setK(); if(over()<=0&&(!kp.classList.contains('fit')||parseInt(kp.style.getPropertyValue('--kbh'))>=52)) return;
+  /* 단추가 너무 작아지면 팀 레이스 판의 덧붙은 줄(친구 칩·소식)을 접고 단추를 다시 키워요 */
+  S.classList.add('tight'); setK();
+}
+const fitPlaySoon=()=>{ if(!FP_RAF) FP_RAF=requestAnimationFrame(fitPlay); };
+/* 대전 막대는 자주 다시 그려지니, 높이가 바뀐 때만 다시 맞춰요 */
+function fitPlayIfBar(){
+  const a=el('bLive'), b=el('bTot'), c=el('bsHud'), sig=[a,b,c].map(x=>x&&x.style.display!=='none'?x.offsetHeight:0).join(',');
+  if(sig!==FP_SIG){ FP_SIG=sig; fitPlaySoon(); }
+}
+window.addEventListener('resize',fitPlaySoon);
+window.addEventListener('orientationchange',()=>setTimeout(fitPlay,250));
+if(window.visualViewport) window.visualViewport.addEventListener('resize',fitPlaySoon);
 function press(k){
   if(!G||G.over||G.frozen) return;
   if(G.phase==='hint'){ if(k==='ok'&&G.onNext&&performance.now()-(G.hintAt||0)>300) G.onNext(); return; }
@@ -18625,7 +18669,8 @@ function bossStTick(){
   if(now<G.hurtUntil){ st.className='bsst hurt'; st.innerHTML='🩹 부상 · 대미지 ½'; return; }
   st.className='bsst'; st.innerHTML='';
 }
-function paintBossHud(r){
+function paintBossHud(r){ paintBossHud0(r); fitPlayIfBar(); }
+function paintBossHud0(r){
   const box=el('bsHud'); if(!box||!r) return;
   const sum=bossSum(r), rem=Math.max(0,r.target-sum), pct=Math.max(0,Math.round(rem/Math.max(1,r.target)*100));
   box.style.display='';
